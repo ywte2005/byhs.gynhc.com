@@ -1,0 +1,155 @@
+<template>
+  <cl-page class="bg-gray-100">
+    <!-- Logo 区域 -->
+    <view class="flex flex-col items-center justify-center pt-15 pb-8">
+      <view class="w-18 h-18 bg-blue-600 rounded-lg flex items-center justify-center mb-3">
+        <text class="text-white text-2xl">⚡</text>
+      </view>
+      <text class="text-2xl font-bold text-gray-900">旺铺集</text>
+    </view>
+
+    <!-- 表单区域 -->
+    <view class="px-8 pb-8">
+      <!-- 手机号输入 -->
+      <view class="mb-4">
+        <text class="text-sm font-medium text-gray-900 block mb-2">手机号</text>
+        <input
+          v-model="form.phone"
+          type="text"
+          placeholder="请输入手机号"
+          class="w-full h-12 bg-gray-200 rounded-lg px-4 text-base"
+        />
+      </view>
+
+      <!-- 密码输入 -->
+      <view class="mb-6">
+        <text class="text-sm font-medium text-gray-900 block mb-2">密码</text>
+        <input
+          v-model="form.password"
+          type="password"
+          placeholder="请输入密码"
+          class="w-full h-12 bg-gray-200 rounded-lg px-4 text-base"
+        />
+      </view>
+
+      <!-- 协议勾选 -->
+      <view class="flex items-center mb-6">
+        <view
+          class="w-4.5 h-4.5 border border-gray-300 rounded mr-2"
+          :class="{ 'bg-blue-600 border-blue-600': form.agree }"
+          @tap="form.agree = !form.agree"
+        />
+        <text class="text-xs text-gray-600">我已阅读并同意《用户协议》和《隐私政策》</text>
+      </view>
+
+      <!-- 登录按钮 -->
+      <button
+        class="w-full h-12 bg-blue-600 text-white rounded-lg font-semibold mb-4"
+        :disabled="loading"
+        @tap="handleLogin"
+      >
+        <text v-if="!loading">登录</text>
+        <text v-else>登录中...</text>
+      </button>
+
+      <!-- 分割线 -->
+      <view class="flex items-center justify-center mb-4">
+        <view class="flex-1 h-px bg-gray-300" />
+        <text class="text-xs text-gray-500 mx-4">其他登录方式</text>
+        <view class="flex-1 h-px bg-gray-300" />
+      </view>
+
+      <!-- 微信登录 -->
+      <button
+        class="w-full h-12 border border-gray-300 rounded-lg flex items-center justify-center"
+        @tap="handleWechatLogin"
+      >
+        <text class="text-sm text-gray-900">微信快捷登录</text>
+      </button>
+    </view>
+
+    <!-- 底部链接 -->
+    <view class="flex justify-center gap-4 pb-8">
+      <text class="text-sm text-blue-600 cursor-pointer" @tap="goToRegister">注册账号</text>
+      <text class="text-sm text-gray-400">|</text>
+      <text class="text-sm text-blue-600 cursor-pointer" @tap="goToForgot">忘记密码</text>
+    </view>
+  </cl-page>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import { login, wechatLogin } from '@/services/auth'
+
+type LoginForm = {
+  phone: string
+  password: string
+  agree: boolean
+}
+
+const form = ref<LoginForm>({
+  phone: '',
+  password: '',
+  agree: false
+})
+
+const loading = ref(false)
+
+async function handleLogin(): Promise<void> {
+  if (!form.value.phone || !form.value.password) {
+    uni.showToast({ title: '请填写完整信息', icon: 'none' })
+    return
+  }
+
+  if (!form.value.agree) {
+    uni.showToast({ title: '请同意用户协议', icon: 'none' })
+    return
+  }
+
+  loading.value = true
+  try {
+    const res = await login(form.value.phone, form.value.password)
+    uni.setStorageSync('token', res.data.token)
+    uni.setStorageSync('user', JSON.stringify(res.data.user))
+    uni.navigateTo({ url: '/pages/index/index' })
+  } catch (err: any) {
+    uni.showToast({ title: err.message, icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+async function handleWechatLogin(): Promise<void> {
+  loading.value = true
+  try {
+    // 获取微信登录授权
+    uni.login({
+      provider: 'weixin',
+      success: async (res: any) => {
+        const loginRes = await wechatLogin(res.code)
+        uni.setStorageSync('token', loginRes.data.token)
+        uni.setStorageSync('user', JSON.stringify(loginRes.data.user))
+        uni.navigateTo({ url: '/pages/index/index' })
+      },
+      fail: () => {
+        uni.showToast({ title: '微信登录失败', icon: 'none' })
+      }
+    })
+  } catch (err: any) {
+    uni.showToast({ title: err.message, icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
+function goToRegister(): void {
+  uni.navigateTo({ url: '/pages/auth/register' })
+}
+
+function goToForgot(): void {
+  uni.navigateTo({ url: '/pages/auth/forgot' })
+}
+</script>
+
+<style scoped>
+</style>

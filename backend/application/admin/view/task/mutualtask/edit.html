@@ -1,0 +1,86 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('User_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-user_id" data-rule="required" data-source="user/user/index" data-field="nickname" class="form-control selectpage" name="row[user_id]" type="text" value="{$row.user_id|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Task_no')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-task_no" data-rule="required" class="form-control" name="row[task_no]" type="text" value="{$row.task_no|htmlentities}" readonly>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Total_amount')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-total_amount" data-rule="required" class="form-control" step="0.01" name="row[total_amount]" type="number" value="{$row.total_amount|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Deposit_amount')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-deposit_amount" data-rule="required" class="form-control" step="0.01" name="row[deposit_amount]" type="number" value="{$row.deposit_amount|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['pending'=>__('Status pending'), 'approved'=>__('Status approved'), 'running'=>__('Status running'), 'paused'=>__('Status paused'), 'completed'=>__('Status completed'), 'cancelled'=>__('Status cancelled'), 'rejected'=>__('Status rejected')], $row.status)}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Receipt_type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[receipt_type]', ['entry'=>__('Entry_qrcode'), 'collection'=>__('Collection_qrcode')], $row.receipt_type)}
+        </div>
+    </div>
+    <div class="form-group" data-favisible="receipt_type=entry">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Entry_qrcode')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-entry_qrcode" class="form-control" size="50" name="row[entry_qrcode]" type="text" value="{$row.entry_qrcode|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-entry_qrcode" class="btn btn-danger faupload" data-input-id="c-entry_qrcode" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-entry_qrcode"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="fachoose-entry_qrcode" class="btn btn-primary fachoose" data-input-id="c-entry_qrcode" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-entry_qrcode"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-entry_qrcode"></ul>
+        </div>
+    </div>
+    <div class="form-group" data-favisible="receipt_type=collection">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Collection_qrcode')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-collection_qrcode" class="form-control" size="50" name="row[collection_qrcode]" type="text" value="{$row.collection_qrcode|htmlentities}">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-collection_qrcode" class="btn btn-danger faupload" data-input-id="c-collection_qrcode" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp,image/webp" data-multiple="false" data-preview-id="p-collection_qrcode"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="fachoose-collection_qrcode" class="btn btn-primary fachoose" data-input-id="c-collection_qrcode" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-collection_qrcode"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-collection_qrcode"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Content')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <textarea id="c-content" class="form-control editor" rows="5" name="row[content]" cols="50">{$row.content|htmlentities}</textarea>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Remark')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-remark" class="form-control" name="row[remark]" type="text" value="{$row.remark|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

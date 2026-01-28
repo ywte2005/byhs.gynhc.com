@@ -1,0 +1,101 @@
+<style>
+.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.status-pending { background: #FFF3E0; color: #E65100; }
+.status-approved { background: #E8F5E9; color: #2E7D32; }
+.status-rejected { background: #FFEBEE; color: #C62828; }
+.status-disabled { background: #ECEFF1; color: #546E7A; }
+.tab-stat { display: inline-block; background: #f44336; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+.merchant-detail { padding: 20px; }
+.merchant-detail .info-row { display: flex; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.merchant-detail .info-label { width: 100px; color: #666; }
+.merchant-detail .info-value { flex: 1; color: #333; font-weight: 500; }
+.merchant-detail .id-card-images { display: flex; gap: 15px; margin-top: 10px; }
+.merchant-detail .id-card-images img { max-width: 200px; border-radius: 8px; border: 1px solid #ddd; }
+</style>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>商户管理</em> - 审核商户入驻申请，管理商户信息</div>
+        <ul class="nav nav-tabs" data-field="status">
+            <li class="active"><a href="#t-all" data-value="" data-toggle="tab">全部</a></li>
+            <li><a href="#t-pending" data-value="pending" data-toggle="tab">待审核 <span class="tab-stat" id="pending-count">0</span></a></li>
+            <li><a href="#t-approved" data-value="approved" data-toggle="tab">已通过</a></li>
+            <li><a href="#t-rejected" data-value="rejected" data-toggle="tab">已拒绝</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        <a href="javascript:;" class="btn btn-primary btn-refresh" title="刷新"><i class="fa fa-refresh"></i></a>
+                        <a href="javascript:;" class="btn btn-success btn-add {:$auth->check('merchant/merchant/add')?'':'hide'}" title="添加"><i class="fa fa-plus"></i> 添加</a>
+                        <a href="javascript:;" class="btn btn-success btn-multi-approve {:$auth->check('merchant/merchant/approve')?'':'hide'}" title="批量通过"><i class="fa fa-check"></i> 批量通过</a>
+                        <a href="javascript:;" class="btn btn-danger btn-multi-reject {:$auth->check('merchant/merchant/reject')?'':'hide'}" title="批量拒绝"><i class="fa fa-times"></i> 批量拒绝</a>
+                        <div class="dropdown btn-group" style="margin-left:10px;">
+                            <a class="btn btn-default dropdown-toggle btn-command" data-toggle="dropdown"><i class="fa fa-download"></i> 导出</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="btn-export" data-type="all">导出全部</a></li>
+                                <li><a class="btn-export" data-type="selected">导出选中</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="{:$auth->check('merchant/merchant/edit')}"
+                           data-operate-del="{:$auth->check('merchant/merchant/del')}"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 商户详情弹窗 -->
+<div class="modal fade" id="merchantDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-building"></i> 商户详情</h4>
+            </div>
+            <div class="modal-body merchant-detail" id="merchantDetailContent">
+                <!-- 内容动态加载 -->
+            </div>
+            <div class="modal-footer" id="merchantDetailFooter">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 拒绝原因弹窗 -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-times-circle text-danger"></i> 拒绝商户申请</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>拒绝原因 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="rejectReason" rows="4" placeholder="请输入拒绝原因，将通知商户"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>快捷原因：</label>
+                    <div class="quick-reasons">
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">资料不完整</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">身份证照片模糊</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">营业执照不清晰</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">信息与证件不符</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmReject"><i class="fa fa-times"></i> 确认拒绝</button>
+            </div>
+        </div>
+    </div>
+</div>

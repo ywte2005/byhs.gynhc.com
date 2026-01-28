@@ -1,0 +1,52 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('User_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-user_id" data-rule="required" data-source="user/user/index" data-field="nickname" class="form-control selectpage" name="row[user_id]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Source_user_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-source_user_id" data-rule="required" data-source="user/user/index" data-field="nickname" class="form-control selectpage" name="row[source_user_id]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Scene')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[scene]', $sceneList, null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Reward_type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[reward_type]', $rewardTypeList, null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Base_amount')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-base_amount" data-rule="required" class="form-control" step="0.01" name="row[base_amount]" type="number" value="0.00">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Amount')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-amount" data-rule="required" class="form-control" step="0.01" name="row[amount]" type="number" value="0.00">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['pending'=>__('Status pending'), 'settled'=>__('Status settled'), 'cancelled'=>__('Status cancelled')], 'pending')}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

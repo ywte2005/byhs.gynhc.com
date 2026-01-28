@@ -1,0 +1,138 @@
+<style>
+    /* 基础布局优化 */
+    .panel-heading { position: relative; padding: 0 !important; border-bottom: none; background: #fff; }
+    .tab-content { padding: 25px; background: #fff; min-height: 400px; }
+
+    /* 详情信息表格标准化 - 极致对齐 */
+    .info-table { width: 100%; border: 1px solid #f0f0f0; border-radius: 4px; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; table-layout: fixed; }
+    .info-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; line-height: 1.5; vertical-align: middle; }
+    .info-table tr:last-child td { border-bottom: none; }
+    .info-table .label-col { width: 130px; background: #fafafa; color: #8c8c8c; font-weight: 500; border-right: 1px solid #f0f0f0; text-align: right; }
+    .info-table .content-col { color: #262626; word-break: break-all; padding-left: 20px; }
+    
+    /* 标题与装饰 */
+    .section-header { display: flex; align-items: center; margin-bottom: 16px; margin-top: 10px; }
+    .section-header i { color: #1890ff; margin-right: 8px; font-size: 16px; }
+    .section-header span { font-size: 16px; font-weight: 600; color: #262626; }
+
+    /* 时间轴 Timeline */
+    .timeline-container { padding: 20px 0 20px 20px; }
+    .timeline { position: relative; padding-left: 30px; list-style: none; }
+    .timeline::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #f0f0f0; }
+    .timeline-item { position: relative; margin-bottom: 30px; }
+    .timeline-item::before { content: ""; position: absolute; left: -34px; top: 5px; width: 10px; height: 10px; border-radius: 50%; background: #fff; border: 2px solid #1890ff; z-index: 1; }
+    .timeline-item.active::before { background: #1890ff; box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.2); }
+    .timeline-item.disabled::before { border-color: #d9d9d9; }
+    .timeline-item .timeline-time { font-size: 12px; color: #8c8c8c; margin-bottom: 4px; }
+    .timeline-item .timeline-content { font-size: 14px; font-weight: 500; color: #262626; }
+
+    /* 返回按钮位置 */
+    .btn-back-container { position: absolute; right: 20px; top: 12px; z-index: 10; }
+
+    /* 顶部操作区 */
+    .header-actions { background: #fffbe6; border: 1px solid #ffe58f; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .header-actions .action-tips { color: #856404; font-size: 14px; }
+    .page-close-btn {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+
+<a href="javascript:;" class="btn btn-sm btn-danger page-close-btn" onclick="Backend.api.closetabs();"><i class="fa fa-times"></i> 返回列表</a>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        {:build_heading(null, false)}
+    </div>
+    <div class="panel-body">
+        <!-- 快速操作 -->
+        {if $row.status == 'pending'}
+        <div class="header-actions">
+            <div class="action-tips">
+                <i class="fa fa-info-circle"></i> 该充值订单尚未到账，如您已确认收到款项，可进行手动补单。
+            </div>
+            <div class="action-btns">
+                <a href="wallet/recharge/confirm/ids/{$row.id}" class="btn btn-warning btn-embossed btn-ajax" data-confirm="确定要手动确认到账吗？此操作不可撤销且会增加会员余额。"><i class="fa fa-check-square-o"></i> 手动确认到账</a>
+            </div>
+        </div>
+        {/if}
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="section-header">
+                    <i class="fa fa-caret-right"></i>
+                    <span>充值基本信息</span>
+                </div>
+                <table class="info-table">
+                    <tr>
+                        <td class="label-col">系统单号</td>
+                        <td class="content-col"><code>{$row.order_no|htmlentities}</code></td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">流水单号</td>
+                        <td class="content-col">{$row.trade_no|default='-'}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">充值会员</td>
+                        <td class="content-col">
+                            <a href="user/user/detail/ids/{$row.user_id}" class="addtabsit">{$row.user.nickname|htmlentities}</a>
+                            <small class="text-muted" style="margin-left: 5px;">(ID {$row.user_id})</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">充值金额</td>
+                        <td class="content-col text-success" style="font-weight: 600; font-size: 18px;">¥{$row.amount|number_format=2}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">入账目标</td>
+                        <td class="content-col"><span class="label label-info">{$row.target_text|htmlentities}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">支付方式</td>
+                        <td class="content-col">{$row.pay_type|htmlentities}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-col">订单状态</td>
+                        <td class="content-col">
+                            {switch $row.status}
+                                {case pending}<span class="label label-warning">待支付</span>{/case}
+                                {case paid}<span class="label label-success">已支付</span>{/case}
+                                {case failed}<span class="label label-danger">支付失败</span>{/case}
+                                {case cancelled}<span class="label label-default">已取消</span>{/case}
+                                {default /}<span class="label label-info">{$row.status_text}</span>
+                            {/switch}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="col-md-4">
+                <div class="section-header">
+                    <i class="fa fa-clock-o"></i>
+                    <span>订单时间轴</span>
+                </div>
+                <div class="timeline-container">
+                    <ul class="timeline">
+                        <li class="timeline-item {if $row.createtime}active{/if}">
+                            <div class="timeline-time">{if $row.createtime}{:date('Y-m-d H:i:s', $row.createtime)}{else}-{/if}</div>
+                            <div class="timeline-content">创建充值单</div>
+                        </li>
+                        <li class="timeline-item {if $row.paid_time}active{/if} {if !$row.paid_time}disabled{/if}">
+                            <div class="timeline-time">{if $row.paid_time}{:date('Y-m-d H:i:s', $row.paid_time)}{else}-{/if}</div>
+                            <div class="timeline-content">完成支付/入账</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-default btn-embossed" onclick="Backend.api.close();">关闭页面</button>
+            </div>
+        </div>
+    </div>
+</div>

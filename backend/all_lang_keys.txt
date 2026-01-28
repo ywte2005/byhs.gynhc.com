@@ -1,0 +1,294 @@
+Account info
+Account_name
+Actual_amount
+Add
+Add new config
+Admin_id
+Admin log
+All
+Always show multiple tab when multiple nav is set
+Always show sub menu
+Amount
+Append
+appid
+Approved_time
+Array key
+Array value
+Attachment count
+Attachment nums
+Attachment size
+Audit_time
+Avatar
+Balance
+Bank_account
+Bank_branch
+Bank info
+Bank_name
+Base_amount
+Basic info
+Bio
+Birthday
+Bonus_config_id
+Business_license
+Captcha
+Category
+Category warmtips
+Certificates
+Check all
+Choose
+City
+Classify
+Click to edit
+Close
+Collection_qrcode
+Commission
+Commission_rate
+Condition
+Conflict tips
+Contact_phone
+Content
+Controller/Action
+Control panel
+Country
+Createtime
+Custom
+Custom zone
+Dashboard
+Database count
+Database size
+Database table nums
+Delete
+Delete all the addon database and cannot be recovered!
+Delete all the addon file and cannot be recovered!
+Demo
+Deposit
+Deposit_amount
+Description
+Direct_invite_min
+Edit
+Email
+End_time
+Entry_fee
+Entry_qrcode
+Expand all
+Extend
+Extend tips
+Extparam
+Fee
+Female
+Field title
+Field value
+File
+Filename
+Filesize
+Filter Type
+Flag
+Free
+From_user_id
+Gender
+Group
+Growth_min
+Headimgurl
+Hidden
+Home
+Icon
+Id_card
+Id_card_back
+Id_card_front
+Image
+Imageframes
+Imageheight
+Imagetype
+Imagewidth
+Install
+Invite_code
+Ismenu
+Joinip
+Jointime
+Keep login
+Keyword
+Keywords
+Language
+Layout Options
+Leave password blank if dont want to change
+Legal_name
+Let the sidebar mini expand on hover
+Level
+Level_diff
+Level_id
+Local addon
+Local install
+Loginfailure
+Loginip
+Logintime
+Logout
+Maxsuccessions
+Menu tips
+Menutype
+Merchant detail
+Merchant_no
+Mimetype
+Mobile
+Money
+Month
+More
+Mutual_balance
+Name
+Nickname
+No
+OK
+Online
+Only work at development environment
+Openid
+Open Type
+Open Url
+Order_no
+pagepath
+Paid_remark
+Paid_time
+Parent
+Parent_id
+Password
+Paying
+Pay_type
+Permission
+Personal_performance_min
+Pic
+Picture count
+Picture nums
+Picture size
+Pid
+Please backup important data manually before uninstall!
+Please select category
+Please select table
+Pool_rate
+Prevtime
+Profile
+Profit_rate
+Province
+Qualified_count_min
+Real time
+Receipt_type
+Recharge detail
+Refresh
+Reject_reason
+Remark
+Reply_type
+Reset
+Reward_type
+Reward_type team
+Routine_openid
+Rule
+Rule tips
+Scene
+Scene level_upgrade
+Score
+Search icon
+Search menu
+Security tips
+Selectpage conditions
+Selectpage field
+Selectpage primarykey
+Selectpage table
+Service_fee
+Service_fee_rate
+Session_key
+Setting
+Set to hidden
+Set to normal
+Seven dau
+Seven dnu
+Sex
+Sign in
+Skins
+Sort
+Source_user_id
+Start_time
+Status
+Status cancelled
+Status disabled
+Status failed
+Status rejected
+Storage
+Submit
+Subscribe
+Subscribe_time
+Sub_task_max
+Sub_task_min
+Successions
+Tagid_list
+Target
+Target deposit
+Task_id
+Task_no
+Team_performance_min
+Tempid
+Tempkey
+Thirty dau
+Three dnu
+Time info
+Tip
+Title
+Today user login
+Today user signup
+Toggle all
+Toggle between dark and light skins for the right sidebar
+Toggle between slide over content and push content effects
+Toggle navigation
+Toggle Sidebar
+Toggle the top menu state (multiple or single)
+Total_amount
+Total commission
+Total merchant
+Total task
+Total user
+To_user_id
+Trade_no
+Type
+Uncategoried
+Uninstall
+Unionid
+Updatetime
+Upgrade
+Upgrade_price
+Upgrade_type
+Upgrade_type both
+Upload
+Uploadtime
+Upload to local
+Upload to local by chunk
+Upload to third
+Upload to third by chunk
+Url
+Url tips
+User
+User_id
+Userinfo
+Username
+User_type
+Value
+Version
+Visible condition
+Weigh
+Wipe addons cache
+Wipe all cache
+Wipe browser cache
+Wipe browser cache tips
+Wipe cache
+Wipe content cache
+Wipe template cache
+Withdraw detail
+Withdraw_no
+Working addon count
+Working addon count tips
+Yes
+上传图片
+上传视频
+上传音频
+关键词类型
+匹配方式
+回复内容
+视频描述
+视频标题
+选择关键词
+选择图文

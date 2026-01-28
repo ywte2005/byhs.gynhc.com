@@ -1,0 +1,283 @@
+<style>
+    #config-form table tr td {
+        border: none;
+        padding: 10px 8px;
+    }
+    #config-form div a.btn {
+        color: #fff;
+        text-decoration: none;
+    }
+    #config-form table.table-notice {
+        margin: 0 -8px;
+        width: 100%;
+    }
+    #config-form table.table-notice tr td {
+        padding: 5px 8px;
+        width: 50%;
+    }
+    #config-form table.table-notice tr td input:first-child {
+        width: 100%;
+    }
+    .table-striped > tbody > tr {
+        background-color:#fff!important;
+    }
+    label {
+        margin:5px 10px 0 0;
+    }
+    .n-default .msg-wrap {
+        margin-top:3px;
+    }
+    .list-inline .col-xs-3 {
+        width: 11%;
+    }
+    .title_td {
+        width: 12%;
+    }
+    @media (max-width: 500px) {
+        .table tr td input {
+            width: 70%;
+        }
+        .title_td {
+            width: 30%;
+        }
+    }
+    .n-right .msg-wrap {
+        margin-left: -1px;
+    }
+    .help-block {
+        color: #999;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+    .panel-intro > .panel-heading .panel-lead {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="panel panel-default panel-intro">
+    {:build_heading()}
+</div>
+<form id="config-form" class="edit-form form-horizontal" role="form" data-toggle="validator" method="POST" action="weixin/config/edit">
+    <div class="panel panel-default panel-intro" style="height: calc(78vh);overflow: hidden;overflow-y: auto;">
+        <div class="panel-body no-padding">
+            <div id="myTabContent" class="tab-content">
+                <div class='tab-pane fade active in' style="margin-top: 10px">
+                    <table class="table table-striped table-config mb-0">
+                        <tbody>
+                        <tr>
+                            <td colspan="2" style="font-weight: bold;text-align: left;padding-left: 30px">
+                                微信公众号
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title_td" align="right" style="line-height: 33px;">公众号名称</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-name" type="text" name="row[name]" value="{$oaconfig.name|default=''}" class="form-control" data-rule=""/>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 注册信息，查看公众号名称。</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">原始ID</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-original_id" type="text" name="row[original_id]" value="{$oaconfig.original_id|default=''}" class="form-control" data-rule=""/>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 注册信息，查看原始ID。</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">公众号二维码</td>
+                            <td>
+                                <div class="form-inline">
+                                    <input id="c-qrcode" class="form-control" size="28" name="row[qrcode]" type="text" value="{$oaconfig.qrcode|htmlentities}">
+                                    <span><button type="button" id="plupload-qrcode" class="btn btn-danger plupload" data-input-id="c-qrcode" data-mimetype="image/*" data-multiple="false" data-preview-id="p-qrcode"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                                    <span><button type="button" id="fachoose-qrcode" class="btn btn-primary fachoose" data-input-id="c-qrcode" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                                    <span class="msg-box n-right" for="c-qrcode"></span>
+                                    <ul class="row list-inline plupload-preview" id="p-qrcode"></ul>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 公开信息，下载公众号二维码（15cm）</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class='tab-pane fade active in' style="margin-top: 20px">
+                    <table class="table table-striped table-config mb-0">
+                        <tbody>
+                        <tr>
+                            <td colspan="2" style="font-weight: bold;text-align: left;padding-left: 30px">
+                                开发者信息
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title_td" align="right" style="line-height: 33px;">应用ID</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-appid" type="text" name="row[appid]" value="{$oaconfig.appid|htmlentities}" class="form-control" data-rule="required"/>
+                                    </div>
+                                </div>
+                                <span class="msg-box n-right" for="c-appid" style="display: none;"></span>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 基本配置 - 公众号开发信息，记录开发者ID(AppID)</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">应用密钥</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-appsecret" type="text" name="row[appsecret]" value="{$oaconfig.appsecret|htmlentities}" class="form-control" data-rule="required"/>
+                                    </div>
+                                </div>
+                                <span class="msg-box n-right" for="c-appsecret" style="display: none;"></span>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 基本配置 - 公众号开发信息，记录开发者AppSecret</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class='tab-pane fade active in' style="margin-top: 20px">
+                    <table class="table table-striped table-config mb-0">
+                        <tbody>
+                        <tr>
+                            <td colspan="2" style="font-weight: bold;text-align: left;padding-left: 30px">
+                                服务器配置
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title_td" align="right" style="line-height: 33px;">服务器URL</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-url" type="text" name="row[url]" value="{$oaconfig.url|htmlentities}" readonly class="form-control"/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-copy" data-copy-name="url"><i class="fa fa-copy"></i> 复制</button>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，点击开发>基本配置>服务器配置，填写服务器地址（URL）</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">令牌</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-token" type="text" name="row[token]" value="{$oaconfig.token|htmlentities}" class="form-control" data-rule="required"/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-rand" data-name="token" data-len="12"><i class="fa fa-rotate-left"></i> 生成</button>
+                                    </div>
+                                </div>
+                                <span class="msg-box n-right" for="c-token" style="display: none;"></span>
+                                <span class="help-block">登录微信公众平台，点击开发>基本配置>服务器配置，设置令牌Token。</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">消息加密方式</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-8 col-xs-12">
+                                        <label for="encode-1">
+                                            <input id="encode-1" name="row[encode]" type="radio" value="0" {in name="$oaconfig.encode" value="0" }checked{/in} /> 明文模式
+                                        </label>
+                                        <label for="encode-2">
+                                            <input id="encode-2" name="row[encode]" type="radio" value="1" {in name="$oaconfig.encode" value="1" }checked{/in} /> 兼容模式
+                                        </label>
+                                        <label for="encode-3">
+                                            <input id="encode-3" name="row[encode]" type="radio" value="2" {in name="$oaconfig.encode" value="2" }checked{/in} /> 安全模式（推荐）
+                                        </label>
+                                        <span class="help-block">明文模式(不使用消息体加解密功能)，兼容模式(明文密文将共存，方便开发者调试和维护)，安全模式(消息包为纯密文，安全系数高)</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">消息加解密密钥</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-encodingaeskey" type="text" name="row[encodingaeskey]" value="{$oaconfig.encodingaeskey|htmlentities}" class="form-control" data-rule=""/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-rand" data-name="encodingaeskey" data-len="43"><i class="fa fa-rotate-left"></i> 生成</button>
+                                    </div>
+                                </div>
+                                <span class="help-block">消息加密密钥由43位字符组成，字符范围为A-Z,a-z,0-9</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class='tab-pane fade active in' style="margin-top: 20px;margin-bottom: 50px">
+                    <table class="table table-striped table-config mb-0">
+                        <tbody>
+                        <tr>
+                            <td colspan="2" style="font-weight: bold;text-align: left;padding-left: 30px">
+                                授权域名设置
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="title_td" align="right" style="line-height: 33px;">业务域名</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-business_domain" type="text" name="row[business_domain]" value="{$oaconfig.business_domain|htmlentities}" readonly class="form-control"/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-copy" data-copy-name="business_domain"><i class="fa fa-copy"></i> 复制</button>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 功能设置，填写业务域名</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">JS接口安全域名</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-js_secure_domain" type="text" name="row[js_secure_domain]" value="{$oaconfig.js_secure_domain|htmlentities}" readonly class="form-control"/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-copy" data-copy-name="js_secure_domain"><i class="fa fa-copy"></i> 复制</button>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 功能设置，填写JS接口安全域名</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right" style="line-height: 33px;">网页授权域名</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-3 col-xs-12">
+                                        <input id="c-web_auth_domain" type="text" name="row[web_auth_domain]" value="{$oaconfig.web_auth_domain|htmlentities}" readonly class="form-control"/>
+                                    </div>
+                                    <div class="col-sm-4" style="padding-left: 0">
+                                        <button type="button" class="btn btn-default btn-embossed btn-copy" data-copy-name="web_auth_domain"><i class="fa fa-copy"></i> 复制</button>
+                                    </div>
+                                </div>
+                                <span class="help-block">登录微信公众平台，设置与开发 - 公众号设置 - 功能设置，填写网页授权域名</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <div  class="col-xs-12 col-sm-2" style="width:12.2%;"></div>
+        <div class="col-sm-8 col-xs-12" style="margin-top: 20px">
+            <button type="submit" class="btn btn-primary btn-embossed">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

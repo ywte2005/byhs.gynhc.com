@@ -1,0 +1,19 @@
+{
+  "name": "merchant-mutual-platform",
+  "version": "1.0.0",
+  "description": "商户互助平台客户端",
+  "type": "module",
+  "scripts": {
+    "dev": "echo '请在 HBuilderX 中运行此项目'",
+    "build": "echo '请在 HBuilderX 中构建此项目'",
+    "build:h5": "echo '请在 HBuilderX 中构建 H5 版本'",
+    "build:app": "echo '请在 HBuilderX 中构建 App 版本'",
+    "build:mp-weixin": "echo '请在 HBuilderX 中构建小程序版本'"
+  },
+  "dependencies": {
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

@@ -1,0 +1,112 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('User_id')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-user_id" data-rule="required" data-source="user/user/index" data-field="nickname" class="form-control selectpage" name="row[user_id]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" data-rule="required" class="form-control" name="row[name]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Legal_name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-legal_name" data-rule="required" class="form-control" name="row[legal_name]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Id_card')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-id_card" data-rule="required" class="form-control" name="row[id_card]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Id_card_front')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-id_card_front" data-rule="required" class="form-control" size="50" name="row[id_card_front]" type="text">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-id_card_front" class="btn btn-danger faupload" data-input-id="c-id_card_front" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-id_card_front"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="faselect-id_card_front" class="btn btn-primary faselect" data-input-id="c-id_card_front" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-id_card_front"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-id_card_front"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Id_card_back')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-id_card_back" data-rule="required" class="form-control" size="50" name="row[id_card_back]" type="text">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-id_card_back" class="btn btn-danger faupload" data-input-id="c-id_card_back" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-id_card_back"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="faselect-id_card_back" class="btn btn-primary faselect" data-input-id="c-id_card_back" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-id_card_back"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-id_card_back"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Business_license')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="input-group">
+                <input id="c-business_license" class="form-control" size="50" name="row[business_license]" type="text">
+                <div class="input-group-addon no-border no-padding">
+                    <span><button type="button" id="faupload-business_license" class="btn btn-danger faupload" data-input-id="c-business_license" data-mimetype="image/gif,image/jpeg,image/png,image/jpg,image/bmp" data-multiple="false" data-preview-id="p-business_license"><i class="fa fa-upload"></i> {:__('Upload')}</button></span>
+                    <span><button type="button" id="faselect-business_license" class="btn btn-primary faselect" data-input-id="c-business_license" data-mimetype="image/*" data-multiple="false"><i class="fa fa-list"></i> {:__('Choose')}</button></span>
+                </div>
+                <span class="msg-box n-right" for="c-business_license"></span>
+            </div>
+            <ul class="row list-inline faupload-preview" id="p-business_license"></ul>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Bank_name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-bank_name" class="form-control" name="row[bank_name]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Bank_account')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-bank_account" class="form-control" name="row[bank_account]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Bank_branch')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-bank_branch" class="form-control" name="row[bank_branch]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Contact_phone')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-contact_phone" data-rule="required" class="form-control" name="row[contact_phone]" type="text">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Entry_fee')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-entry_fee" class="form-control" step="0.01" name="row[entry_fee]" type="number" value="0.00">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_radios('row[status]', ['pending'=>__('Status pending'), 'approved'=>__('Status approved'), 'rejected'=>__('Status rejected'), 'disabled'=>__('Status disabled')], 'pending')}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

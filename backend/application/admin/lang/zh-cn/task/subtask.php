@@ -1,0 +1,30 @@
+<?php
+
+return [
+    'Id'                    => 'ID',
+    'Task_id'               => '主任务ID',
+    'Task_no'               => '子任务编号',
+    'From_user_id'          => '发起方用户ID',
+    'To_user_id'            => '执行方用户ID',
+    'Amount'                => '刷单金额',
+    'Commission'            => '佣金',
+    'Service_fee'           => '服务费',
+    'Proof_image'           => '支付凭证图片',
+    'Third_order_no'        => '第三方订单号',
+    'Status'                => '状态',
+    'Assigned_time'         => '派发时间',
+    'Accepted_time'         => '接单时间',
+    'Paid_time'             => '支付时间',
+    'Completed_time'        => '完成时间',
+    'Fail_reason'           => '失败原因',
+    'Createtime'            => '创建时间',
+    'Updatetime'            => '更新时间',
+    'Status pending'        => '待分配',
+    'Status assigned'       => '已分配',
+    'Status accepted'       => '已接单',
+    'Status paid'           => '已支付',
+    'Status verified'       => '已验证',
+    'Status completed'      => '已完成',
+    'Status failed'         => '失败',
+    'Status cancelled'      => '已取消'
+];

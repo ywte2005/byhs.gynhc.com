@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    {include file="common/meta" /}
+    <style type="text/css">
+        body {
+            background-color: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #1a1a1a;
+        }
+
+        .login-wrapper {
+            display: flex;
+            width: 1000px;
+            height: 600px;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 左侧商务背景区 */
+        .login-aside {
+            flex: 1;
+            background: linear-gradient(135deg, #1a3353 0%, #2c5af2 100%);
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-aside::after {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            top: -100px;
+            left: -100px;
+        }
+
+        .brand-visual {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-circle {
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .visual-circle::before {
+            content: "";
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .aside-footer {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        /* 右侧登录表单区 */
+        .login-main {
+            width: 450px;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: 40px;
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a3353;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #434343;
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bfbfbf;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 50px;
+            background: #f5f5f5;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            padding: 0 16px 0 46px;
+            font-size: 15px;
+            color: #262626;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            background: #fff;
+            border-color: #2c5af2;
+            box-shadow: 0 0 0 4px rgba(44, 90, 242, 0.1);
+        }
+
+        .form-control:focus + i {
+            color: #2c5af2;
+        }
+
+        .captcha-wrapper {
+            display: flex;
+            gap: 12px;
+        }
+
+        .captcha-img {
+            height: 50px;
+            width: 130px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+            transition: opacity 0.3s;
+        }
+
+        .captcha-img:hover {
+            opacity: 0.8;
+        }
+
+        .keeplogin-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .checkbox-container {
+            display: inline-flex;
+            align-items: center;
+            font-size: 14px;
+            color: #595959;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+            accent-color: #2c5af2;
+        }
+
+        .btn-login {
+            width: 100%;
+            height: 50px;
+            background: #2c5af2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(44, 90, 242, 0.2);
+        }
+
+        .btn-login:hover {
+            background: #1a44d1;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(44, 90, 242, 0.3);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        #errtips {
+            background: #fff2f0;
+            color: #ff4d4f;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 24px;
+            text-align: center;
+            border: 1px solid #ffccc7;
+        }
+
+        .hide {
+            display: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            .login-wrapper {
+                width: 90%;
+                height: auto;
+                max-width: 500px;
+            }
+            .login-aside {
+                display: none;
+            }
+            .login-main {
+                width: 100%;
+                padding: 40px;
+            }
+        }
+    </style>
+    {if $background}
+    <style type="text/css">
+        body {
+            background-image: url('{$background|htmlentities}');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+    {/if}
+</head>
+<body>
+<div class="login-wrapper">
+    <!-- 左侧展示区 -->
+    <div class="login-aside">
+        <div class="aside-header">
+            <img src="__CDN__/assets/img/logo.png" onerror="this.src='/assets/img/logo.png';this.onerror=null;" style="height: 48px; filter: brightness(0) invert(1);">
+        </div>
+        <div class="brand-visual">
+            <div class="visual-circle"></div>
+        </div>
+        <div class="aside-footer">
+            &copy; {:date('Y')} Business Management System.
+        </div>
+    </div>
+
+    <!-- 右侧表单区 -->
+    <div class="login-main">
+        <div class="login-header">
+            <h1>ADMIN LOGIN</h1>
+        </div>
+
+        <form action="" method="post" id="login-form">
+            <div id="errtips" class="hide"></div>
+            {:token()}
+
+            <div class="form-group">
+                <label for="pd-form-username">{:__('Username')}</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-user-circle-o"></i>
+                    <input type="text" class="form-control" id="pd-form-username" placeholder="请输入您的账号" name="username" autocomplete="off" data-rule="{:__('Username')}:required;username"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="pd-form-password">{:__('Password')}</label>
+                <div class="input-wrapper">
+                    <i class="fa fa-lock"></i>
+                    <input type="password" class="form-control" id="pd-form-password" placeholder="请输入您的密码" name="password" autocomplete="off" data-rule="{:__('Password')}:required;password"/>
+                </div>
+            </div>
+
+            {if $Think.config.fastadmin.login_captcha}
+            <div class="form-group">
+                <label>{:__('Captcha')}</label>
+                <div class="captcha-wrapper">
+                    <div class="input-wrapper" style="flex: 1;">
+                        <i class="fa fa-shield"></i>
+                        <input type="text" name="captcha" class="form-control" placeholder="验证码" data-rule="{:__('Captcha')}:required;length({$Think.config.captcha.length|htmlentities})" autocomplete="off"/>
+                    </div>
+                    <img src="{:rtrim('__PUBLIC__', '/')}/index.php?s=/captcha" class="captcha-img" onclick="this.src = '{:rtrim('__PUBLIC__', '/')}/index.php?s=/captcha&r=' + Math.random();" title="点击刷新验证码">
+                </div>
+            </div>
+            {/if}
+
+            <div class="keeplogin-wrapper">
+                {if $keeyloginhours>0}
+                <label class="checkbox-container" title="{:__('The duration of the session is %s hours', $keeyloginhours)}">
+                    <input type="checkbox" name="keeplogin" id="keeplogin" value="1"/>
+                    <span>{:__('保持登录状态')}</span>
+                </label>
+                {/if}
+            </div>
+
+            <button type="submit" class="btn-login">
+                立即登录
+            </button>
+        </form>
+    </div>
+</div>
+{include file="common/script" /}
+</body>
+</html>

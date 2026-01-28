@@ -1,0 +1,33 @@
+<?php
+
+return [
+    'Id'                    => 'ID',
+    'User_id'               => '用户ID',
+    'Merchant_no'           => '商户编号',
+    'Name'                  => '商户名称',
+    'Legal_name'            => '法人姓名',
+    'Id_card'               => '身份证号',
+    'Id_card_front'         => '身份证正面',
+    'Id_card_back'          => '身份证反面',
+    'Business_license'      => '营业执照',
+    'Bank_name'             => '开户银行',
+    'Bank_account'          => '银行账号',
+    'Bank_branch'           => '开户支行',
+    'Contact_phone'         => '联系电话',
+    'Entry_fee'             => '入驻费',
+    'Entry_fee_paid'        => '已支付入驻费',
+    'Status'                => '状态',
+    'Approved_time'         => '审核通过时间',
+    'Createtime'            => '创建时间',
+    'Updatetime'            => '更新时间',
+    'Reject_reason'         => '拒绝原因',
+    'Status pending'        => '待审核',
+    'Status approved'       => '已通过',
+    'Status rejected'       => '已拒绝',
+    'Status disabled'       => '已禁用',
+    'Merchant detail'       => '商户详情',
+    'Basic info'            => '基本信息',
+    'Bank info'             => '银行信息',
+    'Certificates'          => '证件信息',
+    'User'                  => '关联用户'
+];

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        var require = {
+            config: {$config|json_encode}
+        };
+    </script>
+</head>
+<body>
+<div class="content">
+    <div style="width: 100%;text-align: center;padding-top: 30px">
+        <img class="qrcode" src="" style="display: none;height: 220px;width: 220px"></img>
+        <div class="text-area">
+            <text class="title">二维码获取中...</text>
+        </div>
+    </div>
+</div>
+{include file="common/script" /}
+</body>
+<style>
+    .content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .text-area {
+        display: flex;
+        justify-content: center;
+    }
+
+    .title {
+        font-size: 18px;
+        color: #8f8f94;
+    }
+</style>
+</html>

@@ -1,0 +1,314 @@
+<style>
+.dashboard-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+}
+.stat-card.blue { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+.stat-card.green { background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); }
+.stat-card.orange { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+.stat-card.red { background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%); }
+.stat-card.purple { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+.stat-card.cyan { background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%); }
+.stat-card .stat-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    opacity: 0.3;
+}
+.stat-card .stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.stat-card .stat-label {
+    font-size: 14px;
+    opacity: 0.9;
+}
+.stat-card .stat-sub {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 8px;
+}
+.todo-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.todo-item:hover { background: #f5f5f5; }
+.todo-item:last-child { border-bottom: none; }
+.todo-item .todo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    color: #fff;
+}
+.todo-item .todo-icon.merchant { background: #2196F3; }
+.todo-item .todo-icon.task { background: #4CAF50; }
+.todo-item .todo-icon.withdraw { background: #FF9800; }
+.todo-item .todo-icon.subtask { background: #9C27B0; }
+.todo-item .todo-count {
+    margin-left: auto;
+    background: #f44336;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+.todo-item .todo-count.zero { background: #4CAF50; }
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #667eea;
+    color: #333;
+}
+.quick-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.quick-actions .btn {
+    flex: 1;
+    min-width: 120px;
+}
+</style>
+
+<div class="row">
+    <!-- 核心数据卡片 -->
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card blue">
+            <i class="fa fa-users stat-icon"></i>
+            <div class="stat-value">{$stats.users.total|default=0}</div>
+            <div class="stat-label">总用户数</div>
+            <div class="stat-sub">今日新增: +{$stats.users.today|default=0}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card green">
+            <i class="fa fa-building stat-icon"></i>
+            <div class="stat-value">{$stats.merchants.approved|default=0}</div>
+            <div class="stat-label">入驻商户</div>
+            <div class="stat-sub">待审核: {$stats.merchants.pending|default=0}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card orange">
+            <i class="fa fa-tasks stat-icon"></i>
+            <div class="stat-value">{$stats.tasks.running|default=0}</div>
+            <div class="stat-label">进行中任务</div>
+            <div class="stat-sub">待审核: {$stats.tasks.pending|default=0}</div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card purple">
+            <i class="fa fa-money stat-icon"></i>
+            <div class="stat-value">¥{$stats.amounts.today_completed|default='0.00'}</div>
+            <div class="stat-label">今日成交额</div>
+            <div class="stat-sub">累计: ¥{$stats.amounts.completed|default='0.00'}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 待处理事项 -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="section-title"><i class="fa fa-bell-o"></i> 待处理事项</div>
+            <div class="todo-list">
+                {volist name="todoItems" id="item"}
+                <a href="{$item.url}" class="todo-item addtabsit" title="{$item.title}">
+                    <div class="todo-icon {$item.type}">
+                        {switch $item.type}
+                        {case merchant}<i class="fa fa-building"></i>{/case}
+                        {case task}<i class="fa fa-tasks"></i>{/case}
+                        {case withdraw}<i class="fa fa-money"></i>{/case}
+                        {case subtask}<i class="fa fa-list-alt"></i>{/case}
+                        {/switch}
+                    </div>
+                    <div class="todo-info">
+                        <div class="todo-title">{$item.title}</div>
+                    </div>
+                    <div class="todo-count {$item.count == 0 ? 'zero' : ''}">{$item.count}</div>
+                </a>
+                {/volist}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 子任务统计 -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="section-title"><i class="fa fa-pie-chart"></i> 子任务概况</div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="stat-card cyan" style="padding:15px;">
+                        <div class="stat-value" style="font-size:24px;">{$stats.subtasks.completed|default=0}</div>
+                        <div class="stat-label">已完成</div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="stat-card orange" style="padding:15px;">
+                        <div class="stat-value" style="font-size:24px;">{$stats.subtasks.assigned|default=0}</div>
+                        <div class="stat-label">待接单</div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="stat-card blue" style="padding:15px;">
+                        <div class="stat-value" style="font-size:24px;">{$stats.subtasks.pending|default=0}</div>
+                        <div class="stat-label">待派发</div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="stat-card green" style="padding:15px;">
+                        <div class="stat-value" style="font-size:24px;">{$stats.subtasks.today_completed|default=0}</div>
+                        <div class="stat-label">今日完成</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 财务概况 -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="section-title"><i class="fa fa-line-chart"></i> 财务概况</div>
+            <div class="stat-card red" style="margin-bottom:10px;padding:15px;">
+                <div class="stat-value" style="font-size:20px;">¥{$stats.withdraws.pending_amount|default='0.00'}</div>
+                <div class="stat-label">待审核提现 ({$stats.withdraws.pending_count|default=0}笔)</div>
+            </div>
+            <div class="stat-card green" style="margin-bottom:10px;padding:15px;">
+                <div class="stat-value" style="font-size:20px;">¥{$stats.commission.today|default='0.00'}</div>
+                <div class="stat-label">今日发放佣金</div>
+            </div>
+            <div class="stat-card purple" style="margin-bottom:0;padding:15px;">
+                <div class="stat-value" style="font-size:20px;">¥{$stats.commission.total|default='0.00'}</div>
+                <div class="stat-label">累计发放佣金</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 趋势图表 -->
+    <div class="col-lg-8">
+        <div class="dashboard-card">
+            <div class="section-title"><i class="fa fa-area-chart"></i> 近7日趋势</div>
+            <div id="trendChart" style="height: 300px;"></div>
+        </div>
+    </div>
+    
+    <!-- 快捷操作 -->
+    <div class="col-lg-4">
+        <div class="dashboard-card">
+            <div class="section-title"><i class="fa fa-flash"></i> 快捷操作</div>
+            <div class="quick-actions">
+                <a href="merchant/merchant/index" class="btn btn-primary btn-lg btn-block addtabsit">
+                    <i class="fa fa-building"></i> 商户管理
+                </a>
+                <a href="task/mutualtask/index" class="btn btn-success btn-lg btn-block addtabsit">
+                    <i class="fa fa-tasks"></i> 任务管理
+                </a>
+                <a href="wallet/withdraw/index" class="btn btn-warning btn-lg btn-block addtabsit">
+                    <i class="fa fa-money"></i> 提现审核
+                </a>
+                <a href="promo/level/index" class="btn btn-info btn-lg btn-block addtabsit">
+                    <i class="fa fa-star"></i> 等级配置
+                </a>
+                <a href="config/reward/index" class="btn btn-danger btn-lg btn-block addtabsit">
+                    <i class="fa fa-trophy"></i> 奖励规则
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+$(function() {
+    var trends = {:json_encode($trends)};
+    
+    var chart = echarts.init(document.getElementById('trendChart'));
+    var option = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'cross' }
+        },
+        legend: {
+            data: ['新增任务', '完成子任务', '成交金额(万)', '新增用户']
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: trends.dates
+        },
+        yAxis: [
+            { type: 'value', name: '数量' },
+            { type: 'value', name: '金额(万)', position: 'right' }
+        ],
+        series: [
+            {
+                name: '新增任务',
+                type: 'line',
+                smooth: true,
+                data: trends.tasks,
+                itemStyle: { color: '#FF9800' }
+            },
+            {
+                name: '完成子任务',
+                type: 'line',
+                smooth: true,
+                data: trends.subtasks,
+                itemStyle: { color: '#4CAF50' }
+            },
+            {
+                name: '成交金额(万)',
+                type: 'bar',
+                yAxisIndex: 1,
+                data: trends.amounts.map(function(v) { return (v/10000).toFixed(2); }),
+                itemStyle: { color: '#9C27B0' }
+            },
+            {
+                name: '新增用户',
+                type: 'line',
+                smooth: true,
+                data: trends.users,
+                itemStyle: { color: '#2196F3' }
+            }
+        ]
+    };
+    chart.setOption(option);
+    
+    $(window).resize(function() {
+        chart.resize();
+    });
+});
+</script>

@@ -1,0 +1,262 @@
+<style>
+    .info-card {
+        background: #fff;
+        border-radius: 4px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        min-height: 200px;
+    }
+    .info-card h4 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+    }
+    .stat-item {
+        text-align: center;
+        padding: 10px 0;
+    }
+    .stat-item .value {
+        font-size: 22px;
+        font-weight: bold;
+        color: #3c8dbc;
+        display: block;
+    }
+    .stat-item .label {
+        color: #777;
+        font-size: 13px;
+    }
+    .profile-info dt {
+        width: 100px;
+        text-align: left;
+        color: #777;
+        font-weight: normal;
+    }
+    .profile-info dd {
+        margin-left: 110px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+    .level-tag {
+        margin-bottom: 8px;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .growth-item {
+        border-bottom: 1px dashed #eee;
+        padding: 8px 0;
+    }
+    .growth-item:last-child {
+        border-bottom: none;
+    }
+    .page-close-btn {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+
+<a href="javascript:;" class="btn btn-sm btn-danger page-close-btn" onclick="Backend.api.closetabs();"><i class="fa fa-times"></i> 返回列表</a>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-body">
+        <div class="row">
+            <!-- 基础信息 -->
+            <div class="col-md-4">
+                <div class="info-card">
+                    <h4>{:__('Basic Info')}</h4>
+                    <dl class="dl-horizontal profile-info">
+                        <dt>{:__('User ID')}</dt>
+                        <dd>{$row.user_id}</dd>
+                        <dt>{:__('Nickname')}</dt>
+                        <dd>{$row.user.nickname|default='-'}</dd>
+                        <dt>{:__('Level')}</dt>
+                        <dd><span class="label label-success">{$row.level.name|default='普通用户'}</span></dd>
+                        <dt>{:__('Invite Code')}</dt>
+                        <dd>{$row.invite_code}</dd>
+                        <dt>{:__('Parent User')}</dt>
+                        <dd>
+                            {if $row.parent_id}
+                                <a href="user/user/detail/ids/{$row.parent_id}" class="addtabsit">{$row.parent.user.nickname|default='-'} (ID: {$row.parent_id})</a>
+                            {else}
+                                无
+                            {/if}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- 团队统计 -->
+            <div class="col-md-5">
+                <div class="info-card">
+                    <h4>{:__('Team Statistics')}</h4>
+                    <div class="row">
+                        <div class="col-xs-3 stat-item">
+                            <span class="value">{$team_count}</span>
+                            <span class="label">{:__('Total Team Members')}</span>
+                        </div>
+                        <div class="col-xs-3 stat-item">
+                            <span class="value">{$direct_count}</span>
+                            <span class="label">{:__('Direct Members')}</span>
+                        </div>
+                        <div class="col-xs-3 stat-item">
+                            <span class="value">{$indirect_count}</span>
+                            <span class="label">{:__('Indirect Members')}</span>
+                        </div>
+                        <div class="col-xs-3 stat-item">
+                            <span class="value">{$active_count}</span>
+                            <span class="label">{:__('Active Members')}</span>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 15px; border-top: 1px solid #f9f9f9; padding-top: 15px;">
+                        <div class="col-xs-4 stat-item">
+                            <span class="value">￥{$performance.personal_amount|default='0.00'}</span>
+                            <span class="label">{:__('Personal Performance')}</span>
+                        </div>
+                        <div class="col-xs-4 stat-item">
+                            <span class="value">￥{$performance.team_amount|default='0.00'}</span>
+                            <span class="label">{:__('Team Performance')}</span>
+                        </div>
+                        <div class="col-xs-4 stat-item">
+                            <span class="value {if $growth_rate > 0}text-danger{elseif $growth_rate < 0}text-success{/if}">{$growth_rate}%</span>
+                            <span class="label">{:__('Growth Rate')}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 团队增长 -->
+            <div class="col-md-3">
+                <div class="info-card">
+                    <h4>{:__('Team Growth')}</h4>
+                    <div class="growth-item">
+                        <span class="pull-left text-muted">{:__('Today Growth')}</span>
+                        <span class="pull-right text-primary"><strong>{$growth.today}</strong></span>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="growth-item">
+                        <span class="pull-left text-muted">{:__('Week Growth')}</span>
+                        <span class="pull-right text-info"><strong>{$growth.week}</strong></span>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="growth-item">
+                        <span class="pull-left text-muted">{:__('Month Growth')}</span>
+                        <span class="pull-right text-success"><strong>{$growth.month}</strong></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 团队分布 -->
+            <div class="col-md-3">
+                <div class="info-card">
+                    <h4>{:__('Level Distribution')}</h4>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        {foreach name="level_distribution" item="item"}
+                        <div class="level-tag">
+                            <span class="label label-info">{$item.level_name|default='普通用户'}: {$item.count}人</span>
+                        </div>
+                        {/foreach}
+                        {if empty($level_distribution)}
+                        <p class="text-muted text-center">{:__('No Data')}</p>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 团队达人 -->
+            <div class="col-md-3">
+                <div class="info-card">
+                    <h4>{:__('Team Top Performers')}</h4>
+                    <div style="max-height: 250px; overflow-y: auto;">
+                        {foreach name="team_top_performers" item="item"}
+                        <div class="growth-item">
+                            <span class="pull-left text-muted" title="ID: {$item.user_id}">{$item.nickname}</span>
+                            <span class="pull-right text-danger">￥{$item.personal_amount}</span>
+                            <div class="clearfix"></div>
+                        </div>
+                        {/foreach}
+                        {if empty($team_top_performers)}
+                        <p class="text-muted text-center">{:__('No Data')}</p>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 业绩历史 -->
+            <div class="col-md-6">
+                <div class="info-card">
+                    <h4>{:__('Performance History')}</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{:__('Month')}</th>
+                                    <th>{:__('Personal Performance')}</th>
+                                    <th>{:__('Team Performance')}</th>
+                                    <th>{:__('Total Performance')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach name="performance_history" item="item"}
+                                <tr>
+                                    <td>{$item.month}</td>
+                                    <td>￥{$item.personal_amount}</td>
+                                    <td>￥{$item.team_amount}</td>
+                                    <td>￥{:bcadd($item.personal_amount, $item.team_amount, 2)}</td>
+                                </tr>
+                                {/foreach}
+                                {if empty($performance_history)}
+                                <tr>
+                                    <td colspan="4" class="text-center">{:__('No Data')}</td>
+                                </tr>
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- 直属下级列表 -->
+            <div class="col-md-12">
+                <div class="info-card">
+                    <h4>{:__('Direct Members List')} (最近10名)</h4>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>{:__('Nickname')}</th>
+                                    <th>{:__('Level')}</th>
+                                    <th>{:__('Join Time')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {foreach name="direct_list" item="item"}
+                                <tr>
+                                    <td><a href="user/user/detail/ids/{$item.user_id}" class="addtabsit">{$item.user_id}</a></td>
+                                    <td><a href="user/user/detail/ids/{$item.user_id}" class="addtabsit">{$item.user.nickname|default='-'}</a></td>
+                                    <td><span class="label label-info">{$item.level.name|default='普通用户'}</span></td>
+                                    <td>{$item.createtime|datetime}</td>
+                                </tr>
+                                {/foreach}
+                                {if empty($direct_list)}
+                                <tr>
+                                    <td colspan="4" class="text-center">{:__('No Data')}</td>
+                                </tr>
+                                {/if}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

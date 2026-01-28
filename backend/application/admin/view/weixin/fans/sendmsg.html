@@ -1,0 +1,40 @@
+<form id="edit-form" class="form-horizontal hide" role="form" data-toggle="validator" method="POST" action="">
+    {:token()}
+    <input type="hidden" name="ids" value="{$Request.param.ids|htmlentities}">
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Reply_type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <div class="radio">
+                {foreach name="replyTypeList" item="vo"}
+                <label for="row[reply_type]-{$key|htmlentities}"><input id="row[reply_type]-{$key|htmlentities}" name="row[reply_type]" type="radio" value="{$key|htmlentities}" {in name="key" value="text"}checked{/in} /> {$vo|htmlentities}</label>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('选择关键词')}:</label>
+        <div class="col-xs-12 col-sm-8" data-favisible="reply_type='text'">
+            <input id="c-text" data-rule="required" data-source="weixin/reply/index" data-params='{"custom[reply_type]":"text","custom[status]":"normal"}' data-field="keyword" class="form-control selectpage sp_input" name="row[text]" type="text" value="" autocomplete="off">
+        </div>
+        <div class="col-xs-12 col-sm-8" data-favisible="reply_type='image'">
+            <input id="c-image" data-rule="required" data-source="weixin/reply/index" data-params='{"custom[reply_type]":"image","custom[status]":"normal"}' data-field="keyword" class="form-control selectpage sp_input" name="row[image]" type="text" value="" autocomplete="off">
+        </div>
+        <div class="col-xs-12 col-sm-8" data-favisible="reply_type='news'">
+            <input id="c-news" data-rule="required" data-source="weixin/reply/index" data-params='{"custom[reply_type]":"news","custom[status]":"normal"}' data-field="keyword" class="form-control selectpage sp_input" name="row[news]" type="text" value="" autocomplete="off">
+        </div>
+        <div class="col-xs-12 col-sm-8" data-favisible="reply_type='voice'">
+            <input id="c-voice" data-rule="required" data-source="weixin/reply/index" data-params='{"custom[reply_type]":"voice","custom[status]":"normal"}' data-field="keyword" class="form-control selectpage sp_input" name="row[voice]" type="text" value="" autocomplete="off">
+        </div>
+        <div class="col-xs-12 col-sm-8" data-favisible="reply_type='video'">
+            <input id="c-video" data-rule="required" data-source="weixin/reply/index" data-params='{"custom[reply_type]":"video","custom[status]":"normal"}' data-field="keyword" class="form-control selectpage sp_input" name="row[video]" type="text" value="" autocomplete="off">
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-primary btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+

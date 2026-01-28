@@ -1,0 +1,24 @@
+{
+  "name": "merchant-mutual-platform",
+  "version": "1.0.0",
+  "description": "商户互助平台 - 完整项目",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "build:h5": "cd frontend && npm run build:h5",
+    "build:app": "cd frontend && npm run build:app",
+    "build:mp-weixin": "cd frontend && npm run build:mp-weixin",
+    "preview": "cd frontend && npm run preview",
+    "install:frontend": "cd frontend && npm install"
+  },
+  "keywords": [
+    "merchant",
+    "mutual",
+    "platform",
+    "uni-app",
+    "vue3"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,57 @@
+<form id="add-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">规则名称:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" class="form-control" name="row[name]" type="text" value="">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Scene')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[scene]', ['merchant_entry'=>__('Scene merchant_entry'),'order_complete'=>__('Scene order_complete'),'level_upgrade'=>__('Scene level_upgrade')], null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Reward_type')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[reward_type]', ['direct'=>__('Reward_type direct'),'indirect'=>__('Reward_type indirect'),'level_diff'=>__('Reward_type level_diff'),'peer'=>__('Reward_type peer'),'team'=>__('Reward_type team')], null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">目标层级:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-target_depth" class="form-control" name="row[target_depth]" type="number" value="1">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">金额类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[amount_type]', ['fixed'=>'固定金额','percent'=>'比例'], null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">金额值:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-amount_value" class="form-control" name="row[amount_value]" type="text" value="0.0000">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">增量门槛:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-growth_min" class="form-control" name="row[growth_min]" type="text" value="0.00">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[status]', ['normal'=>__('Normal'),'hidden'=>__('Hidden')], null, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

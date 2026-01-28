@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'Id'                    => 'ID',
+    'User_id'               => '发起用户ID',
+    'Task_no'               => '任务编号',
+    'Total_amount'          => '目标总金额',
+    'Completed_amount'      => '已完成金额',
+    'Deposit_amount'        => '缴纳保证金',
+    'Service_fee_rate'      => '服务费率',
+    'Sub_task_min'          => '子任务最小金额',
+    'Sub_task_max'          => '子任务最大金额',
+    'Channel_id'            => '支付通道ID',
+    'Start_time'            => '开始时间',
+    'End_time'              => '结束时间',
+    'Status'                => '状态',
+    'Receipt_type'          => '收款类型',
+    'Entry_qrcode'          => '进件二维码',
+    'Collection_qrcode'     => '收款码',
+    'Content'               => '任务说明',
+    'Remark'                => '备注',
+    'Createtime'            => '创建时间',
+    'Updatetime'            => '更新时间',
+    'Status pending'        => '待审核',
+    'Status approved'       => '已审核',
+    'Status running'        => '进行中',
+    'Status paused'         => '已暂停',
+    'Status completed'      => '已完成',
+    'Status cancelled'      => '已取消',
+    'Status rejected'       => '已拒绝'
+];

@@ -1,0 +1,57 @@
+<form id="edit-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Name')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-name" class="form-control" name="row[name]" type="text" value="{$row.name|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Team_performance_min')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-team_performance_min" class="form-control" name="row[team_performance_min]" type="text" value="{$row.team_performance_min|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Personal_performance_min')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-personal_performance_min" class="form-control" name="row[personal_performance_min]" type="text" value="{$row.personal_performance_min|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Qualified_count_min')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-qualified_count_min" class="form-control" name="row[qualified_count_min]" type="number" value="{$row.qualified_count_min|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Growth_min')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-growth_min" class="form-control" name="row[growth_min]" type="text" value="{$row.growth_min|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Pool_rate')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-pool_rate" class="form-control" name="row[pool_rate]" type="text" value="{$row.pool_rate|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Sort')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-sort" class="form-control" name="row[sort]" type="number" value="{$row.sort|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">{:__('Status')}:</label>
+        <div class="col-xs-12 col-sm-8">
+            {:build_select('row[status]', ['normal'=>__('Normal'),'hidden'=>__('Hidden')], $row.status, ['class'=>'form-control selectpicker'])}
+        </div>
+    </div>
+    <div class="form-group layer-footer">
+        <label class="control-label col-xs-12 col-sm-2"></label>
+        <div class="col-xs-12 col-sm-8">
+            <button type="submit" class="btn btn-success btn-embossed disabled">{:__('OK')}</button>
+            <button type="reset" class="btn btn-default btn-embossed">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>

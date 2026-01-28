@@ -1,0 +1,142 @@
+<template>
+  <cl-page class="bg-gray-100">
+    <!-- 头部 -->
+    <view class="h-14 bg-blue-600 flex items-center px-4 justify-between">
+      <text class="text-lg font-semibold text-white">旺铺集</text>
+      <view class="flex gap-4">
+        <icon-font name="qr-code" size="24" color="white" @tap="scanQR" />
+        <icon-font name="bell" size="24" color="white" @tap="goToMessage" />
+      </view>
+    </view>
+
+    <!-- 余额卡片 -->
+    <view class="bg-blue-600 text-white px-4 py-6 mx-4 mt-4 rounded-lg">
+      <!-- 余额展示 -->
+      <view class="flex justify-between mb-6">
+        <view class="flex flex-col items-center">
+          <text class="text-3xl font-bold">¥12,580.00</text>
+          <text class="text-sm opacity-75 mt-1">可用余额</text>
+        </view>
+        <view class="flex flex-col items-center">
+          <text class="text-xl font-semibold">¥2,000.00</text>
+          <text class="text-xs opacity-75 mt-1">冻结金额</text>
+        </view>
+        <view class="flex flex-col items-center">
+          <text class="text-xl font-semibold">¥5,320.00</text>
+          <text class="text-xs opacity-75 mt-1">待结算</text>
+        </view>
+      </view>
+
+      <!-- 快捷入口 -->
+      <view class="flex justify-around">
+        <view class="flex flex-col items-center cursor-pointer" @tap="goToMerchant">
+          <view class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+            <icon-font name="file-text" size="22" color="white" />
+          </view>
+          <text class="text-xs">进件</text>
+        </view>
+        <view class="flex flex-col items-center cursor-pointer" @tap="goToCreateTask">
+          <view class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+            <icon-font name="megaphone" size="22" color="white" />
+          </view>
+          <text class="text-xs">发布任务</text>
+        </view>
+        <view class="flex flex-col items-center cursor-pointer" @tap="goToRecharge">
+          <view class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+            <icon-font name="plus" size="22" color="white" />
+          </view>
+          <text class="text-xs">充值</text>
+        </view>
+        <view class="flex flex-col items-center cursor-pointer" @tap="goToWithdraw">
+          <view class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+            <icon-font name="credit-card" size="22" color="white" />
+          </view>
+          <text class="text-xs">提现</text>
+        </view>
+        <view class="flex flex-col items-center cursor-pointer" @tap="goToInvite">
+          <view class="w-11 h-11 bg-white bg-opacity-20 rounded-full flex items-center justify-center mb-2">
+            <icon-font name="user-plus" size="22" color="white" />
+          </view>
+          <text class="text-xs">邀请</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 待办事项 -->
+    <view class="px-4 mt-4">
+      <text class="text-base font-semibold text-gray-900 block mb-3">待办事项</text>
+      <view class="flex gap-3">
+        <view class="flex-1 bg-white rounded-lg p-4 flex flex-col items-center">
+          <text class="text-2xl font-bold text-blue-600">3</text>
+          <text class="text-xs text-gray-600 mt-2">待审核进件</text>
+        </view>
+        <view class="flex-1 bg-white rounded-lg p-4 flex flex-col items-center">
+          <text class="text-2xl font-bold text-yellow-500">5</text>
+          <text class="text-xs text-gray-600 mt-2">待验收任务</text>
+        </view>
+        <view class="flex-1 bg-white rounded-lg p-4 flex flex-col items-center">
+          <text class="text-2xl font-bold text-red-500">2</text>
+          <text class="text-xs text-gray-600 mt-2">待处理提现</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 今日数据 -->
+    <view class="px-4 mt-4 mb-4">
+      <view class="bg-white rounded-lg p-4">
+        <text class="text-base font-semibold text-gray-900 block mb-3">今日数据</text>
+        <view class="flex gap-2">
+          <view class="flex-1 bg-blue-50 rounded-lg p-3 flex flex-col items-center">
+            <text class="text-xl font-bold text-blue-600">8</text>
+            <text class="text-xs text-gray-600 mt-1">已接任务</text>
+          </view>
+          <view class="flex-1 bg-green-50 rounded-lg p-3 flex flex-col items-center">
+            <text class="text-xl font-bold text-green-600">5</text>
+            <text class="text-xs text-gray-600 mt-1">已完成</text>
+          </view>
+          <view class="flex-1 bg-yellow-50 rounded-lg p-3 flex flex-col items-center">
+            <text class="text-xl font-bold text-yellow-600">¥280</text>
+            <text class="text-xs text-gray-600 mt-1">今日收入</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </cl-page>
+</template>
+
+<script setup lang="ts">
+function scanQR(): void {
+  uni.scanCode({
+    success: (res: any) => {
+      uni.showToast({ title: `扫描结果: ${res.result}`, icon: 'none' })
+    }
+  })
+}
+
+function goToMessage(): void {
+  uni.navigateTo({ url: '/pages/message/index' })
+}
+
+function goToMerchant(): void {
+  uni.navigateTo({ url: '/pages/merchant/register' })
+}
+
+function goToCreateTask(): void {
+  uni.navigateTo({ url: '/pages/task/create' })
+}
+
+function goToRecharge(): void {
+  uni.navigateTo({ url: '/pages/wallet/recharge' })
+}
+
+function goToWithdraw(): void {
+  uni.navigateTo({ url: '/pages/wallet/withdraw' })
+}
+
+function goToInvite(): void {
+  uni.navigateTo({ url: '/pages/promo/invite' })
+}
+</script>
+
+<style scoped>
+</style>

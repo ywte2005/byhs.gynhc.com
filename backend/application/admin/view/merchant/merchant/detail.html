@@ -1,0 +1,397 @@
+<style>
+    /* 基础布局优化 */
+    .panel-heading { position: relative; padding: 0 !important; border-bottom: none; background: #fff; }
+    .panel-intro .nav-tabs { background: #fcfcfc; padding: 10px 15px 0; border-bottom: 1px solid #eee; display: flex; gap: 4px; }
+    .panel-intro .nav-tabs > li > a { border: none; border-bottom: 3px solid transparent; color: #666; padding: 12px 20px; font-weight: 500; transition: all 0.2s; background: transparent !important; }
+    .panel-intro .nav-tabs > li.active > a { border-bottom: 3px solid #1890ff; color: #1890ff; font-weight: 600; }
+    .tab-content { padding: 25px; background: #fff; min-height: 400px; }
+
+    /* 详情信息表格标准化 - 极致对齐 */
+    .info-table { width: 100%; border: 1px solid #f0f0f0; border-radius: 4px; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; table-layout: fixed; }
+    .info-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; line-height: 1.5; vertical-align: middle; }
+    .info-table tr:last-child td { border-bottom: none; }
+    .info-table .label-col { width: 130px; background: #fafafa; color: #8c8c8c; font-weight: 500; border-right: 1px solid #f0f0f0; text-align: right; }
+    .info-table .content-col { color: #262626; word-break: break-all; padding-left: 20px; }
+    
+    /* 统计卡片美化 */
+    .stat-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 20px; transition: all 0.3s; position: relative; overflow: hidden; height: 100%; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-2px); }
+    .stat-card::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #1890ff; }
+    .stat-card.success::after { background: #52c41a; }
+    .stat-card.warning::after { background: #faad14; }
+    .stat-card.info::after { background: #13c2c2; }
+    .stat-card.danger::after { background: #ff4d4f; }
+    
+    .stat-card .stat-title { font-size: 13px; color: #8c8c8c; margin-bottom: 8px; }
+    .stat-card .stat-number { font-size: 24px; font-weight: 600; color: #262626; }
+
+    /* 标题与装饰 */
+    .section-header { display: flex; align-items: center; margin-bottom: 16px; margin-top: 10px; }
+    .section-header i { color: #1890ff; margin-right: 8px; font-size: 16px; }
+    .section-header span { font-size: 16px; font-weight: 600; color: #262626; }
+
+    /* 资质图片容器 */
+    .cert-item { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 20px; }
+    .cert-item .cert-title { margin-bottom: 12px; color: #595959; font-weight: 500; font-size: 13px; }
+    .cert-img { max-width: 100%; border-radius: 4px; border: 1px solid #d9d9d9; transition: all 0.3s; cursor: zoom-in; background: #fff; }
+    .cert-img:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); transform: scale(1.02); }
+
+    /* 返回按钮位置 */
+    .btn-back-container { position: absolute; right: 20px; top: 12px; z-index: 10; }
+    
+    /* 顶部操作区 */
+    .header-actions { background: #fffbe6; border: 1px solid #ffe58f; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .header-actions .action-tips { color: #856404; font-size: 14px; }
+    .header-actions .action-tips i { margin-right: 8px; }
+    .page-close-btn {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+
+<a href="javascript:;" class="btn btn-sm btn-danger page-close-btn" onclick="Backend.api.closetabs();"><i class="fa fa-times"></i> 返回列表</a>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#basic" data-toggle="tab"><i class="fa fa-vcard-o"></i> 基本信息</a></li>
+            <li><a href="#stat" data-toggle="tab"><i class="fa fa-pie-chart"></i> 业务统计</a></li>
+            <li><a href="#publish" data-toggle="tab"><i class="fa fa-cloud-upload"></i> 发布任务</a></li>
+            <li><a href="#accept" data-toggle="tab"><i class="fa fa-tasks"></i> 接单任务</a></li>
+            <li><a href="#wallet-log" data-toggle="tab"><i class="fa fa-list-alt"></i> 账变记录</a></li>
+            <li><a href="#cert" data-toggle="tab"><i class="fa fa-certificate"></i> 资质证明</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <!-- 快速审核/管理区 -->
+        <div class="header-actions">
+            <div class="action-tips">
+                <i class="fa fa-info-circle"></i> 当前商户状态：<strong>{$row.status_text}</strong>。您可以进行快速管理操作。
+            </div>
+            <div class="action-btns">
+                {if $row.status == 'pending'}
+                <a href="merchant/merchant/approve/ids/{$row.id}" class="btn btn-success btn-embossed btn-ajax" data-confirm="确定通过该商户的入驻申请吗？"><i class="fa fa-check"></i> 审核通过</a>
+                <a href="merchant/merchant/reject/ids/{$row.id}" class="btn btn-danger btn-embossed btn-dialog" title="拒绝申请"><i class="fa fa-times"></i> 拒绝申请</a>
+                {/if}
+                
+                {if $row.status == 'approved'}
+                <a href="merchant/merchant/disable/ids/{$row.id}" class="btn btn-warning btn-embossed btn-ajax" data-confirm="确定要禁用该商户吗？禁用后将无法发布任务。"><i class="fa fa-ban"></i> 禁用商户</a>
+                {/if}
+                
+                {if $row.status == 'disabled'}
+                <a href="merchant/merchant/enable/ids/{$row.id}" class="btn btn-success btn-embossed btn-ajax" data-confirm="确定要恢复启用该商户吗？"><i class="fa fa-play-circle"></i> 恢复启用</a>
+                {/if}
+            </div>
+        </div>
+
+        <div id="myTabContent" class="tab-content">
+            <!-- 基本信息 -->
+            <div class="tab-pane fade active in" id="basic">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="section-header">
+                            <i class="fa fa-caret-right"></i>
+                            <span>商户基础信息</span>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="label-col">商户编号</td>
+                                <td class="content-col"><code>{$row.merchant_no|htmlentities}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">关联会员</td>
+                                <td class="content-col">
+                                    <a href="user/user/detail/ids/{$row.user_id}" class="addtabsit">{$row.user.nickname|htmlentities}</a>
+                                    <small class="text-muted" style="margin-left: 5px;">(ID {$row.user_id})</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">商户名称</td>
+                                <td class="content-col">{$row.name|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">联系电话</td>
+                                <td class="content-col">{$row.contact_phone|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">当前状态</td>
+                                <td class="content-col">
+                                    {switch $row.status}
+                                        {case pending}<span class="label label-warning">待审核</span>{/case}
+                                        {case approved}<span class="label label-success">已通过</span>{/case}
+                                        {case rejected}<span class="label label-danger">已拒绝</span>{/case}
+                                        {case disabled}<span class="label label-default">已禁用</span>{/case}
+                                        {default /}<span class="label label-info">{$row.status_text}</span>
+                                    {/switch}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">申请时间</td>
+                                <td class="content-col">{:date('Y-m-d H:i:s', $row.createtime)}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-header">
+                            <i class="fa fa-caret-right"></i>
+                            <span>法人与银行信息</span>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="label-col">法人姓名</td>
+                                <td class="content-col">{$row.legal_name|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">身份证号</td>
+                                <td class="content-col">{$row.id_card|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">开户银行</td>
+                                <td class="content-col">{$row.bank_name|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">银行卡号</td>
+                                <td class="content-col">{$row.bank_account|htmlentities}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">开户支行</td>
+                                <td class="content-col">{$row.bank_branch|htmlentities}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                {if $row.reject_reason}
+                <div class="alert alert-danger-light" style="background-color: #fff1f0; border: 1px solid #ffa39e; color: #cf1322; padding: 15px; border-radius: 4px; margin-top: 10px;">
+                    <i class="fa fa-info-circle"></i> <strong>拒绝原因</strong> {$row.reject_reason|htmlentities}
+                </div>
+                {/if}
+            </div>
+
+            <!-- 业务统计 -->
+            <div class="tab-pane fade" id="stat">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-card">
+                            <div class="stat-title">当前可用余额</div>
+                            <div class="stat-number text-danger">¥{$stats.user_money|number_format=2}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card success">
+                            <div class="stat-title">已完成任务</div>
+                            <div class="stat-number">{$stats.completed_tasks} / {$stats.total_tasks}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card info">
+                            <div class="stat-title">累计充值总额</div>
+                            <div class="stat-number">¥{$stats.total_recharge|number_format=2}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card warning">
+                            <div class="stat-title">累计支出佣金</div>
+                            <div class="stat-number">¥{$stats.total_commission|number_format=2}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-top: 20px;">
+                    <div class="col-md-6">
+                        <div class="section-header">
+                            <i class="fa fa-caret-right"></i>
+                            <span>财务概况</span>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="label-col">累计提现总额</td>
+                                <td class="content-col">¥{$stats.total_withdraw|number_format=2}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">入驻服务费</td>
+                                <td class="content-col">¥{$row.entry_fee|number_format=2}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">服务费状态</td>
+                                <td class="content-col">
+                                    {if $row.entry_fee_paid}
+                                    <span class="text-success"><i class="fa fa-check-circle"></i> 已支付</span>
+                                    {else/}
+                                    <span class="text-warning"><i class="fa fa-clock-o"></i> 未支付</span>
+                                    {/if}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="section-header">
+                            <i class="fa fa-caret-right"></i>
+                            <span>账户活跃度</span>
+                        </div>
+                        <table class="info-table">
+                            <tr>
+                                <td class="label-col">会员积分</td>
+                                <td class="content-col">{$stats.user_score}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">成交任务总额</td>
+                                <td class="content-col text-primary" style="font-weight: 600;">¥{$stats.total_amount|number_format=2}</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">审核通过时间</td>
+                                <td class="content-col">{if $row.approved_time}{:date('Y-m-d H:i:s', $row.approved_time)}{else}<span class="text-muted">未通过</span>{/if}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 发布任务 -->
+            <div class="tab-pane fade" id="publish">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>任务编号</th>
+                                <th>总金额</th>
+                                <th>已完成</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th width="60">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name="publishTasks" id="task"}
+                            <tr>
+                                <td><code class="text-primary">{$task.task_no}</code></td>
+                                <td>¥{$task.total_amount|number_format=2}</td>
+                                <td>¥{$task.completed_amount|number_format=2}</td>
+                                <td>{$task.status_text}</td>
+                                <td>{:date('Y-m-d H:i', $task.createtime)}</td>
+                                <td>
+                                    <a href="task/mutualtask/detail/ids/{$task.id}" class="btn btn-xs btn-default addtabsit" title="任务详情"><i class="fa fa-search"></i></a>
+                                </td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 接单任务 -->
+            <div class="tab-pane fade" id="accept">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>子任务号</th>
+                                <th>金额</th>
+                                <th>佣金</th>
+                                <th>状态</th>
+                                <th>更新时间</th>
+                                <th width="60">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name="acceptTasks" id="subtask"}
+                            <tr>
+                                <td><code class="text-success">{$subtask.task_no}</code></td>
+                                <td>¥{$subtask.amount|number_format=2}</td>
+                                <td>¥{$subtask.commission|number_format=2}</td>
+                                <td>{$subtask.status_text}</td>
+                                <td>{:date('Y-m-d H:i', $subtask.updatetime)}</td>
+                                <td>
+                                    <a href="task/subtask/detail/ids/{$subtask.id}" class="btn btn-xs btn-default addtabsit" title="子任务详情"><i class="fa fa-search"></i></a>
+                                </td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 账变记录 -->
+            <div class="tab-pane fade" id="wallet-log">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>钱包类型</th>
+                                <th>变更类型</th>
+                                <th>金额</th>
+                                <th>变更前</th>
+                                <th>变更后</th>
+                                <th>备注</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name="walletLogs" id="log"}
+                            <tr>
+                                <td>{$log.id}</td>
+                                <td><span class="label label-info">{$log.wallet_type_text}</span></td>
+                                <td><span class="label label-default">{$log.change_type_text}</span></td>
+                                <td>
+                                    {if $log.change_type == 'income' || $log.change_type == 'unfreeze'}
+                                    <span class="text-success" style="font-weight: 600;">+{$log.amount}</span>
+                                    {else/}
+                                    <span class="text-danger" style="font-weight: 600;">-{$log.amount}</span>
+                                    {/if}
+                                </td>
+                                <td>{$log.before}</td>
+                                <td>{$log.after}</td>
+                                <td>{$log.memo}</td>
+                                <td>{:date('Y-m-d H:i:s', $log.createtime)}</td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center" style="margin-top: 15px;">
+                    <a href="wallet/log/index?user_id={$row.user_id}" class="btn btn-default btn-sm addtabsit"><i class="fa fa-list"></i> 查看完整账变记录</a>
+                </div>
+            </div>
+
+            <!-- 资质证明 -->
+            <div class="tab-pane fade" id="cert">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="cert-item">
+                            <div class="cert-title">身份证正面</div>
+                            <a href="{$row.id_card_front|cdnurl|htmlentities}" target="_blank">
+                                <img src="{$row.id_card_front|cdnurl|htmlentities}" class="cert-img">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cert-item">
+                            <div class="cert-title">身份证反面</div>
+                            <a href="{$row.id_card_back|cdnurl|htmlentities}" target="_blank">
+                                <img src="{$row.id_card_back|cdnurl|htmlentities}" class="cert-img">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="cert-item">
+                            <div class="cert-title">营业执照</div>
+                            <a href="{$row.business_license|cdnurl|htmlentities}" target="_blank">
+                                <img src="{$row.business_license|cdnurl|htmlentities}" class="cert-img">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-default btn-embossed" onclick="Backend.api.close();">关闭页面</button>
+            </div>
+        </div>
+    </div>
+</div>

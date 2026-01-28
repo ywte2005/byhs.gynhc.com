@@ -1,0 +1,303 @@
+<style>
+    /* 基础布局优化 */
+    .panel-heading { position: relative; padding: 0 !important; border-bottom: none; background: #fff; }
+    .panel-intro .nav-tabs { background: #fcfcfc; padding: 10px 15px 0; border-bottom: 1px solid #eee; display: flex; gap: 4px; }
+    .panel-intro .nav-tabs > li > a { border: none; border-bottom: 3px solid transparent; color: #666; padding: 12px 20px; font-weight: 500; transition: all 0.2s; background: transparent !important; }
+    .panel-intro .nav-tabs > li.active > a { border-bottom: 3px solid #1890ff; color: #1890ff; font-weight: 600; }
+    .tab-content { padding: 25px; background: #fff; min-height: 400px; }
+
+    /* 详情信息表格标准化 - 极致对齐 */
+    .info-table { width: 100%; border: 1px solid #f0f0f0; border-radius: 4px; border-collapse: separate; border-spacing: 0; margin-bottom: 20px; table-layout: fixed; }
+    .info-table td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; line-height: 1.5; vertical-align: middle; }
+    .info-table tr:last-child td { border-bottom: none; }
+    .info-table .label-col { width: 130px; background: #fafafa; color: #8c8c8c; font-weight: 500; border-right: 1px solid #f0f0f0; text-align: right; }
+    .info-table .content-col { color: #262626; word-break: break-all; padding-left: 20px; }
+    
+    /* 统计卡片美化 */
+    .stat-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 8px; padding: 20px; transition: all 0.3s; position: relative; overflow: hidden; height: 100%; }
+    .stat-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); transform: translateY(-2px); }
+    .stat-card::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #1890ff; }
+    .stat-card.success::after { background: #52c41a; }
+    .stat-card.warning::after { background: #faad14; }
+    .stat-card.danger::after { background: #ff4d4f; }
+    
+    .stat-card .stat-title { font-size: 13px; color: #8c8c8c; margin-bottom: 8px; }
+    .stat-card .stat-number { font-size: 24px; font-weight: 600; color: #262626; }
+
+    /* 区域标题与装饰 */
+    .section-header { display: flex; align-items: center; margin-bottom: 16px; margin-top: 10px; }
+    .section-header i { color: #1890ff; margin-right: 8px; font-size: 16px; }
+    .section-header span { font-size: 16px; font-weight: 600; color: #262626; }
+
+    /* 会员头像 */
+    .user-avatar-container { text-align: center; padding: 20px; background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 20px; }
+    .user-avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+    /* 返回按钮位置 */
+    .btn-back-container { position: absolute; right: 20px; top: 12px; z-index: 10; }
+
+    /* 顶部操作区 */
+    .header-actions { background: #f6ffed; border: 1px solid #b7eb8f; padding: 15px 20px; border-radius: 4px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .header-actions .action-tips { color: #389e0d; font-size: 14px; }
+    .page-close-btn {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000;
+    }
+</style>
+
+<a href="javascript:;" class="btn btn-sm btn-danger page-close-btn" onclick="Backend.api.closetabs();"><i class="fa fa-times"></i> 返回列表</a>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#basic" data-toggle="tab"><i class="fa fa-user-circle-o"></i> 会员资料</a></li>
+            <li><a href="#stats" data-toggle="tab"><i class="fa fa-bar-chart"></i> 业务统计</a></li>
+            <li><a href="#money" data-toggle="tab"><i class="fa fa-money"></i> 资金流水</a></li>
+            <li><a href="#login" data-toggle="tab"><i class="fa fa-history"></i> 活跃记录</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <!-- 会员管理操作区 -->
+        <div class="header-actions" {if $row.status != 'normal'}style="background: #fff2f0; border-color: #ffccc7;"{/if}>
+            <div class="action-tips" {if $row.status != 'normal'}style="color: #cf1322;"{/if}>
+                <i class="fa fa-info-circle"></i> 当前会员状态：<strong>{$row.status == 'normal' ? '正常' : '已禁用'}</strong>。
+            </div>
+            <div class="action-btns">
+                {if $row.status == 'normal'}
+                <a href="user/user/disable/ids/{$row.id}" class="btn btn-danger btn-embossed btn-ajax" data-confirm="确定要禁用该会员吗？禁用后会员将无法登录。"><i class="fa fa-ban"></i> 禁用会员</a>
+                {else/}
+                <a href="user/user/enable/ids/{$row.id}" class="btn btn-success btn-embossed btn-ajax" data-confirm="确定要恢复启用该会员吗？"><i class="fa fa-play-circle"></i> 恢复启用</a>
+                {/if}
+                <a href="wallet/wallet/edit/ids/{$row.id}" class="btn btn-primary btn-embossed btn-dialog" title="手动调账"><i class="fa fa-exchange"></i> 手动调账</a>
+            </div>
+        </div>
+
+        <div id="myTabContent" class="tab-content">
+            <!-- 会员资料 -->
+            <div class="tab-pane fade active in" id="basic">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="user-avatar-container">
+                            <img src="{$row.avatar|cdnurl|default='/assets/img/avatar.png'}" class="user-avatar">
+                            <div style="margin-top: 15px;">
+                                <span class="label label-primary">{$row.group.name|default='普通会员'}</span>
+                            </div>
+                            <div style="margin-top: 8px; color: #8c8c8c; font-size: 12px;">
+                                ID {$row.id}
+                            </div>
+                            
+                            <div class="btn-group-vertical" style="width: 100%; margin-top: 20px;">
+                                {if $merchant_id}
+                                <a href="merchant/merchant/detail/ids/{$merchant_id}" class="btn btn-info addtabsit"><i class="fa fa-briefcase"></i> 商家详情</a>
+                                {/if}
+                                <a href="user/user/edit/ids/{$row.id}" class="btn btn-default btn-dialog" title="编辑资料"><i class="fa fa-pencil"></i> 编辑资料</a>
+                            </div>
+                        </div>
+                        
+                        <!-- 团队关系简述 -->
+                        <div class="section-header">
+                            <i class="fa fa-users"></i>
+                            <span>团队关系</span>
+                        </div>
+                        <div class="well bg-white" style="border: 1px solid #f0f0f0; border-radius: 4px; padding: 15px;">
+                            <div style="margin-bottom: 10px;">
+                                <small class="text-muted">上级推荐人：</small><br>
+                                {if $stats.promo.upline}
+                                <a href="user/user/detail/ids/{$stats.promo.upline.pid}" class="addtabsit">{$stats.promo.upline.parent.nickname|default='系统推荐'}</a>
+                                {else/}
+                                <span class="text-muted">无</span>
+                                {/if}
+                            </div>
+                            <div>
+                                <small class="text-muted">直属下级人数：</small><br>
+                                <span class="text-primary" style="font-weight: 600; font-size: 16px;">{$stats.promo.invite_count}</span> 人
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="section-header">
+                                    <i class="fa fa-caret-right"></i>
+                                    <span>账户信息</span>
+                                </div>
+                                <table class="info-table">
+                                    <tr>
+                                        <td class="label-col">用户名</td>
+                                        <td class="content-col">{$row.username|htmlentities}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">昵称</td>
+                                        <td class="content-col">{$row.nickname|htmlentities}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">手机号</td>
+                                        <td class="content-col">{$row.mobile|default='未绑定'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">电子邮箱</td>
+                                        <td class="content-col">{$row.email|default='未绑定'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">账户余额</td>
+                                        <td class="content-col text-danger font-weight-bold">¥{$row.money|number_format=2}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">账户积分</td>
+                                        <td class="content-col">{$row.score}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="section-header">
+                                    <i class="fa fa-caret-right"></i>
+                                    <span>登录统计</span>
+                                </div>
+                                <table class="info-table">
+                                    <tr>
+                                        <td class="label-col">累计登录</td>
+                                        <td class="content-col">{$row.successions} 次 (连登)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">最后登录时间</td>
+                                        <td class="content-col">{$row.logintime|datetime}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">最后登录IP</td>
+                                        <td class="content-col">{$row.loginip|default='-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">注册时间</td>
+                                        <td class="content-col">{$row.jointime|datetime}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">注册IP</td>
+                                        <td class="content-col">{$row.joinip|default='-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-col">状态</td>
+                                        <td class="content-col">
+                                            {if $row.status == 'normal'}
+                                            <span class="label label-success">正常</span>
+                                            {else/}
+                                            <span class="label label-danger">禁用</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 业务统计 -->
+            <div class="tab-pane fade" id="stats">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="stat-title">作为商户发布任务</div>
+                            <div class="stat-number">{$stats.merchant.total_tasks} 笔</div>
+                            <div style="margin-top: 10px; color: #8c8c8c; font-size: 13px;">
+                                累计总金额：<span class="text-primary">¥{$stats.merchant.total_amount|number_format=2}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card success">
+                            <div class="stat-title">作为会员完成任务</div>
+                            <div class="stat-number">{$stats.worker.total_completed} 笔</div>
+                            <div style="margin-top: 10px; color: #8c8c8c; font-size: 13px;">
+                                累计收佣金：<span class="text-success">¥{$stats.worker.total_commission|number_format=2}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card warning">
+                            <div class="stat-title">推广邀请人数</div>
+                            <div class="stat-number">{$stats.promo.invite_count} 人</div>
+                            <div style="margin-top: 10px; color: #8c8c8c; font-size: 13px;">
+                                直属下级活跃度较好
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 资金流水 -->
+            <div class="tab-pane fade" id="money">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>金额变更</th>
+                                <th>变更前</th>
+                                <th>变更后</th>
+                                <th>备注</th>
+                                <th>变更时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name="moneyLogs" id="log"}
+                            <tr>
+                                <td>{$log.id}</td>
+                                <td>
+                                    {if $log.money > 0}
+                                    <span class="text-success" style="font-weight: 600;">+{$log.money}</span>
+                                    {else/}
+                                    <span class="text-danger" style="font-weight: 600;">{$log.money}</span>
+                                    {/if}
+                                </td>
+                                <td>{$log.before}</td>
+                                <td>{$log.after}</td>
+                                <td>{$log.memo}</td>
+                                <td>{:date('Y-m-d H:i:s', $log.createtime)}</td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center" style="margin-top: 15px;">
+                    <a href="wallet/log/index?user_id={$row.id}" class="btn btn-default btn-sm addtabsit"><i class="fa fa-list"></i> 查看完整资金流水</a>
+                </div>
+            </div>
+
+            <!-- 活跃记录 -->
+            <div class="tab-pane fade" id="login">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>登录设备/Token</th>
+                                <th>过期时间</th>
+                                <th>最后活跃</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {volist name="loginLogs" id="log"}
+                            <tr>
+                                <td><code style="font-size: 11px;">{$log.token}</code></td>
+                                <td>{:date('Y-m-d H:i', $log.expiretime)}</td>
+                                <td>{:date('Y-m-d H:i', $log.createtime)}</td>
+                            </tr>
+                            {/volist}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-info-light" style="margin-top: 20px;">
+                    <i class="fa fa-info-circle"></i> 仅展示最近 5 条登录凭证记录。
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <button type="button" class="btn btn-default btn-embossed" onclick="Backend.api.close();">关闭页面</button>
+            </div>
+        </div>
+    </div>
+</div>
