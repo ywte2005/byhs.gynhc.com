@@ -8,6 +8,21 @@ inclusion: always
 
 商户互助刷单平台，实现商户之间互助完成刷单任务，配套完整的推广分销、等级权益、佣金分润体系。
 
+### 开发环境要求
+
+**后端开发环境：**
+- PHP ≥ 7.4
+- MySQL ≥ 5.7
+- Composer
+- Web 服务器（Apache/Nginx）
+
+**前端开发环境：**
+- **HBuilderX ≥ 3.8.0**（必需，用于运行和编译项目）
+- Node.js ≥ 16（用于安装基础依赖）
+- 不支持命令行运行（npm run dev/build 无效）
+
+**重要：** 前端项目必须在 HBuilderX 中打开、运行和编译，所有平台（H5/App/小程序）的开发调试都需要通过 HBuilderX 完成。
+
 ### 核心业务流程
 
 **商户入驻流程：**
@@ -21,15 +36,21 @@ inclusion: always
 
 ## 技术栈
 
-| 层级 | 技术 | 版本 |
-|------|------|------|
-| 后端框架 | FastAdmin (ThinkPHP) | 5.x |
-| 后端语言 | PHP | ≥7.4 |
-| 数据库 | MySQL | ≥5.7 |
-| 前端框架 | Cool Unix (uni-app x) | 8.1.0 |
-| 前端语言 | TypeScript/UTS | - |
-| UI框架 | TailwindCSS + Cool UI | - |
-| 支持平台 | H5 / App / 微信小程序 | - |
+| 层级 | 技术 | 版本 | 说明 |
+|------|------|------|------|
+| 后端框架 | FastAdmin (ThinkPHP) | 5.x | - |
+| 后端语言 | PHP | ≥7.4 | - |
+| 数据库 | MySQL | ≥5.7 | - |
+| 前端框架 | uni-app x | - | **必须使用 HBuilderX 运行** |
+| 前端语言 | TypeScript/UTS | - | - |
+| UI框架 | TailwindCSS | - | - |
+| 开发工具 | HBuilderX | ≥3.8.0 | **前端项目必需** |
+| 支持平台 | H5 / App / 微信小程序 | - | 通过 HBuilderX 编译 |
+
+**重要提示：**
+- 前端项目必须在 HBuilderX 中打开和运行
+- 不支持通过命令行（npm run dev/build）运行
+- 所有平台的编译和调试都需要通过 HBuilderX 完成
 
 ## 核心配置体系
 
