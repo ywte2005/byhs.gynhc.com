@@ -1,0 +1,173 @@
+<template>
+	<cl-page>
+		<view class="commission-page">
+			<cl-list-view :auto="false" :data="list" @load="loadMore">
+				<template v-slot:item="{ item }">
+					<view class="commission-item">
+						<view class="item-left">
+							<text class="item-type">{{ getRewardTypeName(item.reward_type) }}</text>
+							<text class="item-remark">{{ item.remark }}</text>
+							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+						</view>
+						<view class="item-right">
+							<text class="item-amount">+{{ item.amount }}</text>
+							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
+						</view>
+					</view>
+				</template>
+			</cl-list-view>
+
+			<view v-if="list.length == 0 && !loading" class="empty">
+				<text class="empty-text">暂无佣金记录</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getCommissionList } from "@/services/promo";
+	import type { CommissionLog } from "@/services/promo";
+
+	export default {
+		data() {
+			return {
+				list: [] as CommissionLog[],
+				page: 1,
+				loading: false,
+				hasMore: true
+			};
+		},
+		onShow() {
+			this.page = 1;
+			this.list = [];
+			this.loadMore();
+		},
+		methods: {
+			loadMore() {
+				if (this.loading || !this.hasMore) return;
+				this.loading = true;
+
+				getCommissionList(this.page, 20)
+					.then((res : { list : CommissionLog[] }) => {
+						if (res.list.length > 0) {
+							this.list = this.list.concat(res.list);
+							this.page++;
+						} else {
+							this.hasMore = false;
+						}
+						this.loading = false;
+					})
+					.catch(() => {
+						this.loading = false;
+					});
+			},
+			getRewardTypeName(type : string) : string {
+				const map : UTSJSONObject = {
+					'direct': '直推奖',
+					'indirect': '间推奖',
+					'flat': '平级奖',
+					'diff': '级差奖',
+					'bonus': '分红'
+				};
+				return (map[type] ?? type) as string;
+			},
+			getStatusName(status : string) : string {
+				const map : UTSJSONObject = {
+					'pending': '待发放',
+					'granted': '已发放',
+					'failed': '发放失败'
+				};
+				return (map[status] ?? status) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				const h = date.getHours().toString().padStart(2, '0');
+				const min = date.getMinutes().toString().padStart(2, '0');
+				return `${y}-${m}-${d} ${h}:${min}`;
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.commission-page {
+		padding: 20rpx;
+	}
+
+	.commission-item {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 30rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		margin-bottom: 16rpx;
+	}
+
+	.item-left {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.item-type {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.item-remark {
+		font-size: 24rpx;
+		color: #666666;
+		margin-top: 8rpx;
+	}
+
+	.item-time {
+		font-size: 22rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.item-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+
+	.item-amount {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #ff6b35;
+	}
+
+	.item-status {
+		font-size: 22rpx;
+		margin-top: 8rpx;
+	}
+
+	.item-status.granted {
+		color: #52c41a;
+	}
+
+	.item-status.pending {
+		color: #faad14;
+	}
+
+	.item-status.failed {
+		color: #ff4d4f;
+	}
+
+	.empty {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 100rpx 0;
+	}
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #999999;
+	}
+</style>

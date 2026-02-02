@@ -1,0 +1,326 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">发起任务</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<view class="px-4 py-4">
+				<!-- 任务信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">任务信息</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">任务标题 <text class="text-[#ff3b30]">*</text></text>
+						<input 
+							v-model="form.title"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入任务标题"
+							placeholder-class="text-[#c8c9cc]"
+						/>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">任务类目 <text class="text-[#ff3b30]">*</text></text>
+						<view 
+							@click="showCategoryPicker = true"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 flex items-center justify-between"
+						>
+							<text :class="['text-4', form.category ? 'text-[#1f2329]' : 'text-[#c8c9cc]']">
+								{{ form.category || '请选择任务类目' }}
+							</text>
+							<text class="text-4 text-[#999]">→</text>
+						</view>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">平台名称 <text class="text-[#ff3b30]">*</text></text>
+						<input 
+							v-model="form.platform"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="如：美团、淘宝、京东等"
+							placeholder-class="text-[#c8c9cc]"
+						/>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">任务描述 <text class="text-[#ff3b30]">*</text></text>
+						<textarea 
+							v-model="form.description"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请详细描述任务要求和操作步骤"
+							placeholder-class="text-[#c8c9cc]"
+							:maxlength="500"
+							:show-confirm-bar="false"
+							style="height: 120px;"
+						/>
+						<text class="text-3 text-[#999] mt-1">{{ form.description.length }}/500</text>
+					</view>
+				</view>
+
+				<!-- 金额设置 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">金额设置</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">单价（元）<text class="text-[#ff3b30]">*</text></text>
+						<input 
+							v-model="form.unitPrice"
+							type="digit"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入单个任务的佣金"
+							placeholder-class="text-[#c8c9cc]"
+							@input="calculateTotal"
+						/>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">任务数量 <text class="text-[#ff3b30]">*</text></text>
+						<input 
+							v-model="form.totalCount"
+							type="number"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="需要完成的任务数量"
+							placeholder-class="text-[#c8c9cc]"
+							@input="calculateTotal"
+						/>
+					</view>
+
+					<view class="bg-[#f5f5f5] rounded-2 p-3">
+						<view class="flex items-center justify-between mb-2">
+							<text class="text-3.5 text-[#999]">任务总额</text>
+							<text class="text-5 font-bold text-[#1f2329]">¥{{ totalAmount }}</text>
+						</view>
+						<view class="flex items-center justify-between mb-2">
+							<text class="text-3.5 text-[#999]">平台手续费（5%）</text>
+							<text class="text-4 text-[#ff9500]">¥{{ serviceFee }}</text>
+						</view>
+						<view class="flex items-center justify-between mb-2">
+							<text class="text-3.5 text-[#999]">保证金（10%）</text>
+							<text class="text-4 text-[#ff9500]">¥{{ depositAmount }}</text>
+						</view>
+						<view class="border-t border-[#e5e5e5] pt-2 mt-2">
+							<view class="flex items-center justify-between">
+								<text class="text-4 font-bold text-[#1f2329]">需支付总额</text>
+								<text class="text-6 font-bold text-[#ff3b30]">¥{{ payAmount }}</text>
+							</view>
+						</view>
+					</view>
+				</view>
+
+				<!-- 任务要求 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">任务要求</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">完成时限（小时）<text class="text-[#ff3b30]">*</text></text>
+						<input 
+							v-model="form.timeLimit"
+							type="number"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="接单后需在多少小时内完成"
+							placeholder-class="text-[#c8c9cc]"
+						/>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">凭证要求</text>
+						<view class="flex flex-wrap">
+							<view 
+								v-for="(item, index) in proofTypes" 
+								:key="index"
+								@click="toggleProofType(item.value)"
+								:class="['border rounded-2 px-3 py-2 mr-2 mb-2', form.proofTypes.includes(item.value) ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+							>
+								<text :class="['text-3.5', form.proofTypes.includes(item.value) ? 'text-[#07c160]' : 'text-[#646a73]']">
+									{{ item.label }}
+								</text>
+							</view>
+						</view>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#646a73] mb-2">特殊要求</text>
+						<textarea 
+							v-model="form.specialRequirement"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="如有特殊要求请在此说明（选填）"
+							placeholder-class="text-[#c8c9cc]"
+							:maxlength="200"
+							:show-confirm-bar="false"
+							style="height: 80px;"
+						/>
+					</view>
+				</view>
+
+				<!-- 温馨提示 -->
+				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
+					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
+					<text class="text-3.5 text-[#646a73] mt-2">• 发起任务需支付任务总额+手续费+保证金</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 任务完成后保证金将自动退还</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 请确保任务描述清晰，避免纠纷</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 恶意发布任务将被封号处理</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部操作按钮 -->
+		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+			<button 
+				@click="submitTask"
+				:class="['w-full rounded-full py-3', canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999]']"
+				:disabled="!canSubmit"
+			>
+				<text class="text-4">确认发布（¥{{ payAmount }}）</text>
+			</button>
+		</view>
+
+		<!-- 分类选择器 -->
+		<view v-if="showCategoryPicker" class="fixed inset-0 bg-black/50 flex items-end" @click="showCategoryPicker = false">
+			<view class="bg-white w-full rounded-t-3 p-4" @click.stop>
+				<text class="text-4 font-bold text-[#1f2329] mb-4">选择任务类目</text>
+				<view 
+					v-for="(item, index) in categories" 
+					:key="index"
+					@click="selectCategory(item)"
+					class="py-3 border-b border-[#e5e5e5]"
+				>
+					<text class="text-4 text-[#1f2329]">{{ item }}</text>
+				</view>
+				<button @click="showCategoryPicker = false" class="w-full bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mt-4">
+					<text class="text-4">取消</text>
+				</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+import { createTask } from '@/services/task'
+
+// 表单数据
+const form = ref({
+	title: '',
+	category: '',
+	platform: '',
+	description: '',
+	unitPrice: '',
+	totalCount: '',
+	timeLimit: '24',
+	proofTypes: ['screenshot'],
+	specialRequirement: ''
+})
+
+// 分类列表
+const categories = ['电商', '外卖', '出行', '生活', '其他']
+
+// 凭证类型
+const proofTypes = [
+	{ label: '订单截图', value: 'screenshot' },
+	{ label: '聊天记录', value: 'chat' },
+	{ label: '物流信息', value: 'logistics' },
+	{ label: '评价截图', value: 'review' }
+]
+
+// 显示分类选择器
+const showCategoryPicker = ref(false)
+
+// 计算总金额
+const totalAmount = computed(() => {
+	const price = parseFloat(form.value.unitPrice) || 0
+	const count = parseInt(form.value.totalCount) || 0
+	return (price * count).toFixed(2)
+})
+
+// 计算手续费
+const serviceFee = computed(() => {
+	return (parseFloat(totalAmount.value) * 0.05).toFixed(2)
+})
+
+// 计算保证金
+const depositAmount = computed(() => {
+	return (parseFloat(totalAmount.value) * 0.1).toFixed(2)
+})
+
+// 计算需支付总额
+const payAmount = computed(() => {
+	return (parseFloat(totalAmount.value) + parseFloat(serviceFee.value) + parseFloat(depositAmount.value)).toFixed(2)
+})
+
+// 判断是否可以提交
+const canSubmit = computed(() => {
+	return form.value.title && form.value.category && form.value.platform && 
+		form.value.description && form.value.unitPrice && form.value.totalCount && 
+		form.value.timeLimit && form.value.proofTypes.length > 0
+})
+
+// 选择分类
+const selectCategory = (category: string) => {
+	form.value.category = category
+	showCategoryPicker.value = false
+}
+
+// 切换凭证类型
+const toggleProofType = (value: string) => {
+	const index = form.value.proofTypes.indexOf(value)
+	if (index > -1) {
+		form.value.proofTypes.splice(index, 1)
+	} else {
+		form.value.proofTypes.push(value)
+	}
+}
+
+// 计算总额
+const calculateTotal = () => {
+	// 触发计算
+}
+
+// 提交任务
+const submitTask = async () => {
+	if (!canSubmit.value) return
+	
+	try {
+		uni.showLoading({ title: '提交中...' })
+		
+		const res = await createTask(form.value)
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			uni.showToast({
+				title: '发布成功',
+				icon: 'success'
+			})
+			
+			// 跳转到任务详情
+			setTimeout(() => {
+				uni.redirectTo({
+					url: `/pages/task/detail?id=${res.data.id}`
+				})
+			}, 1500)
+		} else {
+			uni.showToast({
+				title: res.message || '发布失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '发布失败，请重试',
+			icon: 'none'
+		})
+	}
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+</script>

@@ -1,0 +1,259 @@
+<template>
+	<cl-page>
+		<view class="bonus-page">
+			<view class="summary-card">
+				<view class="summary-row">
+					<view class="summary-item">
+						<text class="summary-value">{{ summary.total_bonus }}</text>
+						<text class="summary-label">累计分红</text>
+					</view>
+					<view class="summary-item">
+						<text class="summary-value">{{ summary.month_bonus }}</text>
+						<text class="summary-label">本月分红</text>
+					</view>
+				</view>
+				<view v-if="summary.qualified_rules.length > 0" class="qualified-info">
+					<text class="qualified-label">已达标档位：</text>
+					<text class="qualified-value">{{ summary.qualified_rules.join('、') }}</text>
+				</view>
+			</view>
+
+			<view class="section-title">
+				<text>分红记录</text>
+			</view>
+
+			<cl-list-view :auto="false" :data="list" @load="loadMore">
+				<template v-slot:item="{ item }">
+					<view class="bonus-item">
+						<view class="item-left">
+							<text class="item-title">团队分红</text>
+							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+						</view>
+						<view class="item-right">
+							<text class="item-amount">+{{ item.amount }}</text>
+							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
+						</view>
+					</view>
+				</template>
+			</cl-list-view>
+
+			<view v-if="list.length == 0 && !loading" class="empty">
+				<text class="empty-text">暂无分红记录</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getBonusSummary, getBonusRecords } from "@/services/promo";
+
+	type BonusSummary = {
+		total_bonus : string;
+		month_bonus : string;
+		qualified_rules : string[];
+	};
+
+	type BonusRecord = {
+		id : number;
+		amount : string;
+		status : string;
+		createtime : number;
+	};
+
+	export default {
+		data() {
+			return {
+				summary: {
+					total_bonus: '0.00',
+					month_bonus: '0.00',
+					qualified_rules: [] as string[]
+				} as BonusSummary,
+				list: [] as BonusRecord[],
+				page: 1,
+				loading: false,
+				hasMore: true
+			};
+		},
+		onShow() {
+			this.loadSummary();
+			this.page = 1;
+			this.list = [];
+			this.loadMore();
+		},
+		methods: {
+			loadSummary() {
+				getBonusSummary()
+					.then((res : BonusSummary) => {
+						this.summary = res;
+					})
+					.catch(() => { });
+			},
+			loadMore() {
+				if (this.loading || !this.hasMore) return;
+				this.loading = true;
+
+				getBonusRecords(this.page, 20)
+					.then((res : { list : BonusRecord[] }) => {
+						if (res.list.length > 0) {
+							this.list = this.list.concat(res.list);
+							this.page++;
+						} else {
+							this.hasMore = false;
+						}
+						this.loading = false;
+					})
+					.catch(() => {
+						this.loading = false;
+					});
+			},
+			getStatusName(status : string) : string {
+				const map : UTSJSONObject = {
+					'pending': '待发放',
+					'granted': '已发放',
+					'failed': '发放失败'
+				};
+				return (map[status] ?? status) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				return `${y}-${m}-${d}`;
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.bonus-page {
+		padding: 20rpx;
+	}
+
+	.summary-card {
+		padding: 40rpx;
+		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.summary-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+	}
+
+	.summary-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.summary-value {
+		font-size: 48rpx;
+		font-weight: bold;
+		color: #ffffff;
+	}
+
+	.summary-label {
+		font-size: 26rpx;
+		color: rgba(255, 255, 255, 0.8);
+		margin-top: 10rpx;
+	}
+
+	.qualified-info {
+		display: flex;
+		flex-direction: row;
+		margin-top: 30rpx;
+		padding-top: 30rpx;
+		border-top: 1rpx solid rgba(255, 255, 255, 0.3);
+	}
+
+	.qualified-label {
+		font-size: 26rpx;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.qualified-value {
+		font-size: 26rpx;
+		color: #ffffff;
+	}
+
+	.section-title {
+		padding: 20rpx 0;
+	}
+
+	.section-title text {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.bonus-item {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 30rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		margin-bottom: 16rpx;
+	}
+
+	.item-left {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.item-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.item-time {
+		font-size: 24rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.item-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+
+	.item-amount {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #f5576c;
+	}
+
+	.item-status {
+		font-size: 22rpx;
+		margin-top: 8rpx;
+	}
+
+	.item-status.granted {
+		color: #52c41a;
+	}
+
+	.item-status.pending {
+		color: #faad14;
+	}
+
+	.item-status.failed {
+		color: #ff4d4f;
+	}
+
+	.empty {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 100rpx 0;
+	}
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #999999;
+	}
+</style>

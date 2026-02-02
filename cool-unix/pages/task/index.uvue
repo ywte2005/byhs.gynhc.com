@@ -1,0 +1,261 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<text class="text-5 font-bold text-[#1f2329]">任务大厅</text>
+			<view @click="goToMyTasks">
+				<text class="text-4 text-[#07c160]">我的任务</text>
+			</view>
+		</view>
+
+		<!-- 筛选栏 -->
+		<view class="bg-white px-4 py-3 mb-2">
+			<scroll-view class="flex" scroll-x>
+				<view class="flex">
+					<view 
+						v-for="(item, index) in categories" 
+						:key="index"
+						@click="selectCategory(item.value)"
+						:class="['px-4 py-2 rounded-full mr-2', currentCategory === item.value ? 'bg-[#07c160] text-white' : 'bg-[#f5f5f5] text-[#646a73]']"
+					>
+						<text :class="['text-3.5', currentCategory === item.value ? 'text-white' : 'text-[#646a73]']">{{ item.label }}</text>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+
+		<!-- 任务列表 -->
+		<scroll-view class="flex-1" scroll-y @scrolltolower="loadMore">
+			<view class="px-4 py-2">
+				<view 
+					v-for="(task, index) in taskList" 
+					:key="index"
+					@click="goToDetail(task.id)"
+					class="bg-white rounded-2 p-4 mb-3"
+				>
+					<!-- 任务头部 -->
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex items-center">
+							<view class="w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-3">
+								<text class="text-5">{{ task.merchantAvatar }}</text>
+							</view>
+							<view>
+								<text class="text-4 font-bold text-[#1f2329]">{{ task.merchantName }}</text>
+								<text class="text-3 text-[#999] mt-0.5">{{ task.createTime }}</text>
+							</view>
+						</view>
+						<view :class="['px-2 py-1 rounded', getStatusColor(task.status)]">
+							<text class="text-3 text-white">{{ getStatusText(task.status) }}</text>
+						</view>
+					</view>
+
+					<!-- 任务信息 -->
+					<view class="mb-3">
+						<text class="text-4.5 font-bold text-[#1f2329]">{{ task.title }}</text>
+						<text class="text-3.5 text-[#646a73] mt-2">{{ task.description }}</text>
+					</view>
+
+					<!-- 任务标签 -->
+					<view class="flex flex-wrap mb-3">
+						<view class="bg-[#f0f9ff] px-2 py-1 rounded mr-2 mb-2">
+							<text class="text-3 text-[#07c160]">{{ task.category }}</text>
+						</view>
+						<view class="bg-[#fff9e6] px-2 py-1 rounded mr-2 mb-2">
+							<text class="text-3 text-[#ed6a0c]">{{ task.platform }}</text>
+						</view>
+					</view>
+
+					<!-- 任务数据 -->
+					<view class="flex items-center justify-between border-t border-[#e5e5e5] pt-3">
+						<view class="flex-1">
+							<text class="text-3 text-[#999]">单价</text>
+							<text class="text-5 font-bold text-[#ff3b30] ml-1">¥{{ task.unitPrice }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3 text-[#999]">总数</text>
+							<text class="text-4 font-bold text-[#1f2329] ml-1">{{ task.totalCount }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3 text-[#999]">剩余</text>
+							<text class="text-4 font-bold text-[#07c160] ml-1">{{ task.remainCount }}</text>
+						</view>
+						<view class="flex-1 text-right">
+							<text class="text-3 text-[#999]">进度</text>
+							<text class="text-4 font-bold text-[#5856d6] ml-1">{{ task.progress }}%</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 加载更多 -->
+				<view v-if="loading" class="flex justify-center py-4">
+					<text class="text-3.5 text-[#999]">加载中...</text>
+				</view>
+				<view v-if="!hasMore && taskList.length > 0" class="flex justify-center py-4">
+					<text class="text-3.5 text-[#999]">没有更多了</text>
+				</view>
+				<view v-if="taskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-20">
+					<text class="text-10 mb-3">📋</text>
+					<text class="text-4 text-[#999]">暂无任务</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部操作栏 -->
+		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+			<button 
+				@click="goToCreate"
+				class="w-full bg-[#07c160] text-white rounded-full py-3"
+			>
+				<text class="text-4">发起任务</text>
+			</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getTaskList } from '@/services/task'
+
+// 当前分类
+const currentCategory = ref('all')
+
+// 分类列表
+const categories = [
+	{ label: '全部', value: 'all' },
+	{ label: '电商', value: 'ecommerce' },
+	{ label: '外卖', value: 'food' },
+	{ label: '出行', value: 'travel' },
+	{ label: '生活', value: 'life' },
+	{ label: '其他', value: 'other' }
+]
+
+// 任务列表
+const taskList = ref([
+	{
+		id: 1,
+		merchantAvatar: '🏪',
+		merchantName: '示例商户A',
+		createTime: '2小时前',
+		status: 'ongoing',
+		title: '美团外卖订单互助',
+		description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
+		category: '外卖',
+		platform: '美团',
+		unitPrice: '15.00',
+		totalCount: 100,
+		remainCount: 45,
+		progress: 55
+	},
+	{
+		id: 2,
+		merchantAvatar: '🏬',
+		merchantName: '示例商户B',
+		createTime: '5小时前',
+		status: 'ongoing',
+		title: '淘宝店铺刷单任务',
+		description: '淘宝店铺需要刷单提升销量，要求按照指定流程操作',
+		category: '电商',
+		platform: '淘宝',
+		unitPrice: '20.00',
+		totalCount: 50,
+		remainCount: 12,
+		progress: 76
+	}
+])
+
+// 加载状态
+const loading = ref(false)
+const hasMore = ref(true)
+const page = ref(1)
+
+// 选择分类
+const selectCategory = (value: string) => {
+	currentCategory.value = value
+	page.value = 1
+	taskList.value = []
+	loadTaskList()
+}
+
+// 加载任务列表
+const loadTaskList = async () => {
+	if (loading.value) return
+	
+	try {
+		loading.value = true
+		
+		const res = await getTaskList({
+			category: currentCategory.value,
+			page: page.value,
+			pageSize: 10
+		})
+		
+		loading.value = false
+		
+		if (res.code === 0) {
+			if (page.value === 1) {
+				taskList.value = res.data.list
+			} else {
+				taskList.value = taskList.value.concat(res.data.list)
+			}
+			hasMore.value = res.data.hasMore
+		}
+	} catch (error) {
+		loading.value = false
+		console.log('加载任务列表失败', error)
+	}
+}
+
+// 加载更多
+const loadMore = () => {
+	if (!loading.value && hasMore.value) {
+		page.value++
+		loadTaskList()
+	}
+}
+
+// 获取状态文本
+const getStatusText = (status: string): string => {
+	const statusMap = {
+		ongoing: '进行中',
+		completed: '已完成',
+		cancelled: '已取消'
+	}
+	return statusMap[status] || '未知'
+}
+
+// 获取状态颜色
+const getStatusColor = (status: string): string => {
+	const colorMap = {
+		ongoing: 'bg-[#07c160]',
+		completed: 'bg-[#999]',
+		cancelled: 'bg-[#ff3b30]'
+	}
+	return colorMap[status] || 'bg-[#999]'
+}
+
+// 进入任务详情
+const goToDetail = (id: number) => {
+	uni.navigateTo({
+		url: `/pages/task/detail?id=${id}`
+	})
+}
+
+// 进入我的任务
+const goToMyTasks = () => {
+	uni.navigateTo({
+		url: '/pages/task/my-tasks'
+	})
+}
+
+// 发起任务
+const goToCreate = () => {
+	uni.navigateTo({
+		url: '/pages/task/create'
+	})
+}
+
+// 页面加载时获取任务列表
+onMounted(() => {
+	loadTaskList()
+})
+</script>

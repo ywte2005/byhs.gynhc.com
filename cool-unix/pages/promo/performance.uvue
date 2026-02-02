@@ -1,0 +1,187 @@
+<template>
+	<cl-page>
+		<view class="performance-page">
+			<view class="month-selector">
+				<cl-button type="text" @tap="prevMonth">
+					<text>上月</text>
+				</cl-button>
+				<text class="current-month">{{ currentMonth }}</text>
+				<cl-button type="text" @tap="nextMonth">
+					<text>下月</text>
+				</cl-button>
+			</view>
+
+			<view class="performance-card">
+				<view class="card-item">
+					<text class="item-value">{{ performance.personal_total }}</text>
+					<text class="item-label">个人业绩</text>
+				</view>
+				<view class="card-item">
+					<text class="item-value">{{ performance.team_total }}</text>
+					<text class="item-label">团队业绩</text>
+				</view>
+				<view class="card-item">
+					<text class="item-value">{{ performance.growth }}</text>
+					<text class="item-label">业绩增量</text>
+				</view>
+				<view class="card-item">
+					<text class="item-value">{{ performance.direct_count }}</text>
+					<text class="item-label">直推人数</text>
+				</view>
+			</view>
+
+			<view class="tips-card">
+				<text class="tips-title">业绩说明</text>
+				<text class="tips-item">个人业绩：您本人产生的业绩总额</text>
+				<text class="tips-item">团队业绩：您及下级团队的业绩总额</text>
+				<text class="tips-item">业绩增量：本月业绩减去上月业绩</text>
+				<text class="tips-item">直推人数：您直接邀请的用户数量</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getPerformanceSummary } from "@/services/promo";
+
+	type PerformanceData = {
+		month : string;
+		personal_total : string;
+		team_total : string;
+		growth : string;
+		direct_count : number;
+	};
+
+	export default {
+		data() {
+			return {
+				currentMonth: '',
+				performance: {
+					month: '',
+					personal_total: '0.00',
+					team_total: '0.00',
+					growth: '0.00',
+					direct_count: 0
+				} as PerformanceData
+			};
+		},
+		onShow() {
+			this.currentMonth = this.getCurrentMonth();
+			this.loadData();
+		},
+		methods: {
+			getCurrentMonth() : string {
+				const now = new Date();
+				const y = now.getFullYear();
+				const m = (now.getMonth() + 1).toString().padStart(2, '0');
+				return `${y}-${m}`;
+			},
+			loadData() {
+				getPerformanceSummary(this.currentMonth)
+					.then((res : PerformanceData) => {
+						this.performance = res;
+					})
+					.catch(() => { });
+			},
+			prevMonth() {
+				const parts = this.currentMonth.split('-');
+				let y = parseInt(parts[0]);
+				let m = parseInt(parts[1]) - 1;
+				if (m < 1) {
+					m = 12;
+					y--;
+				}
+				this.currentMonth = `${y}-${m.toString().padStart(2, '0')}`;
+				this.loadData();
+			},
+			nextMonth() {
+				const now = this.getCurrentMonth();
+				if (this.currentMonth >= now) return;
+
+				const parts = this.currentMonth.split('-');
+				let y = parseInt(parts[0]);
+				let m = parseInt(parts[1]) + 1;
+				if (m > 12) {
+					m = 1;
+					y++;
+				}
+				this.currentMonth = `${y}-${m.toString().padStart(2, '0')}`;
+				this.loadData();
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.performance-page {
+		padding: 20rpx;
+	}
+
+	.month-selector {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20rpx 40rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.current-month {
+		font-size: 34rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.performance-card {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		padding: 20rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.card-item {
+		width: 50%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 30rpx 0;
+	}
+
+	.item-value {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #667eea;
+	}
+
+	.item-label {
+		font-size: 26rpx;
+		color: #999999;
+		margin-top: 10rpx;
+	}
+
+	.tips-card {
+		display: flex;
+		flex-direction: column;
+		padding: 30rpx;
+		background-color: #ffffff;
+		border-radius: 16rpx;
+	}
+
+	.tips-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 20rpx;
+	}
+
+	.tips-item {
+		font-size: 26rpx;
+		color: #666666;
+		line-height: 48rpx;
+	}
+</style>

@@ -1,0 +1,263 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">上传凭证</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<view class="px-4 py-4">
+				<!-- 任务信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-2">{{ taskInfo.title }}</text>
+					<text class="text-3.5 text-[#646a73]">{{ taskInfo.description }}</text>
+					
+					<view class="flex items-center justify-between mt-3 pt-3 border-t border-[#e5e5e5]">
+						<view>
+							<text class="text-3 text-[#999]">佣金</text>
+							<text class="text-5 font-bold text-[#ff3b30] ml-1">¥{{ taskInfo.commission }}</text>
+						</view>
+						<view>
+							<text class="text-3 text-[#999]">剩余时间</text>
+							<text class="text-4 font-bold text-[#ff9500] ml-1">{{ taskInfo.remainTime }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 凭证要求 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">凭证要求</text>
+					
+					<view class="mb-3">
+						<text class="text-3.5 text-[#646a73] mb-2">需要上传的凭证类型</text>
+						<view class="flex flex-wrap mt-2">
+							<view 
+								v-for="(item, index) in taskInfo.proofTypes" 
+								:key="index"
+								class="bg-[#f0f9ff] px-2 py-1 rounded mr-2 mb-2"
+							>
+								<text class="text-3 text-[#07c160]">{{ item }}</text>
+							</view>
+						</view>
+					</view>
+
+					<view v-if="taskInfo.specialRequirement" class="bg-[#fff9e6] rounded-2 p-3">
+						<text class="text-3 text-[#ed6a0c] font-bold">特殊要求</text>
+						<text class="text-3.5 text-[#646a73] mt-1">{{ taskInfo.specialRequirement }}</text>
+					</view>
+				</view>
+
+				<!-- 上传图片 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">上传图片 <text class="text-[#ff3b30]">*</text></text>
+					
+					<view class="flex flex-wrap">
+						<view 
+							v-for="(img, index) in uploadedImages" 
+							:key="index"
+							class="w-24 h-24 rounded-2 mr-2 mb-2 overflow-hidden relative"
+						>
+							<image :src="img" class="w-full h-full" mode="aspectFill" />
+							<view 
+								@click="removeImage(index)"
+								class="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center"
+							>
+								<text class="text-3 text-white">×</text>
+							</view>
+						</view>
+						
+						<view 
+							v-if="uploadedImages.length < 9"
+							@click="chooseImage"
+							class="w-24 h-24 border-2 border-dashed border-[#e5e5e5] rounded-2 flex flex-col items-center justify-center bg-[#fafafa]"
+						>
+							<text class="text-8 text-[#c8c9cc]">+</text>
+							<text class="text-3 text-[#c8c9cc] mt-1">{{ uploadedImages.length }}/9</text>
+						</view>
+					</view>
+
+					<text class="text-3 text-[#999] mt-2">• 最多上传9张图片</text>
+					<text class="text-3 text-[#999] mt-1">• 请确保图片清晰可见</text>
+				</view>
+
+				<!-- 文字说明 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">文字说明</text>
+					
+					<textarea 
+						v-model="proofNote"
+						class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+						placeholder="请补充说明任务完成情况（选填）"
+						placeholder-class="text-[#c8c9cc]"
+						:maxlength="200"
+						:show-confirm-bar="false"
+						style="height: 100px;"
+					/>
+					<text class="text-3 text-[#999] mt-1">{{ proofNote.length }}/200</text>
+				</view>
+
+				<!-- 温馨提示 -->
+				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
+					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
+					<text class="text-3.5 text-[#646a73] mt-2">• 请按要求上传真实有效的凭证</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 上传虚假凭证将被封号处理</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 提交后等待商户确认</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 确认通过后佣金自动到账</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部操作按钮 -->
+		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+			<button 
+				@click="submitProof"
+				:class="['w-full rounded-full py-3', canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999]']"
+				:disabled="!canSubmit"
+			>
+				<text class="text-4">提交凭证</text>
+			</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+import { getSubTaskDetail, uploadProof } from '@/services/task'
+
+// 子任务ID
+const subtaskId = ref(0)
+
+// 任务信息
+const taskInfo = ref({
+	title: '美团外卖订单互助',
+	description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
+	commission: '15.00',
+	remainTime: '23小时30分',
+	proofTypes: ['订单截图', '聊天记录'],
+	specialRequirement: '请在下单后30分钟内上传截图'
+})
+
+// 已上传的图片
+const uploadedImages = ref<string[]>([])
+
+// 文字说明
+const proofNote = ref('')
+
+// 判断是否可以提交
+const canSubmit = computed(() => {
+	return uploadedImages.value.length > 0
+})
+
+// 加载任务信息
+const loadTaskInfo = async () => {
+	try {
+		const res = await getSubTaskDetail(subtaskId.value)
+		if (res.code === 0) {
+			taskInfo.value = res.data
+		}
+	} catch (error) {
+		console.log('加载任务信息失败', error)
+	}
+}
+
+// 选择图片
+const chooseImage = () => {
+	const remainCount = 9 - uploadedImages.value.length
+	
+	uni.chooseImage({
+		count: remainCount,
+		sizeType: ['compressed'],
+		sourceType: ['album', 'camera'],
+		success: (res) => {
+			const tempFilePaths = res.tempFilePaths
+			
+			// 这里应该上传到服务器，暂时直接使用本地路径
+			uploadedImages.value = uploadedImages.value.concat(tempFilePaths)
+			
+			// TODO: 实际项目中应该上传到服务器
+			// uploadFiles(tempFilePaths).then(urls => {
+			//   uploadedImages.value = uploadedImages.value.concat(urls)
+			// })
+		}
+	})
+}
+
+// 移除图片
+const removeImage = (index: number) => {
+	uploadedImages.value.splice(index, 1)
+}
+
+// 提交凭证
+const submitProof = async () => {
+	if (!canSubmit.value) return
+	
+	try {
+		uni.showLoading({ title: '提交中...' })
+		
+		const res = await uploadProof({
+			subtaskId: subtaskId.value,
+			images: uploadedImages.value,
+			note: proofNote.value
+		})
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			uni.showToast({
+				title: '提交成功',
+				icon: 'success'
+			})
+			
+			// 返回上一页
+			setTimeout(() => {
+				uni.navigateBack()
+			}, 1500)
+		} else {
+			uni.showToast({
+				title: res.message || '提交失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '提交失败，请重试',
+			icon: 'none'
+		})
+	}
+}
+
+// 返回
+const goBack = () => {
+	if (uploadedImages.value.length > 0 || proofNote.value) {
+		uni.showModal({
+			title: '提示',
+			content: '确定要放弃当前编辑的内容吗？',
+			success: (res) => {
+				if (res.confirm) {
+					uni.navigateBack()
+				}
+			}
+		})
+	} else {
+		uni.navigateBack()
+	}
+}
+
+// 页面加载时获取任务信息
+onMounted(() => {
+	// 获取子任务ID
+	const pages = getCurrentPages()
+	const currentPage = pages[pages.length - 1]
+	// @ts-ignore
+	subtaskId.value = parseInt(currentPage.options?.id || '0')
+	
+	if (subtaskId.value > 0) {
+		loadTaskInfo()
+	}
+})
+</script>

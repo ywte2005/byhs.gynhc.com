@@ -1,0 +1,226 @@
+<template>
+	<cl-page>
+		<view class="wallet-page">
+			<view class="balance-card">
+				<text class="balance-label">可用余额</text>
+				<text class="balance-value">{{ balance }}</text>
+				<view class="balance-actions">
+					<cl-button type="primary" size="small">
+						<text>提现</text>
+					</cl-button>
+				</view>
+			</view>
+
+			<view class="section-title">
+				<text>资金明细</text>
+			</view>
+
+			<cl-list-view :auto="false" :data="list" @load="loadMore">
+				<template v-slot:item="{ item }">
+					<view class="wallet-item">
+						<view class="item-left">
+							<text class="item-type">{{ getBizTypeName(item.biz_type) }}</text>
+							<text class="item-remark">{{ item.remark }}</text>
+							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+						</view>
+						<view class="item-right">
+							<text class="item-amount" :class="parseFloat(item.amount) >= 0 ? 'positive' : 'negative'">
+								{{ parseFloat(item.amount) >= 0 ? '+' : '' }}{{ item.amount }}
+							</text>
+							<text class="item-after">余额：{{ item.after }}</text>
+						</view>
+					</view>
+				</template>
+			</cl-list-view>
+
+			<view v-if="list.length == 0 && !loading" class="empty">
+				<text class="empty-text">暂无资金记录</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getOverview, getWalletLogs } from "@/services/promo";
+	import type { PromoOverview, WalletLog } from "@/services/promo";
+
+	export default {
+		data() {
+			return {
+				balance: '0.00',
+				list: [] as WalletLog[],
+				page: 1,
+				loading: false,
+				hasMore: true
+			};
+		},
+		onShow() {
+			this.loadBalance();
+			this.page = 1;
+			this.list = [];
+			this.loadMore();
+		},
+		methods: {
+			loadBalance() {
+				getOverview()
+					.then((res : PromoOverview) => {
+						this.balance = res.wallet.balance;
+					})
+					.catch(() => { });
+			},
+			loadMore() {
+				if (this.loading || !this.hasMore) return;
+				this.loading = true;
+
+				getWalletLogs(this.page, 20)
+					.then((res : { list : WalletLog[] }) => {
+						if (res.list.length > 0) {
+							this.list = this.list.concat(res.list);
+							this.page++;
+						} else {
+							this.hasMore = false;
+						}
+						this.loading = false;
+					})
+					.catch(() => {
+						this.loading = false;
+					});
+			},
+			getBizTypeName(type : string) : string {
+				const map : UTSJSONObject = {
+					'commission': '佣金收入',
+					'profit_share': '分润收入',
+					'bonus': '分红收入',
+					'level_purchase': '等级购买',
+					'task_deposit': '任务保证金',
+					'task_service_fee': '任务服务费',
+					'task_refund': '保证金退还',
+					'withdraw': '提现'
+				};
+				return (map[type] ?? type) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				const h = date.getHours().toString().padStart(2, '0');
+				const min = date.getMinutes().toString().padStart(2, '0');
+				return `${y}-${m}-${d} ${h}:${min}`;
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.wallet-page {
+		padding: 20rpx;
+	}
+
+	.balance-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 60rpx 40rpx;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.balance-label {
+		font-size: 28rpx;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.balance-value {
+		font-size: 64rpx;
+		font-weight: bold;
+		color: #ffffff;
+		margin: 20rpx 0;
+	}
+
+	.balance-actions {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.section-title {
+		padding: 20rpx 0;
+	}
+
+	.section-title text {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.wallet-item {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 30rpx;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		margin-bottom: 16rpx;
+	}
+
+	.item-left {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.item-type {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.item-remark {
+		font-size: 24rpx;
+		color: #666666;
+		margin-top: 8rpx;
+	}
+
+	.item-time {
+		font-size: 22rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.item-right {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+	}
+
+	.item-amount {
+		font-size: 32rpx;
+		font-weight: bold;
+	}
+
+	.item-amount.positive {
+		color: #52c41a;
+	}
+
+	.item-amount.negative {
+		color: #ff4d4f;
+	}
+
+	.item-after {
+		font-size: 22rpx;
+		color: #999999;
+		margin-top: 8rpx;
+	}
+
+	.empty {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 100rpx 0;
+	}
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #999999;
+	}
+</style>

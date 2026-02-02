@@ -1,0 +1,230 @@
+<template>
+	<cl-page class="bg-white">
+		<view class="flex flex-col items-center px-8 pt-15">
+			<!-- Logo -->
+			<view class="flex flex-col items-center gap-3 mb-8">
+				<view class="w-18 h-18 bg-primary rounded-4 flex items-center justify-center">
+					<cl-icon name="zap" :size="36" color="#ffffff" />
+				</view>
+				<text class="text-6 font-semibold text-[#1f2329]">旺铺集</text>
+			</view>
+
+			<!-- 表单 -->
+			<view class="w-full flex flex-col gap-4">
+				<!-- 手机号 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">手机号</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.mobile"
+							type="number"
+							placeholder="请输入手机号"
+							class="flex-1 text-3.75"
+							maxlength="11"
+						/>
+					</view>
+				</view>
+
+				<!-- 密码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">密码</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.password"
+							:type="showPassword ? 'text' : 'password'"
+							placeholder="请输入密码"
+							class="flex-1 text-3.75"
+						/>
+						<cl-icon
+							:name="showPassword ? 'eye' : 'eye-off'"
+							:size="20"
+							color="#9aa0a6"
+							@tap="showPassword = !showPassword"
+						/>
+					</view>
+				</view>
+
+				<!-- 协议 -->
+				<view class="flex items-center gap-2">
+					<view
+						class="w-4.5 h-4.5 rounded-1 border border-[#e5e6eb] flex items-center justify-center"
+						:class="{ 'bg-primary border-primary': form.agree }"
+						@tap="form.agree = !form.agree"
+					>
+						<cl-icon v-if="form.agree" name="check" :size="12" color="#ffffff" />
+					</view>
+					<text class="text-3 text-[#646a73]">我已阅读并同意</text>
+					<text class="text-3 text-primary" @tap="showAgreement">《用户协议》和《隐私政策》</text>
+				</view>
+
+				<!-- 登录按钮 -->
+				<cl-button
+					:disabled="!canLogin"
+					:loading="loading"
+					round
+					type="primary"
+					size="large"
+					@tap="handleLogin"
+				>
+					登录
+				</cl-button>
+
+				<!-- 分隔线 -->
+				<view class="flex items-center gap-4 my-2">
+					<view class="flex-1 h-px bg-[#e5e6eb]"></view>
+					<text class="text-3 text-[#9aa0a6]">其他登录方式</text>
+					<view class="flex-1 h-px bg-[#e5e6eb]"></view>
+				</view>
+
+				<!-- 微信登录 -->
+				<view
+					class="h-12 border border-[#e5e6eb] rounded-2 flex items-center justify-center gap-2"
+					@tap="handleWechatLogin"
+				>
+					<view class="w-6 h-6 bg-[#07C160] rounded-full flex items-center justify-center">
+						<cl-icon name="message-square" :size="16" color="#ffffff" />
+					</view>
+					<text class="text-3.5 font-medium text-[#1f2329]">微信快捷登录</text>
+				</view>
+
+				<!-- 注册入口 -->
+				<view class="flex justify-center mt-4">
+					<text class="text-3.5 text-[#646a73]">还没有账号？</text>
+					<text class="text-3.5 text-primary ml-2" @tap="goRegister">立即注册</text>
+				</view>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from "vue";
+import { loginByPassword, loginByWechat } from "@/services/auth";
+import { useStore } from "@/.cool";
+
+// 表单数据
+const form = ref({
+	mobile: "",
+	password: "",
+	agree: false
+});
+
+const showPassword = ref(false);
+const loading = ref(false);
+
+// 是否可以登录
+const canLogin = computed(() => {
+	return (
+		form.value.mobile.length === 11 &&
+		form.value.password.length >= 6 &&
+		form.value.agree
+	);
+});
+
+// 登录
+async function handleLogin() {
+	if (!canLogin.value) {
+		return;
+	}
+
+	try {
+		loading.value = true;
+
+		const res = await loginByPassword(form.value.mobile, form.value.password);
+
+		// 保存token
+		const { user } = useStore();
+		user.setToken(res.token);
+
+		uni.showToast({
+			title: "登录成功",
+			icon: "success"
+		});
+
+		// 跳转首页
+		setTimeout(() => {
+			uni.reLaunch({
+				url: "/pages/index/home"
+			});
+		}, 1000);
+	} catch (error : any) {
+		uni.showToast({
+			title: error.message || "登录失败",
+			icon: "none"
+		});
+	} finally {
+		loading.value = false;
+	}
+}
+
+// 微信登录
+function handleWechatLogin() {
+	// #ifdef MP-WEIXIN
+	uni.login({
+		provider: "weixin",
+		success: async (loginRes) => {
+			try {
+				loading.value = true;
+				const res = await loginByWechat(loginRes.code);
+
+				const { user } = useStore();
+				user.setToken(res.token);
+
+				uni.showToast({
+					title: "登录成功",
+					icon: "success"
+				});
+
+				setTimeout(() => {
+					uni.reLaunch({
+						url: "/pages/index/home"
+					});
+				}, 1000);
+			} catch (error : any) {
+				uni.showToast({
+					title: error.message || "登录失败",
+					icon: "none"
+				});
+			} finally {
+				loading.value = false;
+			}
+		},
+		fail: () => {
+			uni.showToast({
+				title: "微信授权失败",
+				icon: "none"
+			});
+		}
+	});
+	// #endif
+
+	// #ifndef MP-WEIXIN
+	uni.showToast({
+		title: "请在微信小程序中使用",
+		icon: "none"
+	});
+	// #endif
+}
+
+// 查看协议
+function showAgreement() {
+	uni.showModal({
+		title: "用户协议",
+		content: "这里是用户协议和隐私政策的内容...",
+		showCancel: false
+	});
+}
+
+// 去注册
+function goRegister() {
+	uni.navigateTo({
+		url: "/pages/auth/register"
+	});
+}
+</script>
+
+<style scoped>
+input {
+	background: transparent;
+}
+</style>

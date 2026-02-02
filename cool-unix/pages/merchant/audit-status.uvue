@@ -1,0 +1,245 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">审核状态</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<!-- 审核状态卡片 -->
+			<view class="px-4 py-4">
+				<!-- 审核中 -->
+				<view v-if="auditInfo.status === 'pending'" class="bg-white rounded-2 p-4 mb-3">
+					<view class="flex flex-col items-center py-6">
+						<text class="text-12 mb-3">⏳</text>
+						<text class="text-5 font-bold text-[#1f2329] mb-2">审核中</text>
+						<text class="text-3.5 text-[#646a73]">您的入驻申请正在审核中，请耐心等待</text>
+						<text class="text-3.5 text-[#999] mt-2">预计1-3个工作日完成审核</text>
+					</view>
+
+					<view class="border-t border-[#e5e5e5] pt-4">
+						<view class="flex items-center justify-between mb-3">
+							<text class="text-3.5 text-[#999]">提交时间</text>
+							<text class="text-3.5 text-[#1f2329]">{{ auditInfo.submitTime }}</text>
+						</view>
+						<view class="flex items-center justify-between">
+							<text class="text-3.5 text-[#999]">审核编号</text>
+							<text class="text-3.5 text-[#1f2329]">{{ auditInfo.auditNo }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 审核通过 -->
+				<view v-if="auditInfo.status === 'approved'" class="bg-white rounded-2 p-4 mb-3">
+					<view class="flex flex-col items-center py-6">
+						<text class="text-12 mb-3">✅</text>
+						<text class="text-5 font-bold text-[#07c160] mb-2">审核通过</text>
+						<text class="text-3.5 text-[#646a73]">恭喜您，入驻申请已通过审核</text>
+					</view>
+
+					<view class="border-t border-[#e5e5e5] pt-4">
+						<view class="flex items-center justify-between mb-3">
+							<text class="text-3.5 text-[#999]">审核时间</text>
+							<text class="text-3.5 text-[#1f2329]">{{ auditInfo.auditTime }}</text>
+						</view>
+						<view class="flex items-center justify-between mb-3">
+							<text class="text-3.5 text-[#999]">商户编号</text>
+							<text class="text-3.5 text-[#1f2329]">{{ auditInfo.merchantNo }}</text>
+						</view>
+					</view>
+
+					<view class="mt-4">
+						<button 
+							@click="goToMerchant"
+							class="w-full bg-[#07c160] text-white rounded-full py-3"
+						>
+							<text class="text-4">进入商户中心</text>
+						</button>
+					</view>
+				</view>
+
+				<!-- 审核驳回 -->
+				<view v-if="auditInfo.status === 'rejected'" class="bg-white rounded-2 p-4 mb-3">
+					<view class="flex flex-col items-center py-6">
+						<text class="text-12 mb-3">❌</text>
+						<text class="text-5 font-bold text-[#ff3b30] mb-2">审核未通过</text>
+						<text class="text-3.5 text-[#646a73]">很抱歉，您的入驻申请未通过审核</text>
+					</view>
+
+					<view class="border-t border-[#e5e5e5] pt-4">
+						<view class="mb-3">
+							<text class="text-3.5 text-[#999] mb-2">驳回原因</text>
+							<view class="bg-[#fff5f5] rounded-2 p-3 mt-2">
+								<text class="text-3.5 text-[#ff3b30]">{{ auditInfo.rejectReason }}</text>
+							</view>
+						</view>
+						<view class="flex items-center justify-between mb-3">
+							<text class="text-3.5 text-[#999]">审核时间</text>
+							<text class="text-3.5 text-[#1f2329]">{{ auditInfo.auditTime }}</text>
+						</view>
+					</view>
+
+					<view class="mt-4">
+						<button 
+							@click="resubmit"
+							class="w-full bg-[#07c160] text-white rounded-full py-3"
+						>
+							<text class="text-4">重新提交</text>
+						</button>
+					</view>
+				</view>
+
+				<!-- 申请信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">申请信息</text>
+					
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">商户类型</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.type === 'personal' ? '个人商户' : '企业商户' }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">商户名称</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.name }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">联系人</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.contact }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">联系电话</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.phone }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">经营地址</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.address }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">经营类目</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ auditInfo.category }}</text>
+					</view>
+				</view>
+
+				<!-- 审核进度 -->
+				<view v-if="auditInfo.status === 'pending'" class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">审核进度</text>
+					
+					<view class="flex items-start mb-4">
+						<view class="flex flex-col items-center mr-3">
+							<view class="w-6 h-6 rounded-full bg-[#07c160] flex items-center justify-center">
+								<text class="text-3 text-white">✓</text>
+							</view>
+							<view class="w-0.5 h-12 bg-[#07c160]"></view>
+						</view>
+						<view class="flex-1">
+							<text class="text-4 text-[#1f2329] font-bold">提交申请</text>
+							<text class="text-3.5 text-[#999] mt-1">{{ auditInfo.submitTime }}</text>
+						</view>
+					</view>
+
+					<view class="flex items-start mb-4">
+						<view class="flex flex-col items-center mr-3">
+							<view class="w-6 h-6 rounded-full bg-[#07c160] flex items-center justify-center">
+								<text class="text-3 text-white">⏳</text>
+							</view>
+							<view class="w-0.5 h-12 bg-[#e5e5e5]"></view>
+						</view>
+						<view class="flex-1">
+							<text class="text-4 text-[#1f2329] font-bold">资料审核</text>
+							<text class="text-3.5 text-[#999] mt-1">审核中...</text>
+						</view>
+					</view>
+
+					<view class="flex items-start">
+						<view class="flex flex-col items-center mr-3">
+							<view class="w-6 h-6 rounded-full bg-[#e5e5e5] flex items-center justify-center">
+								<text class="text-3 text-[#999]">3</text>
+							</view>
+						</view>
+						<view class="flex-1">
+							<text class="text-4 text-[#999]">审核完成</text>
+							<text class="text-3.5 text-[#999] mt-1">等待审核</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 温馨提示 -->
+				<view class="bg-[#fff9e6] rounded-2 p-4">
+					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
+					<text class="text-3.5 text-[#646a73] mt-2">• 审核时间：工作日9:00-18:00</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 如有疑问，请联系客服：400-123-4567</text>
+					<text class="text-3.5 text-[#646a73] mt-1">• 审核结果将通过短信和站内消息通知</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getAuditStatus } from '@/services/merchant'
+
+// 审核信息
+const auditInfo = ref({
+	status: 'pending', // pending: 审核中, approved: 通过, rejected: 驳回
+	submitTime: '2025-01-29 10:30:00',
+	auditTime: '',
+	auditNo: 'A202501290001',
+	merchantNo: '',
+	rejectReason: '',
+	type: 'personal',
+	name: '',
+	contact: '',
+	phone: '',
+	address: '',
+	category: ''
+})
+
+// 加载审核状态
+const loadAuditStatus = async () => {
+	try {
+		uni.showLoading({ title: '加载中...' })
+		
+		const res = await getAuditStatus()
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			auditInfo.value = res.data
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '加载失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 进入商户中心
+const goToMerchant = () => {
+	uni.redirectTo({
+		url: '/pages/merchant/index'
+	})
+}
+
+// 重新提交
+const resubmit = () => {
+	uni.redirectTo({
+		url: '/pages/merchant/register'
+	})
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+
+// 页面加载时获取审核状态
+onMounted(() => {
+	loadAuditStatus()
+})
+</script>

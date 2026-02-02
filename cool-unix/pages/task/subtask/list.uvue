@@ -1,0 +1,294 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">可接子任务</text>
+			</view>
+		</view>
+
+		<!-- 筛选栏 -->
+		<view class="bg-white px-4 py-3 mb-2">
+			<view class="flex items-center justify-between">
+				<text class="text-4 text-[#1f2329]">共 {{ totalCount }} 个可接任务</text>
+				<view @click="showFilterDialog = true" class="flex items-center">
+					<text class="text-3.5 text-[#07c160]">筛选</text>
+					<text class="text-4 text-[#07c160] ml-1">⚙</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 子任务列表 -->
+		<scroll-view class="flex-1" scroll-y @scrolltolower="loadMore">
+			<view class="px-4 py-2">
+				<view 
+					v-for="(task, index) in subtaskList" 
+					:key="index"
+					@click="goToDetail(task.id)"
+					class="bg-white rounded-2 p-4 mb-3"
+				>
+					<!-- 任务头部 -->
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex items-center">
+							<view class="bg-[#f0f9ff] px-2 py-1 rounded mr-2">
+								<text class="text-3 text-[#07c160]">{{ task.category }}</text>
+							</view>
+							<view class="bg-[#fff9e6] px-2 py-1 rounded">
+								<text class="text-3 text-[#ed6a0c]">{{ task.platform }}</text>
+							</view>
+						</view>
+						<text class="text-3 text-[#999]">{{ task.createTime }}</text>
+					</view>
+
+					<!-- 任务信息 -->
+					<view class="mb-3">
+						<text class="text-4.5 font-bold text-[#1f2329]">{{ task.title }}</text>
+						<text class="text-3.5 text-[#646a73] mt-2">{{ task.description }}</text>
+					</view>
+
+					<!-- 任务要求 -->
+					<view class="flex flex-wrap mb-3">
+						<view class="flex items-center mr-3 mb-2">
+							<text class="text-3 text-[#999]">⏰ {{ task.timeLimit }}小时</text>
+						</view>
+						<view class="flex items-center mr-3 mb-2">
+							<text class="text-3 text-[#999]">📸 {{ task.proofCount }}张凭证</text>
+						</view>
+					</view>
+
+					<!-- 任务数据 -->
+					<view class="flex items-center justify-between border-t border-[#e5e5e5] pt-3">
+						<view>
+							<text class="text-3 text-[#999]">佣金</text>
+							<text class="text-6 font-bold text-[#ff3b30] ml-1">¥{{ task.commission }}</text>
+						</view>
+						<button 
+							@click.stop="receiveTask(task.id)"
+							class="bg-[#07c160] text-white rounded-full px-6 py-2"
+						>
+							<text class="text-3.5">立即接单</text>
+						</button>
+					</view>
+				</view>
+
+				<!-- 加载更多 -->
+				<view v-if="loading" class="flex justify-center py-4">
+					<text class="text-3.5 text-[#999]">加载中...</text>
+				</view>
+				<view v-if="!hasMore && subtaskList.length > 0" class="flex justify-center py-4">
+					<text class="text-3.5 text-[#999]">没有更多了</text>
+				</view>
+				<view v-if="subtaskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-20">
+					<text class="text-10 mb-3">📋</text>
+					<text class="text-4 text-[#999]">暂无可接任务</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 筛选对话框 -->
+		<view v-if="showFilterDialog" class="fixed inset-0 bg-black/50 flex items-end" @click="showFilterDialog = false">
+			<view class="bg-white w-full rounded-t-3 p-4" @click.stop>
+				<text class="text-4 font-bold text-[#1f2329] mb-4">筛选条件</text>
+				
+				<view class="mb-4">
+					<text class="text-3.5 text-[#646a73] mb-2">任务类目</text>
+					<view class="flex flex-wrap mt-2">
+						<view 
+							v-for="(item, index) in categories" 
+							:key="index"
+							@click="filter.category = item"
+							:class="['border rounded-full px-4 py-2 mr-2 mb-2', filter.category === item ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+						>
+							<text :class="['text-3.5', filter.category === item ? 'text-[#07c160]' : 'text-[#646a73]']">{{ item }}</text>
+						</view>
+					</view>
+				</view>
+
+				<view class="mb-4">
+					<text class="text-3.5 text-[#646a73] mb-2">佣金范围</text>
+					<view class="flex flex-wrap mt-2">
+						<view 
+							v-for="(item, index) in commissionRanges" 
+							:key="index"
+							@click="filter.commissionRange = item.value"
+							:class="['border rounded-full px-4 py-2 mr-2 mb-2', filter.commissionRange === item.value ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+						>
+							<text :class="['text-3.5', filter.commissionRange === item.value ? 'text-[#07c160]' : 'text-[#646a73]']">{{ item.label }}</text>
+						</view>
+					</view>
+				</view>
+
+				<view class="flex">
+					<button 
+						@click="resetFilter"
+						class="flex-1 bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mr-2"
+					>
+						<text class="text-4">重置</text>
+					</button>
+					<button 
+						@click="applyFilter"
+						class="flex-1 bg-[#07c160] text-white rounded-full py-3"
+					>
+						<text class="text-4">确定</text>
+					</button>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getAvailableSubTasks, acceptSubTask } from '@/services/task'
+
+// 任务ID（可选）
+const taskId = ref(0)
+
+// 总数量
+const totalCount = ref(0)
+
+// 子任务列表
+const subtaskList = ref([])
+
+// 加载状态
+const loading = ref(false)
+const hasMore = ref(true)
+const page = ref(1)
+
+// 显示筛选对话框
+const showFilterDialog = ref(false)
+
+// 筛选条件
+const filter = ref({
+	category: '全部',
+	commissionRange: 'all'
+})
+
+// 分类列表
+const categories = ['全部', '电商', '外卖', '出行', '生活', '其他']
+
+// 佣金范围
+const commissionRanges = [
+	{ label: '全部', value: 'all' },
+	{ label: '10元以下', value: '0-10' },
+	{ label: '10-20元', value: '10-20' },
+	{ label: '20-50元', value: '20-50' },
+	{ label: '50元以上', value: '50-' }
+]
+
+// 加载子任务列表
+const loadSubtaskList = async () => {
+	if (loading.value) return
+	
+	try {
+		loading.value = true
+		
+		const res = await getAvailableSubTasks({
+			taskId: taskId.value,
+			category: filter.value.category === '全部' ? '' : filter.value.category,
+			commissionRange: filter.value.commissionRange,
+			page: page.value,
+			pageSize: 10
+		})
+		
+		loading.value = false
+		
+		if (res.code === 0) {
+			if (page.value === 1) {
+				subtaskList.value = res.data.list
+			} else {
+				subtaskList.value = subtaskList.value.concat(res.data.list)
+			}
+			totalCount.value = res.data.total
+			hasMore.value = res.data.hasMore
+		}
+	} catch (error) {
+		loading.value = false
+		console.log('加载子任务列表失败', error)
+	}
+}
+
+// 加载更多
+const loadMore = () => {
+	if (!loading.value && hasMore.value) {
+		page.value++
+		loadSubtaskList()
+	}
+}
+
+// 接单
+const receiveTask = async (id: number) => {
+	try {
+		uni.showLoading({ title: '接单中...' })
+		
+		const res = await acceptSubTask(id)
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			uni.showToast({
+				title: '接单成功',
+				icon: 'success'
+			})
+			
+			// 跳转到子任务详情
+			setTimeout(() => {
+				uni.navigateTo({
+					url: `/pages/task/subtask/detail?id=${id}`
+				})
+			}, 1500)
+		} else {
+			uni.showToast({
+				title: res.message || '接单失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '接单失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 重置筛选
+const resetFilter = () => {
+	filter.value = {
+		category: '全部',
+		commissionRange: 'all'
+	}
+}
+
+// 应用筛选
+const applyFilter = () => {
+	showFilterDialog.value = false
+	page.value = 1
+	subtaskList.value = []
+	loadSubtaskList()
+}
+
+// 进入子任务详情
+const goToDetail = (id: number) => {
+	uni.navigateTo({
+		url: `/pages/task/subtask/detail?id=${id}`
+	})
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+
+// 页面加载时获取子任务列表
+onMounted(() => {
+	// 获取任务ID（可选）
+	const pages = getCurrentPages()
+	const currentPage = pages[pages.length - 1]
+	// @ts-ignore
+	taskId.value = parseInt(currentPage.options?.taskId || '0')
+	
+	loadSubtaskList()
+})
+</script>

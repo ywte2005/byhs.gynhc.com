@@ -1,0 +1,41 @@
+{
+	"compilerOptions": {
+		"ignoreDeprecations": "5.0",
+		"verbatimModuleSyntax": false,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"noImplicitAny": false,
+		"module": "ESNext",
+		"moduleResolution": "bundler",
+		"target": "ESNext",
+		"types": [
+			"@dcloudio/types",
+			"vue",
+			"vite/client",
+			"./.cool/types/uni-app.d.ts",
+			"./uni_modules/cool-ui/index.d.ts",
+			"./uni_modules/cool-svg/index.d.ts"
+		],
+		"lib": ["esnext", "dom"],
+		"outDir": "esbuild",
+		"paths": {
+			"@/*": ["./*"]
+		}
+	},
+	"vueCompilerOptions": {
+		"extensions": [".vue", ".uvue"]
+	},
+	"include": [
+		"**/*.uts",
+		"**/*.ts",
+		"main.ts",
+		"**/*.uvue",
+		"**/*.vue",
+		"App.uvue",
+		"**/*.d.ts",
+		"./.cool/*.ts"
+	],
+	"exclude": ["node_modules", "dist"]
+}

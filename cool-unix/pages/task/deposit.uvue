@@ -1,0 +1,374 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">保证金管理</text>
+			</view>
+		</view>
+
+		<!-- 保证金余额卡片 -->
+		<view class="px-4 py-4">
+			<view class="bg-gradient-to-r from-[#5856d6] to-[#4845c7] rounded-2 p-4 mb-3">
+				<text class="text-3.5 text-white mb-2">保证金余额（元）</text>
+				<text class="text-8 font-bold text-white mb-4">{{ depositInfo.balance }}</text>
+				
+				<view class="flex items-center justify-between bg-white/20 rounded-2 p-3">
+					<view class="flex-1 text-center">
+						<text class="text-4 font-bold text-white">{{ depositInfo.frozen }}</text>
+						<text class="text-3 text-white mt-1">冻结中</text>
+					</view>
+					<view class="w-0.5 h-10 bg-white/30"></view>
+					<view class="flex-1 text-center">
+						<text class="text-4 font-bold text-white">{{ depositInfo.available }}</text>
+						<text class="text-3 text-white mt-1">可用</text>
+					</view>
+					<view class="w-0.5 h-10 bg-white/30"></view>
+					<view class="flex-1 text-center">
+						<text class="text-4 font-bold text-white">{{ depositInfo.total }}</text>
+						<text class="text-3 text-white mt-1">累计</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 操作按钮 -->
+			<view class="flex mb-3">
+				<button 
+					@click="showRechargeDialog = true"
+					class="flex-1 bg-[#07c160] text-white rounded-full py-3 mr-2"
+				>
+					<text class="text-4">充值保证金</text>
+				</button>
+				<button 
+					@click="showWithdrawDialog = true"
+					class="flex-1 bg-white border border-[#07c160] text-[#07c160] rounded-full py-3"
+				>
+					<text class="text-4">提取保证金</text>
+				</button>
+			</view>
+
+			<!-- 说明卡片 -->
+			<view class="bg-white rounded-2 p-4 mb-3">
+				<text class="text-4 font-bold text-[#1f2329] mb-3">保证金说明</text>
+				<text class="text-3.5 text-[#646a73] mb-2">• 发起任务需要缴纳任务总额10%的保证金</text>
+				<text class="text-3.5 text-[#646a73] mb-2">• 任务完成后保证金自动退还</text>
+				<text class="text-3.5 text-[#646a73] mb-2">• 可用保证金可随时提取到钱包</text>
+				<text class="text-3.5 text-[#646a73]">• 冻结保证金为进行中任务占用的金额</text>
+			</view>
+
+			<!-- 流水记录 -->
+			<view class="bg-white rounded-2 p-4">
+				<text class="text-4 font-bold text-[#1f2329] mb-3">流水记录</text>
+				
+				<view 
+					v-for="(item, index) in logList" 
+					:key="index"
+					class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
+				>
+					<view class="flex-1">
+						<text class="text-4 text-[#1f2329]">{{ item.title }}</text>
+						<text class="text-3 text-[#999] mt-1">{{ item.time }}</text>
+					</view>
+					<view class="text-right">
+						<text :class="['text-5 font-bold', item.type === 'in' ? 'text-[#07c160]' : 'text-[#ff3b30]']">
+							{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
+						</text>
+						<text class="text-3 text-[#999] mt-1">余额：{{ item.balance }}</text>
+					</view>
+				</view>
+
+				<view v-if="logList.length === 0" class="flex flex-col items-center justify-center py-10">
+					<text class="text-8 mb-2">📝</text>
+					<text class="text-3.5 text-[#999]">暂无流水记录</text>
+				</view>
+			</view>
+		</view>
+
+		<!-- 充值对话框 -->
+		<view v-if="showRechargeDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center" @click="showRechargeDialog = false">
+			<view class="bg-white w-4/5 rounded-2 p-4" @click.stop>
+				<text class="text-5 font-bold text-[#1f2329] mb-4">充值保证金</text>
+				
+				<view class="mb-4">
+					<text class="text-3.5 text-[#646a73] mb-2">充值金额（元）</text>
+					<input 
+						v-model="rechargeAmount"
+						type="digit"
+						class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+						placeholder="请输入充值金额"
+						placeholder-class="text-[#c8c9cc]"
+					/>
+				</view>
+
+				<view class="flex flex-wrap mb-4">
+					<view 
+						v-for="(amount, index) in quickAmounts" 
+						:key="index"
+						@click="rechargeAmount = amount"
+						class="w-1/3 px-1 mb-2"
+					>
+						<view class="border border-[#e5e5e5] rounded-2 py-2 text-center">
+							<text class="text-4 text-[#1f2329]">{{ amount }}元</text>
+						</view>
+					</view>
+				</view>
+
+				<view class="flex">
+					<button 
+						@click="showRechargeDialog = false"
+						class="flex-1 bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mr-2"
+					>
+						<text class="text-4">取消</text>
+					</button>
+					<button 
+						@click="confirmRecharge"
+						class="flex-1 bg-[#07c160] text-white rounded-full py-3"
+					>
+						<text class="text-4">确认充值</text>
+					</button>
+				</view>
+			</view>
+		</view>
+
+		<!-- 提取对话框 -->
+		<view v-if="showWithdrawDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center" @click="showWithdrawDialog = false">
+			<view class="bg-white w-4/5 rounded-2 p-4" @click.stop>
+				<text class="text-5 font-bold text-[#1f2329] mb-4">提取保证金</text>
+				
+				<view class="mb-4">
+					<view class="flex items-center justify-between mb-2">
+						<text class="text-3.5 text-[#646a73]">提取金额（元）</text>
+						<text class="text-3.5 text-[#999]">可用：{{ depositInfo.available }}元</text>
+					</view>
+					<input 
+						v-model="withdrawAmount"
+						type="digit"
+						class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+						placeholder="请输入提取金额"
+						placeholder-class="text-[#c8c9cc]"
+					/>
+					<view @click="withdrawAmount = depositInfo.available" class="mt-2">
+						<text class="text-3.5 text-[#07c160]">全部提取</text>
+					</view>
+				</view>
+
+				<view class="bg-[#fff9e6] rounded-2 p-3 mb-4">
+					<text class="text-3 text-[#ed6a0c]">提取后将转入钱包余额，可随时提现</text>
+				</view>
+
+				<view class="flex">
+					<button 
+						@click="showWithdrawDialog = false"
+						class="flex-1 bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mr-2"
+					>
+						<text class="text-4">取消</text>
+					</button>
+					<button 
+						@click="confirmWithdraw"
+						class="flex-1 bg-[#07c160] text-white rounded-full py-3"
+					>
+						<text class="text-4">确认提取</text>
+					</button>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getDepositInfo, rechargeDeposit, withdrawDeposit } from '@/services/task'
+
+// 保证金信息
+const depositInfo = ref({
+	balance: '5,000.00',
+	frozen: '2,500.00',
+	available: '2,500.00',
+	total: '15,000.00'
+})
+
+// 流水记录
+const logList = ref([
+	{
+		title: '任务完成退还',
+		time: '2025-01-30 10:30:00',
+		type: 'in',
+		amount: '500.00',
+		balance: '5,000.00'
+	},
+	{
+		title: '发起任务冻结',
+		time: '2025-01-30 09:00:00',
+		type: 'out',
+		amount: '1,500.00',
+		balance: '4,500.00'
+	},
+	{
+		title: '充值保证金',
+		time: '2025-01-29 15:00:00',
+		type: 'in',
+		amount: '3,000.00',
+		balance: '6,000.00'
+	}
+])
+
+// 显示充值对话框
+const showRechargeDialog = ref(false)
+// 显示提取对话框
+const showWithdrawDialog = ref(false)
+
+// 充值金额
+const rechargeAmount = ref('')
+// 提取金额
+const withdrawAmount = ref('')
+
+// 快捷金额
+const quickAmounts = ['500', '1000', '2000', '3000', '5000', '10000']
+
+// 加载保证金信息
+const loadDepositInfo = async () => {
+	try {
+		const res = await getDepositInfo()
+		if (res.code === 0) {
+			depositInfo.value = res.data
+		}
+	} catch (error) {
+		console.log('加载保证金信息失败', error)
+	}
+}
+
+// 加载流水记录
+const loadLogList = async () => {
+	try {
+		// TODO: 实现获取保证金流水接口
+		const res = { code: 0, data: { list: [] } } as any
+		if (res.code === 0) {
+			logList.value = res.data.list
+		}
+	} catch (error) {
+		console.log('加载流水记录失败', error)
+	}
+}
+
+// 确认充值
+const confirmRecharge = async () => {
+	if (!rechargeAmount.value) {
+		uni.showToast({
+			title: '请输入充值金额',
+			icon: 'none'
+		})
+		return
+	}
+
+	const amount = parseFloat(rechargeAmount.value)
+	if (amount <= 0) {
+		uni.showToast({
+			title: '充值金额必须大于0',
+			icon: 'none'
+		})
+		return
+	}
+
+	try {
+		uni.showLoading({ title: '处理中...' })
+		
+		const res = await rechargeDeposit(rechargeAmount.value)
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			uni.showToast({
+				title: '充值成功',
+				icon: 'success'
+			})
+			showRechargeDialog.value = false
+			rechargeAmount.value = ''
+			loadDepositInfo()
+			loadLogList()
+		} else {
+			uni.showToast({
+				title: res.message || '充值失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '充值失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 确认提取
+const confirmWithdraw = async () => {
+	if (!withdrawAmount.value) {
+		uni.showToast({
+			title: '请输入提取金额',
+			icon: 'none'
+		})
+		return
+	}
+
+	const amount = parseFloat(withdrawAmount.value)
+	const available = parseFloat(depositInfo.value.available.replace(/,/g, ''))
+	
+	if (amount <= 0) {
+		uni.showToast({
+			title: '提取金额必须大于0',
+			icon: 'none'
+		})
+		return
+	}
+
+	if (amount > available) {
+		uni.showToast({
+			title: '提取金额不能大于可用余额',
+			icon: 'none'
+		})
+		return
+	}
+
+	try {
+		uni.showLoading({ title: '处理中...' })
+		
+		const res = await withdrawDeposit(withdrawAmount.value)
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			uni.showToast({
+				title: '提取成功',
+				icon: 'success'
+			})
+			showWithdrawDialog.value = false
+			withdrawAmount.value = ''
+			loadDepositInfo()
+			loadLogList()
+		} else {
+			uni.showToast({
+				title: res.message || '提取失败',
+				icon: 'none'
+			})
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '提取失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+	loadDepositInfo()
+	loadLogList()
+})
+</script>

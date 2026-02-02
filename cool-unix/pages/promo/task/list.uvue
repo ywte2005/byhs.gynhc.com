@@ -1,0 +1,256 @@
+<template>
+	<cl-page>
+		<view class="task-list-page">
+			<view class="header-actions">
+				<cl-button type="primary" @tap="goCreate">
+					<text>发起任务</text>
+				</cl-button>
+			</view>
+
+			<view class="tab-bar">
+				<view class="tab-item" :class="{ active: currentTab == '' }" @tap="switchTab('')">
+					<text>全部</text>
+				</view>
+				<view class="tab-item" :class="{ active: currentTab == 'pending' }" @tap="switchTab('pending')">
+					<text>待启动</text>
+				</view>
+				<view class="tab-item" :class="{ active: currentTab == 'running' }" @tap="switchTab('running')">
+					<text>进行中</text>
+				</view>
+				<view class="tab-item" :class="{ active: currentTab == 'completed' }" @tap="switchTab('completed')">
+					<text>已完成</text>
+				</view>
+			</view>
+
+			<view class="task-list">
+				<view v-for="(item, index) in list" :key="index" class="task-item" @tap="goDetail(item.id)">
+					<view class="task-header">
+						<text class="task-amount">¥{{ item.total_amount }}</text>
+						<text class="task-status" :class="item.status">{{ getStatusName(item.status) }}</text>
+					</view>
+					<view class="task-info">
+						<view class="info-row">
+							<text class="info-label">保证金：</text>
+							<text class="info-value">¥{{ item.deposit_amount }}</text>
+						</view>
+						<view class="info-row">
+							<text class="info-label">已完成：</text>
+							<text class="info-value">¥{{ item.completed_amount }}</text>
+						</view>
+						<view class="info-row">
+							<text class="info-label">服务费：</text>
+							<text class="info-value">¥{{ item.service_fee }}</text>
+						</view>
+					</view>
+					<view class="task-footer">
+						<text class="task-time">{{ formatTime(item.createtime) }}</text>
+					</view>
+				</view>
+			</view>
+
+			<view v-if="list.length == 0 && !loading" class="empty">
+				<text class="empty-text">暂无互助任务</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getTaskList } from "@/services/promo-task";
+	import type { PromoTask } from "@/services/promo-task";
+
+	export default {
+		data() {
+			return {
+				list: [] as PromoTask[],
+				currentTab: '',
+				loading: false
+			};
+		},
+		onShow() {
+			this.loadData();
+		},
+		methods: {
+			loadData() {
+				this.loading = true;
+				const status = this.currentTab.length > 0 ? this.currentTab : null;
+				getTaskList(status)
+					.then((res : { list : PromoTask[] }) => {
+						this.list = res.list;
+						this.loading = false;
+					})
+					.catch(() => {
+						this.loading = false;
+					});
+			},
+			switchTab(tab : string) {
+				this.currentTab = tab;
+				this.loadData();
+			},
+			goCreate() {
+				uni.navigateTo({ url: '/pages/promo/task/create' });
+			},
+			goDetail(taskId : number) {
+				uni.navigateTo({ url: `/pages/promo/task/detail?task_id=${taskId}` });
+			},
+			getStatusName(status : string) : string {
+				const map : UTSJSONObject = {
+					'pending': '待启动',
+					'running': '进行中',
+					'paused': '已暂停',
+					'completed': '已完成',
+					'cancelled': '已取消'
+				};
+				return (map[status] ?? status) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				return `${y}-${m}-${d}`;
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.task-list-page {
+		padding: 20rpx;
+	}
+
+	.header-actions {
+		margin-bottom: 20rpx;
+	}
+
+	.tab-bar {
+		display: flex;
+		flex-direction: row;
+		background-color: #ffffff;
+		border-radius: 12rpx;
+		padding: 10rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.tab-item {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 16rpx 0;
+		border-radius: 8rpx;
+	}
+
+	.tab-item text {
+		font-size: 26rpx;
+		color: #666666;
+	}
+
+	.tab-item.active {
+		background-color: #667eea;
+	}
+
+	.tab-item.active text {
+		color: #ffffff;
+	}
+
+	.task-list {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.task-item {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.task-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20rpx;
+	}
+
+	.task-amount {
+		font-size: 40rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.task-status {
+		font-size: 24rpx;
+		padding: 8rpx 16rpx;
+		border-radius: 20rpx;
+	}
+
+	.task-status.pending {
+		background-color: #fff7e6;
+		color: #fa8c16;
+	}
+
+	.task-status.running {
+		background-color: #e6f7ff;
+		color: #1890ff;
+	}
+
+	.task-status.completed {
+		background-color: #f6ffed;
+		color: #52c41a;
+	}
+
+	.task-status.paused {
+		background-color: #fff1f0;
+		color: #ff4d4f;
+	}
+
+	.task-status.cancelled {
+		background-color: #f5f5f5;
+		color: #999999;
+	}
+
+	.task-info {
+		margin-bottom: 20rpx;
+	}
+
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 8rpx;
+	}
+
+	.info-label {
+		font-size: 26rpx;
+		color: #999999;
+		width: 140rpx;
+	}
+
+	.info-value {
+		font-size: 26rpx;
+		color: #333333;
+	}
+
+	.task-footer {
+		border-top: 1rpx solid #f0f0f0;
+		padding-top: 16rpx;
+	}
+
+	.task-time {
+		font-size: 24rpx;
+		color: #999999;
+	}
+
+	.empty {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 100rpx 0;
+	}
+
+	.empty-text {
+		font-size: 28rpx;
+		color: #999999;
+	}
+</style>

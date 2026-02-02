@@ -1,0 +1,332 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">商户中心</text>
+			</view>
+			<view @click="goToInfo">
+				<text class="text-4 text-[#07c160]">设置</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<!-- 商户信息卡片 -->
+			<view class="px-4 py-4">
+				<view class="bg-gradient-to-r from-[#07c160] to-[#05a850] rounded-2 p-4 mb-3">
+					<view class="flex items-center justify-between mb-4">
+						<view class="flex items-center">
+							<view class="w-16 h-16 rounded-full bg-white flex items-center justify-center mr-3">
+								<text class="text-8">🏪</text>
+							</view>
+							<view>
+								<text class="text-5 font-bold text-white">{{ merchantInfo.name }}</text>
+								<text class="text-3.5 text-white mt-1">商户编号：{{ merchantInfo.merchantNo }}</text>
+							</view>
+						</view>
+					</view>
+
+					<view class="flex items-center justify-between bg-white/20 rounded-2 p-3">
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-white">{{ merchantInfo.level }}</text>
+							<text class="text-3 text-white mt-1">商户等级</text>
+						</view>
+						<view class="w-0.5 h-10 bg-white/30"></view>
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-white">{{ merchantInfo.credit }}</text>
+							<text class="text-3 text-white mt-1">信用分</text>
+						</view>
+						<view class="w-0.5 h-10 bg-white/30"></view>
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-white">{{ merchantInfo.orderCount }}</text>
+							<text class="text-3 text-white mt-1">订单数</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 余额卡片 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">账户余额</text>
+					
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">可用余额</text>
+							<text class="text-6 font-bold text-[#1f2329] mt-1">¥{{ merchantInfo.balance }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">冻结金额</text>
+							<text class="text-5 font-bold text-[#ff9500] mt-1">¥{{ merchantInfo.frozenAmount }}</text>
+						</view>
+					</view>
+
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">保证金</text>
+							<text class="text-5 font-bold text-[#07c160] mt-1">¥{{ merchantInfo.deposit }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">互助余额</text>
+							<text class="text-5 font-bold text-[#5856d6] mt-1">¥{{ merchantInfo.mutualBalance }}</text>
+						</view>
+					</view>
+
+					<view class="flex mt-3">
+						<button 
+							@click="goToRecharge"
+							class="flex-1 bg-[#07c160] text-white rounded-full py-2.5 mr-2"
+						>
+							<text class="text-3.5">充值</text>
+						</button>
+						<button 
+							@click="goToWithdraw"
+							class="flex-1 bg-white border border-[#07c160] text-[#07c160] rounded-full py-2.5"
+						>
+							<text class="text-3.5">提现</text>
+						</button>
+					</view>
+				</view>
+
+				<!-- 快捷操作 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">快捷操作</text>
+					
+					<view class="flex flex-wrap">
+						<view 
+							v-for="(item, index) in quickActions" 
+							:key="index"
+							@click="handleQuickAction(item.action)"
+							class="w-1/4 flex flex-col items-center mb-4"
+						>
+							<view class="w-12 h-12 rounded-full bg-[#f5f5f5] flex items-center justify-center mb-2">
+								<text class="text-6">{{ item.icon }}</text>
+							</view>
+							<text class="text-3.5 text-[#1f2329]">{{ item.label }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 今日数据 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">今日数据</text>
+					
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">发起任务</text>
+							<text class="text-5 font-bold text-[#1f2329] mt-1">{{ todayData.publishedTasks }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">接单数</text>
+							<text class="text-5 font-bold text-[#1f2329] mt-1">{{ todayData.receivedTasks }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">完成数</text>
+							<text class="text-5 font-bold text-[#1f2329] mt-1">{{ todayData.completedTasks }}</text>
+						</view>
+					</view>
+
+					<view class="flex items-center justify-between">
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">收入</text>
+							<text class="text-5 font-bold text-[#07c160] mt-1">¥{{ todayData.income }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">支出</text>
+							<text class="text-5 font-bold text-[#ff3b30] mt-1">¥{{ todayData.expense }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-3.5 text-[#999]">佣金</text>
+							<text class="text-5 font-bold text-[#ff9500] mt-1">¥{{ todayData.commission }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 待办事项 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">待办事项</text>
+					
+					<view 
+						v-for="(item, index) in todoList" 
+						:key="index"
+						@click="handleTodo(item.action)"
+						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
+					>
+						<view class="flex items-center flex-1">
+							<text class="text-5 mr-3">{{ item.icon }}</text>
+							<view>
+								<text class="text-4 text-[#1f2329]">{{ item.title }}</text>
+								<text class="text-3.5 text-[#999] mt-1">{{ item.desc }}</text>
+							</view>
+						</view>
+						<view class="flex items-center">
+							<text class="text-5 font-bold text-[#ff3b30] mr-2">{{ item.count }}</text>
+							<text class="text-4 text-[#999]">→</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 公告通知 -->
+				<view class="bg-white rounded-2 p-4">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">公告通知</text>
+					
+					<view 
+						v-for="(item, index) in notices" 
+						:key="index"
+						class="flex items-start py-3 border-b border-[#e5e5e5]"
+					>
+						<text class="text-4 mr-2">📢</text>
+						<view class="flex-1">
+							<text class="text-4 text-[#1f2329]">{{ item.title }}</text>
+							<text class="text-3.5 text-[#999] mt-1">{{ item.time }}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getMerchantInfo } from '@/services/merchant'
+
+// 商户信息
+const merchantInfo = ref({
+	name: '示例商户',
+	merchantNo: 'M202501290001',
+	level: 'VIP',
+	credit: 98,
+	orderCount: 156,
+	balance: '12,580.00',
+	frozenAmount: '2,500.00',
+	deposit: '5,000.00',
+	mutualBalance: '8,320.00'
+})
+
+// 今日数据
+const todayData = ref({
+	publishedTasks: 5,
+	receivedTasks: 12,
+	completedTasks: 8,
+	income: '1,250.00',
+	expense: '850.00',
+	commission: '320.00'
+})
+
+// 快捷操作
+const quickActions = [
+	{ icon: '📝', label: '发起任务', action: 'createTask' },
+	{ icon: '📋', label: '任务大厅', action: 'taskList' },
+	{ icon: '💰', label: '我的钱包', action: 'wallet' },
+	{ icon: '📊', label: '数据统计', action: 'statistics' },
+	{ icon: '👥', label: '我的团队', action: 'team' },
+	{ icon: '🎁', label: '推广中心', action: 'promo' },
+	{ icon: '💬', label: '消息中心', action: 'message' },
+	{ icon: '⚙️', label: '设置', action: 'settings' }
+]
+
+// 待办事项
+const todoList = ref([
+	{ icon: '⏰', title: '待接单任务', desc: '有新的任务等待接单', count: 8, action: 'pendingTasks' },
+	{ icon: '📸', title: '待上传凭证', desc: '有任务需要上传凭证', count: 3, action: 'uploadProof' },
+	{ icon: '✅', title: '待确认完成', desc: '有任务等待确认', count: 2, action: 'confirmTasks' }
+])
+
+// 公告通知
+const notices = ref([
+	{ title: '平台升级通知：系统将于今晚22:00-24:00进行维护', time: '2小时前' },
+	{ title: '新功能上线：支持批量发起任务', time: '1天前' },
+	{ title: '春节活动：完成任务送红包', time: '2天前' }
+])
+
+// 加载商户信息
+const loadMerchantInfo = async () => {
+	try {
+		const res = await getMerchantInfo()
+		if (res.code === 0) {
+			merchantInfo.value = res.data
+		}
+	} catch (error) {
+		console.log('加载商户信息失败', error)
+	}
+}
+
+// 加载今日数据
+const loadTodayData = async () => {
+	try {
+		// TODO: 实现获取今日数据接口
+		const res = { code: 0, data: {} } as any
+		if (res.code === 0) {
+			todayData.value = res.data
+		}
+	} catch (error) {
+		console.log('加载今日数据失败', error)
+	}
+}
+
+// 处理快捷操作
+const handleQuickAction = (action: string) => {
+	const routes = {
+		createTask: '/pages/task/create',
+		taskList: '/pages/task/index',
+		wallet: '/pages/wallet/index',
+		statistics: '/pages/merchant/statistics',
+		team: '/pages/promo/team',
+		promo: '/pages/promo/index',
+		message: '/pages/message/index',
+		settings: '/pages/merchant/info'
+	}
+	
+	const url = routes[action]
+	if (url) {
+		uni.navigateTo({ url })
+	}
+}
+
+// 处理待办事项
+const handleTodo = (action: string) => {
+	const routes = {
+		pendingTasks: '/pages/task/subtask/list',
+		uploadProof: '/pages/task/subtask/my',
+		confirmTasks: '/pages/task/my-tasks'
+	}
+	
+	const url = routes[action]
+	if (url) {
+		uni.navigateTo({ url })
+	}
+}
+
+// 充值
+const goToRecharge = () => {
+	uni.navigateTo({
+		url: '/pages/wallet/recharge'
+	})
+}
+
+// 提现
+const goToWithdraw = () => {
+	uni.navigateTo({
+		url: '/pages/wallet/withdraw'
+	})
+}
+
+// 进入商户信息
+const goToInfo = () => {
+	uni.navigateTo({
+		url: '/pages/merchant/info'
+	})
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+	loadMerchantInfo()
+	loadTodayData()
+})
+</script>

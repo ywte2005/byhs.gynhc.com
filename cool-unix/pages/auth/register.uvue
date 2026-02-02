@@ -1,0 +1,228 @@
+<template>
+	<cl-page>
+		<cl-topbar title="注册" />
+
+		<view class="px-4 pt-6">
+			<view class="flex flex-col gap-4">
+				<!-- 手机号 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">手机号</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.mobile"
+							type="number"
+							placeholder="请输入手机号"
+							class="flex-1 text-3.75"
+							maxlength="11"
+						/>
+					</view>
+				</view>
+
+				<!-- 验证码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">验证码</text>
+					<view class="flex gap-3">
+						<view class="flex-1 h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+							<input
+								v-model="form.code"
+								type="number"
+								placeholder="请输入验证码"
+								class="flex-1 text-3.75"
+								maxlength="6"
+							/>
+						</view>
+						<cl-button
+							:disabled="countdown > 0 || form.mobile.length !== 11"
+							size="large"
+							@tap="sendCode"
+						>
+							{{ countdown > 0 ? `${countdown}s` : "获取验证码" }}
+						</cl-button>
+					</view>
+				</view>
+
+				<!-- 密码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">设置密码</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.password"
+							:type="showPassword ? 'text' : 'password'"
+							placeholder="请设置6-20位密码"
+							class="flex-1 text-3.75"
+						/>
+						<cl-icon
+							:name="showPassword ? 'eye' : 'eye-off'"
+							:size="20"
+							color="#9aa0a6"
+							@tap="showPassword = !showPassword"
+						/>
+					</view>
+				</view>
+
+				<!-- 确认密码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">确认密码</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.confirm_password"
+							:type="showConfirmPassword ? 'text' : 'password'"
+							placeholder="请再次输入密码"
+							class="flex-1 text-3.75"
+						/>
+						<cl-icon
+							:name="showConfirmPassword ? 'eye' : 'eye-off'"
+							:size="20"
+							color="#9aa0a6"
+							@tap="showConfirmPassword = !showConfirmPassword"
+						/>
+					</view>
+				</view>
+
+				<!-- 邀请码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.5 font-medium text-[#1f2329]">邀请码（选填）</text>
+					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+						<input
+							v-model="form.invite_code"
+							placeholder="请输入邀请码"
+							class="flex-1 text-3.75"
+						/>
+					</view>
+				</view>
+
+				<!-- 协议 -->
+				<view class="flex items-center gap-2">
+					<view
+						class="w-4.5 h-4.5 rounded-1 border border-[#e5e6eb] flex items-center justify-center"
+						:class="{ 'bg-primary border-primary': form.agree }"
+						@tap="form.agree = !form.agree"
+					>
+						<cl-icon v-if="form.agree" name="check" :size="12" color="#ffffff" />
+					</view>
+					<text class="text-3 text-[#646a73]">我已阅读并同意《用户协议》和《隐私政策》</text>
+				</view>
+			</view>
+		</view>
+
+		<cl-footer>
+			<cl-button
+				:disabled="!canRegister"
+				:loading="loading"
+				round
+				type="primary"
+				size="large"
+				@tap="handleRegister"
+			>
+				注册
+			</cl-button>
+		</cl-footer>
+	</cl-page>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from "vue";
+import { register, sendSmsCode } from "@/services/auth";
+import { useStore } from "@/.cool";
+
+const form = ref({
+	mobile: "",
+	code: "",
+	password: "",
+	confirm_password: "",
+	invite_code: "",
+	agree: false
+});
+
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+const loading = ref(false);
+const countdown = ref(0);
+
+// 是否可以注册
+const canRegister = computed(() => {
+	return (
+		form.value.mobile.length === 11 &&
+		form.value.code.length === 6 &&
+		form.value.password.length >= 6 &&
+		form.value.password === form.value.confirm_password &&
+		form.value.agree
+	);
+});
+
+// 发送验证码
+async function sendCode() {
+	if (form.value.mobile.length !== 11) {
+		uni.showToast({
+			title: "请输入正确的手机号",
+			icon: "none"
+		});
+		return;
+	}
+
+	try {
+		await sendSmsCode(form.value.mobile, "register");
+
+		uni.showToast({
+			title: "验证码已发送",
+			icon: "success"
+		});
+
+		// 倒计时
+		countdown.value = 60;
+		const timer = setInterval(() => {
+			countdown.value--;
+			if (countdown.value <= 0) {
+				clearInterval(timer);
+			}
+		}, 1000);
+	} catch (error : any) {
+		uni.showToast({
+			title: error.message || "发送失败",
+			icon: "none"
+		});
+	}
+}
+
+// 注册
+async function handleRegister() {
+	if (!canRegister.value) {
+		return;
+	}
+
+	try {
+		loading.value = true;
+
+		const res = await register(form.value);
+
+		// 保存token
+		const { user } = useStore();
+		user.setToken(res.token);
+
+		uni.showToast({
+			title: "注册成功",
+			icon: "success"
+		});
+
+		// 跳转首页
+		setTimeout(() => {
+			uni.reLaunch({
+				url: "/pages/index/home"
+			});
+		}, 1000);
+	} catch (error : any) {
+		uni.showToast({
+			title: error.message || "注册失败",
+			icon: "none"
+		});
+	} finally {
+		loading.value = false;
+	}
+}
+</script>
+
+<style scoped>
+input {
+	background: transparent;
+}
+</style>

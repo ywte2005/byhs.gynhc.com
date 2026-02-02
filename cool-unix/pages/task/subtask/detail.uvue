@@ -1,0 +1,278 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">子任务详情</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<view class="px-4 py-4">
+				<!-- 任务状态卡片 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<view class="flex items-center justify-between mb-3">
+						<view :class="['px-3 py-1.5 rounded-full', getStatusBgColor(subtaskInfo.status)]">
+							<text :class="['text-4 font-bold', getStatusTextColor(subtaskInfo.status)]">
+								{{ getStatusText(subtaskInfo.status) }}
+							</text>
+						</view>
+						<text class="text-3.5 text-[#999]">编号：{{ subtaskInfo.subtaskNo }}</text>
+					</view>
+
+					<text class="text-5 font-bold text-[#1f2329] mb-2">{{ subtaskInfo.title }}</text>
+					<text class="text-3.5 text-[#646a73]">{{ subtaskInfo.description }}</text>
+				</view>
+
+				<!-- 时间信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">时间信息</text>
+					
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">接单时间</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ subtaskInfo.receiveTime }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">完成时限</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ subtaskInfo.timeLimit }}小时</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">剩余时间</text>
+						<text class="text-4 font-bold text-[#ff9500] ml-2">{{ subtaskInfo.remainTime }}</text>
+					</view>
+					<view v-if="subtaskInfo.completeTime">
+						<text class="text-3.5 text-[#999]">完成时间</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ subtaskInfo.completeTime }}</text>
+					</view>
+				</view>
+
+				<!-- 任务信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">任务信息</text>
+					
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">任务类目</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ subtaskInfo.category }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">平台名称</text>
+						<text class="text-4 text-[#1f2329] ml-2">{{ subtaskInfo.platform }}</text>
+					</view>
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999]">任务佣金</text>
+						<text class="text-5 font-bold text-[#ff3b30] ml-2">¥{{ subtaskInfo.commission }}</text>
+					</view>
+				</view>
+
+				<!-- 任务要求 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">任务要求</text>
+					
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999] mb-2">操作步骤</text>
+						<view class="bg-[#f5f5f5] rounded-2 p-3 mt-2">
+							<text class="text-3.5 text-[#646a73]">{{ subtaskInfo.steps }}</text>
+						</view>
+					</view>
+
+					<view class="mb-3">
+						<text class="text-3.5 text-[#999] mb-2">凭证要求</text>
+						<view class="flex flex-wrap mt-2">
+							<view 
+								v-for="(item, index) in subtaskInfo.proofTypes" 
+								:key="index"
+								class="bg-[#f0f9ff] px-2 py-1 rounded mr-2 mb-2"
+							>
+								<text class="text-3 text-[#07c160]">{{ item }}</text>
+							</view>
+						</view>
+					</view>
+
+					<view v-if="subtaskInfo.specialRequirement">
+						<text class="text-3.5 text-[#999] mb-2">特殊要求</text>
+						<view class="bg-[#fff9e6] rounded-2 p-3 mt-2">
+							<text class="text-3.5 text-[#646a73]">{{ subtaskInfo.specialRequirement }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 上传的凭证 -->
+				<view v-if="subtaskInfo.proofImages && subtaskInfo.proofImages.length > 0" class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">上传的凭证</text>
+					
+					<view class="flex flex-wrap">
+						<view 
+							v-for="(img, index) in subtaskInfo.proofImages" 
+							:key="index"
+							@click="previewImage(index)"
+							class="w-24 h-24 rounded-2 mr-2 mb-2 overflow-hidden"
+						>
+							<image :src="img" class="w-full h-full" mode="aspectFill" />
+						</view>
+					</view>
+
+					<view v-if="subtaskInfo.proofNote" class="bg-[#f5f5f5] rounded-2 p-3 mt-3">
+						<text class="text-3.5 text-[#646a73]">{{ subtaskInfo.proofNote }}</text>
+					</view>
+				</view>
+
+				<!-- 发布商户 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">发布商户</text>
+					<view class="flex items-center">
+						<view class="w-12 h-12 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-3">
+							<text class="text-6">{{ subtaskInfo.merchantAvatar }}</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-4 font-bold text-[#1f2329]">{{ subtaskInfo.merchantName }}</text>
+							<view class="flex items-center mt-1">
+								<view class="bg-[#07c160] px-2 py-0.5 rounded mr-2">
+									<text class="text-3 text-white">{{ subtaskInfo.merchantLevel }}</text>
+								</view>
+								<text class="text-3 text-[#999]">信用分：{{ subtaskInfo.merchantCredit }}</text>
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部操作栏 -->
+		<view v-if="showActions" class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+			<button 
+				v-if="subtaskInfo.canUpload"
+				@click="goToUpload"
+				class="w-full bg-[#07c160] text-white rounded-full py-3"
+			>
+				<text class="text-4">上传凭证</text>
+			</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+import { getSubTaskDetail, cancelSubTask } from '@/services/task'
+
+// 子任务ID
+const subtaskId = ref(0)
+
+// 子任务信息
+const subtaskInfo = ref({
+	subtaskNo: 'ST202501300001',
+	status: 'ongoing',
+	title: '美团外卖订单互助',
+	description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
+	receiveTime: '2025-01-30 10:00:00',
+	timeLimit: 24,
+	remainTime: '23小时30分',
+	completeTime: '',
+	category: '外卖',
+	platform: '美团',
+	commission: '15.00',
+	steps: '1. 打开美团APP\n2. 搜索指定商家\n3. 下单指定商品\n4. 完成支付\n5. 上传订单截图',
+	proofTypes: ['订单截图', '聊天记录'],
+	specialRequirement: '请在下单后30分钟内上传截图',
+	proofImages: [],
+	proofNote: '',
+	merchantAvatar: '🏪',
+	merchantName: '示例商户A',
+	merchantLevel: 'VIP',
+	merchantCredit: 98,
+	canUpload: true
+})
+
+// 是否显示操作按钮
+const showActions = computed(() => {
+	return subtaskInfo.value.canUpload
+})
+
+// 加载子任务详情
+const loadSubtaskDetail = async () => {
+	try {
+		uni.showLoading({ title: '加载中...' })
+		
+		const res = await getSubTaskDetail(subtaskId.value)
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			subtaskInfo.value = res.data
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '加载失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 获取状态文本
+const getStatusText = (status: string): string => {
+	const statusMap = {
+		ongoing: '进行中',
+		completed: '已完成',
+		cancelled: '已取消',
+		timeout: '已超时'
+	}
+	return statusMap[status] || '未知'
+}
+
+// 获取状态背景色
+const getStatusBgColor = (status: string): string => {
+	const colorMap = {
+		ongoing: 'bg-[#fff9e6]',
+		completed: 'bg-[#f0f9ff]',
+		cancelled: 'bg-[#fff5f5]',
+		timeout: 'bg-[#f5f5f5]'
+	}
+	return colorMap[status] || 'bg-[#f5f5f5]'
+}
+
+// 获取状态文字颜色
+const getStatusTextColor = (status: string): string => {
+	const colorMap = {
+		ongoing: 'text-[#ff9500]',
+		completed: 'text-[#07c160]',
+		cancelled: 'text-[#ff3b30]',
+		timeout: 'text-[#999]'
+	}
+	return colorMap[status] || 'text-[#999]'
+}
+
+// 预览图片
+const previewImage = (index: number) => {
+	uni.previewImage({
+		urls: subtaskInfo.value.proofImages,
+		current: index
+	})
+}
+
+// 上传凭证
+const goToUpload = () => {
+	uni.navigateTo({
+		url: `/pages/task/subtask/upload?id=${subtaskId.value}`
+	})
+}
+
+// 返回
+const goBack = () => {
+	uni.navigateBack()
+}
+
+// 页面加载时获取子任务详情
+onMounted(() => {
+	// 获取子任务ID
+	const pages = getCurrentPages()
+	const currentPage = pages[pages.length - 1]
+	// @ts-ignore
+	subtaskId.value = parseInt(currentPage.options?.id || '0')
+	
+	if (subtaskId.value > 0) {
+		loadSubtaskDetail()
+	}
+})
+</script>

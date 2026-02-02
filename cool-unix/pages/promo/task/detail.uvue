@@ -1,0 +1,279 @@
+<template>
+	<cl-page>
+		<view class="task-detail-page">
+			<view v-if="task != null" class="task-content">
+				<view class="status-card" :class="task.status">
+					<text class="status-text">{{ getStatusName(task.status) }}</text>
+				</view>
+
+				<view class="info-card">
+					<view class="info-row">
+						<text class="info-label">任务金额</text>
+						<text class="info-value highlight">¥{{ task.total_amount }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">保证金</text>
+						<text class="info-value">¥{{ task.deposit_amount }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">已完成</text>
+						<text class="info-value">¥{{ task.completed_amount }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">服务费</text>
+						<text class="info-value">¥{{ task.service_fee }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">开始时间</text>
+						<text class="info-value">{{ formatTime(task.start_time) }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">结束时间</text>
+						<text class="info-value">{{ formatTime(task.end_time) }}</text>
+					</view>
+					<view class="info-row">
+						<text class="info-label">创建时间</text>
+						<text class="info-value">{{ formatTime(task.createtime) }}</text>
+					</view>
+				</view>
+
+				<view class="progress-card">
+					<text class="card-title">完成进度</text>
+					<view class="progress-bar">
+						<view class="progress-fill" :style="{ width: progressPercent + '%' }"></view>
+					</view>
+					<text class="progress-text">{{ progressPercent }}%</text>
+				</view>
+
+				<view v-if="task.status == 'pending'" class="action-card">
+					<cl-button type="primary" @tap="startTask">
+						<text>启动任务</text>
+					</cl-button>
+				</view>
+			</view>
+
+			<view v-else class="loading">
+				<text>加载中...</text>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getTaskDetail, startTask } from "@/services/promo-task";
+	import type { PromoTask, TaskItem } from "@/services/promo-task";
+
+	type TaskDetail = PromoTask & { items : TaskItem[] };
+
+	export default {
+		props: {
+			task_id: {
+				type: Number,
+				default: 0
+			}
+		},
+		data() {
+			return {
+				task: null as TaskDetail | null
+			};
+		},
+		computed: {
+			progressPercent() : number {
+				if (this.task == null) return 0;
+				const total = parseFloat(this.task.total_amount);
+				const completed = parseFloat(this.task.completed_amount);
+				if (total <= 0) return 0;
+				return Math.round((completed / total) * 100);
+			}
+		},
+		onShow() {
+			this.loadData();
+		},
+		methods: {
+			loadData() {
+				if (this.task_id <= 0) {
+					uni.showToast({ title: '参数错误', icon: 'none' });
+					return;
+				}
+				getTaskDetail(this.task_id)
+					.then((res : TaskDetail) => {
+						this.task = res;
+					})
+					.catch((err : any) => {
+						uni.showToast({ title: err.message ?? '加载失败', icon: 'none' });
+					});
+			},
+			getStatusName(status : string) : string {
+				const map : UTSJSONObject = {
+					'pending': '待启动',
+					'running': '进行中',
+					'paused': '已暂停',
+					'completed': '已完成',
+					'cancelled': '已取消'
+				};
+				return (map[status] ?? status) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				return `${y}-${m}-${d}`;
+			},
+			startTask() {
+				uni.showModal({
+					title: '确认启动',
+					content: '启动后任务将开始分配，确定启动吗？',
+					success: (res) => {
+						if (res.confirm) {
+							this.doStart();
+						}
+					}
+				});
+			},
+			doStart() {
+				uni.showLoading({ title: '启动中...' });
+				startTask(this.task_id)
+					.then(() => {
+						uni.hideLoading();
+						uni.showToast({ title: '启动成功', icon: 'success' });
+						this.loadData();
+					})
+					.catch((err : any) => {
+						uni.hideLoading();
+						uni.showToast({ title: err.message ?? '启动失败', icon: 'none' });
+					});
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.task-detail-page {
+		padding: 20rpx;
+	}
+
+	.status-card {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 40rpx;
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.status-card.pending {
+		background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+	}
+
+	.status-card.running {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	}
+
+	.status-card.completed {
+		background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+	}
+
+	.status-card.paused {
+		background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+	}
+
+	.status-card.cancelled {
+		background-color: #f5f5f5;
+	}
+
+	.status-text {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #ffffff;
+	}
+
+	.status-card.cancelled .status-text {
+		color: #999999;
+	}
+
+	.info-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 16rpx 0;
+		border-bottom: 1rpx solid #f5f5f5;
+	}
+
+	.info-row:last-child {
+		border-bottom: none;
+	}
+
+	.info-label {
+		font-size: 28rpx;
+		color: #666666;
+	}
+
+	.info-value {
+		font-size: 28rpx;
+		color: #333333;
+	}
+
+	.info-value.highlight {
+		font-size: 32rpx;
+		font-weight: bold;
+		color: #667eea;
+	}
+
+	.progress-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.card-title {
+		font-size: 30rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 20rpx;
+	}
+
+	.progress-bar {
+		height: 20rpx;
+		background-color: #f0f0f0;
+		border-radius: 10rpx;
+		overflow: hidden;
+		margin-bottom: 16rpx;
+	}
+
+	.progress-fill {
+		height: 100%;
+		background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+		border-radius: 10rpx;
+	}
+
+	.progress-text {
+		font-size: 26rpx;
+		color: #667eea;
+		text-align: right;
+	}
+
+	.action-card {
+		padding: 20rpx 0;
+	}
+
+	.loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 100rpx 0;
+	}
+
+	.loading text {
+		font-size: 28rpx;
+		color: #999999;
+	}
+</style>

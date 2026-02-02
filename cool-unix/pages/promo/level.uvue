@@ -1,0 +1,220 @@
+<template>
+	<cl-page>
+		<view class="level-page">
+			<view class="current-level">
+				<text class="current-label">当前等级</text>
+				<text class="current-name">{{ currentLevelName }}</text>
+			</view>
+
+			<view class="level-list">
+				<view v-for="(item, index) in levels" :key="index" class="level-card" :class="{ active: isCurrentLevel(item.id) }">
+					<view class="level-header">
+						<text class="level-name">{{ item.name }}</text>
+						<text v-if="isCurrentLevel(item.id)" class="level-tag">当前</text>
+					</view>
+					<view class="level-info">
+						<view class="info-row">
+							<text class="info-label">升级方式：</text>
+							<text class="info-value">{{ getUpgradeTypeName(item.upgrade_type) }}</text>
+						</view>
+						<view v-if="item.upgrade_price != '0.00'" class="info-row">
+							<text class="info-label">升级价格：</text>
+							<text class="info-value">¥{{ item.upgrade_price }}</text>
+						</view>
+						<view v-if="item.personal_performance_min != '0.00'" class="info-row">
+							<text class="info-label">个人业绩：</text>
+							<text class="info-value">≥{{ item.personal_performance_min }}</text>
+						</view>
+						<view v-if="item.team_performance_min != '0.00'" class="info-row">
+							<text class="info-label">团队业绩：</text>
+							<text class="info-value">≥{{ item.team_performance_min }}</text>
+						</view>
+						<view v-if="item.direct_invite_min > 0" class="info-row">
+							<text class="info-label">直推人数：</text>
+							<text class="info-value">≥{{ item.direct_invite_min }}人</text>
+						</view>
+					</view>
+					<view v-if="canPurchase(item)" class="level-action">
+						<cl-button type="primary" size="small" @tap="purchaseLevel(item)">
+							<text>立即升级</text>
+						</cl-button>
+					</view>
+				</view>
+			</view>
+		</view>
+	</cl-page>
+</template>
+
+<script lang="uts">
+	import { getLevels, purchaseLevel, getOverview } from "@/services/promo";
+	import type { PromoLevel, PromoOverview } from "@/services/promo";
+
+	export default {
+		data() {
+			return {
+				levels: [] as PromoLevel[],
+				currentLevelId: 0,
+				currentLevelName: '普通会员',
+				loading: false
+			};
+		},
+		onShow() {
+			this.loadData();
+		},
+		methods: {
+			loadData() {
+				this.loading = true;
+				getOverview()
+					.then((res : PromoOverview) => {
+						if (res.level != null) {
+							this.currentLevelId = res.level.id;
+							this.currentLevelName = res.level.name;
+						}
+						return getLevels();
+					})
+					.then((res : PromoLevel[]) => {
+						this.levels = res;
+						this.loading = false;
+					})
+					.catch(() => {
+						this.loading = false;
+					});
+			},
+			isCurrentLevel(levelId : number) : boolean {
+				return levelId == this.currentLevelId;
+			},
+			canPurchase(level : PromoLevel) : boolean {
+				if (this.isCurrentLevel(level.id)) return false;
+				const currentLevel = this.levels.find((l : PromoLevel) : boolean => l.id == this.currentLevelId);
+				if (currentLevel != null && currentLevel.sort >= level.sort) return false;
+				if (level.upgrade_type == 'performance') return false;
+				return true;
+			},
+			getUpgradeTypeName(type : string) : string {
+				const map : UTSJSONObject = {
+					'buy': '购买升级',
+					'performance': '业绩升级',
+					'both': '购买/业绩'
+				};
+				return (map[type] ?? type) as string;
+			},
+			purchaseLevel(level : PromoLevel) {
+				uni.showModal({
+					title: '确认升级',
+					content: `确定花费¥${level.upgrade_price}升级到${level.name}吗？`,
+					success: (res) => {
+						if (res.confirm) {
+							this.doPurchase(level.id);
+						}
+					}
+				});
+			},
+			doPurchase(levelId : number) {
+				uni.showLoading({ title: '处理中...' });
+				purchaseLevel(levelId, 'balance')
+					.then(() => {
+						uni.hideLoading();
+						uni.showToast({ title: '升级成功', icon: 'success' });
+						this.loadData();
+					})
+					.catch((err : any) => {
+						uni.hideLoading();
+						uni.showToast({ title: err.message ?? '升级失败', icon: 'none' });
+					});
+			}
+		}
+	};
+</script>
+
+<style lang="scss">
+	.level-page {
+		padding: 20rpx;
+	}
+
+	.current-level {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 40rpx;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-radius: 16rpx;
+		margin-bottom: 20rpx;
+	}
+
+	.current-label {
+		font-size: 26rpx;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.current-name {
+		font-size: 48rpx;
+		font-weight: bold;
+		color: #ffffff;
+		margin-top: 10rpx;
+	}
+
+	.level-list {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.level-card {
+		background-color: #ffffff;
+		border-radius: 16rpx;
+		padding: 30rpx;
+		margin-bottom: 20rpx;
+		border: 2rpx solid #eeeeee;
+	}
+
+	.level-card.active {
+		border-color: #667eea;
+	}
+
+	.level-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 20rpx;
+	}
+
+	.level-name {
+		font-size: 34rpx;
+		font-weight: bold;
+		color: #333333;
+	}
+
+	.level-tag {
+		font-size: 22rpx;
+		color: #667eea;
+		background-color: rgba(102, 126, 234, 0.1);
+		padding: 6rpx 16rpx;
+		border-radius: 20rpx;
+	}
+
+	.level-info {
+		margin-bottom: 20rpx;
+	}
+
+	.info-row {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 12rpx;
+	}
+
+	.info-label {
+		font-size: 26rpx;
+		color: #999999;
+		width: 180rpx;
+	}
+
+	.info-value {
+		font-size: 26rpx;
+		color: #333333;
+	}
+
+	.level-action {
+		display: flex;
+		justify-content: flex-end;
+	}
+</style>

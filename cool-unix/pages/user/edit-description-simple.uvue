@@ -1,0 +1,216 @@
+<template>
+	<view class="page">
+		<!-- 顶部导航栏 -->
+		<view class="navbar">
+			<view class="navbar-inner">
+				<view class="navbar-left" @tap="goBack">
+					<text class="icon">←</text>
+				</view>
+				<view class="navbar-center">
+					<text class="navbar-title">编辑简介</text>
+				</view>
+				<view class="navbar-right"></view>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<view class="content">
+			<!-- 文本域 -->
+			<view class="textarea-section">
+				<textarea
+					class="textarea"
+					v-model="description"
+					placeholder="介绍一下自己"
+					:maxlength="200"
+					:focus="true"
+					:auto-height="true"
+				/>
+				<view class="textarea-counter">
+					<text class="counter-text">{{ description.length }} / 200</text>
+				</view>
+			</view>
+
+			<!-- 提示信息 -->
+			<view class="tip-section">
+				<text class="tip-text">简介将展示在您的个人主页，让其他人更好地了解您</text>
+			</view>
+		</view>
+
+		<!-- 底部按钮 -->
+		<view class="footer">
+			<view
+				class="btn"
+				:class="{ 'btn-disabled': description.length === 0 }"
+				hover-class="btn-hover"
+				@tap="confirm"
+			>
+				<text class="btn-text">确认</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+// 简介
+const description = ref('')
+
+// 返回上一页
+function goBack() {
+	uni.navigateBack()
+}
+
+// 确认
+function confirm() {
+	if (description.value.length === 0) {
+		uni.showToast({
+			title: '简介不能为空',
+			icon: 'none'
+		})
+		return
+	}
+
+	// 保存简介
+	uni.showToast({
+		title: '简介修改成功',
+		icon: 'success'
+	})
+
+	setTimeout(() => {
+		uni.navigateBack()
+	}, 1500)
+}
+
+// 页面加载时，获取当前简介
+onReady(() => {
+	// TODO: 从用户信息中获取简介
+	description.value = ''
+})
+</script>
+
+<style scoped>
+.page {
+	width: 750rpx;
+	min-height: 100vh;
+	background-color: #f5f5f5;
+	display: flex;
+	flex-direction: column;
+}
+
+/* 导航栏 */
+.navbar {
+	background-color: #ffffff;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.navbar-inner {
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0 30rpx;
+}
+
+.navbar-left,
+.navbar-right {
+	width: 120rpx;
+}
+
+.navbar-left {
+	display: flex;
+	align-items: center;
+}
+
+.icon {
+	font-size: 48rpx;
+	color: #333333;
+}
+
+.navbar-center {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+}
+
+.navbar-title {
+	font-size: 36rpx;
+	font-weight: 500;
+	color: #333333;
+}
+
+/* 内容区域 */
+.content {
+	flex: 1;
+	padding: 30rpx;
+}
+
+/* 文本域区域 */
+.textarea-section {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 30rpx;
+	margin-bottom: 30rpx;
+}
+
+.textarea {
+	width: 100%;
+	min-height: 240rpx;
+	font-size: 32rpx;
+	color: #333333;
+	line-height: 48rpx;
+}
+
+.textarea-counter {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 20rpx;
+}
+
+.counter-text {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+/* 提示信息 */
+.tip-section {
+	padding: 0 30rpx;
+}
+
+.tip-text {
+	font-size: 24rpx;
+	color: #999999;
+	line-height: 40rpx;
+}
+
+/* 底部按钮 */
+.footer {
+	padding: 30rpx;
+	background-color: #ffffff;
+	border-top: 1px solid #f5f5f5;
+}
+
+.btn {
+	height: 88rpx;
+	background-color: #007aff;
+	border-radius: 16rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.btn-hover {
+	opacity: 0.8;
+}
+
+.btn-disabled {
+	background-color: #cccccc;
+	opacity: 0.6;
+}
+
+.btn-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
+}
+</style>

@@ -1,0 +1,227 @@
+<template>
+	<cl-page class="bg-[#f5f7fa]">
+		<cl-topbar title="实名认证" />
+
+		<view class="px-4 pt-4 flex flex-col gap-4">
+			<!-- 认证类型 -->
+			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
+				<text class="text-3.5 font-medium text-[#1f2329]">认证类型</text>
+				<view class="flex gap-3">
+					<view
+						class="flex-1 h-11 rounded-2 flex items-center justify-center border"
+						:class="
+							form.type === 'personal'
+								? 'bg-[#eaf2ff] border-primary'
+								: 'bg-white border-[#e5e6eb]'
+						"
+						@tap="form.type = 'personal'"
+					>
+						<text
+							class="text-3.5 font-medium"
+							:class="form.type === 'personal' ? 'text-primary' : 'text-[#646a73]'"
+						>
+							个人认证
+						</text>
+					</view>
+					<view
+						class="flex-1 h-11 rounded-2 flex items-center justify-center border"
+						:class="
+							form.type === 'enterprise'
+								? 'bg-[#eaf2ff] border-primary'
+								: 'bg-white border-[#e5e6eb]'
+						"
+						@tap="form.type = 'enterprise'"
+					>
+						<text
+							class="text-3.5 font-medium"
+							:class="form.type === 'enterprise' ? 'text-primary' : 'text-[#646a73]'"
+						>
+							企业认证
+						</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 基本信息 -->
+			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
+				<text class="text-3.5 font-medium text-[#1f2329]">基本信息</text>
+
+				<!-- 姓名/法人姓名 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.25 text-[#646a73]">
+						{{ form.type === 'personal' ? '姓名' : '法人姓名' }}
+					</text>
+					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
+						<input
+							v-model="form.name"
+							placeholder="请输入姓名"
+							class="flex-1 text-3.5"
+						/>
+					</view>
+				</view>
+
+				<!-- 证件号码 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.25 text-[#646a73]">证件号码</text>
+					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
+						<input
+							v-model="form.id_card"
+							placeholder="请输入身份证号"
+							class="flex-1 text-3.5"
+						/>
+					</view>
+				</view>
+
+				<!-- 联系电话 -->
+				<view class="flex flex-col gap-2">
+					<text class="text-3.25 text-[#646a73]">联系电话</text>
+					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
+						<input
+							v-model="form.contact_phone"
+							type="number"
+							placeholder="请输入联系电话"
+							class="flex-1 text-3.5"
+							maxlength="11"
+						/>
+					</view>
+				</view>
+			</view>
+
+			<!-- 证件照片 -->
+			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
+				<text class="text-3.5 font-medium text-[#1f2329]">证件照片</text>
+
+				<view class="flex gap-3">
+					<!-- 身份证正面 -->
+					<view class="flex-1">
+						<cl-upload
+							v-model="form.id_card_front"
+							:limit="1"
+							accept="image"
+						>
+							<view
+								class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
+							>
+								<cl-icon name="plus" :size="24" color="#9aa0a6" />
+								<text class="text-3 text-[#9aa0a6]">身份证正面</text>
+							</view>
+						</cl-upload>
+					</view>
+
+					<!-- 身份证反面 -->
+					<view class="flex-1">
+						<cl-upload
+							v-model="form.id_card_back"
+							:limit="1"
+							accept="image"
+						>
+							<view
+								class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
+							>
+								<cl-icon name="plus" :size="24" color="#9aa0a6" />
+								<text class="text-3 text-[#9aa0a6]">身份证反面</text>
+							</view>
+						</cl-upload>
+					</view>
+				</view>
+
+				<!-- 营业执照（企业认证） -->
+				<view v-if="form.type === 'enterprise'" class="flex-1">
+					<cl-upload
+						v-model="form.business_license"
+						:limit="1"
+						accept="image"
+					>
+						<view
+							class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
+						>
+							<cl-icon name="plus" :size="24" color="#9aa0a6" />
+							<text class="text-3 text-[#9aa0a6]">营业执照</text>
+						</view>
+					</cl-upload>
+				</view>
+			</view>
+		</view>
+
+		<cl-footer>
+			<cl-button
+				:disabled="!canSubmit"
+				:loading="loading"
+				round
+				type="primary"
+				size="large"
+				@tap="handleSubmit"
+			>
+				提交认证
+			</cl-button>
+		</cl-footer>
+	</cl-page>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from "vue";
+import { submitCertification } from "@/services/auth";
+
+const form = ref({
+	type: "personal" as "personal" | "enterprise",
+	name: "",
+	id_card: "",
+	contact_phone: "",
+	id_card_front: "",
+	id_card_back: "",
+	business_license: ""
+});
+
+const loading = ref(false);
+
+// 是否可以提交
+const canSubmit = computed(() => {
+	const basic =
+		form.value.name &&
+		form.value.id_card &&
+		form.value.contact_phone &&
+		form.value.id_card_front &&
+		form.value.id_card_back;
+
+	if (form.value.type === "enterprise") {
+		return basic && form.value.business_license;
+	}
+
+	return basic;
+});
+
+// 提交认证
+async function handleSubmit() {
+	if (!canSubmit.value) {
+		return;
+	}
+
+	try {
+		loading.value = true;
+
+		await submitCertification(form.value);
+
+		uni.showToast({
+			title: "提交成功，等待审核",
+			icon: "success"
+		});
+
+		setTimeout(() => {
+			uni.navigateBack();
+		}, 1500);
+	} catch (error : any) {
+		uni.showToast({
+			title: error.message || "提交失败",
+			icon: "none"
+		});
+	} finally {
+		loading.value = false;
+	}
+}
+</script>
+
+<style scoped>
+input {
+	background: transparent;
+}
+</style>

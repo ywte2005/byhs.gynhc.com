@@ -1,0 +1,358 @@
+<template>
+	<view class="flex flex-col h-full bg-[#f5f5f5]">
+		<!-- 顶部导航 -->
+		<view class="flex items-center justify-between px-4 py-3 bg-white">
+			<view class="flex items-center" @click="goBack">
+				<text class="text-6">←</text>
+				<text class="text-4 ml-2">商户信息</text>
+			</view>
+			<view @click="toggleEdit">
+				<text class="text-4 text-[#07c160]">{{ isEditing ? '保存' : '编辑' }}</text>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="flex-1" scroll-y>
+			<view class="px-4 py-4">
+				<!-- 商户头像 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<view class="flex items-center">
+						<view class="w-20 h-20 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-4">
+							<text class="text-10">🏪</text>
+						</view>
+						<view class="flex-1">
+							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
+							<text class="text-3.5 text-[#999] mt-1">商户编号：{{ merchantInfo.merchantNo }}</text>
+							<view class="flex items-center mt-2">
+								<view class="bg-[#07c160] rounded px-2 py-0.5 mr-2">
+									<text class="text-3 text-white">{{ merchantInfo.level }}</text>
+								</view>
+								<view class="bg-[#ff9500] rounded px-2 py-0.5">
+									<text class="text-3 text-white">信用分：{{ merchantInfo.credit }}</text>
+								</view>
+							</view>
+						</view>
+					</view>
+				</view>
+
+				<!-- 基本信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">基本信息</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">商户类型</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.type === 'personal' ? '个人商户' : '企业商户' }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">商户名称</text>
+						<input 
+							v-if="isEditing"
+							v-model="merchantInfo.name"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入商户名称"
+						/>
+						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.name }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">联系人</text>
+						<input 
+							v-if="isEditing"
+							v-model="merchantInfo.contact"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入联系人"
+						/>
+						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.contact }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">联系电话</text>
+						<input 
+							v-if="isEditing"
+							v-model="merchantInfo.phone"
+							type="number"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入联系电话"
+						/>
+						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.phone }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">经营地址</text>
+						<input 
+							v-if="isEditing"
+							v-model="merchantInfo.address"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入经营地址"
+						/>
+						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.address }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">经营类目</text>
+						<input 
+							v-if="isEditing"
+							v-model="merchantInfo.category"
+							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							placeholder="请输入经营类目"
+						/>
+						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.category }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">入驻时间</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.joinTime }}</text>
+					</view>
+				</view>
+
+				<!-- 企业信息（仅企业商户） -->
+				<view v-if="merchantInfo.type === 'enterprise'" class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">企业信息</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">统一社会信用代码</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.creditCode }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">法人姓名</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.legalPerson }}</text>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">法人身份证号</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.legalIdCard }}</text>
+					</view>
+				</view>
+
+				<!-- 认证信息 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">认证信息</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">实名认证</text>
+						<view class="flex items-center">
+							<text class="text-4 text-[#07c160] mr-2">✓ 已认证</text>
+							<text class="text-3.5 text-[#999]">{{ merchantInfo.realName }}</text>
+						</view>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">身份证号</text>
+						<text class="text-4 text-[#1f2329]">{{ merchantInfo.idCard }}</text>
+					</view>
+				</view>
+
+				<!-- 证件照片 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">证件照片</text>
+					
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">身份证正面</text>
+						<image 
+							:src="merchantInfo.idCardFront || '/static/images/placeholder.png'" 
+							class="w-full h-40 rounded-2 mt-2"
+							mode="aspectFit"
+						/>
+					</view>
+
+					<view class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">身份证反面</text>
+						<image 
+							:src="merchantInfo.idCardBack || '/static/images/placeholder.png'" 
+							class="w-full h-40 rounded-2 mt-2"
+							mode="aspectFit"
+						/>
+					</view>
+
+					<view v-if="merchantInfo.type === 'enterprise'" class="mb-4">
+						<text class="text-3.5 text-[#999] mb-2">营业执照</text>
+						<image 
+							:src="merchantInfo.businessLicense || '/static/images/placeholder.png'" 
+							class="w-full h-40 rounded-2 mt-2"
+							mode="aspectFit"
+						/>
+					</view>
+				</view>
+
+				<!-- 账户统计 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<text class="text-4 font-bold text-[#1f2329] mb-3">账户统计</text>
+					
+					<view class="flex items-center justify-between mb-3">
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.totalOrders }}</text>
+							<text class="text-3.5 text-[#999] mt-1">总订单数</text>
+						</view>
+						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.completedOrders }}</text>
+							<text class="text-3.5 text-[#999] mt-1">完成订单</text>
+						</view>
+						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.completionRate }}%</text>
+							<text class="text-3.5 text-[#999] mt-1">完成率</text>
+						</view>
+					</view>
+
+					<view class="flex items-center justify-between">
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-[#07c160]">¥{{ merchantInfo.totalIncome }}</text>
+							<text class="text-3.5 text-[#999] mt-1">累计收入</text>
+						</view>
+						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
+						<view class="flex-1 text-center">
+							<text class="text-5 font-bold text-[#ff9500]">¥{{ merchantInfo.totalCommission }}</text>
+							<text class="text-3.5 text-[#999] mt-1">累计佣金</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 操作按钮 -->
+				<view class="bg-white rounded-2 p-4 mb-3">
+					<button 
+						@click="logout"
+						class="w-full bg-white border border-[#ff3b30] text-[#ff3b30] rounded-full py-3"
+					>
+						<text class="text-4">退出登录</text>
+					</button>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+import { getMerchantInfo, updateMerchantInfo } from '@/services/merchant'
+
+// 是否编辑模式
+const isEditing = ref(false)
+
+// 商户信息
+const merchantInfo = ref({
+	merchantNo: 'M202501290001',
+	type: 'personal',
+	name: '示例商户',
+	contact: '张三',
+	phone: '13800138000',
+	address: '广东省深圳市南山区科技园',
+	category: '餐饮',
+	level: 'VIP',
+	credit: 98,
+	joinTime: '2025-01-15 10:30:00',
+	creditCode: '',
+	legalPerson: '',
+	legalIdCard: '',
+	realName: '张三',
+	idCard: '440***********1234',
+	idCardFront: '',
+	idCardBack: '',
+	businessLicense: '',
+	totalOrders: 156,
+	completedOrders: 148,
+	completionRate: 94.9,
+	totalIncome: '125,800.00',
+	totalCommission: '12,580.00'
+})
+
+// 原始数据备份
+const originalInfo = ref({})
+
+// 加载商户信息
+const loadMerchantInfo = async () => {
+	try {
+		uni.showLoading({ title: '加载中...' })
+		
+		const res = await getMerchantInfo()
+		
+		uni.hideLoading()
+		
+		if (res.code === 0) {
+			merchantInfo.value = res.data
+			originalInfo.value = JSON.parse(JSON.stringify(res.data))
+		}
+	} catch (error) {
+		uni.hideLoading()
+		uni.showToast({
+			title: '加载失败',
+			icon: 'none'
+		})
+	}
+}
+
+// 切换编辑模式
+const toggleEdit = async () => {
+	if (isEditing.value) {
+		// 保存修改
+		try {
+			uni.showLoading({ title: '保存中...' })
+			
+			const res = await updateMerchantInfo(merchantInfo.value)
+			
+			uni.hideLoading()
+			
+			if (res.code === 0) {
+				uni.showToast({
+					title: '保存成功',
+					icon: 'success'
+				})
+				isEditing.value = false
+				originalInfo.value = JSON.parse(JSON.stringify(merchantInfo.value))
+			} else {
+				uni.showToast({
+					title: res.message || '保存失败',
+					icon: 'none'
+				})
+			}
+		} catch (error) {
+			uni.hideLoading()
+			uni.showToast({
+				title: '保存失败',
+				icon: 'none'
+			})
+		}
+	} else {
+		// 进入编辑模式
+		isEditing.value = true
+	}
+}
+
+// 退出登录
+const logout = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要退出登录吗？',
+		success: (res) => {
+			if (res.confirm) {
+				// 清除登录信息
+				uni.removeStorageSync('token')
+				uni.removeStorageSync('userInfo')
+				
+				// 跳转到登录页
+				uni.reLaunch({
+					url: '/pages/auth/login'
+				})
+			}
+		}
+	})
+}
+
+// 返回
+const goBack = () => {
+	if (isEditing.value) {
+		// 如果在编辑模式，恢复原始数据
+		merchantInfo.value = JSON.parse(JSON.stringify(originalInfo.value))
+		isEditing.value = false
+	} else {
+		uni.navigateBack()
+	}
+}
+
+// 页面加载时获取商户信息
+onMounted(() => {
+	loadMerchantInfo()
+})
+</script>

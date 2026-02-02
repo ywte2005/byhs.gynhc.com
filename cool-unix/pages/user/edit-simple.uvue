@@ -1,0 +1,519 @@
+<template>
+	<view class="page">
+		<!-- 顶部导航栏 -->
+		<view class="navbar">
+			<view class="navbar-inner">
+				<view class="navbar-left" @tap="goBack">
+					<text class="icon">←</text>
+				</view>
+				<view class="navbar-center">
+					<text class="navbar-title">编辑资料</text>
+				</view>
+				<view class="navbar-right"></view>
+			</view>
+		</view>
+
+		<!-- 内容区域 -->
+		<scroll-view class="content" scroll-y>
+			<!-- 头像 -->
+			<view class="avatar-section">
+				<view class="avatar-wrapper" @tap="uploadAvatar">
+					<image
+						class="avatar"
+						:src="avatarUrl || '/static/default-avatar.png'"
+						mode="aspectFill"
+					/>
+					<view class="avatar-edit-icon">
+						<text class="icon-text">✏️</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 基本信息 -->
+			<view class="list-section">
+				<view class="list-item" hover-class="list-item-hover" @tap="editName">
+					<text class="list-label">我的昵称</text>
+					<view class="list-value-wrapper">
+						<text class="list-value">{{ nickName || '未设置' }}</text>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+				<view class="list-item">
+					<text class="list-label">手机号</text>
+					<view class="list-value-wrapper">
+						<text class="list-value">{{ phone || '未绑定' }}</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 简介 -->
+			<view class="list-section">
+				<view class="list-item" hover-class="list-item-hover" @tap="editDescription">
+					<text class="list-label">简介</text>
+					<view class="list-value-wrapper">
+						<text class="list-value" :class="{ 'text-placeholder': !description }">
+							{{ description || '介绍一下自己' }}
+						</text>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 其他信息 -->
+			<view class="list-section">
+				<view class="list-item" hover-class="list-item-hover" @tap="selectGender">
+					<text class="list-label">性别</text>
+					<view class="list-value-wrapper">
+						<text class="list-value" :class="{ 'text-placeholder': gender === null }">
+							{{ genderText }}
+						</text>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+				<view class="list-item" hover-class="list-item-hover" @tap="selectBirthday">
+					<text class="list-label">生日</text>
+					<view class="list-value-wrapper">
+						<text class="list-value" :class="{ 'text-placeholder': !birthday }">
+							{{ birthday || '选择生日' }}
+						</text>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+				<view class="list-item" hover-class="list-item-hover" @tap="selectRegion">
+					<text class="list-label">地区</text>
+					<view class="list-value-wrapper">
+						<text class="list-value" :class="{ 'text-placeholder': !regionText }">
+							{{ regionText || '选择所在的地区' }}
+						</text>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 性别选择弹窗 -->
+		<view v-if="showGenderPicker" class="modal" @tap="showGenderPicker = false">
+			<view class="modal-content" @tap.stop>
+				<view class="modal-header">
+					<text class="modal-title">选择性别</text>
+					<view class="modal-close" @tap="showGenderPicker = false">
+						<text class="close-icon">✕</text>
+					</view>
+				</view>
+				<view class="picker-list">
+					<view
+						v-for="(item, index) in genderOptions"
+						:key="index"
+						class="picker-item"
+						hover-class="picker-item-hover"
+						@tap="onGenderChange(item.value)"
+					>
+						<text class="picker-text">{{ item.label }}</text>
+						<text v-if="gender === item.value" class="check-icon">✓</text>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 生日选择弹窗 -->
+		<view v-if="showBirthdayPicker" class="modal" @tap="showBirthdayPicker = false">
+			<view class="modal-content" @tap.stop>
+				<view class="modal-header">
+					<text class="modal-title">选择生日</text>
+					<view class="modal-close" @tap="showBirthdayPicker = false">
+						<text class="close-icon">✕</text>
+					</view>
+				</view>
+				<picker
+					mode="date"
+					:value="birthday || '2000-01-01'"
+					:end="today"
+					@change="onBirthdayChange"
+				>
+					<view class="picker-trigger">
+						<text class="picker-trigger-text">{{ birthday || '选择日期' }}</text>
+					</view>
+				</picker>
+			</view>
+		</view>
+
+		<!-- 地区选择弹窗 -->
+		<view v-if="showRegionPicker" class="modal" @tap="showRegionPicker = false">
+			<view class="modal-content" @tap.stop>
+				<view class="modal-header">
+					<text class="modal-title">选择地区</text>
+					<view class="modal-close" @tap="showRegionPicker = false">
+						<text class="close-icon">✕</text>
+					</view>
+				</view>
+				<picker mode="region" @change="onRegionChange">
+					<view class="picker-trigger">
+						<text class="picker-trigger-text">{{ regionText || '选择省市区' }}</text>
+					</view>
+				</picker>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+
+// 用户信息
+const avatarUrl = ref<string | null>(null)
+const nickName = ref<string | null>('未设置昵称')
+const phone = ref<string | null>('138****8888')
+const description = ref<string | null>(null)
+const gender = ref<number | null>(null)
+const birthday = ref<string | null>(null)
+const province = ref<string | null>(null)
+const city = ref<string | null>(null)
+const district = ref<string | null>(null)
+
+// 弹窗显示状态
+const showGenderPicker = ref(false)
+const showBirthdayPicker = ref(false)
+const showRegionPicker = ref(false)
+
+// 今天日期
+const today = new Date().toISOString().split('T')[0]
+
+// 性别选项
+const genderOptions = [
+	{ label: '保密', value: 0 },
+	{ label: '男', value: 1 },
+	{ label: '女', value: 2 }
+]
+
+// 性别文本
+const genderText = computed((): string => {
+	if (gender.value === null) return '编辑性别'
+	return ['保密', '男', '女'][gender.value]
+})
+
+// 地区文本
+const regionText = computed((): string => {
+	const arr: string[] = []
+	if (province.value) arr.push(province.value)
+	if (city.value) arr.push(city.value)
+	if (district.value) arr.push(district.value)
+	return arr.join(' - ')
+})
+
+// 返回上一页
+function goBack() {
+	uni.navigateBack()
+}
+
+// 编辑昵称
+function editName() {
+	uni.navigateTo({
+		url: '/pages/user/edit-name-simple'
+	})
+}
+
+// 编辑简介
+function editDescription() {
+	uni.navigateTo({
+		url: '/pages/user/edit-description-simple'
+	})
+}
+
+// 选择性别
+function selectGender() {
+	showGenderPicker.value = true
+}
+
+// 性别改变
+function onGenderChange(value: number) {
+	gender.value = value
+	showGenderPicker.value = false
+	uni.showToast({
+		title: '性别设置成功',
+		icon: 'success'
+	})
+}
+
+// 选择生日
+function selectBirthday() {
+	showBirthdayPicker.value = true
+}
+
+// 生日改变
+function onBirthdayChange(e: any) {
+	birthday.value = e.detail.value
+	showBirthdayPicker.value = false
+	uni.showToast({
+		title: '生日设置成功',
+		icon: 'success'
+	})
+}
+
+// 选择地区
+function selectRegion() {
+	showRegionPicker.value = true
+}
+
+// 地区改变
+function onRegionChange(e: any) {
+	const arr = e.detail.value
+	province.value = arr[0]
+	city.value = arr[1]
+	district.value = arr[2]
+	showRegionPicker.value = false
+	uni.showToast({
+		title: '地区设置成功',
+		icon: 'success'
+	})
+}
+
+// 上传头像
+function uploadAvatar() {
+	uni.chooseImage({
+		count: 1,
+		success: (res) => {
+			avatarUrl.value = res.tempFilePaths[0]
+			uni.showToast({
+				title: '头像上传成功',
+				icon: 'success'
+			})
+		}
+	})
+}
+</script>
+
+<style scoped>
+.page {
+	width: 750rpx;
+	min-height: 100vh;
+	background-color: #f5f5f5;
+	display: flex;
+	flex-direction: column;
+}
+
+/* 导航栏 */
+.navbar {
+	background-color: #ffffff;
+	border-bottom: 1px solid #e5e5e5;
+}
+
+.navbar-inner {
+	height: 88rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0 30rpx;
+}
+
+.navbar-left,
+.navbar-right {
+	width: 120rpx;
+}
+
+.navbar-left {
+	display: flex;
+	align-items: center;
+}
+
+.icon {
+	font-size: 48rpx;
+	color: #333333;
+}
+
+.navbar-center {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+}
+
+.navbar-title {
+	font-size: 36rpx;
+	font-weight: 500;
+	color: #333333;
+}
+
+/* 内容区域 */
+.content {
+	flex: 1;
+	padding: 30rpx;
+}
+
+/* 头像区域 */
+.avatar-section {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 60rpx 0;
+	margin-bottom: 30rpx;
+}
+
+.avatar-wrapper {
+	position: relative;
+	width: 160rpx;
+	height: 160rpx;
+}
+
+.avatar {
+	width: 160rpx;
+	height: 160rpx;
+	border-radius: 40rpx;
+}
+
+.avatar-edit-icon {
+	position: absolute;
+	bottom: 0;
+	right: -6rpx;
+	width: 48rpx;
+	height: 48rpx;
+	background-color: #000000;
+	border-radius: 24rpx;
+	border: 2px solid #ffffff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.icon-text {
+	font-size: 24rpx;
+}
+
+/* 列表区域 */
+.list-section {
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	margin-bottom: 30rpx;
+	overflow: hidden;
+}
+
+.list-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 30rpx;
+	border-bottom: 1px solid #f5f5f5;
+}
+
+.list-item:last-child {
+	border-bottom: none;
+}
+
+.list-item-hover {
+	background-color: #f5f5f5;
+}
+
+.list-label {
+	font-size: 30rpx;
+	color: #333333;
+}
+
+.list-value-wrapper {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.list-value {
+	font-size: 28rpx;
+	color: #666666;
+	margin-right: 10rpx;
+}
+
+.text-placeholder {
+	color: #999999;
+}
+
+.arrow {
+	font-size: 40rpx;
+	color: #999999;
+}
+
+/* 弹窗 */
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: flex-end;
+	z-index: 1000;
+}
+
+.modal-content {
+	width: 750rpx;
+	background-color: #ffffff;
+	border-radius: 32rpx 32rpx 0 0;
+	padding-bottom: 60rpx;
+}
+
+.modal-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 40rpx 30rpx;
+	border-bottom: 1px solid #f5f5f5;
+}
+
+.modal-title {
+	font-size: 32rpx;
+	font-weight: 500;
+	color: #333333;
+}
+
+.modal-close {
+	width: 60rpx;
+	height: 60rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.close-icon {
+	font-size: 40rpx;
+	color: #999999;
+}
+
+/* 选择器列表 */
+.picker-list {
+	padding: 20rpx 0;
+}
+
+.picker-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 30rpx;
+}
+
+.picker-item-hover {
+	background-color: #f5f5f5;
+}
+
+.picker-text {
+	font-size: 30rpx;
+	color: #333333;
+}
+
+.check-icon {
+	font-size: 36rpx;
+	color: #007aff;
+}
+
+/* 选择器触发器 */
+.picker-trigger {
+	padding: 30rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.picker-trigger-text {
+	font-size: 30rpx;
+	color: #007aff;
+}
+</style>
