@@ -9,16 +9,28 @@ class Task extends Api
     protected $noNeedLogin = [];
     protected $noNeedRight = ['*'];
 
+    /**
+     * 任务大厅列表（可接的子任务）
+     */
     public function list()
     {
         $page = $this->request->get('page', 1);
         $limit = $this->request->get('limit', 20);
-        $status = $this->request->get('status', null);
+        $category = $this->request->get('category', null);
+        
+        // 如果category为'all'，则不筛选
+        if ($category === 'all') {
+            $category = null;
+        }
         
         $userId = $this->auth->id;
-        $list = TaskService::getUserTasks($userId, $status, $page, $limit);
+        $list = TaskService::getAvailableSubTasks($userId, $category, $page, $limit);
         
-        $this->success('获取成功', ['list' => $list->items(), 'total' => $list->total()]);
+        $this->success('获取成功', [
+            'list' => $list->items(), 
+            'total' => $list->total(),
+            'hasMore' => $list->hasMore()
+        ]);
     }
 
     public function detail()

@@ -335,9 +335,9 @@ class TaskService
         }
     }
 
-    public static function getAvailableSubTasks($userId, $page = 1, $limit = 20)
+    public static function getAvailableSubTasks($userId, $category = null, $page = 1, $limit = 20)
     {
-        return SubTask::getAvailableForUser($userId, $page, $limit);
+        return SubTask::getAvailableForUser($userId, $category, $page, $limit);
     }
 
     public static function getUserAcceptedSubTasks($userId, $page = 1, $limit = 20)

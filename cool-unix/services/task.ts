@@ -5,16 +5,20 @@ import type { MutualTask, SubTask, CreateTaskForm, UploadProofForm } from "@/typ
  * 任务服务
  */
 
-// 获取任务列表
+// 获取任务列表（任务大厅 - 可接的子任务）
 export function getTaskList(params: {
-	status?: string;
+	category?: string;
 	page?: number;
-	limit?: number;
-}): Promise<{ list: MutualTask[]; total: number }> {
+	pageSize?: number;
+}): Promise<{ list: SubTask[]; total: number; hasMore: boolean }> {
 	return request({
-		url: "/task/list",
+		url: "/api/task/list",
 		method: "GET",
-		data: params
+		data: {
+			category: params.category,
+			page: params.page,
+			limit: params.pageSize
+		}
 	});
 }
 

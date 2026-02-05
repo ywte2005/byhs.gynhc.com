@@ -119,7 +119,7 @@ import { getTaskList } from '@/services/task'
 // 当前分类
 const currentCategory = ref('all')
 
-// 分类列表
+// 分类列表（根据数据库中的实际分类）
 const categories = [
 	{ label: '全部', value: 'all' },
 	{ label: '电商', value: 'ecommerce' },
@@ -129,39 +129,8 @@ const categories = [
 	{ label: '其他', value: 'other' }
 ]
 
-// 任务列表
-const taskList = ref([
-	{
-		id: 1,
-		merchantAvatar: '🏪',
-		merchantName: '示例商户A',
-		createTime: '2小时前',
-		status: 'ongoing',
-		title: '美团外卖订单互助',
-		description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
-		category: '外卖',
-		platform: '美团',
-		unitPrice: '15.00',
-		totalCount: 100,
-		remainCount: 45,
-		progress: 55
-	},
-	{
-		id: 2,
-		merchantAvatar: '🏬',
-		merchantName: '示例商户B',
-		createTime: '5小时前',
-		status: 'ongoing',
-		title: '淘宝店铺刷单任务',
-		description: '淘宝店铺需要刷单提升销量，要求按照指定流程操作',
-		category: '电商',
-		platform: '淘宝',
-		unitPrice: '20.00',
-		totalCount: 50,
-		remainCount: 12,
-		progress: 76
-	}
-])
+// 任务列表（初始为空，从后端加载）
+const taskList = ref([] as any[])
 
 // 加载状态
 const loading = ref(false)
@@ -183,7 +152,7 @@ const loadTaskList = async () => {
 	try {
 		loading.value = true
 		
-		const res = await getTaskList({
+		const data = await getTaskList({
 			category: currentCategory.value,
 			page: page.value,
 			pageSize: 10
@@ -191,18 +160,71 @@ const loadTaskList = async () => {
 		
 		loading.value = false
 		
-		if (res.code === 0) {
+		// 处理返回的数据
+		if (data && data.list) {
+			// 转换后端数据格式为前端需要的格式
+			const formattedList = data.list.map((item: any) => ({
+				id: item.id,
+				merchantAvatar: '🏪',
+				merchantName: `商户${item.from_user_id}`,
+				createTime: formatTime(item.createtime),
+				status: getTaskStatus(item.status),
+				title: `互助任务 #${item.task_no}`,
+				description: `金额：¥${item.amount}，佣金：¥${item.commission}`,
+				category: '互助',
+				platform: '平台',
+				unitPrice: item.amount,
+				totalCount: 1,
+				remainCount: item.status === 'assigned' ? 1 : 0,
+				progress: item.status === 'completed' ? 100 : 0
+			}))
+			
 			if (page.value === 1) {
-				taskList.value = res.data.list
+				taskList.value = formattedList
 			} else {
-				taskList.value = taskList.value.concat(res.data.list)
+				taskList.value = taskList.value.concat(formattedList)
 			}
-			hasMore.value = res.data.hasMore
+			hasMore.value = data.hasMore || false
 		}
-	} catch (error) {
+	} catch (error: any) {
 		loading.value = false
 		console.log('加载任务列表失败', error)
+		uni.showToast({
+			title: error.message || '加载失败',
+			icon: 'none'
+		})
 	}
+}
+
+// 格式化时间
+const formatTime = (timestamp: number): string => {
+	const now = Date.now() / 1000
+	const diff = now - timestamp
+	
+	if (diff < 60) {
+		return '刚刚'
+	} else if (diff < 3600) {
+		return `${Math.floor(diff / 60)}分钟前`
+	} else if (diff < 86400) {
+		return `${Math.floor(diff / 3600)}小时前`
+	} else {
+		return `${Math.floor(diff / 86400)}天前`
+	}
+}
+
+// 转换任务状态
+const getTaskStatus = (status: string): string => {
+	const statusMap: Record<string, string> = {
+		'pending': 'ongoing',
+		'assigned': 'ongoing',
+		'accepted': 'ongoing',
+		'paid': 'ongoing',
+		'verified': 'ongoing',
+		'completed': 'completed',
+		'failed': 'cancelled',
+		'cancelled': 'cancelled'
+	}
+	return statusMap[status] || 'ongoing'
 }
 
 // 加载更多

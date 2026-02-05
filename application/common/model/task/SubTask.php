@@ -54,12 +54,23 @@ class SubTask extends Model
         return 'ST' . date('YmdHis') . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
     }
 
-    public static function getAvailableForUser($userId, $page = 1, $limit = 20)
+    public static function getAvailableForUser($userId, $category = null, $page = 1, $limit = 20)
     {
-        return self::where('status', 'assigned')
+        $query = self::with(['task' => function($query) {
+                $query->field('id,title,category,platform,createtime');
+            }])
+            ->where('status', 'assigned')
             ->where('to_user_id', 0)
-            ->where('from_user_id', '<>', $userId)
-            ->order('id', 'asc')
+            ->where('from_user_id', '<>', $userId);
+        
+        // 如果指定了分类，则关联主任务表进行筛选
+        if ($category && $category !== 'all') {
+            $query->hasWhere('task', function($query) use ($category) {
+                $query->where('category', $category);
+            });
+        }
+        
+        return $query->order('id', 'asc')
             ->paginate(['page' => $page, 'list_rows' => $limit]);
     }
 
