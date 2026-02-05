@@ -85,7 +85,7 @@ class SettlementService
                 $bonus = Bonus::create([
                     'user_id' => $userId,
                     'config_id' => $config->id,
-                    'month' => $month,
+                    'period' => $month,
                     'pool_amount' => $poolAmount,
                     'qualified_count' => $qualifiedCount,
                     'amount' => $bonusPerUser,
@@ -100,14 +100,14 @@ class SettlementService
 
     protected static function getQualifiedUsers($config, $month)
     {
-        $performances = Performance::where('month', $month)->select();
+        $performances = Performance::where('period', $month)->select();
         $qualifiedUsers = [];
         
         foreach ($performances as $perf) {
-            if (bccomp($perf->team_amount, $config->team_performance_min, 2) < 0) {
+            if (bccomp($perf->team_performance, $config->team_performance_min, 2) < 0) {
                 continue;
             }
-            if (bccomp($perf->personal_amount, $config->personal_performance_min, 2) < 0) {
+            if (bccomp($perf->personal_performance, $config->personal_performance_min, 2) < 0) {
                 continue;
             }
             
@@ -152,7 +152,7 @@ class SettlementService
 
     public static function settlePendingBonuses($month)
     {
-        $bonuses = Bonus::where('month', $month)->where('status', 'pending')->select();
+        $bonuses = Bonus::where('period', $month)->where('status', 'pending')->select();
         foreach ($bonuses as $bonus) {
             try {
                 self::settleBonus($bonus->id);

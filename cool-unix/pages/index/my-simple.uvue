@@ -196,7 +196,7 @@ function onNotificationChange(e: any) {
 function toEdit() {
 	if (!isLogin.value) {
 		uni.navigateTo({
-			url: '/pages/auth/login'
+			url: '/pages/user/login'
 		})
 		return
 	}
@@ -229,7 +229,7 @@ function toWallet() {
 // 跳转到首页
 function toHome() {
 	uni.switchTab({
-		url: '/pages/index/home-simple'
+		url: '/pages/index/home'
 	})
 }
 

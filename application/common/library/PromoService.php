@@ -151,10 +151,10 @@ class PromoService
         $currentLevel = $relation->level_id ? Level::getById($relation->level_id) : null;
         $currentSort = $currentLevel ? $currentLevel->sort : -1;
         
-        $month = date('Y-m');
-        $performance = Performance::getByUserMonth($userId, $month);
-        $personalAmount = $performance ? $performance->personal_amount : 0;
-        $teamAmount = $performance ? $performance->team_amount : 0;
+        $period = date('Y-m');
+        $performance = Performance::getByUserMonth($userId, $period);
+        $personalAmount = $performance ? $performance->personal_performance : 0;
+        $teamAmount = $performance ? $performance->team_performance : 0;
         $directCount = Relation::getDirectChildren($userId)->count();
         
         $levels = Level::where('status', 'normal')
@@ -182,9 +182,9 @@ class PromoService
         $wallet = WalletService::getWallet($userId);
         $level = $relation && $relation->level_id ? Level::getById($relation->level_id) : null;
         
-        $month = date('Y-m');
-        $performance = Performance::getByUserMonth($userId, $month);
-        $growth = Performance::calculateGrowth($userId, $month);
+        $period = date('Y-m');
+        $performance = Performance::getByUserMonth($userId, $period);
+        $growth = Performance::calculateGrowth($userId, $period);
         $directCount = $relation ? Relation::getDirectChildren($userId)->count() : 0;
         
         $totalBonus = Commission::getUserTotalCommission($userId, 'settled');
@@ -211,9 +211,9 @@ class PromoService
                 'total_income' => $wallet->total_income
             ],
             'performance' => [
-                'month' => $month,
-                'personal_total' => $performance ? $performance->personal_amount : '0.00',
-                'team_total' => $performance ? $performance->team_amount : '0.00',
+                'period' => $period,
+                'personal_total' => $performance ? $performance->personal_performance : '0.00',
+                'team_total' => $performance ? $performance->team_performance : '0.00',
                 'growth' => $growth,
                 'direct_count' => $directCount
             ],

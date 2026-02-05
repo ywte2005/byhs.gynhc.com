@@ -119,7 +119,7 @@ const logout = () => {
 				
 				// 跳转到登录页
 				uni.reLaunch({
-					url: '/pages/auth/login'
+					url: '/pages/user/login'
 				})
 			}
 		}

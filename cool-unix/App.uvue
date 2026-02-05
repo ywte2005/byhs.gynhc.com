@@ -1,9 +1,14 @@
 <script lang="ts">
 import { useStore } from "./.cool";
+import { setupRouterGuard } from "./.cool/router/guard";
 
 export default {
 	onLaunch: function () {
 		console.log("App Launch");
+		
+		// 初始化路由守卫
+		setupRouterGuard();
+		console.log("[路由守卫] 已初始化");
 	},
 	onShow: function () {
 		console.log("App Show");

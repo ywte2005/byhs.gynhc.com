@@ -94,8 +94,14 @@ export function isEmpty(value: any): boolean {
  * @example keys({a: 1, b: 2}) // ['a', 'b']
  */
 export function keys(value: any): string[] {
+	// #ifdef APP-ANDROID
 	// @ts-ignore
 	return UTSJSONObject.keys(value as UTSJSONObject);
+	// #endif
+
+	// #ifndef APP-ANDROID
+	return Object.keys(value || {});
+	// #endif
 }
 
 /**
@@ -152,8 +158,22 @@ export function get(object: any, path: string, defaultValue: any | null = null):
 		return defaultValue;
 	}
 
+	// #ifdef APP-ANDROID
 	// @ts-ignore
 	const value = new UTSJSONObject(object).getAny(path);
+	// #endif
+
+	// #ifndef APP-ANDROID
+	// H5 环境下使用简单的路径解析
+	const paths = path.split('.');
+	let value = object;
+	for (let i = 0; i < paths.length; i++) {
+		if (value == null || value == undefined) {
+			return defaultValue;
+		}
+		value = value[paths[i]];
+	}
+	// #endif
 
 	if (isNull(value)) {
 		return defaultValue;
@@ -379,8 +399,14 @@ export function groupBy<T>(array: T[], key: string) {
  * @example assign({a: 1}, {b: 2}) // {a: 1, b: 2}
  */
 export function assign(...items: any[]) {
+	// #ifdef APP-ANDROID
 	// @ts-ignore
 	return UTSJSONObject.assign(...items.map((item) => item as UTSJSONObject));
+	// #endif
+
+	// #ifndef APP-ANDROID
+	return Object.assign({}, ...items);
+	// #endif
 }
 
 /**

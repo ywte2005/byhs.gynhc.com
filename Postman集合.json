@@ -1,0 +1,776 @@
+{
+  "info": {
+    "name": "商户互助平台API",
+    "description": "商户互助刷单平台完整API接口集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://你的域名",
+      "type": "string",
+      "description": "修改为你的服务器地址，例如：http://example.com"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string",
+      "description": "从test_web.php页面获取用户Token后填写到这里"
+    }
+  ],
+  "item": [
+    {
+      "name": "认证模块",
+      "item": [
+        {
+          "name": "用户登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"account\": \"13800138000\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "login"]
+            }
+          }
+        },
+        {
+          "name": "用户注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user001\",\n  \"password\": \"123456\",\n  \"mobile\": \"13800138000\",\n  \"code\": \"123456\",\n  \"invite_code\": \"ABC123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "商户模块",
+      "item": [
+        {
+          "name": "获取商户信息",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/merchant/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "merchant", "info"]
+            }
+          }
+        }
+,
+        {
+          "name": "商户注册",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company_name\": \"测试公司\",\n  \"legal_person\": \"张三\",\n  \"id_card\": \"110101199001011234\",\n  \"business_license\": \"https://example.com/license.jpg\",\n  \"contact_name\": \"张三\",\n  \"contact_mobile\": \"13800138000\",\n  \"bank_name\": \"中国银行\",\n  \"bank_account\": \"6222021234567890\",\n  \"bank_account_name\": \"张三\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/merchant/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "merchant", "register"]
+            }
+          }
+        },
+        {
+          "name": "获取审核状态",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/merchant/auditStatus",
+              "host": ["{{base_url}}"],
+              "path": ["api", "merchant", "auditStatus"]
+            }
+          }
+        },
+        {
+          "name": "支付入驻费",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pay_type\": \"balance\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/merchant/payEntryFee",
+              "host": ["{{base_url}}"],
+              "path": ["api", "merchant", "payEntryFee"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "任务模块",
+      "item": [
+        {
+          "name": "任务列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/list?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "list"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "任务详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/detail?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "detail"],
+              "query": [
+                {"key": "id", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "发起任务",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"测试任务\",\n  \"total_amount\": 10000,\n  \"total_count\": 5,\n  \"service_fee_rate\": 0.05,\n  \"remark\": \"测试任务说明\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/task/create",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "create"]
+            }
+          }
+        },
+        {
+          "name": "取消任务",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/task/cancel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "cancel"]
+            }
+          }
+        },
+        {
+          "name": "我发起的任务",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/myTasks?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "myTasks"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "可接子任务列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/subtaskAvailable?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "subtaskAvailable"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "我接的子任务",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/subtaskMy?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "subtaskMy"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "子任务详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/subtaskDetail?id=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "subtaskDetail"],
+              "query": [
+                {"key": "id", "value": "1"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "接受子任务",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/task/subtaskAccept",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "subtaskAccept"]
+            }
+          }
+        },
+        {
+          "name": "上传支付凭证",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"proof_image\": \"https://example.com/proof.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/task/subtaskUploadProof",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "subtaskUploadProof"]
+            }
+          }
+        },
+        {
+          "name": "检查接单资格",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/task/canReceive",
+              "host": ["{{base_url}}"],
+              "path": ["api", "task", "canReceive"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "钱包模块",
+      "item": [
+        {
+          "name": "钱包信息",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/info",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "info"]
+            }
+          }
+        },
+        {
+          "name": "流水记录",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/logs?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "logs"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "充值",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"pay_type\": \"alipay\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/recharge",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "recharge"]
+            }
+          }
+        },
+        {
+          "name": "提现申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500,\n  \"bank_name\": \"中国银行\",\n  \"bank_account\": \"6222021234567890\",\n  \"bank_account_name\": \"张三\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/withdraw",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "withdraw"]
+            }
+          }
+        },
+        {
+          "name": "提现记录",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/wallet/withdrawRecords?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "withdrawRecords"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "充值保证金",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 5000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/depositPay",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "depositPay"]
+            }
+          }
+        },
+        {
+          "name": "提取保证金",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/wallet/depositWithdraw",
+              "host": ["{{base_url}}"],
+              "path": ["api", "wallet", "depositWithdraw"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "推广模块",
+      "item": [
+        {
+          "name": "推广概览",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "overview"]
+            }
+          }
+        },
+        {
+          "name": "等级列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/levels",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "levels"]
+            }
+          }
+        },
+        {
+          "name": "购买等级",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level_id\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/promo/purchaseLevel",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "purchaseLevel"]
+            }
+          }
+        },
+        {
+          "name": "我的邀请码",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/myInviteCode",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "myInviteCode"]
+            }
+          }
+        },
+        {
+          "name": "绑定上级",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invite_code\": \"ABC123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/promo/bindRelation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "bindRelation"]
+            }
+          }
+        },
+        {
+          "name": "我的团队",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/myTeam?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "myTeam"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "佣金记录",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/commissionList?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "commissionList"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "钱包流水",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/walletLogs?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "walletLogs"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "业绩统计",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/performanceSummary?month=2025-01",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "performanceSummary"],
+              "query": [
+                {"key": "month", "value": "2025-01"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "分红概览",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Token",
+                "value": "{{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/promo/bonusSummary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "promo", "bonusSummary"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

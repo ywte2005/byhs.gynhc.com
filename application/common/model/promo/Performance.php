@@ -14,38 +14,39 @@ class Performance extends Model
         return $this->belongsTo('app\common\model\User', 'user_id', 'id');
     }
 
-    public static function getByUserMonth($userId, $month)
+    public static function getByUserMonth($userId, $period)
     {
-        return self::where('user_id', $userId)->where('month', $month)->find();
+        return self::where('user_id', $userId)->where('period', $period)->find();
     }
 
-    public static function updatePerformance($userId, $month, $personalAmount = 0, $teamAmount = 0)
+    public static function updatePerformance($userId, $period, $personalAmount = 0, $teamAmount = 0)
     {
-        $record = self::getByUserMonth($userId, $month);
+        $record = self::getByUserMonth($userId, $period);
         if (!$record) {
             return self::create([
                 'user_id' => $userId,
-                'month' => $month,
-                'personal_amount' => $personalAmount,
-                'team_amount' => $teamAmount,
-                'growth_amount' => 0,
-                'direct_count' => 0
+                'period' => $period,
+                'personal_performance' => $personalAmount,
+                'team_performance' => $teamAmount,
+                'growth' => 0,
+                'direct_invite_count' => 0,
+                'team_member_count' => 0
             ]);
         }
-        $record->personal_amount = bcadd($record->personal_amount, $personalAmount, 2);
-        $record->team_amount = bcadd($record->team_amount, $teamAmount, 2);
+        $record->personal_performance = bcadd($record->personal_performance, $personalAmount, 2);
+        $record->team_performance = bcadd($record->team_performance, $teamAmount, 2);
         $record->save();
         return $record;
     }
 
-    public static function calculateGrowth($userId, $month)
+    public static function calculateGrowth($userId, $period)
     {
-        $current = self::getByUserMonth($userId, $month);
-        $prevMonth = date('Y-m', strtotime($month . '-01 -1 month'));
-        $prev = self::getByUserMonth($userId, $prevMonth);
+        $current = self::getByUserMonth($userId, $period);
+        $prevPeriod = date('Y-m', strtotime($period . '-01 -1 month'));
+        $prev = self::getByUserMonth($userId, $prevPeriod);
         
-        $currentTotal = $current ? bcadd($current->personal_amount, $current->team_amount, 2) : '0.00';
-        $prevTotal = $prev ? bcadd($prev->personal_amount, $prev->team_amount, 2) : '0.00';
+        $currentTotal = $current ? bcadd($current->personal_performance, $current->team_performance, 2) : '0.00';
+        $prevTotal = $prev ? bcadd($prev->personal_performance, $prev->team_performance, 2) : '0.00';
         
         return bcsub($currentTotal, $prevTotal, 2);
     }

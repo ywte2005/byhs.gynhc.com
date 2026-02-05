@@ -1,543 +1,494 @@
 <template>
-	<cl-page>
-		<cl-topbar
-			fixed
-			:show-back="false"
-			safe-area-top
-			:height="isMp() ? null : 50"
-			:pt="{
-				className: '!z-50'
-			}"
-			background-color="transparent"
-		>
-			<view
-				class="flex flex-row items-center p-3 flex-1 w-full"
-				:class="{
-					'pt-0': isMp()
-				}"
-			>
-				<view
-					class="bg-white rounded-lg h-[32px] w-[32px] flex flex-row items-center justify-center"
-				>
-					<cl-image
-						src="/static/logo.png"
-						:width="18"
-						:height="18"
-						:show-loading="false"
-					></cl-image>
+	<view class="page-container">
+		<!-- 顶部导航 -->
+		<view class="top-bar">
+			<text class="title">旺铺集</text>
+			<view class="actions">
+				<text class="icon">📷</text>
+				<text class="icon">🔔</text>
+			</view>
+		</view>
+
+		<!-- 余额卡片 -->
+		<view class="balance-card">
+			<view class="balance-row">
+				<view class="balance-item">
+					<text class="amount-large">¥12,580.00</text>
+					<text class="label">可用余额</text>
 				</view>
-
-				<cl-text
-					:size="16"
-					:pt="{
-						className: 'mr-auto ml-2 flex-1 font-bold'
-					}"
-				>
-					{{ config.name }}
-				</cl-text>
-
-				<view
-					class="bg-surface-500 h-[32px] w-[32px] rounded-full flex flex-row items-center justify-center mr-3"
-					@tap="setSize"
-				>
-					<cl-icon name="font-size" color="white" :size="16"></cl-icon>
+				<view class="balance-item">
+					<text class="amount-medium">¥2,000.00</text>
+					<text class="label">冻结金额</text>
 				</view>
-
-				<view
-					class="bg-primary-500 h-[32px] w-[32px] rounded-full flex flex-row items-center justify-center"
-					:class="{
-						'mr-24': isMp()
-					}"
-					@tap="setLocale"
-				>
-					<cl-icon name="translate" color="white" :size="16"></cl-icon>
+				<view class="balance-item">
+					<text class="amount-medium">¥5,320.00</text>
+					<text class="label">待结算</text>
 				</view>
 			</view>
-		</cl-topbar>
 
-		<view class="p-3">
-			<view class="group" v-for="item in data" :key="item.label">
-				<cl-text :size="12" :pt="{ className: '!text-surface-400 mb-2 ml-2' }"
-					>{{ item.label }}（{{ item.children?.length ?? 0 }}）</cl-text
-				>
-
-				<view class="list">
-					<cl-row :gutter="10">
-						<template v-for="child in item.children" :key="child.label">
-							<cl-col :span="6" v-if="child.hidden != true">
-								<view
-									class="item dark:!bg-surface-800"
-									hover-class="opacity-80"
-									:hover-stay-time="250"
-									@tap="toPath(child)"
-								>
-									<cl-icon :name="child.icon" :size="18"></cl-icon>
-									<cl-text
-										:size="12"
-										:pt="{
-											className: 'mt-2 text-center'
-										}"
-										>{{ child.label }}</cl-text
-									>
-								</view>
-							</cl-col>
-						</template>
-					</cl-row>
+			<!-- 快捷入口 -->
+			<view class="quick-actions">
+				<view class="action-item" @tap="goToPage('/pages/merchant/register')">
+					<view class="action-icon">
+						<text class="emoji">📄</text>
+					</view>
+					<text class="action-label">进件</text>
+				</view>
+				<view class="action-item" @tap="goToPage('/pages/task/create')">
+					<view class="action-icon">
+						<text class="emoji">📢</text>
+					</view>
+					<text class="action-label">发布任务</text>
+				</view>
+				<view class="action-item" @tap="goToPage('/pages/wallet/recharge')">
+					<view class="action-icon">
+						<text class="emoji">➕</text>
+					</view>
+					<text class="action-label">充值</text>
+				</view>
+				<view class="action-item" @tap="goToPage('/pages/wallet/withdraw')">
+					<view class="action-icon">
+						<text class="emoji">💳</text>
+					</view>
+					<text class="action-label">提现</text>
+				</view>
+				<view class="action-item" @tap="goToPage('/pages/promo/invite')">
+					<view class="action-icon">
+						<text class="emoji">👥</text>
+					</view>
+					<text class="action-label">邀请</text>
 				</view>
 			</view>
 		</view>
 
-		<!-- 自定义底部导航栏 -->
-		<custom-tabbar></custom-tabbar>
+		<!-- 待办事项 -->
+		<view class="section">
+			<text class="section-title">待办事项</text>
+			<view class="todo-row">
+				<view class="todo-card">
+					<text class="todo-number primary">3</text>
+					<text class="todo-label">待审核进件</text>
+				</view>
+				<view class="todo-card">
+					<text class="todo-number warning">5</text>
+					<text class="todo-label">待验收任务</text>
+				</view>
+				<view class="todo-card">
+					<text class="todo-number danger">2</text>
+					<text class="todo-label">待处理提现</text>
+				</view>
+			</view>
+		</view>
 
-		<!-- 主题设置 -->
-		<locale-set :ref="refs.set('localeSet')"></locale-set>
+		<!-- 今日数据 -->
+		<view class="section">
+			<view class="data-card">
+				<text class="section-title">今日数据</text>
+				<view class="data-row">
+					<view class="data-item bg-blue">
+						<text class="data-number primary">8</text>
+						<text class="data-label">已接任务</text>
+					</view>
+					<view class="data-item bg-green">
+						<text class="data-number success">5</text>
+						<text class="data-label">已完成</text>
+					</view>
+					<view class="data-item bg-yellow">
+						<text class="data-number warning">¥280</text>
+						<text class="data-label">今日收入</text>
+					</view>
+				</view>
+			</view>
+		</view>
 
-		<!-- 字体大小设置 -->
-		<size-set :ref="refs.set('sizeSet')"></size-set>
-	</cl-page>
+		<!-- 平台动态 -->
+		<view class="section news-section">
+			<view class="news-card">
+				<view class="news-header">
+					<text class="section-title">平台动态</text>
+					<text class="more-link">查看更多 ></text>
+				</view>
+				<view class="news-list">
+					<view class="news-item">
+						<view class="dot primary"></view>
+						<view class="news-content">
+							<text class="news-title">新春任务大礼包上线啦！</text>
+							<text class="news-date">2024-01-20</text>
+						</view>
+					</view>
+					<view class="news-item">
+						<view class="dot success"></view>
+						<view class="news-content">
+							<text class="news-title">系统升级维护公告</text>
+							<text class="news-date">2024-01-18</text>
+						</view>
+					</view>
+					<view class="news-item">
+						<view class="dot warning"></view>
+						<view class="news-content">
+							<text class="news-title">新增商户认证功能</text>
+							<text class="news-date">2024-01-15</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 底部导航栏 -->
+		<view class="tabbar">
+			<view class="tab-item active" @tap="goToPage('/pages/index/home')">
+				<text class="tab-icon">🏠</text>
+				<text class="tab-label active">首页</text>
+			</view>
+			<view class="tab-item" @tap="goToPage('/pages/task/index')">
+				<text class="tab-icon">📋</text>
+				<text class="tab-label">任务</text>
+			</view>
+			<view class="tab-item" @tap="goToPage('/pages/promo/index')">
+				<text class="tab-icon">👥</text>
+				<text class="tab-label">推广</text>
+			</view>
+			<view class="tab-item" @tap="goToPage('/pages/merchant/index')">
+				<text class="tab-icon">👤</text>
+				<text class="tab-label">我的</text>
+			</view>
+		</view>
+	</view>
 </template>
 
-<script lang="ts" setup>
-import { isApp, isMp, router, useRefs, t } from "@/.cool";
-import { computed } from "vue";
-import { useUi } from "@/uni_modules/cool-ui";
-import { config } from "@/config";
-import LocaleSet from "@/components/locale-set.uvue";
-import SizeSet from "@/components/size-set.uvue";
-import CustomTabbar from "./components/tabbar.uvue";
-
-const ui = useUi();
-const refs = useRefs();
-
-type Item = {
-	label: string;
-	icon?: string;
-	path?: string;
-	disabled?: boolean;
-	hidden?: boolean;
-	children?: Item[];
-};
-
-const data = computed<Item[]>(() => {
-	return [
-		{
-			label: t("基础组件"),
-			children: [
-				{
-					label: t("文本"),
-					icon: "text",
-					path: "/pages/demo/basic/text"
-				},
-				{
-					label: t("按钮"),
-					icon: "mouse-line",
-					path: "/pages/demo/basic/button"
-				},
-				{
-					label: t("图片"),
-					icon: "image-line",
-					path: "/pages/demo/basic/image"
-				},
-				{
-					label: t("图标"),
-					icon: "puzzle-2-line",
-					path: "/pages/demo/basic/icon"
-				},
-				{
-					label: t("标签"),
-					icon: "price-tag-3-line",
-					path: "/pages/demo/basic/tag"
-				}
-			]
-		},
-		{
-			label: t("表单组件"),
-			children: [
-				{
-					label: t("表单验证"),
-					icon: "draft-line",
-					path: "/pages/demo/form/form"
-				},
-				{
-					label: t("输入框"),
-					icon: "input-field",
-					path: "/pages/demo/form/input"
-				},
-				{
-					label: t("文本域"),
-					icon: "text-block",
-					path: "/pages/demo/form/textarea"
-				},
-				{
-					label: t("计数器"),
-					icon: "increase-decrease-line",
-					path: "/pages/demo/form/input-number"
-				},
-				{
-					label: t("口令输入"),
-					icon: "input-method-line",
-					path: "/pages/demo/form/input-otp"
-				},
-				{
-					label: t("键盘"),
-					icon: "keyboard-box-line",
-					path: "/pages/demo/form/keyboard"
-				},
-				{
-					label: t("单选框"),
-					icon: "radio-button-line",
-					path: "/pages/demo/form/radio"
-				},
-				{
-					label: t("多选框"),
-					icon: "checkbox-line",
-					path: "/pages/demo/form/checkbox"
-				},
-				{
-					label: t("开关"),
-					icon: "toggle-line",
-					path: "/pages/demo/form/switch"
-				},
-				{
-					label: t("评分"),
-					icon: "star-line",
-					path: "/pages/demo/form/rate"
-				},
-				{
-					label: t("滑块"),
-					icon: "equalizer-2-line",
-					path: "/pages/demo/form/slider"
-				},
-				{
-					label: t("选择器"),
-					icon: "dropdown-list",
-					path: "/pages/demo/form/select"
-				},
-				{
-					label: t("日期选择器"),
-					icon: "calendar-line",
-					path: "/pages/demo/form/select-date"
-				},
-				{
-					label: t("时间选择器"),
-					icon: "time-line",
-					path: "/pages/demo/form/select-time"
-				},
-				{
-					label: t("级联选择器"),
-					icon: "stacked-view",
-					path: "/pages/demo/form/cascader"
-				},
-				{
-					label: t("文件上传"),
-					icon: "file-upload-line",
-					path: "/pages/demo/form/upload"
-				},
-				{
-					label: t("日历"),
-					icon: "calendar-line",
-					path: "/pages/demo/form/calendar"
-				}
-			]
-		},
-		{
-			label: t("布局组件"),
-			children: [
-				{
-					label: t("弹性布局"),
-					icon: "layout-2-line",
-					path: "/pages/demo/layout/flex"
-				},
-				{
-					label: t("标签页"),
-					icon: "function-add-line",
-					path: "/pages/demo/layout/tabs"
-				},
-				{
-					label: t("折叠面板"),
-					icon: "collapse-vertical-line",
-					path: "/pages/demo/layout/collapse"
-				},
-				{
-					label: t("吸顶"),
-					icon: "align-top",
-					path: "/pages/demo/layout/sticky"
-				},
-				{
-					label: t("导航栏"),
-					icon: "layout-top-line",
-					path: "/pages/demo/layout/topbar"
-				},
-				{
-					label: t("底部视图"),
-					icon: "layout-bottom-line",
-					path: "/pages/demo/layout/footer"
-				},
-				{
-					label: t("悬浮视图"),
-					icon: "picture-in-picture-line",
-					path: "/pages/demo/layout/float-view"
-				},
-				{
-					label: t("底部导航栏"),
-					icon: "layout-bottom-2-line",
-					path: "/pages/demo/layout/tabbar"
-				}
-			]
-		},
-		{
-			label: t("数据展示"),
-			children: [
-				{
-					label: t("头像"),
-					icon: "account-circle-line",
-					path: "/pages/demo/data/avatar"
-				},
-				{
-					label: t("查看更多"),
-					icon: "menu-add-line",
-					path: "/pages/demo/data/read-more"
-				},
-				{
-					label: t("列表"),
-					icon: "list-check",
-					path: "/pages/demo/data/list"
-				},
-				{
-					label: t("列表视图"),
-					icon: "list-view",
-					path: "/pages/demo/data/list-view"
-				},
-				{
-					label: t("列表刷新"),
-					icon: "refresh-line",
-					path: "/pages/demo/data/list-view-refresh",
-					disabled: false
-				},
-				{
-					label: t("瀑布流"),
-					icon: "layout-column-line",
-					path: "/pages/demo/data/waterfall"
-				},
-				{
-					label: t("轮播图"),
-					icon: "carousel-view",
-					path: "/pages/demo/data/banner"
-				},
-				{
-					label: t("跑马灯"),
-					icon: "film-line",
-					path: "/pages/demo/data/marquee"
-				},
-				{
-					label: t("分页"),
-					icon: "page-separator",
-					path: "/pages/demo/data/pagination"
-				},
-				{
-					label: t("时间轴"),
-					icon: "timeline-view",
-					path: "/pages/demo/data/timeline"
-				},
-				{
-					label: t("拖拽"),
-					icon: "drag-move-line",
-					path: "/pages/demo/data/draggable"
-				},
-				{
-					label: t("筛选栏"),
-					icon: "filter-line",
-					path: "/pages/demo/data/filter-bar"
-				},
-				{
-					label: t("树形结构"),
-					icon: "node-tree",
-					path: "/pages/demo/data/tree"
-				}
-			]
-		},
-		{
-			label: t("状态组件"),
-			children: [
-				{
-					label: t("角标"),
-					icon: "notification-badge-line",
-					path: "/pages/demo/status/badge"
-				},
-				{
-					label: t("通知栏"),
-					icon: "error-warning-line",
-					path: "/pages/demo/status/noticebar"
-				},
-				{
-					label: t("倒计时"),
-					icon: "timer-line",
-					path: "/pages/demo/status/countdown"
-				},
-				{
-					label: t("数字滚动"),
-					icon: "arrow-up-box-line",
-					path: "/pages/demo/status/rolling-number"
-				},
-				{
-					label: t("进度条"),
-					icon: "subtract-line",
-					path: "/pages/demo/status/progress"
-				},
-				{
-					label: t("圆形进度条"),
-					icon: "circle-line",
-					path: "/pages/demo/status/progress-circle"
-				},
-				{
-					label: t("骨架图"),
-					icon: "shadow-line",
-					path: "/pages/demo/status/skeleton"
-				},
-				{
-					label: t("加载更多"),
-					icon: "loader-4-line",
-					path: "/pages/demo/status/loadmore"
-				}
-			]
-		},
-		{
-			label: t("反馈组件"),
-			children: [
-				{
-					label: t("操作菜单"),
-					icon: "menu-line",
-					path: "/pages/demo/feedback/action-sheet"
-				},
-				{
-					label: t("弹窗"),
-					icon: "chat-4-line",
-					path: "/pages/demo/feedback/popup"
-				},
-				{
-					label: t("确认框"),
-					icon: "chat-check-line",
-					path: "/pages/demo/feedback/confirm"
-				},
-				{
-					label: t("提示框"),
-					icon: "message-2-line",
-					path: "/pages/demo/feedback/toast"
-				}
-			]
-		},
-		{
-			label: "其他",
-			children: [
-				{
-					label: "QRCode",
-					icon: "qr-code-line",
-					path: "/pages/demo/other/qrcode"
-				},
-				{
-					label: t("签名"),
-					icon: "sketching",
-					path: "/pages/demo/other/sign"
-				},
-				{
-					label: t("水印"),
-					icon: "copyright-line",
-					path: "/pages/demo/other/watermark"
-				},
-				{
-					label: t("图片裁剪"),
-					icon: "crop-line",
-					path: "/pages/demo/other/cropper"
-				},
-				{
-					label: t("Canvas"),
-					icon: "markup-line",
-					path: "/pages/demo/other/canvas"
-				},
-				{
-					label: t("富文本"),
-					icon: "text-snippet",
-					path: "/pages/demo/other/rict-text",
-					disabled: true
-				},
-				{
-					label: "DayUts",
-					icon: "timer-2-line",
-					path: "/pages/demo/other/day-uts"
-				},
-				{
-					label: "Vibrate",
-					icon: "volume-vibrate-line",
-					path: "/pages/demo/other/vibrate"
-				},
-				{
-					label: "SVG",
-					icon: "bubble-chart-line",
-					path: "/pages/demo/other/svg"
-				},
-				{
-					label: "SlideVerify",
-					icon: "contract-right-fill",
-					path: "/pages/demo/other/slide-verify"
-				},
-				{
-					label: "Animation",
-					icon: "instance-line",
-					path: "/pages/demo/other/animation"
-				},
-				{
-					label: "Router",
-					icon: "compass-discover-line",
-					path: "/pages/demo/other/router/index"
-				},
-				{
-					label: "Share",
-					icon: "share-line",
-					path: "/pages/demo/other/share",
-					hidden: !isApp()
-				},
-				{
-					label: t("选座"),
-					icon: "armchair-line",
-					path: "/pages/demo/other/select-seat"
-				}
-			]
-		}
-	];
+<script setup lang="uts">
+// 定义组件选项
+defineOptions({
+	name: 'PageHomeSimple'
 });
 
-function toPath(item: Item) {
-	if (item.disabled == true) {
-		return ui.showToast({
-			message: t("该功能正在开发中")
-		});
-	}
-
-	router.to(item.path!);
-}
-
-function setLocale() {
-	refs.open("localeSet");
-}
-
-function setSize() {
-	refs.open("sizeSet");
+function goToPage(url: string) {
+	uni.navigateTo({
+		url: url
+	});
 }
 </script>
 
-<style lang="scss" scoped>
-.group {
-	@apply mb-10;
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	min-height: 100vh;
+	padding-bottom: 120rpx;
+}
 
-	.list {
-		.item {
-			@apply flex flex-col items-center;
-			@apply rounded-xl bg-white px-2;
-			height: 70px;
-			margin-bottom: 5px;
-			padding-top: 18px;
-		}
-	}
+/* 顶部导航 */
+.top-bar {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: 112rpx;
+	background-color: #0052d9;
+	padding: 0 32rpx;
+}
+
+.title {
+	font-size: 36rpx;
+	font-weight: 600;
+	color: #ffffff;
+}
+
+.actions {
+	display: flex;
+	flex-direction: row;
+	gap: 32rpx;
+}
+
+.icon {
+	font-size: 48rpx;
+}
+
+/* 余额卡片 */
+.balance-card {
+	background-color: #0052d9;
+	padding: 0 32rpx 48rpx;
+}
+
+.balance-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.balance-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.amount-large {
+	font-size: 48rpx;
+	font-weight: 700;
+	color: #ffffff;
+}
+
+.amount-medium {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #ffffff;
+}
+
+.label {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.7);
+	margin-top: 8rpx;
+}
+
+/* 快捷入口 */
+.quick-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	margin-top: 48rpx;
+}
+
+.action-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.action-icon {
+	width: 88rpx;
+	height: 88rpx;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.emoji {
+	font-size: 44rpx;
+}
+
+.action-label {
+	font-size: 24rpx;
+	color: #ffffff;
+	margin-top: 12rpx;
+}
+
+/* 通用区块 */
+.section {
+	padding: 32rpx;
+}
+
+.section-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+/* 待办事项 */
+.todo-row {
+	display: flex;
+	flex-direction: row;
+	gap: 24rpx;
+	margin-top: 24rpx;
+}
+
+.todo-card {
+	flex: 1;
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.todo-number {
+	font-size: 56rpx;
+	font-weight: 700;
+}
+
+.todo-number.primary {
+	color: #0052d9;
+}
+
+.todo-number.warning {
+	color: #faad14;
+}
+
+.todo-number.danger {
+	color: #e34d59;
+}
+
+.todo-label {
+	font-size: 26rpx;
+	color: #646a73;
+	margin-top: 16rpx;
+}
+
+/* 今日数据 */
+.data-card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+}
+
+.data-row {
+	display: flex;
+	flex-direction: row;
+	gap: 16rpx;
+	margin-top: 24rpx;
+}
+
+.data-item {
+	flex: 1;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.data-item.bg-blue {
+	background-color: #f8f9ff;
+}
+
+.data-item.bg-green {
+	background-color: #f0f9f4;
+}
+
+.data-item.bg-yellow {
+	background-color: #fff8e1;
+}
+
+.data-number {
+	font-size: 40rpx;
+	font-weight: 700;
+}
+
+.data-number.primary {
+	color: #0052d9;
+}
+
+.data-number.success {
+	color: #00b578;
+}
+
+.data-number.warning {
+	color: #faad14;
+}
+
+.data-label {
+	font-size: 24rpx;
+	color: #646a73;
+	margin-top: 8rpx;
+}
+
+/* 平台动态 */
+.news-section {
+	padding-bottom: 160rpx;
+}
+
+.news-card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+}
+
+.news-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.more-link {
+	font-size: 26rpx;
+	color: #0052d9;
+}
+
+.news-list {
+	margin-top: 24rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.news-item {
+	display: flex;
+	flex-direction: row;
+	gap: 24rpx;
+}
+
+.dot {
+	width: 12rpx;
+	height: 12rpx;
+	border-radius: 50%;
+	margin-top: 12rpx;
+}
+
+.dot.primary {
+	background-color: #0052d9;
+}
+
+.dot.success {
+	background-color: #00b578;
+}
+
+.dot.warning {
+	background-color: #faad14;
+}
+
+.news-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.news-title {
+	font-size: 28rpx;
+	color: #1f2329;
+}
+
+.news-date {
+	font-size: 24rpx;
+	color: #9aa0a6;
+	margin-top: 8rpx;
+}
+
+/* 底部导航栏 */
+.tabbar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 120rpx;
+	background-color: #ffffff;
+	border-top: 1px solid #e5e6eb;
+	display: flex;
+	flex-direction: row;
+}
+
+.tab-item {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.tab-icon {
+	font-size: 48rpx;
+}
+
+.tab-label {
+	font-size: 20rpx;
+	color: #646a73;
+	margin-top: 4rpx;
+}
+
+.tab-label.active {
+	color: #0052d9;
 }
 </style>

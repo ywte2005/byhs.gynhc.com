@@ -75,18 +75,18 @@ class Relation extends Backend
         
         // 业绩历史 (最近6个月)
         $performance_history = \app\common\model\promo\Performance::where('user_id', $row->user_id)
-            ->order('month', 'desc')
+            ->order('period', 'desc')
             ->limit(6)
             ->select();
         $performance_history = $performance_history ? collection($performance_history)->toArray() : [];
 
         // 计算增长率 (对比上月)
-        $prev_month = date('Y-m', strtotime('-1 month'));
-        $prev_performance = \app\common\model\promo\Performance::getByUserMonth($row->user_id, $prev_month);
+        $prev_period = date('Y-m', strtotime('-1 month'));
+        $prev_performance = \app\common\model\promo\Performance::getByUserMonth($row->user_id, $prev_period);
         $growth_rate = '0.00';
-        if ($prev_performance && isset($prev_performance->team_amount) && $prev_performance->team_amount > 0) {
-            $curr_amount = $performance ? bcadd($performance->personal_amount ?? 0, $performance->team_amount ?? 0, 2) : '0.00';
-            $prev_amount = bcadd($prev_performance->personal_amount ?? 0, $prev_performance->team_amount ?? 0, 2);
+        if ($prev_performance && isset($prev_performance->team_performance) && $prev_performance->team_performance > 0) {
+            $curr_amount = $performance ? bcadd($performance->personal_performance ?? 0, $performance->team_performance ?? 0, 2) : '0.00';
+            $prev_amount = bcadd($prev_performance->personal_performance ?? 0, $prev_performance->team_performance ?? 0, 2);
             if ($prev_amount > 0) {
                 $growth_rate = bcmul(bcdiv(bcsub($curr_amount, $prev_amount, 2), $prev_amount, 4), 100, 2);
             }
@@ -96,8 +96,8 @@ class Relation extends Backend
         $active_count = \app\common\model\promo\Performance::alias('p')
             ->join('promo_relation r', 'p.user_id = r.user_id')
             ->where('r.path', 'like', "%{$row->user_id}%")
-            ->where('p.month', $month)
-            ->where('(p.personal_amount + p.team_amount) > 0')
+            ->where('p.period', $period)
+            ->where('(p.personal_performance + p.team_performance) > 0')
             ->count();
 
         // 团队达人 (本月团队内个人业绩前5名)
@@ -105,9 +105,9 @@ class Relation extends Backend
             ->join('promo_relation r', 'p.user_id = r.user_id')
             ->join('user u', 'p.user_id = u.id')
             ->where('r.path', 'like', "%{$row->user_id}%")
-            ->where('p.month', $month)
-            ->field('u.nickname, p.personal_amount, p.team_amount, p.user_id')
-            ->order('p.personal_amount', 'desc')
+            ->where('p.period', $period)
+            ->field('u.nickname, p.personal_performance, p.team_performance, p.user_id')
+            ->order('p.personal_performance', 'desc')
             ->limit(5)
             ->select();
         $team_top_performers = $team_top_performers ? collection($team_top_performers)->toArray() : [];

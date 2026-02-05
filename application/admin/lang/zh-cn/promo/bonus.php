@@ -3,7 +3,7 @@
 return [
     'Id'                    => 'ID',
     'User_id'               => '用户ID',
-    'Month'                 => '月份',
+    'Period'                => '期数',
     'Pool_amount'           => '奖池金额',
     'Qualified_count'       => '达标人数',
     'Amount'                => '分红金额',

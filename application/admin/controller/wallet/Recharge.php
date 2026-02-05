@@ -88,4 +88,101 @@ class Recharge extends Backend
             }
         }
     }
+
+    /**
+     * 充值退款
+     */
+    public function refund($ids = null)
+    {
+        if ($this->request->isPost()) {
+            $ids = $ids ?: $this->request->post('ids');
+            $reason = $this->request->post('reason', '');
+            if (!$ids) {
+                $this->error('参数缺失');
+            }
+            
+            $recharge = $this->model->find($ids);
+            if (!$recharge || !in_array($recharge->status, ['pending', 'paid'])) {
+                $this->error('订单不存在或状态不允许退款');
+            }
+            
+            \think\Db::startTrans();
+            try {
+                // 如果已支付，需要扣除用户余额
+                if ($recharge->status === 'paid') {
+                    if ($recharge->target === 'balance') {
+                        \app\common\library\WalletService::changeBalance($recharge->user_id, '-' . $recharge->amount, 'recharge_refund', $recharge->id, '充值退款：' . $reason);
+                    } elseif ($recharge->target === 'deposit') {
+                        \app\common\library\WalletService::changeDeposit($recharge->user_id, '-' . $recharge->amount, 'recharge_refund', $recharge->id, '充值退款：' . $reason);
+                        \app\common\library\WalletService::changeBalance($recharge->user_id, $recharge->amount, 'recharge_refund', $recharge->id, '充值退款');
+                    }
+                }
+                
+                $recharge->status = 'cancelled';
+                $recharge->refund_reason = $reason;
+                $recharge->refund_time = time();
+                $recharge->save();
+                
+                \think\Db::commit();
+                $this->success('退款成功');
+            } catch (\Exception $e) {
+                \think\Db::rollback();
+                $this->error($e->getMessage());
+            }
+        }
+        return $this->view->fetch();
+    }
+
+    /**
+     * 批量确认到账
+     */
+    public function batchConfirm()
+    {
+        if ($this->request->isPost()) {
+            $ids = $this->request->post('ids');
+            if (!$ids) {
+                $this->error('参数缺失');
+            }
+            
+            $idArr = explode(',', $ids);
+            $count = 0;
+            $errors = [];
+            
+            foreach ($idArr as $id) {
+                \think\Db::startTrans();
+                try {
+                    $recharge = $this->model->find($id);
+                    if ($recharge && $recharge->status === 'pending') {
+                        $recharge->status = 'paid';
+                        $recharge->paid_time = time();
+                        $recharge->save();
+                        
+                        if ($recharge->target === 'balance') {
+                            \app\common\library\WalletService::changeBalance($recharge->user_id, $recharge->amount, 'recharge', $recharge->id, '充值到账(批量补单)');
+                        } elseif ($recharge->target === 'deposit') {
+                            \app\common\library\WalletService::changeBalance($recharge->user_id, $recharge->amount, 'recharge', $recharge->id, '充值');
+                            \app\common\library\WalletService::changeBalance($recharge->user_id, '-' . $recharge->amount, 'deposit_pay', $recharge->id, '保证金充值');
+                            \app\common\library\WalletService::changeDeposit($recharge->user_id, $recharge->amount, 'deposit_pay', $recharge->id, '保证金充值');
+                        }
+                        
+                        $count++;
+                    }
+                    \think\Db::commit();
+                } catch (\Exception $e) {
+                    \think\Db::rollback();
+                    $errors[] = "订单{$id}处理失败：" . $e->getMessage();
+                }
+            }
+            
+            if ($count > 0) {
+                $msg = "成功确认 {$count} 笔订单";
+                if (!empty($errors)) {
+                    $msg .= "，失败：" . implode('；', $errors);
+                }
+                $this->success($msg);
+            } else {
+                $this->error('没有可确认的订单');
+            }
+        }
+    }
 }

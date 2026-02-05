@@ -113,8 +113,19 @@ export function request(options: RequestOptions): Promise<any | null> {
 							)!;
 
 							switch (code) {
+								// 0 或 1000 都表示成功（兼容不同后端）
+								case 0:
 								case 1000:
 									resolve(data);
+									break;
+								// 401 未登录或token失效
+								case 401:
+									user.logout();
+									reject({ message: message || t("请登录后操作"), code } as Response);
+									break;
+								// 403 权限不足
+								case 403:
+									reject({ message: message || t("权限不足"), code } as Response);
 									break;
 								default:
 									reject({ message, code } as Response);
