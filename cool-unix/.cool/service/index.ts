@@ -113,8 +113,9 @@ export function request(options: RequestOptions): Promise<any | null> {
 							)!;
 
 							switch (code) {
-								// 0 或 1000 都表示成功（兼容不同后端）
+								// 0、1 或 1000 都表示成功（兼容不同后端）
 								case 0:
+								case 1:
 								case 1000:
 									resolve(data);
 									break;

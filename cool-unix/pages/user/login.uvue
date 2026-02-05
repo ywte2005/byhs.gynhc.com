@@ -104,8 +104,23 @@ const agree = ref(false);
 
 // 登录成功
 async function toLogin(res: any) {
-	user.setToken(parse<Token>(res)!);
-	user.get();
+	// 后端返回格式：{ token, expire, refreshToken, refreshExpire, userinfo }
+	const tokenData = {
+		token: res.token,
+		expire: res.expire,
+		refreshToken: res.refreshToken,
+		refreshExpire: res.refreshExpire || res.refreshExpire
+	};
+	
+	// 设置token
+	user.setToken(parse<Token>(tokenData)!);
+	
+	// 设置用户信息
+	if (res.userinfo) {
+		user.set(res.userinfo);
+	}
+	
+	// 跳转到登录前的页面或首页
 	router.nextLogin();
 }
 

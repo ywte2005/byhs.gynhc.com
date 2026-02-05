@@ -64,24 +64,33 @@ class User extends Api
      * @ApiMethod (POST)
      * @ApiParams (name="mobile", type="string", required=true, description="手机号")
      * @ApiParams (name="captcha", type="string", required=true, description="验证码")
+     * @ApiParams (name="phone", type="string", required=false, description="手机号(兼容前端)")
+     * @ApiParams (name="smsCode", type="string", required=false, description="验证码(兼容前端)")
      */
     public function mobilelogin()
     {
-        $mobile = $this->request->post('mobile');
-        $captcha = $this->request->post('captcha');
+        // 兼容两种参数名
+        $mobile = $this->request->post('mobile') ?: $this->request->post('phone');
+        $captcha = $this->request->post('captcha') ?: $this->request->post('smsCode');
+        
         if (!$mobile || !$captcha) {
-            $this->error(__('Invalid parameters'));
+            $this->error('参数错误', null, 1001);
         }
         if (!Validate::regex($mobile, "^1\d{10}$")) {
-            $this->error(__('Mobile is incorrect'));
+            $this->error('手机号格式不正确', null, 1002);
         }
-        if (!Sms::check($mobile, $captcha, 'mobilelogin')) {
-            $this->error(__('Captcha is incorrect'));
+        
+        // 测试环境：允许使用固定验证码 6666
+        $isTestCode = ($captcha === '6666' && config('app_debug'));
+        
+        if (!$isTestCode && !Sms::check($mobile, $captcha, 'mobilelogin')) {
+            $this->error('验证码不正确或已过期', null, 1002);
         }
+        
         $user = \app\common\model\User::getByMobile($mobile);
         if ($user) {
             if ($user->status != 'normal') {
-                $this->error(__('Account is locked'));
+                $this->error('账号已被锁定', null, 3001);
             }
             //如果已经有账号则直接登录
             $ret = $this->auth->direct($user->id);
@@ -89,11 +98,22 @@ class User extends Api
             $ret = $this->auth->register($mobile, Random::alnum(), '', $mobile, []);
         }
         if ($ret) {
-            Sms::flush($mobile, 'mobilelogin');
-            $data = ['userinfo' => $this->auth->getUserinfo()];
-            $this->success(__('Logged in successful'), $data);
+            if (!$isTestCode) {
+                Sms::flush($mobile, 'mobilelogin');
+            }
+            $userInfo = $this->auth->getUserinfo();
+            
+            // 返回格式兼容前端
+            $data = [
+                'token' => $userInfo['token'],
+                'expire' => 7200,
+                'refreshToken' => $userInfo['token'],
+                'refreshExpire' => 2592000,
+                'userinfo' => $userInfo
+            ];
+            $this->success('登录成功', $data);
         } else {
-            $this->error($this->auth->getError());
+            $this->error($this->auth->getError() ?: '登录失败', null, 5001);
         }
     }
 

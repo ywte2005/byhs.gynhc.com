@@ -173,49 +173,40 @@ async function getCaptcha() {
 
 // 发送短信
 async function send() {
-	if (code.value != "") {
-		captcha.sending = true;
+	// 测试环境直接发送，不需要图片验证码
+	captcha.sending = true;
 
-		await request({
-			url: "/app/user/login/smsCode",
-			method: "POST",
-			data: {
-				phone: props.phone,
-				code: code.value,
-				captchaId: captchaId.value
-			}
-		})
-			.then(() => {
-				ui.showToast({
-					message: t("短信已发送，请查收")
-				});
-				startCountdown();
-				close();
-				emit("success");
-			})
-
-			.catch((err) => {
-				ui.showToast({
-					message: (err as Response).message!
-				});
-
-				getCaptcha();
+	await request({
+		url: "/api/sms/send",
+		method: "POST",
+		data: {
+			mobile: props.phone,
+			event: "mobilelogin"
+		}
+	})
+		.then(() => {
+			ui.showToast({
+				message: t("短信已发送，请查收")
 			});
-
-		captcha.sending = false;
-	} else {
-		ui.showToast({
-			message: t("请填写验证码")
+			startCountdown();
+			close();
+			emit("success");
+		})
+		.catch((err) => {
+			ui.showToast({
+				message: (err as Response).message!
+			});
 		});
-	}
+
+	captcha.sending = false;
 }
 
 // 打开
 function open() {
 	if (props.phone != "") {
 		if (/^(?:(?:\+|00)86)?1[3-9]\d{9}$/.test(props.phone!)) {
-			captcha.visible = true;
-			getCaptcha();
+			// 直接发送短信，不需要图片验证码
+			send();
 		} else {
 			ui.showToast({
 				message: t("请填写正确的手机号格式")

@@ -21,12 +21,11 @@ export function loginByPassword(mobile: string, password: string): Promise<{ tok
 // 短信验证码登录
 export function loginBySms(mobile: string, code: string): Promise<{ token: string; userInfo: any }> {
 	return request({
-		url: "/user/login",
+		url: "/api/user/mobilelogin",
 		method: "POST",
 		data: {
-			mobile,
-			code,
-			type: "sms"
+			phone: mobile,
+			smsCode: code
 		}
 	});
 }

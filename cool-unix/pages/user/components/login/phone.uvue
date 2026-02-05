@@ -112,7 +112,7 @@ async function toLogin() {
 	loading.value = true;
 
 	await request({
-		url: "/app/user/login/phone",
+		url: "/api/user/mobilelogin",
 		method: "POST",
 		data: {
 			phone,

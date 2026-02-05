@@ -4,7 +4,7 @@ export const proxy = {
 		// 本地后端地址
 		target: "https://byhs.gynhc.com",
 		changeOrigin: true,
-		rewrite: (path: string) => path.replace("/dev", "/api")
+		rewrite: (path: string) => path.replace("/dev", "")
 	},
 
 	// 生产环境配置
@@ -12,7 +12,7 @@ export const proxy = {
 		// 生产环境地址（需要根据实际情况修改）
 		target: "https://byhs.gynhc.com",
 		changeOrigin: true,
-		rewrite: (path: string) => path.replace("/prod", "/api")
+		rewrite: (path: string) => path.replace("/prod", "")
 	}
 };
 
