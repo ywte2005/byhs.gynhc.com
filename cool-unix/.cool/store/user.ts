@@ -45,7 +45,7 @@ export class User {
 	async get() {
 		if (this.token != null) {
 			await request({
-				url: "/app/user/info/person"
+				url: "/api/user/person"
 			})
 				.then((res) => {
 					if (res != null) {

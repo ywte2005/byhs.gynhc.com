@@ -36,6 +36,34 @@ class User extends Api
     }
 
     /**
+     * 获取用户个人信息
+     */
+    public function person()
+    {
+        $user = $this->auth->getUser();
+        
+        $data = [
+            'id' => $user->id,
+            'unionid' => $user->id, // 使用id作为unionid
+            'nickName' => $user->nickname ?: $user->username,
+            'avatarUrl' => $user->avatar ?: '',
+            'phone' => $user->mobile ?: '',
+            'gender' => $user->gender ?: 0,
+            'status' => $user->status == 'normal' ? 1 : 0,
+            'description' => $user->bio ?: '',
+            'loginType' => 1,
+            'province' => '',
+            'city' => '',
+            'district' => '',
+            'birthday' => $user->birthday ?: '',
+            'createTime' => date('Y-m-d H:i:s', $user->createtime),
+            'updateTime' => date('Y-m-d H:i:s', $user->updatetime)
+        ];
+        
+        $this->success('获取成功', $data);
+    }
+
+    /**
      * 会员登录
      *
      * @ApiMethod (POST)
