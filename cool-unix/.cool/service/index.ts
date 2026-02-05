@@ -68,12 +68,18 @@ export function request(options: RequestOptions): Promise<any | null> {
 	return new Promise((resolve, reject) => {
 		// 发起请求的实际函数
 		const next = () => {
+			// 如果有token且不是忽略token的接口，则将token添加到URL参数中
+			let requestUrl = url;
+			if (Authorization && !isIgnoreToken(url)) {
+				const separator = url.includes('?') ? '&' : '?';
+				requestUrl = `${url}${separator}token=${Authorization}`;
+			}
+
 			uni.request({
-				url,
+				url: requestUrl,
 				method,
 				data,
 				header: {
-					Authorization,
 					language: locale.value,
 					...(header as UTSJSONObject)
 				},

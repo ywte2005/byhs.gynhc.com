@@ -13,15 +13,15 @@
 		<view class="balance-card">
 			<view class="balance-row">
 				<view class="balance-item">
-					<text class="amount-large">¥12,580.00</text>
+					<text class="amount-large">¥{{ formatMoney(statistics.wallet.balance) }}</text>
 					<text class="label">可用余额</text>
 				</view>
 				<view class="balance-item">
-					<text class="amount-medium">¥2,000.00</text>
+					<text class="amount-medium">¥{{ formatMoney(statistics.wallet.frozen) }}</text>
 					<text class="label">冻结金额</text>
 				</view>
 				<view class="balance-item">
-					<text class="amount-medium">¥5,320.00</text>
+					<text class="amount-medium">¥{{ formatMoney(statistics.wallet.pending) }}</text>
 					<text class="label">待结算</text>
 				</view>
 			</view>
@@ -66,15 +66,15 @@
 			<text class="section-title">待办事项</text>
 			<view class="todo-row">
 				<view class="todo-card">
-					<text class="todo-number primary">3</text>
+					<text class="todo-number primary">{{ statistics.todo.pending_merchant }}</text>
 					<text class="todo-label">待审核进件</text>
 				</view>
 				<view class="todo-card">
-					<text class="todo-number warning">5</text>
+					<text class="todo-number warning">{{ statistics.todo.pending_task }}</text>
 					<text class="todo-label">待验收任务</text>
 				</view>
 				<view class="todo-card">
-					<text class="todo-number danger">2</text>
+					<text class="todo-number danger">{{ statistics.todo.pending_withdraw }}</text>
 					<text class="todo-label">待处理提现</text>
 				</view>
 			</view>
@@ -86,15 +86,15 @@
 				<text class="section-title">今日数据</text>
 				<view class="data-row">
 					<view class="data-item bg-blue">
-						<text class="data-number primary">8</text>
+						<text class="data-number primary">{{ statistics.today.accepted }}</text>
 						<text class="data-label">已接任务</text>
 					</view>
 					<view class="data-item bg-green">
-						<text class="data-number success">5</text>
+						<text class="data-number success">{{ statistics.today.completed }}</text>
 						<text class="data-label">已完成</text>
 					</view>
 					<view class="data-item bg-yellow">
-						<text class="data-number warning">¥280</text>
+						<text class="data-number warning">¥{{ formatMoney(statistics.today.income) }}</text>
 						<text class="data-label">今日收入</text>
 					</view>
 				</view>
@@ -109,25 +109,11 @@
 					<text class="more-link">查看更多 ></text>
 				</view>
 				<view class="news-list">
-					<view class="news-item">
-						<view class="dot primary"></view>
+					<view class="news-item" v-for="(item, index) in statistics.news" :key="index">
+						<view class="dot" :class="item.type"></view>
 						<view class="news-content">
-							<text class="news-title">新春任务大礼包上线啦！</text>
-							<text class="news-date">2024-01-20</text>
-						</view>
-					</view>
-					<view class="news-item">
-						<view class="dot success"></view>
-						<view class="news-content">
-							<text class="news-title">系统升级维护公告</text>
-							<text class="news-date">2024-01-18</text>
-						</view>
-					</view>
-					<view class="news-item">
-						<view class="dot warning"></view>
-						<view class="news-content">
-							<text class="news-title">新增商户认证功能</text>
-							<text class="news-date">2024-01-15</text>
+							<text class="news-title">{{ item.title }}</text>
+							<text class="news-date">{{ formatDate(item.createtime) }}</text>
 						</view>
 					</view>
 				</view>
@@ -149,7 +135,7 @@
 				<text class="tab-label">推广</text>
 			</view>
 			<view class="tab-item" @tap="goToPage('/pages/merchant/index')">
-				<text class="tab-icon">👤</text>
+				<text class="tab-icon">�</text>
 				<text class="tab-label">我的</text>
 			</view>
 		</view>
@@ -157,16 +143,76 @@
 </template>
 
 <script setup lang="uts">
+import { ref, onMounted } from 'vue';
+import { request } from '@/.cool/service';
+
 // 定义组件选项
 defineOptions({
 	name: 'PageHomeSimple'
 });
 
+// 统计数据
+const statistics = ref({
+	wallet: {
+		balance: 0,
+		frozen: 0,
+		pending: 0
+	},
+	todo: {
+		pending_merchant: 0,
+		pending_task: 0,
+		pending_withdraw: 0
+	},
+	today: {
+		accepted: 0,
+		completed: 0,
+		income: 0
+	},
+	news: [] as any[]
+});
+
+// 加载统计数据
+async function loadStatistics() {
+	try {
+		const data = await request({
+			url: '/api/index/statistics',
+			method: 'GET'
+		});
+		statistics.value = data;
+	} catch (err: any) {
+		console.error('加载统计数据失败', err);
+		uni.showToast({
+			title: err.message || '加载失败',
+			icon: 'none'
+		});
+	}
+}
+
+// 格式化金额
+function formatMoney(amount: number): string {
+	return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// 格式化日期
+function formatDate(timestamp: number): string {
+	const date = new Date(timestamp * 1000);
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+	return `${year}-${month}-${day}`;
+}
+
+// 页面跳转
 function goToPage(url: string) {
 	uni.navigateTo({
 		url: url
 	});
 }
+
+// 页面加载时获取数据
+onMounted(() => {
+	loadStatistics();
+});
 </script>
 
 <style>

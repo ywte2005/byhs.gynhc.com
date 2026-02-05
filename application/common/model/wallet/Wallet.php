@@ -7,8 +7,9 @@ use think\Db;
 class Wallet extends Model
 {
     protected $name = 'wallet';
-    protected $autoWriteTimestamp = 'updatetime';
+    protected $autoWriteTimestamp = true;
     protected $createTime = false;
+    protected $updateTime = 'updatetime';
 
     public function user()
     {
