@@ -3,11 +3,11 @@
 		<!-- Header -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="header-title">收款账户</text>
 			</view>
 			<view class="header-right" @click="addCard">
-				<text class="add-icon">+</text>
+				<uni-icons type="plus" size="24" color="#0052d9"></uni-icons>
 			</view>
 		</view>
 
@@ -16,7 +16,7 @@
 				<view class="card-list">
 					<view v-for="(item, index) in list" :key="index" class="card bank-item">
 						<view class="bank-icon-wrapper">
-							<text class="bank-icon">🏦</text>
+							<uni-icons type="home" size="20" color="#0052d9"></uni-icons>
 						</view>
 						<view class="bank-info">
 							<text class="bank-name">{{ item.bankName }}</text>
@@ -24,7 +24,7 @@
 							<text class="bank-no">{{ formatCardNo(item.cardNo) }}</text>
 						</view>
 						<view class="bank-action" @click.stop="deleteCard(item.id)">
-							<text class="delete-icon">🗑️</text>
+							<uni-icons type="trash" size="16" color="#ff3b30"></uni-icons>
 						</view>
 					</view>
 					
@@ -122,11 +122,6 @@ onMounted(() => {
 	gap: 16rpx;
 }
 
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
 .header-title {
 	font-size: 34rpx;
 	font-weight: 600;
@@ -137,11 +132,6 @@ onMounted(() => {
 .header-right {
 	display: flex;
 	align-items: center;
-}
-
-.add-icon {
-	font-size: 48rpx;
-	color: #0052d9;
 }
 
 /* Content */
@@ -188,10 +178,6 @@ onMounted(() => {
 	justify-content: center;
 }
 
-.bank-icon {
-	font-size: 40rpx;
-}
-
 .bank-info {
 	flex: 1;
 	display: flex;
@@ -219,10 +205,9 @@ onMounted(() => {
 
 .bank-action {
 	padding: 16rpx;
-}
-
-.delete-icon {
-	font-size: 32rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 /* Empty State */

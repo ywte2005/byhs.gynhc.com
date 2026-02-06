@@ -3,7 +3,7 @@
 		<!-- Header -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="header-title">收益明细</text>
 			</view>
 		</view>
@@ -131,10 +131,7 @@
 	gap: 16rpx;
 }
 
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
+
 
 .header-title {
 	font-size: 34rpx; /* 17px */

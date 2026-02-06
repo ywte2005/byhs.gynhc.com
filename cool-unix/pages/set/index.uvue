@@ -3,7 +3,7 @@
 		<!-- Header -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="header-title">设置</text>
 			</view>
 		</view>
@@ -14,26 +14,26 @@
 				<view class="card setting-group">
 					<view class="setting-item" @tap="router.to('/pages/set/general')">
 						<view class="item-left">
-							<text class="item-icon">⚙️</text>
+							<uni-icons type="settings" size="20" color="#0052d9"></uni-icons>
 							<text class="item-label">通用设置</text>
 						</view>
-						<text class="item-arrow">></text>
+						<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="divider"></view>
 					<view class="setting-item" @tap="router.to('/pages/set/notice')">
 						<view class="item-left">
-							<text class="item-icon">🔔</text>
+							<uni-icons type="notification" size="20" color="#0052d9"></uni-icons>
 							<text class="item-label">通知设置</text>
 						</view>
-						<text class="item-arrow">></text>
+						<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="divider"></view>
 					<view class="setting-item">
 						<view class="item-left">
-							<text class="item-icon">🔒</text>
+							<uni-icons type="locked" size="20" color="#0052d9"></uni-icons>
 							<text class="item-label">隐私设置</text>
 						</view>
-						<text class="item-arrow">></text>
+						<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 
@@ -41,18 +41,18 @@
 				<view class="card setting-group">
 					<view class="setting-item" @tap="router.to('/pages/set/about')">
 						<view class="item-left">
-							<text class="item-icon">ℹ️</text>
+							<uni-icons type="info" size="20" color="#0052d9"></uni-icons>
 							<text class="item-label">关于{{ config.name }}</text>
 						</view>
-						<text class="item-arrow">></text>
+						<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="divider"></view>
 					<view class="setting-item" @tap="refs.open('cs')">
 						<view class="item-left">
-							<text class="item-icon">🎧</text>
+							<uni-icons type="headphones" size="20" color="#0052d9"></uni-icons>
 							<text class="item-label">联系我们</text>
 						</view>
-						<text class="item-arrow">></text>
+						<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 

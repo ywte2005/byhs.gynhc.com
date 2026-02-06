@@ -94,8 +94,8 @@
 					<text class="text-3.5 text-[#999]">没有更多了</text>
 				</view>
 				<view v-if="taskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-20">
-					<text class="text-10 mb-3">📋</text>
-					<text class="text-4 text-[#999]">暂无任务</text>
+					<uni-icons type="compose" size="40" color="#999999"></uni-icons>
+					<text class="text-4 text-[#999] mt-3">暂无任务</text>
 				</view>
 			</view>
 		</scroll-view>

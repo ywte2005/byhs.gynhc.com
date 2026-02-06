@@ -4,7 +4,7 @@
 		<view class="wallet-header">
 			<view class="header-nav">
 				<view class="back-btn" @click="goBack">
-					<text class="back-icon">←</text>
+					<uni-icons type="left" size="24" color="#ffffff"></uni-icons>
 				</view>
 				<text class="nav-title">资金管理</text>
 				<view class="detail-btn" @click="goToLogs">
@@ -51,19 +51,19 @@
 				<view class="card menu-card">
 					<view class="menu-grid">
 						<view class="menu-item" @click="goToBankCard">
-							<text class="menu-icon">💳</text>
+							<uni-icons type="vip" size="24" color="#0052d9"></uni-icons>
 							<text class="menu-name">银行卡</text>
 						</view>
 						<view class="menu-item" @click="goToDeposit">
-							<text class="menu-icon">🔒</text>
+							<uni-icons type="locked" size="24" color="#0052d9"></uni-icons>
 							<text class="menu-name">保证金</text>
 						</view>
 						<view class="menu-item" @click="goToCommission">
-							<text class="menu-icon">🎁</text>
+							<uni-icons type="gift" size="24" color="#0052d9"></uni-icons>
 							<text class="menu-name">佣金</text>
 						</view>
 						<view class="menu-item" @click="goToStatistics">
-							<text class="menu-icon">📊</text>
+							<uni-icons type="bars" size="24" color="#0052d9"></uni-icons>
 							<text class="menu-name">统计</text>
 						</view>
 					</view>
@@ -85,7 +85,7 @@
 							class="log-item"
 						>
 							<view class="log-icon-box">
-								<text class="log-icon">{{ item.icon }}</text>
+								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
 							</view>
 							<view class="log-info">
 								<text class="log-title">{{ item.title }}</text>
@@ -121,21 +121,24 @@ const walletInfo = ref({
 // 最近交易
 const recentLogs = ref([
 	{
-		icon: '💰',
+		iconType: 'wallet',
+		iconColor: '#00b578',
 		title: '任务佣金',
 		time: '2025-01-30 10:30:00',
 		type: 'in',
 		amount: '15.00'
 	},
 	{
-		icon: '📝',
+		iconType: 'compose',
+		iconColor: '#faad14',
 		title: '发起任务',
 		time: '2025-01-30 09:00:00',
 		type: 'out',
 		amount: '1,500.00'
 	},
 	{
-		icon: '💸',
+		iconType: 'wallet',
+		iconColor: '#0052d9',
 		title: '充值',
 		time: '2025-01-29 15:00:00',
 		type: 'in',
@@ -191,9 +194,9 @@ onMounted(() => {
 	padding: 20rpx 32rpx 0 32rpx;
 }
 
-.back-icon {
-	font-size: 48rpx;
-	color: #ffffff;
+.back-btn {
+	display: flex;
+	align-items: center;
 }
 
 .nav-title {
@@ -325,9 +328,7 @@ onMounted(() => {
 	gap: 16rpx;
 }
 
-.menu-icon {
-	font-size: 48rpx;
-}
+/* Menu icon styles removed - using uni-icons */
 
 .menu-name {
 	font-size: 24rpx;
@@ -380,9 +381,7 @@ onMounted(() => {
 	margin-right: 24rpx;
 }
 
-.log-icon {
-	font-size: 40rpx;
-}
+/* Log icon styles removed - using uni-icons */
 
 .log-info {
 	flex: 1;

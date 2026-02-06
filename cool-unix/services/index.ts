@@ -29,7 +29,7 @@ export function getStatistics(): Promise<{
 	}>;
 }> {
 	return request({
-		url: "/api/index/statistics",
+		url: "/index/statistics",
 		method: "GET"
 	});
 }

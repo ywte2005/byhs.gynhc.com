@@ -3,7 +3,7 @@
 		<!-- 顶部导航 -->
 		<view class="flex items-center justify-between px-4 py-3 bg-white">
 			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="text-4 ml-2">任务详情</text>
 			</view>
 			<view @click="shareTask">
@@ -138,8 +138,9 @@
 				<view class="bg-white rounded-2 p-4 mb-3">
 					<view class="flex items-center justify-between mb-3">
 						<text class="text-4 font-bold text-[#1f2329]">子任务列表</text>
-						<view @click="goToSubtaskList">
-							<text class="text-3.5 text-[#07c160]">查看全部 →</text>
+						<view @click="goToSubtaskList" class="flex items-center">
+							<text class="text-3.5 text-[#07c160]">查看全部</text>
+							<uni-icons type="right" size="12" color="#07c160"></uni-icons>
 						</view>
 					</view>
 

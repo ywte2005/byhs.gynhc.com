@@ -3,7 +3,7 @@
 		<!-- Header -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#ffffff"></uni-icons>
 				<text class="header-title">购物车 ({{ list.length }})</text>
 			</view>
 			<view class="header-right" @click="isDel = !isDel">

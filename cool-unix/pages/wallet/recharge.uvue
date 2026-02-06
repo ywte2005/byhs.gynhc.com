@@ -3,7 +3,7 @@
 		<!-- Header -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="header-title">充值</text>
 			</view>
 		</view>
@@ -48,7 +48,7 @@
 							@tap="payType = item.value"
 						>
 							<view class="pay-left">
-								<text class="pay-icon">{{ item.icon }}</text>
+								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
 								<text class="pay-name">{{ item.name }}</text>
 							</view>
 							<view class="radio-box" :class="{ active: payType === item.value }">
@@ -77,9 +77,9 @@ const payType = ref("wechat");
 const quickAmounts = ["100", "500", "1000", "2000", "5000", "10000"];
 
 const payMethods = [
-	{ name: "微信支付", value: "wechat", icon: "💚" },
-	{ name: "支付宝支付", value: "alipay", icon: "💙" },
-	{ name: "银行卡支付", value: "bank", icon: "💳" }
+	{ name: "微信支付", value: "wechat", iconType: "weixin", iconColor: "#07C160" },
+	{ name: "支付宝支付", value: "alipay", iconType: "wallet", iconColor: "#1677FF" },
+	{ name: "银行卡支付", value: "bank", iconType: "vip", iconColor: "#faad14" }
 ];
 
 function goBack() {
@@ -136,11 +136,6 @@ async function handleSubmit() {
 	display: flex;
 	align-items: center;
 	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
 }
 
 .header-title {
@@ -260,10 +255,6 @@ async function handleSubmit() {
 	flex-direction: row;
 	align-items: center;
 	gap: 16rpx;
-}
-
-.pay-icon {
-	font-size: 40rpx;
 }
 
 .pay-name {

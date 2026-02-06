@@ -3,7 +3,7 @@
 		<!-- 顶部导航 -->
 		<view class="header">
 			<view class="header-left" @click="goBack">
-				<text class="back-icon">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="header-title">提现</text>
 			</view>
 		</view>
@@ -53,7 +53,7 @@
 					>
 						<view class="account-info">
 							<view class="bank-icon-box">
-								<text class="bank-icon">🏦</text>
+								<uni-icons type="home" size="20" color="#0052d9"></uni-icons>
 							</view>
 							<view class="bank-detail">
 								<text class="bank-name">{{ item.bankName }}</text>
@@ -76,7 +76,7 @@
 					
 					<view class="time-item">
 						<view class="time-info">
-							<text class="time-icon">⚡</text>
+							<uni-icons type="bolt" size="20" color="#faad14"></uni-icons>
 							<view class="time-detail">
 								<text class="time-title">实时到账</text>
 								<text class="time-desc">预计2小时内到账</text>
@@ -285,11 +285,6 @@ onMounted(() => {
 	gap: 16rpx;
 }
 
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
 .header-title {
 	font-size: 34rpx; /* 17px */
 	font-weight: 600;
@@ -412,10 +407,6 @@ onMounted(() => {
 	margin-right: 24rpx;
 }
 
-.bank-icon {
-	font-size: 40rpx;
-}
-
 .bank-detail {
 	display: flex;
 	flex-direction: column;
@@ -477,11 +468,7 @@ onMounted(() => {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-}
-
-.time-icon {
-	font-size: 40rpx;
-	margin-right: 24rpx;
+	gap: 24rpx;
 }
 
 .time-detail {

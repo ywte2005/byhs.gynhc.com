@@ -12,7 +12,7 @@ export function getTaskList(params: {
 	pageSize?: number;
 }): Promise<{ list: SubTask[]; total: number; hasMore: boolean }> {
 	return request({
-		url: "/api/task/list",
+		url: "/task/list",
 		method: "GET",
 		data: {
 			category: params.category,

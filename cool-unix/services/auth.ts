@@ -21,7 +21,7 @@ export function loginByPassword(mobile: string, password: string): Promise<{ tok
 // 短信验证码登录
 export function loginBySms(mobile: string, code: string): Promise<{ token: string; userInfo: any }> {
 	return request({
-		url: "/api/user/mobilelogin",
+		url: "/user/mobilelogin",
 		method: "POST",
 		data: {
 			phone: mobile,
@@ -104,7 +104,7 @@ export function getCaptcha(params: {
 // 发送短信验证码（用于登录）
 export function sendLoginSms(mobile: string): Promise<void> {
 	return request({
-		url: "/api/sms/send",
+		url: "/sms/send",
 		method: "POST",
 		data: {
 			mobile,

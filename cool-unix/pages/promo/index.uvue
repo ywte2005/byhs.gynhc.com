@@ -27,25 +27,25 @@
 				<view class="quick-row">
 					<view class="quick-item" @tap="goTo('/pages/wallet/withdraw')">
 						<view class="quick-icon-box">
-							<text class="quick-icon">💳</text>
+							<uni-icons type="vip" size="22" color="#0052d9"></uni-icons>
 						</view>
 						<text class="quick-text">立即提现</text>
 					</view>
 					<view class="quick-item" @tap="goTo('/pages/promo/invite')">
 						<view class="quick-icon-box">
-							<text class="quick-icon">👥</text>
+							<uni-icons type="contact" size="22" color="#00b578"></uni-icons>
 						</view>
 						<text class="quick-text">邀请好友</text>
 					</view>
 					<view class="quick-item" @tap="goTo('/pages/promo/commission')">
 						<view class="quick-icon-box">
-							<text class="quick-icon">💰</text>
+							<uni-icons type="wallet" size="22" color="#faad14"></uni-icons>
 						</view>
 						<text class="quick-text">佣金明细</text>
 					</view>
 					<view class="quick-item" @tap="goTo('/pages/promo/team')">
 						<view class="quick-icon-box">
-							<text class="quick-icon">📊</text>
+							<uni-icons type="bars" size="22" color="#5856d6"></uni-icons>
 						</view>
 						<text class="quick-text">团队管理</text>
 					</view>
@@ -77,7 +77,7 @@
 				<view class="recent-list">
 					<view v-for="(item, index) in recentList" :key="index" class="card recent-item">
 						<view class="recent-icon-box">
-							<text class="recent-icon">🔔</text>
+							<uni-icons type="notification" size="20" color="#0052d9"></uni-icons>
 						</view>
 						<view class="recent-info">
 							<text class="recent-text">{{ item.content }}</text>

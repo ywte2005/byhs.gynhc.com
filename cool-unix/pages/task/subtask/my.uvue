@@ -3,7 +3,7 @@
 		<!-- 顶部导航 -->
 		<view class="flex items-center justify-between px-4 py-3 bg-white">
 			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
+				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
 				<text class="text-4 ml-2">我接的任务</text>
 			</view>
 		</view>

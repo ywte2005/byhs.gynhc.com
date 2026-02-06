@@ -1,0 +1,93 @@
+/**
+ * Lucide Icons 字体文件
+ * 
+ * 使用说明：
+ * 1. 下载 Lucide Icons 字体文件（.ttf 或 .woff2）
+ * 2. 将字体文件放在 static/fonts/ 目录下
+ * 3. 在 App.uvue 中引入此 CSS 文件
+ * 
+ * 字体下载地址：
+ * https://lucide.dev/
+ * https://github.com/lucide-icons/lucide
+ */
+
+@font-face {
+  font-family: 'lucide-icons';
+  src: url('./lucide-icons.ttf') format('truetype'),
+       url('./lucide-icons.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 图标基础样式 */
+.lucide-icon {
+  font-family: 'lucide-icons' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  display: inline-block;
+  text-align: center;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 图标大小预设 */
+.icon-xs {
+  font-size: 12px;
+}
+
+.icon-sm {
+  font-size: 16px;
+}
+
+.icon-md {
+  font-size: 20px;
+}
+
+.icon-lg {
+  font-size: 24px;
+}
+
+.icon-xl {
+  font-size: 32px;
+}
+
+.icon-2xl {
+  font-size: 40px;
+}
+
+/* 图标颜色预设 */
+.icon-primary {
+  color: #0052d9;
+}
+
+.icon-success {
+  color: #00b578;
+}
+
+.icon-warning {
+  color: #faad14;
+}
+
+.icon-danger {
+  color: #e34d59;
+}
+
+.icon-info {
+  color: #1890ff;
+}
+
+.icon-gray {
+  color: #9aa0a6;
+}
+
+.icon-dark {
+  color: #1f2329;
+}
+
+.icon-white {
+  color: #ffffff;
+}

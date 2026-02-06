@@ -4,8 +4,8 @@
 		<view class="top-bar">
 			<text class="title">旺铺集</text>
 			<view class="actions">
-				<text class="icon">📷</text>
-				<text class="icon">🔔</text>
+				<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
+				<uni-icons type="notification" size="24" color="#ffffff"></uni-icons>
 			</view>
 		</view>
 
@@ -30,31 +30,31 @@
 			<view class="quick-actions">
 				<view class="action-item" @tap="goToPage('/pages/merchant/register')">
 					<view class="action-icon">
-						<text class="emoji">📄</text>
+						<uni-icons type="compose" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="action-label">进件</text>
 				</view>
 				<view class="action-item" @tap="goToPage('/pages/task/create')">
 					<view class="action-icon">
-						<text class="emoji">📢</text>
+						<uni-icons type="sound" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="action-label">发布任务</text>
 				</view>
 				<view class="action-item" @tap="goToPage('/pages/wallet/recharge')">
 					<view class="action-icon">
-						<text class="emoji">➕</text>
+						<uni-icons type="plus" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="action-label">充值</text>
 				</view>
 				<view class="action-item" @tap="goToPage('/pages/wallet/withdraw')">
 					<view class="action-icon">
-						<text class="emoji">💳</text>
+						<uni-icons type="vip" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="action-label">提现</text>
 				</view>
 				<view class="action-item" @tap="goToPage('/pages/promo/invite')">
 					<view class="action-icon">
-						<text class="emoji">👥</text>
+						<uni-icons type="contact" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="action-label">邀请</text>
 				</view>
@@ -123,19 +123,19 @@
 		<!-- 底部导航栏 -->
 		<view class="tabbar">
 			<view class="tab-item active" @tap="goToPage('/pages/index/home')">
-				<text class="tab-icon">🏠</text>
+				<uni-icons type="home" size="24" color="#0052d9"></uni-icons>
 				<text class="tab-label active">首页</text>
 			</view>
 			<view class="tab-item" @tap="goToPage('/pages/task/index')">
-				<text class="tab-icon">📋</text>
+				<uni-icons type="compose" size="24" color="#646a73"></uni-icons>
 				<text class="tab-label">任务</text>
 			</view>
 			<view class="tab-item" @tap="goToPage('/pages/promo/index')">
-				<text class="tab-icon">👥</text>
+				<uni-icons type="contact" size="24" color="#646a73"></uni-icons>
 				<text class="tab-label">推广</text>
 			</view>
 			<view class="tab-item" @tap="goToPage('/pages/merchant/index')">
-				<text class="tab-icon">�</text>
+				<uni-icons type="person" size="24" color="#646a73"></uni-icons>
 				<text class="tab-label">我的</text>
 			</view>
 		</view>
@@ -245,10 +245,7 @@ onMounted(() => {
 	gap: 32rpx; /* 16px */
 }
 
-.icon {
-	font-size: 48rpx;
-	color: #ffffff;
-}
+
 
 /* 余额卡片 */
 .balance-card {
@@ -313,9 +310,7 @@ onMounted(() => {
 	justify-content: center;
 }
 
-.emoji {
-	font-size: 44rpx;
-}
+
 
 .action-label {
 	font-size: 24rpx;
@@ -530,9 +525,7 @@ onMounted(() => {
 	flex: 1;
 }
 
-.tab-icon {
-	font-size: 48rpx;
-}
+
 
 .tab-label {
 	font-size: 20rpx;
