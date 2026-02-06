@@ -182,7 +182,7 @@ async function loadStatistics() {
 	} catch (err: any) {
 		console.error('加载统计数据失败', err);
 		uni.showToast({
-			title: err.message || '加载失败',
+			title: err.msg || err.message || '加载失败',
 			icon: 'none'
 		});
 	}

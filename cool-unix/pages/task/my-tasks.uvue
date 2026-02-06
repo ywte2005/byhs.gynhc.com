@@ -261,7 +261,7 @@ const cancelTask = (id: number) => {
 						loadTaskList()
 					} else {
 						uni.showToast({
-							title: result.message || '取消失败',
+							title: result.msg || '取消失败',
 							icon: 'none'
 						})
 					}

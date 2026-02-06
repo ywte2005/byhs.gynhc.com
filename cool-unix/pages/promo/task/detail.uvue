@@ -100,7 +100,7 @@
 						this.task = res;
 					})
 					.catch((err : any) => {
-						uni.showToast({ title: err.message ?? '加载失败', icon: 'none' });
+						uni.showToast({ title: err.msg ?? err.message ?? '加载失败', icon: 'none' });
 					});
 			},
 			getStatusName(status : string) : string {
@@ -141,7 +141,7 @@
 					})
 					.catch((err : any) => {
 						uni.hideLoading();
-						uni.showToast({ title: err.message ?? '启动失败', icon: 'none' });
+						uni.showToast({ title: err.msg ?? err.message ?? '启动失败', icon: 'none' });
 					});
 			}
 		}

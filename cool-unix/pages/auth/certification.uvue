@@ -196,7 +196,7 @@ async function handleSubmit() {
 
 	} catch (error : any) {
 		uni.showToast({
-			title: error.message || "提交失败",
+			title: error.msg || "提交失败",
 			icon: "none"
 		});
 	} finally {

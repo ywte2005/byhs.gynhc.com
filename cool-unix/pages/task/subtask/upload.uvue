@@ -218,7 +218,7 @@ const submitProof = async () => {
 			}, 1500)
 		} else {
 			uni.showToast({
-				title: res.message || '提交失败',
+				title: res.msg || '提交失败',
 				icon: 'none'
 			})
 		}

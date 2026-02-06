@@ -69,10 +69,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useStore, router } from "@/.cool";
-import { useUi } from "@/uni_modules/cool-ui";
 
 const { user } = useStore();
-const ui = useUi();
 
 const form = ref({
 	phone: "",
@@ -82,28 +80,42 @@ const form = ref({
 
 async function toLogin() {
 	if (!form.value.phone) {
-		ui.showToast("请输入手机号");
+		uni.showToast({
+			title: "请输入手机号",
+			icon: "none"
+		});
 		return;
 	}
 	if (!form.value.password) {
-		ui.showToast("请输入密码");
+		uni.showToast({
+			title: "请输入密码",
+			icon: "none"
+		});
 		return;
 	}
 	if (!form.value.agree) {
-		ui.showToast("请阅读并同意用户协议");
+		uni.showToast({
+			title: "请阅读并同意用户协议",
+			icon: "none"
+		});
 		return;
 	}
 
-	ui.showLoading();
+	uni.showLoading({
+		title: "登录中..."
+	});
 
 	try {
 		await user.login(form.value);
+		uni.hideLoading();
 		// 登录成功后跳转到首页
 		router.push({ path: "/pages/index/home", isTab: true });
 	} catch (err: any) {
-		ui.showToast(err.message || "登录失败");
-	} finally {
-		ui.hideLoading();
+		uni.hideLoading();
+		uni.showToast({
+			title: err.msg || err.message || "登录失败",
+			icon: "none"
+		});
 	}
 }
 
@@ -112,11 +124,17 @@ function toRegister() {
 }
 
 function toForget() {
-	ui.showToast("功能开发中");
+	uni.showToast({
+		title: "功能开发中",
+		icon: "none"
+	});
 }
 
 function wxLogin() {
-	ui.showToast("微信登录开发中");
+	uni.showToast({
+		title: "微信登录开发中",
+		icon: "none"
+	});
 }
 </script>
 

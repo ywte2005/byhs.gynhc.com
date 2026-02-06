@@ -124,7 +124,7 @@ async function toLogin() {
 		})
 		.catch((err) => {
 			ui.showToast({
-				message: (err as Response).message!
+				message: (err as Response).msg || (err as Response).message!
 			});
 		});
 

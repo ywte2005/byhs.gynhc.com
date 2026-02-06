@@ -46,11 +46,13 @@ Cool Unix 是一个高效的项目脚手架。它内置了 UI 组件库、Servic
 	const ui = useUi();
 
 	ui.showToast({
-		message: t("操作成功")
+		title: t("操作成功"),
+		icon: "none"
 	});
 
 	ui.showToast({
-		message: $t("欢迎回来，{name}", { name: "神仙都没用" })
+		title: $t("欢迎回来，{name}", { name: "神仙都没用" }),
+		icon: "none"
 	});
 </script>
 ```

@@ -121,7 +121,7 @@
 					})
 					.catch((err : any) => {
 						uni.hideLoading();
-						uni.showToast({ title: err.message ?? '创建失败', icon: 'none' });
+						uni.showToast({ title: err.msg ?? err.message ?? '创建失败', icon: 'none' });
 					});
 			}
 		}

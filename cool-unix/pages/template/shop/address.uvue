@@ -99,7 +99,7 @@ const { refresh, list, loadMore } = usePager(async (data, { render }) => {
 		})
 		.catch((err) => {
 			ui.showToast({
-				message: (err as Response).message!
+				message: (err as Response).msg || (err as Response).message!
 			});
 		})
 		.finally(() => {
@@ -159,7 +159,7 @@ function onDelete(id: number) {
 					})
 					.catch((err) => {
 						ui.showToast({
-							message: (err as Response).message!
+							message: (err as Response).msg || (err as Response).message!
 						});
 					});
 			}

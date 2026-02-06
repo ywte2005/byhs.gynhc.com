@@ -303,7 +303,7 @@ const toggleEdit = async () => {
 				originalInfo.value = JSON.parse(JSON.stringify(merchantInfo.value))
 			} else {
 				uni.showToast({
-					title: res.message || '保存失败',
+					title: res.msg || '保存失败',
 					icon: 'none'
 				})
 			}

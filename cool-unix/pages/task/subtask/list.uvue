@@ -240,7 +240,7 @@ const receiveTask = async (id: number) => {
 			}, 1500)
 		} else {
 			uni.showToast({
-				title: res.message || '接单失败',
+				title: res.msg || '接单失败',
 				icon: 'none'
 			})
 		}
