@@ -51,11 +51,12 @@
 </template>
 
 <script lang="ts" setup>
-import { router, isEmpty, type Response, request, parse, t } from "@/.cool";
+import { router, isEmpty, type Response, parse, t } from "@/.cool";
 import { useCascader, useForm, useUi, type ClFormRule } from "@/uni_modules/cool-ui";
 import { type Ref, ref } from "vue";
 import pca from "@/.cool/data/pca.json";
 import type { UserAddress } from "../types";
+import { getAddressInfo, addAddress, updateAddress } from "@/services/user";
 
 const props = defineProps({
 	id: {
@@ -127,11 +128,11 @@ function save() {
 			};
 
 			// 根据是否有id判断是新增还是编辑
-			request({
-				url: `/app/user/address/${props.id != "" ? "update" : "add"}`,
-				method: "POST",
-				data
-			})
+			const request = props.id != "" 
+				? updateAddress({ id: parseInt(props.id), ...data })
+				: addAddress(data);
+
+			request
 				.then(() => {
 					// 保存成功返回上一页
 					router.back();
@@ -157,10 +158,7 @@ function save() {
  * 2. 回填表单和地区选择
  */
 function getInfo() {
-	request({
-		url: "/app/user/address/info",
-		data: { id: props.id }
-	})
+	getAddressInfo(parseInt(props.id))
 		.then((res) => {
 			if (res != null) {
 				// 解析并赋值表单数据

@@ -144,7 +144,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue';
-import { request } from '@/.cool/service';
+import { getStatistics } from '@/services/index';
 
 // 定义组件选项
 defineOptions({
@@ -174,15 +174,12 @@ const statistics = ref({
 // 加载统计数据
 async function loadStatistics() {
 	try {
-		const data = await request({
-			url: '/api/index/statistics',
-			method: 'GET'
-		});
+		const data = await getStatistics();
 		statistics.value = data;
 	} catch (err: any) {
 		console.error('加载统计数据失败', err);
 		uni.showToast({
-			title: err.msg || '加载失败',
+			title: err.msg || err.message || '加载失败',
 			icon: 'none'
 		});
 	}

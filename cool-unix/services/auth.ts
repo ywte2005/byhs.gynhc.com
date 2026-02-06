@@ -86,3 +86,38 @@ export function getCertificationStatus(): Promise<{ status: string; reject_reaso
 		method: "GET"
 	});
 }
+
+// 获取图片验证码
+export function getCaptcha(params: {
+	color?: string;
+	phone?: string;
+	width?: number;
+	height?: number;
+}): Promise<{ captchaId: string; data: string }> {
+	return request({
+		url: "/app/user/login/captcha",
+		method: "GET",
+		data: params
+	});
+}
+
+// 发送短信验证码（用于登录）
+export function sendLoginSms(mobile: string): Promise<void> {
+	return request({
+		url: "/api/sms/send",
+		method: "POST",
+		data: {
+			mobile,
+			event: "mobilelogin"
+		}
+	});
+}
+
+// 微信小程序登录
+export function loginByMiniApp(data: any): Promise<{ token: string; userInfo: any }> {
+	return request({
+		url: "/app/user/login/mini",
+		method: "POST",
+		data
+	});
+}

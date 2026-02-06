@@ -80,17 +80,17 @@
 
 <script lang="ts" setup>
 import { useUi } from "@/uni_modules/cool-ui";
-import { parse, request, router, usePager, type Response, t } from "@/.cool";
+import { parse, router, usePager, type Response, t } from "@/.cool";
 import { computed, ref } from "vue";
 import type { UserAddress } from "../types";
+import { getAddressList, deleteAddress, updateAddress } from "@/services/user";
 
 const ui = useUi();
 
 const { refresh, list, loadMore } = usePager(async (data, { render }) => {
-	await request({
-		url: "/app/user/address/page",
-		method: "POST",
-		data
+	await getAddressList({
+		page: data.page,
+		size: data.limit
 	})
 		.then((res) => {
 			if (res != null) {
@@ -145,11 +145,7 @@ function onDelete(id: number) {
 		message: t("删除地址后无法恢复，确认要删除该地址吗？"),
 		callback: (action) => {
 			if (action == "confirm") {
-				request({
-					url: "/app/user/address/delete",
-					method: "POST",
-					data: { ids: [id] }
-				})
+				deleteAddress([id])
 					.then(() => {
 						ui.showToast({
 							message: t("删除成功")
@@ -185,13 +181,9 @@ function onDefaultChange(item: UserAddress) {
 		}
 	});
 
-	request({
-		url: "/app/user/address/update",
-		method: "POST",
-		data: {
-			id: item.id,
-			isDefault: item.isDefault
-		}
+	updateAddress({
+		id: item.id!,
+		isDefault: item.isDefault ? 1 : 0
 	});
 }
 

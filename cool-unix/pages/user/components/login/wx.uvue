@@ -62,7 +62,6 @@
 <script setup lang="ts">
 import {
 	parse,
-	request,
 	router,
 	upload,
 	userInfo,
@@ -72,6 +71,7 @@ import {
 	type Token,
 	t
 } from "@/.cool";
+import { loginByMiniApp } from "@/services/auth";
 import { useUi } from "@/uni_modules/cool-ui";
 import { reactive, ref } from "vue";
 
@@ -172,11 +172,7 @@ async function miniLogin() {
 	ui.showLoading(t("登录中"));
 
 	await wx.miniLogin().then(async (data) => {
-		await request({
-			url: "/app/user/login/mini",
-			method: "POST",
-			data
-		})
+		await loginByMiniApp(data)
 			.then(async (res) => {
 				// 设置token
 				user.setToken(parse<Token>(res)!);
