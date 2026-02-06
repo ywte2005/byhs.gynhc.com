@@ -112,28 +112,25 @@ export function request(options: RequestOptions): Promise<any | null> {
 							resolve(res.data);
 						} else {
 							// 解析响应数据
-							const { code, message, data } = parse<Response>(
+							const { code, msg, data } = parse<Response>(
 								res.data ?? { code: 0 }
 							)!;
 
 							switch (code) {
-								// 0、1 或 1000 都表示成功（兼容不同后端）
-								case 0:
 								case 1:
-								case 1000:
 									resolve(data);
 									break;
 								// 401 未登录或token失效
 								case 401:
 									user.logout();
-									reject({ message: message || t("请登录后操作"), code } as Response);
+									reject({ message: msg || t("请登录后操作"), code } as Response);
 									break;
 								// 403 权限不足
 								case 403:
-									reject({ message: message || t("权限不足"), code } as Response);
+									reject({ message: msg || t("权限不足"), code } as Response);
 									break;
 								default:
-									reject({ message, code } as Response);
+									reject({ message: msg, code } as Response);
 									break;
 							}
 						}

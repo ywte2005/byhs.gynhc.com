@@ -62,7 +62,7 @@
 </template>
 
 <script lang="uts">
-	// import { getMyInviteCode, bindRelation } from "@/services/promo";
+	import { getMyInviteCode, bindRelation } from "@/services/promo";
 
 	export default {
 		data() {
@@ -79,12 +79,11 @@
 				uni.navigateBack();
 			},
 			loadInviteCode() {
-				// Mock implementation
-				// getMyInviteCode()
-				// 	.then((res : { invite_code : string }) => {
-				// 		this.inviteCode = res.invite_code;
-				// 	})
-				// 	.catch(() => { });
+				getMyInviteCode()
+					.then((res : { invite_code : string }) => {
+						this.inviteCode = res.invite_code;
+					})
+					.catch(() => { });
 			},
 			copyCode() {
 				uni.setClipboardData({
@@ -112,23 +111,17 @@
 			},
 			doBind() {
 				uni.showLoading({ title: '绑定中...' });
-				// Mock
-				setTimeout(() => {
-					uni.hideLoading();
-					uni.showToast({ title: '绑定成功', icon: 'success' });
-					this.parentCode = '';
-				}, 1000);
 				
-				// bindRelation(this.parentCode)
-				// 	.then(() => {
-				// 		uni.hideLoading();
-				// 		uni.showToast({ title: '绑定成功', icon: 'success' });
-				// 		this.parentCode = '';
-				// 	})
-				// 	.catch((err : any) => {
-				// 		uni.hideLoading();
-				// 		uni.showToast({ title: err.message ?? '绑定失败', icon: 'none' });
-				// 	});
+				bindRelation(this.parentCode)
+					.then(() => {
+						uni.hideLoading();
+						uni.showToast({ title: '绑定成功', icon: 'success' });
+						this.parentCode = '';
+					})
+					.catch((err : any) => {
+						uni.hideLoading();
+						uni.showToast({ title: err.message ?? '绑定失败', icon: 'none' });
+					});
 			}
 		}
 	};

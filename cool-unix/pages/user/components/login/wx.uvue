@@ -146,7 +146,7 @@ async function editSave() {
 		.catch((err) => {
 			// 上传失败，提示错误信息
 			ui.showToast({
-				message: (err as Response).msg || (err as Response).message!
+				message: err.message
 			});
 		});
 
@@ -191,7 +191,7 @@ async function miniLogin() {
 			})
 			.catch((err) => {
 				ui.showToast({
-					message: (err as Response).msg || (err as Response).message!
+					message: err.message
 				});
 			});
 	});

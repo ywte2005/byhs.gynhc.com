@@ -185,13 +185,12 @@ export class User {
 				}
 			})
 				.then((res) => {
-					if (res != null) {
-						const token = parse<Token>(res);
-
-						if (token != null) {
-							this.setToken(token);
-							resolve(token.token);
-						}
+					// request 函数已经返回 data，所以 res 就是 token 对象
+					if (res != null && res.token) {
+						this.setToken(res as Token);
+						resolve(res.token);
+					} else {
+						reject(new Error("刷新token失败"));
 					}
 				})
 				.catch((err) => {

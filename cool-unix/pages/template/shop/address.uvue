@@ -98,12 +98,13 @@ const { refresh, list, loadMore } = usePager(async (data, { render }) => {
 			}
 		})
 		.catch((err) => {
-			ui.showToast({
-				message: (err as Response).msg || (err as Response).message!
+			uni.showToast({
+				title: err.message,
+				icon: 'none'
 			});
 		})
 		.finally(() => {
-			ui.hideLoading();
+			uni.hideLoading();
 		});
 });
 
@@ -155,7 +156,7 @@ function onDelete(id: number) {
 					})
 					.catch((err) => {
 						ui.showToast({
-							message: (err as Response).msg || (err as Response).message!
+							message: err.message
 						});
 					});
 			}

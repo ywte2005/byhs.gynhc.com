@@ -90,40 +90,7 @@
 			},
 			loadData() {
 				this.loading = true;
-				// Mock data
-				setTimeout(() => {
-					const mockList : PromoTask[] = [];
-					if (this.currentTab === '' || this.currentTab === 'running') {
-						mockList.push({
-							id: 1,
-							total_amount: '1000.00',
-							deposit_amount: '100.00',
-							completed_amount: '200.00',
-							service_fee: '10.00',
-							status: 'running',
-							createtime: 1678888888,
-							start_time: 0,
-							end_time: 0
-						});
-					}
-					if (this.currentTab === '' || this.currentTab === 'pending') {
-						mockList.push({
-							id: 2,
-							total_amount: '500.00',
-							deposit_amount: '50.00',
-							completed_amount: '0.00',
-							service_fee: '5.00',
-							status: 'pending',
-							createtime: 1678889999,
-							start_time: 0,
-							end_time: 0
-						});
-					}
-					this.list = mockList;
-					this.loading = false;
-				}, 500);
 				
-				/*
 				const status = this.currentTab.length > 0 ? this.currentTab : null;
 				getTaskList(status)
 					.then((res : { list : PromoTask[] }) => {
@@ -133,7 +100,7 @@
 					.catch(() => {
 						this.loading = false;
 					});
-				*/
+				
 			},
 			switchTab(tab : string) {
 				this.currentTab = tab;

@@ -119,8 +119,8 @@
 
 <script setup lang="uts">
 import { ref, computed } from "vue";
-// import { register, sendSmsCode } from "@/services/auth";
-// import { useStore } from "@/.cool";
+import { register, sendSmsCode } from "@/services/auth";
+import { useStore } from "@/.cool";
 
 const form = ref({
 	mobile: "",
@@ -160,7 +160,7 @@ async function sendCode() {
 	if (countdown.value > 0) return;
 
 	try {
-		// await sendSmsCode(form.value.mobile, "register");
+		await sendSmsCode(form.value.mobile, "register");
 
 		uni.showToast({
 			title: "验证码已发送",
@@ -177,7 +177,7 @@ async function sendCode() {
 		}, 1000);
 	} catch (error : any) {
 		uni.showToast({
-			title: error.msg || "发送失败",
+			title: error.message || "发送失败",
 			icon: "none"
 		});
 	}
@@ -192,11 +192,11 @@ async function handleRegister() {
 	try {
 		loading.value = true;
 
-		// const res = await register(form.value);
+		const res = await register(form.value);
 
-		// 保存token
-		// const { user } = useStore();
-		// user.setToken(res.token);
+		保存token
+		const { user } = useStore();
+		user.setToken(res.token);
 
 		uni.showToast({
 			title: "注册成功",
@@ -211,7 +211,7 @@ async function handleRegister() {
 		}, 1000);
 	} catch (error : any) {
 		uni.showToast({
-			title: error.msg || "注册失败",
+			title: error.message || "注册失败",
 			icon: "none"
 		});
 	} finally {

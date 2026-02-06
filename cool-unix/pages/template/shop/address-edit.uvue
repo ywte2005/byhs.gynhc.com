@@ -139,7 +139,7 @@ function save() {
 				})
 				.catch((err) => {
 					// 保存失败提示错误信息
-					ui.showToast({ message: (err as Response).msg || (err as Response).message! });
+					ui.showToast({ message: err.message });
 				})
 				.finally(() => {
 					ui.hideLoading();

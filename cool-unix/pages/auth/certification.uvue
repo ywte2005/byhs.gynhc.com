@@ -139,7 +139,7 @@
 
 <script setup lang="uts">
 import { ref, computed } from "vue";
-// import { submitCertification } from "@/services/auth";
+import { submitCertification } from "@/services/auth";
 
 const form = ref({
 	type: "personal" as "personal" | "enterprise",
@@ -181,22 +181,19 @@ async function handleSubmit() {
 
 	try {
 		loading.value = true;
-		// await submitCertification(form.value);
+		await submitCertification(form.value);
 		
-		// Mock success
+		uni.showToast({
+			title: "提交成功，等待审核",
+			icon: "success"
+		});
 		setTimeout(() => {
-			uni.showToast({
-				title: "提交成功，等待审核",
-				icon: "success"
-			});
-			setTimeout(() => {
-				uni.navigateBack();
-			}, 1500);
-		}, 1000);
+			uni.navigateBack();
+		}, 1500);
 
 	} catch (error : any) {
 		uni.showToast({
-			title: error.msg || "提交失败",
+			title: error.message || "提交失败",
 			icon: "none"
 		});
 	} finally {
