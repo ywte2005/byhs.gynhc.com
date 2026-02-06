@@ -47,18 +47,21 @@ export class User {
 			url: "/user/login",
 			method: "POST",
 			data: {
-				mobile: form.phone,
-				password: form.password,
-				type: "password"
+				account: form.phone,
+				password: form.password
 			}
 		});
 
-		if (res) {
+		// request 函数已经处理了响应，成功时返回 data，失败时 reject
+		// 后端返回的是 { userinfo: {...} }
+		if (res != null) {
+			const userinfo = res.userinfo || res;
+			
 			this.setToken({
-				token: res.token,
-				expire: res.expire || 86400,
-				refreshToken: res.refreshToken || res.token,
-				refreshExpire: res.refreshExpire || 604800
+				token: userinfo.token,
+				expire: userinfo.expire || 86400,
+				refreshToken: userinfo.refreshToken || userinfo.token,
+				refreshExpire: userinfo.refreshExpire || 604800
 			});
 
 			await this.get();

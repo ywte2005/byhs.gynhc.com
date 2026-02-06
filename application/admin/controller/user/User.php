@@ -64,7 +64,57 @@ class User extends Backend
         if ($this->request->isPost()) {
             $this->token();
         }
+        
+        // 获取用户组列表
+        $groupList = \app\common\model\UserGroup::where('status', 'normal')
+            ->order('id', 'asc')
+            ->select();
+        
+        // 构建用户组下拉选择框
+        $groupdata = [];
+        foreach ($groupList as $group) {
+            $groupdata[$group->id] = $group->name;
+        }
+        
+        // 使用 build_select 函数生成下拉框
+        $groupSelect = build_select('row[group_id]', $groupdata, '', ['class' => 'form-control selectpicker']);
+        
+        $this->view->assign('groupList', $groupSelect);
+        
         return parent::add();
+    }
+
+    /**
+     * 编辑
+     */
+    public function edit($ids = null)
+    {
+        $row = $this->model->get($ids);
+        if (!$row) {
+            $this->error(__('No Results were found'));
+        }
+        
+        if ($this->request->isPost()) {
+            $this->token();
+        }
+        
+        // 获取用户组列表
+        $groupList = \app\common\model\UserGroup::where('status', 'normal')
+            ->order('id', 'asc')
+            ->select();
+        
+        // 构建用户组下拉选择框
+        $groupdata = [];
+        foreach ($groupList as $group) {
+            $groupdata[$group->id] = $group->name;
+        }
+        
+        // 使用 build_select 函数生成下拉框
+        $groupSelect = build_select('row[group_id]', $groupdata, $row->group_id, ['class' => 'form-control selectpicker']);
+        
+        $this->view->assign('groupList', $groupSelect);
+        
+        return parent::edit($ids);
     }
 
     /**
