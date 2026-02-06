@@ -1,56 +1,70 @@
 <template>
 	<cl-page>
-		<view class="task-list-page">
-			<view class="header-actions">
-				<cl-button type="primary" @tap="goCreate">
-					<text>发起任务</text>
-				</cl-button>
-			</view>
-
-			<view class="tab-bar">
-				<view class="tab-item" :class="{ active: currentTab == '' }" @tap="switchTab('')">
-					<text>全部</text>
+		<view class="page-container">
+			<!-- Header -->
+			<view class="header">
+				<view class="header-left" @click="goBack">
+					<text class="back-icon">←</text>
+					<text class="header-title">互助任务</text>
 				</view>
-				<view class="tab-item" :class="{ active: currentTab == 'pending' }" @tap="switchTab('pending')">
-					<text>待启动</text>
-				</view>
-				<view class="tab-item" :class="{ active: currentTab == 'running' }" @tap="switchTab('running')">
-					<text>进行中</text>
-				</view>
-				<view class="tab-item" :class="{ active: currentTab == 'completed' }" @tap="switchTab('completed')">
-					<text>已完成</text>
+				<view class="header-right" @click="goCreate">
+					<text class="header-action">发起任务</text>
 				</view>
 			</view>
 
-			<view class="task-list">
-				<view v-for="(item, index) in list" :key="index" class="task-item" @tap="goDetail(item.id)">
-					<view class="task-header">
-						<text class="task-amount">¥{{ item.total_amount }}</text>
-						<text class="task-status" :class="item.status">{{ getStatusName(item.status) }}</text>
-					</view>
-					<view class="task-info">
-						<view class="info-row">
-							<text class="info-label">保证金：</text>
-							<text class="info-value">¥{{ item.deposit_amount }}</text>
+			<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+				<view class="content-wrapper">
+					<!-- Tabs -->
+					<view class="tab-bar">
+						<view class="tab-item" :class="{ active: currentTab == '' }" @tap="switchTab('')">
+							<text class="tab-text" :class="{ active: currentTab == '' }">全部</text>
 						</view>
-						<view class="info-row">
-							<text class="info-label">已完成：</text>
-							<text class="info-value">¥{{ item.completed_amount }}</text>
+						<view class="tab-item" :class="{ active: currentTab == 'pending' }" @tap="switchTab('pending')">
+							<text class="tab-text" :class="{ active: currentTab == 'pending' }">待启动</text>
 						</view>
-						<view class="info-row">
-							<text class="info-label">服务费：</text>
-							<text class="info-value">¥{{ item.service_fee }}</text>
+						<view class="tab-item" :class="{ active: currentTab == 'running' }" @tap="switchTab('running')">
+							<text class="tab-text" :class="{ active: currentTab == 'running' }">进行中</text>
+						</view>
+						<view class="tab-item" :class="{ active: currentTab == 'completed' }" @tap="switchTab('completed')">
+							<text class="tab-text" :class="{ active: currentTab == 'completed' }">已完成</text>
 						</view>
 					</view>
-					<view class="task-footer">
-						<text class="task-time">{{ formatTime(item.createtime) }}</text>
+
+					<!-- Task List -->
+					<view class="task-list">
+						<view v-for="(item, index) in list" :key="index" class="card task-item" @tap="goDetail(item.id)">
+							<view class="task-header">
+								<text class="task-amount">¥{{ item.total_amount }}</text>
+								<view :class="['status-tag', item.status]">
+									<text class="status-text" :class="item.status">{{ getStatusName(item.status) }}</text>
+								</view>
+							</view>
+							<view class="task-info">
+								<view class="info-row">
+									<text class="info-label">保证金：</text>
+									<text class="info-value">¥{{ item.deposit_amount }}</text>
+								</view>
+								<view class="info-row">
+									<text class="info-label">已完成：</text>
+									<text class="info-value">¥{{ item.completed_amount }}</text>
+								</view>
+								<view class="info-row">
+									<text class="info-label">服务费：</text>
+									<text class="info-value">¥{{ item.service_fee }}</text>
+								</view>
+							</view>
+							<view class="task-footer">
+								<text class="task-time">{{ formatTime(item.createtime) }}</text>
+								<text class="detail-link">查看详情 ></text>
+							</view>
+						</view>
+					</view>
+
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无互助任务</text>
 					</view>
 				</view>
-			</view>
-
-			<view v-if="list.length == 0 && !loading" class="empty">
-				<text class="empty-text">暂无互助任务</text>
-			</view>
+			</scroll-view>
 		</view>
 	</cl-page>
 </template>
@@ -71,8 +85,45 @@
 			this.loadData();
 		},
 		methods: {
+			goBack() {
+				uni.navigateBack();
+			},
 			loadData() {
 				this.loading = true;
+				// Mock data
+				setTimeout(() => {
+					const mockList : PromoTask[] = [];
+					if (this.currentTab === '' || this.currentTab === 'running') {
+						mockList.push({
+							id: 1,
+							total_amount: '1000.00',
+							deposit_amount: '100.00',
+							completed_amount: '200.00',
+							service_fee: '10.00',
+							status: 'running',
+							createtime: 1678888888,
+							start_time: 0,
+							end_time: 0
+						});
+					}
+					if (this.currentTab === '' || this.currentTab === 'pending') {
+						mockList.push({
+							id: 2,
+							total_amount: '500.00',
+							deposit_amount: '50.00',
+							completed_amount: '0.00',
+							service_fee: '5.00',
+							status: 'pending',
+							createtime: 1678889999,
+							start_time: 0,
+							end_time: 0
+						});
+					}
+					this.list = mockList;
+					this.loading = false;
+				}, 500);
+				
+				/*
 				const status = this.currentTab.length > 0 ? this.currentTab : null;
 				getTaskList(status)
 					.then((res : { list : PromoTask[] }) => {
@@ -82,6 +133,7 @@
 					.catch(() => {
 						this.loading = false;
 					});
+				*/
 			},
 			switchTab(tab : string) {
 				this.currentTab = tab;
@@ -114,143 +166,206 @@
 	};
 </script>
 
-<style lang="scss">
-	.task-list-page {
-		padding: 20rpx;
-	}
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
 
-	.header-actions {
-		margin-bottom: 20rpx;
-	}
+/* Header */
+.header {
+	height: 112rpx;
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 32rpx;
+	position: relative;
+}
 
-	.tab-bar {
-		display: flex;
-		flex-direction: row;
-		background-color: #ffffff;
-		border-radius: 12rpx;
-		padding: 10rpx;
-		margin-bottom: 20rpx;
-	}
+.header-left {
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
 
-	.tab-item {
-		flex: 1;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 16rpx 0;
-		border-radius: 8rpx;
-	}
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
 
-	.tab-item text {
-		font-size: 26rpx;
-		color: #666666;
-	}
+.header-title {
+	font-size: 34rpx;
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
 
-	.tab-item.active {
-		background-color: #667eea;
-	}
+.header-right {
+	display: flex;
+	align-items: center;
+}
 
-	.tab-item.active text {
-		color: #ffffff;
-	}
+.header-action {
+	font-size: 28rpx;
+	color: #0052d9;
+}
 
-	.task-list {
-		display: flex;
-		flex-direction: column;
-	}
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
 
-	.task-item {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
 
-	.task-header {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 20rpx;
-	}
+/* Tabs */
+.tab-bar {
+	display: flex;
+	flex-direction: row;
+	background-color: #ffffff;
+	border-radius: 16rpx;
+	padding: 8rpx;
+	margin-bottom: 24rpx;
+}
 
-	.task-amount {
-		font-size: 40rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.tab-item {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 16rpx 0;
+	border-radius: 12rpx;
+}
 
-	.task-status {
-		font-size: 24rpx;
-		padding: 8rpx 16rpx;
-		border-radius: 20rpx;
-	}
+.tab-item.active {
+	background-color: #0052d9;
+}
 
-	.task-status.pending {
-		background-color: #fff7e6;
-		color: #fa8c16;
-	}
+.tab-text {
+	font-size: 28rpx;
+	color: #646a73;
+}
 
-	.task-status.running {
-		background-color: #e6f7ff;
-		color: #1890ff;
-	}
+.tab-text.active {
+	color: #ffffff;
+	font-weight: 500;
+}
 
-	.task-status.completed {
-		background-color: #f6ffed;
-		color: #52c41a;
-	}
+/* Task List */
+.task-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
 
-	.task-status.paused {
-		background-color: #fff1f0;
-		color: #ff4d4f;
-	}
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
 
-	.task-status.cancelled {
-		background-color: #f5f5f5;
-		color: #999999;
-	}
+.task-item {
+	gap: 24rpx;
+}
 
-	.task-info {
-		margin-bottom: 20rpx;
-	}
+.task-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 24rpx;
+	border-bottom: 2rpx solid #f5f7fa;
+}
 
-	.info-row {
-		display: flex;
-		flex-direction: row;
-		margin-bottom: 8rpx;
-	}
+.task-amount {
+	font-size: 40rpx;
+	font-weight: 700;
+	color: #1f2329;
+}
 
-	.info-label {
-		font-size: 26rpx;
-		color: #999999;
-		width: 140rpx;
-	}
+.status-tag {
+	padding: 4rpx 16rpx;
+	border-radius: 8rpx;
+}
 
-	.info-value {
-		font-size: 26rpx;
-		color: #333333;
-	}
+.status-tag.pending { background-color: #fff7e6; }
+.status-tag.running { background-color: #f0f9ff; }
+.status-tag.completed { background-color: #e8fff3; }
+.status-tag.paused { background-color: #fff2f0; }
+.status-tag.cancelled { background-color: #f5f5f5; }
 
-	.task-footer {
-		border-top: 1rpx solid #f0f0f0;
-		padding-top: 16rpx;
-	}
+.status-text {
+	font-size: 24rpx;
+}
 
-	.task-time {
-		font-size: 24rpx;
-		color: #999999;
-	}
+.status-text.pending { color: #ff9500; }
+.status-text.running { color: #0052d9; }
+.status-text.completed { color: #00b578; }
+.status-text.paused { color: #ff3b30; }
+.status-text.cancelled { color: #999999; }
 
-	.empty {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 100rpx 0;
-	}
+.task-info {
+	display: flex;
+	flex-direction: column;
+	gap: 12rpx;
+}
 
-	.empty-text {
-		font-size: 28rpx;
-		color: #999999;
-	}
+.info-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.info-label {
+	font-size: 26rpx;
+	color: #999999;
+	width: 140rpx;
+}
+
+.info-value {
+	font-size: 26rpx;
+	color: #1f2329;
+}
+
+.task-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-top: 24rpx;
+	border-top: 2rpx solid #f5f7fa;
+}
+
+.task-time {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.detail-link {
+	font-size: 26rpx;
+	color: #0052d9;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
 </style>

@@ -13,6 +13,32 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">任务标题:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-title" class="form-control" name="row[title]" type="text" value="{$row.title|htmlentities}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">任务分类:</label>
+        <div class="col-xs-12 col-sm-8">
+            <select id="c-category" class="form-control" name="row[category]">
+                <option value="">请选择分类</option>
+                <option value="ecommerce" {$row.category=='ecommerce'?'selected':''}>电商平台</option>
+                <option value="food" {$row.category=='food'?'selected':''}>外卖配送</option>
+                <option value="travel" {$row.category=='travel'?'selected':''}>出行服务</option>
+                <option value="life" {$row.category=='life'?'selected':''}>生活服务</option>
+                <option value="finance" {$row.category=='finance'?'selected':''}>金融支付</option>
+                <option value="other" {$row.category=='other'?'selected':''}>其他</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label col-xs-12 col-sm-2">平台类型:</label>
+        <div class="col-xs-12 col-sm-8">
+            <input id="c-platform" class="form-control" name="row[platform]" type="text" value="{$row.platform|htmlentities}" placeholder="如：淘宝、美团、支付宝等">
+        </div>
+    </div>
+    <div class="form-group">
         <label class="control-label col-xs-12 col-sm-2">{:__('Total_amount')}:</label>
         <div class="col-xs-12 col-sm-8">
             <input id="c-total_amount" data-rule="required" class="form-control" step="0.01" name="row[total_amount]" type="number" value="{$row.total_amount|htmlentities}">

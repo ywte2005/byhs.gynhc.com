@@ -1,154 +1,287 @@
 <template>
-	<cl-page>
-		<cl-topbar safe-area-top background-color="transparent"></cl-topbar>
+	<view class="page-container">
+		<!-- Logo -->
+		<view class="logo-section">
+			<view class="logo-icon">
+				<text class="logo-icon-text">...</text>
+			</view>
+			<text class="logo-text">旺铺集</text>
+		</view>
 
-		<view class="px-10">
-			<!-- Logo -->
-			<view class="flex flex-col items-center justify-center py-20">
-				<view class="p-3 bg-white rounded-2xl">
-					<cl-image
-						src="/static/logo.png"
-						mode="widthFix"
-						:width="60"
-						:height="60"
-					></cl-image>
-				</view>
-
-				<cl-text :size="18" :pt="{ className: 'font-bold mt-4' }">{{
-					config.name
-				}}</cl-text>
+		<!-- Form -->
+		<view class="form-section">
+			<!-- Phone -->
+			<view class="input-group">
+				<input
+					class="input"
+					type="number"
+					v-model="form.phone"
+					placeholder="请输入手机号"
+					placeholder-class="input-placeholder"
+					maxlength="11"
+				/>
 			</view>
 
-			<!-- 手机号登录 -->
-			<login-phone :form="form" @success="toLogin"></login-phone>
-
-			<!-- 微信登录 -->
-			<login-wx :ref="refs.set('loginWx')"></login-wx>
-
-			<!-- 协议 -->
-			<view class="mt-6 flex flex-row flex-wrap items-center justify-center">
-				<cl-checkbox
-					v-model="agree"
-					active-icon="checkbox-circle-fill"
-					inactive-icon="checkbox-blank-circle-line"
-					:pt="{
-						icon: {
-							size: 18
-						}
-					}"
-				>
-				</cl-checkbox>
-				<cl-text color="info" :size="12">{{ t("已阅读并同意") }}</cl-text>
-				<cl-text
-					:size="12"
-					:pt="{
-						className: 'font-bold'
-					}"
-					@tap.stop="toDoc(t('用户协议'), 'userAgreement')"
-				>
-					《{{ t("用户协议") }}》
-				</cl-text>
-				<cl-text color="info" :size="12">、</cl-text>
-				<cl-text
-					:size="12"
-					:pt="{
-						className: 'font-bold'
-					}"
-					@tap.stop="toDoc(t('隐私政策'), 'privacyPolicy')"
-				>
-					《{{ t("隐私政策") }}》
-				</cl-text>
+			<!-- Password -->
+			<view class="input-group">
+				<input
+					class="input"
+					type="password"
+					v-model="form.password"
+					placeholder="请输入密码"
+					placeholder-class="input-placeholder"
+				/>
 			</view>
 
-			<!-- 第三方登录 -->
-			<view class="flex flex-row justify-center mt-10 px-10">
-				<view
-					class="login-item"
-					:class="{
-						'is-dark': isDark
-					}"
-					@tap="refs.callMethod('loginWx', 'login')"
-				>
-					<cl-icon name="wechat-fill" :size="18" color="#00b223"></cl-icon>
+			<!-- Agreement -->
+			<view class="agreement" @tap="form.agree = !form.agree">
+				<view class="checkbox" :class="{ active: form.agree }">
+					<view v-if="form.agree" class="checkbox-inner"></view>
 				</view>
+				<text class="agreement-text">已阅读并同意《用户协议》和《隐私政策》</text>
+			</view>
 
-				<view class="login-item" :class="{ 'is-dark': isDark }">
-					<cl-icon name="apple-fill" :size="18"></cl-icon>
-				</view>
+			<!-- Login Button -->
+			<view class="btn-primary" @tap="toLogin">
+				<text class="btn-text">登录</text>
+			</view>
+
+			<!-- Actions -->
+			<view class="actions">
+				<text class="action-text" @tap="toRegister">注册账号</text>
+				<text class="divider-v">|</text>
+				<text class="action-text" @tap="toForget">忘记密码</text>
+			</view>
+
+			<!-- Divider -->
+			<view class="divider">
+				<text class="divider-text">其他登录方式</text>
+			</view>
+
+			<!-- Wx Login -->
+			<view class="btn-outline" @tap="wxLogin">
+				<text class="btn-outline-text">微信一键登录</text>
 			</view>
 		</view>
-	</cl-page>
+	</view>
 </template>
 
 <script setup lang="ts">
-import { config } from "@/config";
-import { isDark, parse, router, useRefs, useStore, type Token, t } from "@/.cool";
-import { provide, reactive, ref } from "vue";
-import type { LoginForm } from "./types";
+import { ref } from "vue";
+import { useStore, router } from "@/.cool";
 import { useUi } from "@/uni_modules/cool-ui";
-import LoginPhone from "./components/login/phone.uvue";
-import LoginWx from "./components/login/wx.uvue";
 
 const { user } = useStore();
 const ui = useUi();
-const refs = useRefs();
 
-// 表单
-const form = reactive<LoginForm>({
-	phone: "18000000000",
-	smsCode: "6666"
+const form = ref({
+	phone: "",
+	password: "",
+	agree: false
 });
 
-// 是否同意
-const agree = ref(false);
-
-// 登录成功
-async function toLogin(res: any) {
-	// 后端返回格式：{ token, expire, refreshToken, refreshExpire, userinfo }
-	const tokenData = {
-		token: res.token,
-		expire: res.expire,
-		refreshToken: res.refreshToken,
-		refreshExpire: res.refreshExpire || res.refreshExpire
-	};
-	
-	// 设置token
-	user.setToken(parse<Token>(tokenData)!);
-	
-	// 设置用户信息
-	if (res.userinfo) {
-		user.set(res.userinfo);
+async function toLogin() {
+	if (!form.value.phone) {
+		ui.showToast("请输入手机号");
+		return;
 	}
-	
-	// 跳转到登录前的页面或首页
-	router.nextLogin();
-}
-
-// 跳转文档
-function toDoc(name: string, path: string) {}
-
-// 是否同意
-function isAgree() {
-	if (!agree.value) {
-		ui.showToast({
-			message: t("请先阅读并同意《用户协议》和《隐私政策》")
-		});
-
-		return false;
+	if (!form.value.password) {
+		ui.showToast("请输入密码");
+		return;
+	}
+	if (!form.value.agree) {
+		ui.showToast("请阅读并同意用户协议");
+		return;
 	}
 
-	return true;
+	ui.showLoading();
+
+	try {
+		await user.login(form.value);
+		// 登录成功后跳转到首页
+		router.push({ path: "/pages/index/home", isTab: true });
+	} catch (err: any) {
+		ui.showToast(err.message || "登录失败");
+	} finally {
+		ui.hideLoading();
+	}
 }
 
-provide("isAgree", isAgree);
+function toRegister() {
+	router.push("/pages/auth/register");
+}
+
+function toForget() {
+	ui.showToast("功能开发中");
+}
+
+function wxLogin() {
+	ui.showToast("微信登录开发中");
+}
 </script>
 
-<style lang="scss" scoped>
-.login-item {
-	@apply mx-2 p-2 flex items-center justify-center rounded-full bg-white border border-solid border-surface-100;
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #ffffff;
+	min-height: 100vh;
+	padding: 120rpx 64rpx 64rpx 64rpx;
+}
 
-	&.is-dark {
-		@apply border-surface-600 bg-surface-700;
-	}
+/* Logo */
+.logo-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 24rpx;
+	margin-bottom: 64rpx;
+}
+
+.logo-icon {
+	width: 144rpx;
+	height: 144rpx;
+	background-color: #0052d9;
+	border-radius: 32rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.logo-icon-text {
+	color: #ffffff;
+}
+
+.logo-text {
+	font-family: 'PingFang SC', sans-serif;
+	font-size: 48rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+/* Form */
+.form-section {
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.input-group {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+
+.input {
+	height: 96rpx;
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	padding: 0 32rpx;
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.input-placeholder {
+	color: #c0c4cc;
+}
+
+/* Agreement */
+.agreement {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.checkbox {
+	width: 32rpx;
+	height: 32rpx;
+	border: 2rpx solid #c0c4cc;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.checkbox.active {
+	border-color: #0052d9;
+	background-color: #0052d9;
+}
+
+.checkbox-inner {
+	width: 12rpx;
+	height: 24rpx;
+	border-bottom: 4rpx solid #ffffff;
+	border-right: 4rpx solid #ffffff;
+	transform: rotate(45deg) translate(-2rpx, -2rpx);
+}
+
+.agreement-text {
+	font-size: 24rpx;
+	color: #86909c;
+}
+
+/* Buttons */
+.btn-primary {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
+}
+
+.actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 24rpx;
+	margin-top: 16rpx;
+}
+
+.action-text {
+	font-size: 28rpx;
+	color: #0052d9;
+}
+
+.divider-v {
+	font-size: 24rpx;
+	color: #e5e6eb;
+}
+
+.divider {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 40rpx;
+	margin-top: 48rpx;
+}
+
+.divider-text {
+	font-size: 24rpx;
+	color: #c0c4cc;
+}
+
+.btn-outline {
+	height: 96rpx;
+	background-color: #ffffff;
+	border: 2rpx solid #e5e6eb;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-outline-text {
+	font-size: 30rpx;
+	color: #1f2329;
 }
 </style>

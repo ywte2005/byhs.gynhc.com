@@ -1,129 +1,126 @@
 <template>
-	<cl-page>
-		<cl-topbar title="注册" />
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">注册</text>
+			</view>
+		</view>
 
-		<view class="px-4 pt-6">
-			<view class="flex flex-col gap-4">
-				<!-- 手机号 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.5 font-medium text-[#1f2329]">手机号</text>
-					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
-						<input
-							v-model="form.mobile"
-							type="number"
-							placeholder="请输入手机号"
-							class="flex-1 text-3.75"
-							maxlength="11"
-						/>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<view class="form-section">
+					<!-- Phone -->
+					<view class="input-group">
+						<text class="label">手机号</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.mobile"
+								type="number"
+								placeholder="请输入手机号"
+								class="input"
+								placeholder-class="input-placeholder"
+								maxlength="11"
+							/>
+						</view>
 					</view>
-				</view>
 
-				<!-- 验证码 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.5 font-medium text-[#1f2329]">验证码</text>
-					<view class="flex gap-3">
-						<view class="flex-1 h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
+					<!-- Code -->
+					<view class="input-group">
+						<text class="label">验证码</text>
+						<view class="input-wrapper code-wrapper">
 							<input
 								v-model="form.code"
 								type="number"
 								placeholder="请输入验证码"
-								class="flex-1 text-3.75"
+								class="input"
+								placeholder-class="input-placeholder"
 								maxlength="6"
 							/>
+							<view 
+								class="code-btn" 
+								:class="{ disabled: countdown > 0 || form.mobile.length !== 11 }"
+								@tap="sendCode"
+							>
+								<text class="code-btn-text">{{ countdown > 0 ? `${countdown}s` : "获取验证码" }}</text>
+							</view>
 						</view>
-						<cl-button
-							:disabled="countdown > 0 || form.mobile.length !== 11"
-							size="large"
-							@tap="sendCode"
-						>
-							{{ countdown > 0 ? `${countdown}s` : "获取验证码" }}
-						</cl-button>
 					</view>
-				</view>
 
-				<!-- 密码 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.5 font-medium text-[#1f2329]">设置密码</text>
-					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
-						<input
-							v-model="form.password"
-							:type="showPassword ? 'text' : 'password'"
-							placeholder="请设置6-20位密码"
-							class="flex-1 text-3.75"
-						/>
-						<cl-icon
-							:name="showPassword ? 'eye' : 'eye-off'"
-							:size="20"
-							color="#9aa0a6"
-							@tap="showPassword = !showPassword"
-						/>
+					<!-- Password -->
+					<view class="input-group">
+						<text class="label">设置密码</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.password"
+								:type="showPassword ? 'text' : 'password'"
+								placeholder="请设置6-20位密码"
+								class="input"
+								placeholder-class="input-placeholder"
+							/>
+							<view class="eye-icon" @tap="showPassword = !showPassword">
+								<text>{{ showPassword ? '👁️' : '🔒' }}</text>
+							</view>
+						</view>
 					</view>
-				</view>
 
-				<!-- 确认密码 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.5 font-medium text-[#1f2329]">确认密码</text>
-					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
-						<input
-							v-model="form.confirm_password"
-							:type="showConfirmPassword ? 'text' : 'password'"
-							placeholder="请再次输入密码"
-							class="flex-1 text-3.75"
-						/>
-						<cl-icon
-							:name="showConfirmPassword ? 'eye' : 'eye-off'"
-							:size="20"
-							color="#9aa0a6"
-							@tap="showConfirmPassword = !showConfirmPassword"
-						/>
+					<!-- Confirm Password -->
+					<view class="input-group">
+						<text class="label">确认密码</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.confirm_password"
+								:type="showConfirmPassword ? 'text' : 'password'"
+								placeholder="请再次输入密码"
+								class="input"
+								placeholder-class="input-placeholder"
+							/>
+							<view class="eye-icon" @tap="showConfirmPassword = !showConfirmPassword">
+								<text>{{ showConfirmPassword ? '👁️' : '🔒' }}</text>
+							</view>
+						</view>
 					</view>
-				</view>
 
-				<!-- 邀请码 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.5 font-medium text-[#1f2329]">邀请码（选填）</text>
-					<view class="h-12 bg-[#f5f7fa] rounded-2 px-4 flex items-center">
-						<input
-							v-model="form.invite_code"
-							placeholder="请输入邀请码"
-							class="flex-1 text-3.75"
-						/>
+					<!-- Invite Code -->
+					<view class="input-group">
+						<text class="label">邀请码（选填）</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.invite_code"
+								placeholder="请输入邀请码"
+								class="input"
+								placeholder-class="input-placeholder"
+							/>
+						</view>
 					</view>
-				</view>
 
-				<!-- 协议 -->
-				<view class="flex items-center gap-2">
-					<view
-						class="w-4.5 h-4.5 rounded-1 border border-[#e5e6eb] flex items-center justify-center"
-						:class="{ 'bg-primary border-primary': form.agree }"
-						@tap="form.agree = !form.agree"
+					<!-- Agreement -->
+					<view class="agreement" @tap="form.agree = !form.agree">
+						<view class="checkbox" :class="{ active: form.agree }">
+							<view v-if="form.agree" class="checkbox-inner"></view>
+						</view>
+						<text class="agreement-text">我已阅读并同意《用户协议》和《隐私政策》</text>
+					</view>
+
+					<!-- Register Button -->
+					<view 
+						class="btn-primary" 
+						:class="{ disabled: !canRegister }"
+						@tap="handleRegister"
 					>
-						<cl-icon v-if="form.agree" name="check" :size="12" color="#ffffff" />
+						<text class="btn-text">注册</text>
 					</view>
-					<text class="text-3 text-[#646a73]">我已阅读并同意《用户协议》和《隐私政策》</text>
 				</view>
 			</view>
-		</view>
-
-		<cl-footer>
-			<cl-button
-				:disabled="!canRegister"
-				:loading="loading"
-				round
-				type="primary"
-				size="large"
-				@tap="handleRegister"
-			>
-				注册
-			</cl-button>
-		</cl-footer>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, computed } from "vue";
-import { register, sendSmsCode } from "@/services/auth";
-import { useStore } from "@/.cool";
+// import { register, sendSmsCode } from "@/services/auth";
+// import { useStore } from "@/.cool";
 
 const form = ref({
 	mobile: "",
@@ -160,8 +157,10 @@ async function sendCode() {
 		return;
 	}
 
+	if (countdown.value > 0) return;
+
 	try {
-		await sendSmsCode(form.value.mobile, "register");
+		// await sendSmsCode(form.value.mobile, "register");
 
 		uni.showToast({
 			title: "验证码已发送",
@@ -193,11 +192,11 @@ async function handleRegister() {
 	try {
 		loading.value = true;
 
-		const res = await register(form.value);
+		// const res = await register(form.value);
 
 		// 保存token
-		const { user } = useStore();
-		user.setToken(res.token);
+		// const { user } = useStore();
+		// user.setToken(res.token);
 
 		uni.showToast({
 			title: "注册成功",
@@ -219,10 +218,180 @@ async function handleRegister() {
 		loading.value = false;
 	}
 }
+
+function goBack() {
+	uni.navigateBack();
+}
 </script>
 
-<style scoped>
-input {
-	background: transparent;
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #ffffff;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx 48rpx;
+}
+
+.form-section {
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.input-group {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+
+.label {
+	font-size: 28rpx;
+	font-weight: 500;
+	color: #1f2329;
+}
+
+.input-wrapper {
+	height: 96rpx;
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	padding: 0 24rpx;
+}
+
+.code-wrapper {
+	padding-right: 0;
+}
+
+.input {
+	flex: 1;
+	font-size: 30rpx;
+	color: #1f2329;
+	height: 100%;
+}
+
+.input-placeholder {
+	color: #c0c4cc;
+}
+
+.code-btn {
+	height: 100%;
+	padding: 0 32rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-left: 2rpx solid #e5e6eb;
+}
+
+.code-btn.disabled {
+	opacity: 0.5;
+}
+
+.code-btn-text {
+	font-size: 28rpx;
+	color: #0052d9;
+}
+
+.eye-icon {
+	padding: 0 16rpx;
+}
+
+/* Agreement */
+.agreement {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 16rpx;
+	margin-top: 16rpx;
+}
+
+.checkbox {
+	width: 32rpx;
+	height: 32rpx;
+	border: 2rpx solid #c0c4cc;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.checkbox.active {
+	border-color: #0052d9;
+	background-color: #0052d9;
+}
+
+.checkbox-inner {
+	width: 12rpx;
+	height: 24rpx;
+	border-bottom: 4rpx solid #ffffff;
+	border-right: 4rpx solid #ffffff;
+	transform: rotate(45deg) translate(-2rpx, -2rpx);
+}
+
+.agreement-text {
+	font-size: 24rpx;
+	color: #86909c;
+}
+
+/* Buttons */
+.btn-primary {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 32rpx;
+}
+
+.btn-primary.disabled {
+	background-color: #bbd3fb;
+}
+
+.btn-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
 }
 </style>

@@ -1,0 +1,356 @@
+<template>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">我的发布</text>
+			</view>
+		</view>
+
+		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+			<view class="content-wrapper">
+				<view class="publish-list">
+					<view 
+						v-for="(item, index) in list" 
+						:key="index"
+						@click="goToDetail(item.id)"
+						class="card publish-item"
+					>
+						<view class="item-header">
+							<text class="item-no">任务编号：{{ item.taskNo }}</text>
+							<view :class="['status-tag', getStatusColor(item.status)]">
+								<text class="status-text">{{ getStatusText(item.status) }}</text>
+							</view>
+						</view>
+						
+						<view class="item-body">
+							<text class="item-title">{{ item.title }}</text>
+							<view class="item-row">
+								<text class="item-label">单价：</text>
+								<text class="item-value highlight">¥{{ item.unitPrice }}</text>
+								<text class="item-divider">|</text>
+								<text class="item-label">剩余：</text>
+								<text class="item-value">{{ item.remainCount }}/{{ item.totalCount }}</text>
+							</view>
+							<view class="item-row">
+								<text class="item-label">发布时间：</text>
+								<text class="item-value">{{ item.createTime }}</text>
+							</view>
+						</view>
+
+						<view class="item-footer">
+							<view class="btn-action outline" @click.stop="stopTask(item.id)">
+								<text class="btn-text outline">暂停</text>
+							</view>
+							<view class="btn-action primary" @click.stop="goToDetail(item.id)">
+								<text class="btn-text primary">查看详情</text>
+							</view>
+						</view>
+					</view>
+
+					<!-- Empty State -->
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无发布记录</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+// import { getMyPublishedTasks } from '@/services/task'
+
+type PublishedTask = {
+	id: number,
+	taskNo: string,
+	title: string,
+	unitPrice: string,
+	totalCount: number,
+	remainCount: number,
+	status: string,
+	createTime: string
+}
+
+const list = ref([] as PublishedTask[])
+const page = ref(1)
+const loading = ref(false)
+const hasMore = ref(true)
+
+const loadMore = () => {
+	if (loading.value || !hasMore.value) return
+	loading.value = true
+
+	// Mock data
+	setTimeout(() => {
+		const mockList : PublishedTask[] = []
+		if (page.value === 1) {
+			mockList.push({
+				id: 1,
+				taskNo: 'T202501300001',
+				title: '美团外卖订单互助',
+				unitPrice: '15.00',
+				totalCount: 100,
+				remainCount: 45,
+				status: 'ongoing',
+				createTime: '2025-01-30 10:00:00'
+			})
+			mockList.push({
+				id: 2,
+				taskNo: 'T202501290002',
+				title: '淘宝店铺刷单任务',
+				unitPrice: '20.00',
+				totalCount: 50,
+				remainCount: 0,
+				status: 'completed',
+				createTime: '2025-01-29 15:30:00'
+			})
+		}
+		
+		if (mockList.length > 0) {
+			list.value = list.value.concat(mockList)
+			page.value++
+		} else {
+			hasMore.value = false
+		}
+		loading.value = false
+	}, 500)
+}
+
+const getStatusText = (status: string): string => {
+	const map = {
+		'ongoing': '进行中',
+		'completed': '已完成',
+		'paused': '已暂停',
+		'cancelled': '已取消'
+	}
+	return map[status] || '未知'
+}
+
+const getStatusColor = (status: string): string => {
+	const map = {
+		'ongoing': 'bg-green',
+		'completed': 'bg-gray',
+		'paused': 'bg-orange',
+		'cancelled': 'bg-red'
+	}
+	return map[status] || 'bg-gray'
+}
+
+const goBack = () => {
+	uni.navigateBack()
+}
+
+const goToDetail = (id: number) => {
+	uni.navigateTo({
+		url: `/pages/task/detail?id=${id}`
+	})
+}
+
+const stopTask = (id: number) => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要暂停该任务吗？',
+		success: (res) => {
+			if (res.confirm) {
+				uni.showToast({ title: '操作成功', icon: 'success' })
+			}
+		}
+	})
+}
+
+onMounted(() => {
+	loadMore()
+})
+</script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx;
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx;
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Publish List */
+.publish-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.publish-item {
+	gap: 24rpx;
+}
+
+.item-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 24rpx;
+	border-bottom: 2rpx solid #f5f7fa;
+}
+
+.item-no {
+	font-size: 26rpx;
+	color: #999999;
+}
+
+.status-tag {
+	padding: 4rpx 16rpx;
+	border-radius: 8rpx;
+}
+
+.bg-green { background-color: #e8fff3; }
+.bg-gray { background-color: #f5f5f5; }
+.bg-orange { background-color: #fff7e6; }
+.bg-red { background-color: #fff2f0; }
+
+.status-text {
+	font-size: 24rpx;
+}
+
+.bg-green .status-text { color: #07c160; }
+.bg-gray .status-text { color: #999999; }
+.bg-orange .status-text { color: #ff9500; }
+.bg-red .status-text { color: #ff3b30; }
+
+.item-body {
+	display: flex;
+	flex-direction: column;
+	gap: 12rpx;
+}
+
+.item-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.item-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.item-label {
+	font-size: 26rpx;
+	color: #646a73;
+}
+
+.item-value {
+	font-size: 26rpx;
+	color: #1f2329;
+}
+
+.item-value.highlight {
+	color: #ff3b30;
+	font-weight: 600;
+}
+
+.item-divider {
+	font-size: 24rpx;
+	color: #e5e5e5;
+	margin: 0 16rpx;
+}
+
+.item-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	gap: 16rpx;
+	padding-top: 24rpx;
+	border-top: 2rpx solid #f5f7fa;
+}
+
+.btn-action {
+	padding: 12rpx 32rpx;
+	border-radius: 32rpx;
+	border: 2rpx solid;
+}
+
+.btn-action.outline {
+	border-color: #e5e5e5;
+	background-color: #ffffff;
+}
+
+.btn-action.primary {
+	border-color: #0052d9;
+	background-color: #0052d9;
+}
+
+.btn-text {
+	font-size: 26rpx;
+}
+
+.btn-text.outline { color: #646a73; }
+.btn-text.primary { color: #ffffff; }
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
+</style>

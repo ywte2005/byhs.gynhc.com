@@ -26,8 +26,8 @@
 								:class="[
 									categoryActive == index
 										? isDark
-											? 'bg-primary-500'
-											: 'bg-primary-50'
+											? 'bg-blue-900'
+											: 'bg-blue-50'
 										: ''
 								]"
 							>
@@ -36,7 +36,7 @@
 										className: parseClass([
 											[
 												categoryActive == index,
-												isDark ? '!text-white' : '!text-primary-500',
+												isDark ? '!text-white' : '!text-blue-600',
 												isDark ? '!text-surface-300' : '!text-surface-500'
 											]
 										])
@@ -78,7 +78,7 @@
 											:key="goods.name"
 											:span="8"
 										>
-											<view class="flex items-center flex-col justify-center">
+											<view class="flex items-center flex-col justify-center" @tap="toDetail">
 												<cl-image :src="goods.image"></cl-image>
 												<cl-text
 													:size="12"
@@ -334,3 +334,15 @@ onReady(() => {
 	init();
 });
 </script>
+
+<style>
+.bg-blue-50 {
+	background-color: #e8f3ff;
+}
+.bg-blue-900 {
+	background-color: #003399;
+}
+.text-blue-600 {
+	color: #0052d9 !important;
+}
+</style>

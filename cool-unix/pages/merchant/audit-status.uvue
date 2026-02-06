@@ -37,7 +37,7 @@
 				<view v-if="auditInfo.status === 'approved'" class="bg-white rounded-2 p-4 mb-3">
 					<view class="flex flex-col items-center py-6">
 						<text class="text-12 mb-3">✅</text>
-						<text class="text-5 font-bold text-[#07c160] mb-2">审核通过</text>
+						<text class="text-5 font-bold text-[#0052d9] mb-2">审核通过</text>
 						<text class="text-3.5 text-[#646a73]">恭喜您，入驻申请已通过审核</text>
 					</view>
 
@@ -55,7 +55,7 @@
 					<view class="mt-4">
 						<button 
 							@click="goToMerchant"
-							class="w-full bg-[#07c160] text-white rounded-full py-3"
+							class="w-full bg-[#0052d9] text-white rounded-full py-3"
 						>
 							<text class="text-4">进入商户中心</text>
 						</button>
@@ -86,7 +86,7 @@
 					<view class="mt-4">
 						<button 
 							@click="resubmit"
-							class="w-full bg-[#07c160] text-white rounded-full py-3"
+							class="w-full bg-[#0052d9] text-white rounded-full py-3"
 						>
 							<text class="text-4">重新提交</text>
 						</button>
@@ -129,10 +129,10 @@
 					
 					<view class="flex items-start mb-4">
 						<view class="flex flex-col items-center mr-3">
-							<view class="w-6 h-6 rounded-full bg-[#07c160] flex items-center justify-center">
+							<view class="w-6 h-6 rounded-full bg-[#0052d9] flex items-center justify-center">
 								<text class="text-3 text-white">✓</text>
 							</view>
-							<view class="w-0.5 h-12 bg-[#07c160]"></view>
+							<view class="w-0.5 h-12 bg-[#0052d9]"></view>
 						</view>
 						<view class="flex-1">
 							<text class="text-4 text-[#1f2329] font-bold">提交申请</text>
@@ -142,7 +142,7 @@
 
 					<view class="flex items-start mb-4">
 						<view class="flex flex-col items-center mr-3">
-							<view class="w-6 h-6 rounded-full bg-[#07c160] flex items-center justify-center">
+							<view class="w-6 h-6 rounded-full bg-[#0052d9] flex items-center justify-center">
 								<text class="text-3 text-white">⏳</text>
 							</view>
 							<view class="w-0.5 h-12 bg-[#e5e5e5]"></view>

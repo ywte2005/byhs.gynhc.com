@@ -1,166 +1,145 @@
 <template>
-	<cl-page class="bg-[#f5f7fa]">
-		<cl-topbar title="实名认证" />
-
-		<view class="px-4 pt-4 flex flex-col gap-4">
-			<!-- 认证类型 -->
-			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
-				<text class="text-3.5 font-medium text-[#1f2329]">认证类型</text>
-				<view class="flex gap-3">
-					<view
-						class="flex-1 h-11 rounded-2 flex items-center justify-center border"
-						:class="
-							form.type === 'personal'
-								? 'bg-[#eaf2ff] border-primary'
-								: 'bg-white border-[#e5e6eb]'
-						"
-						@tap="form.type = 'personal'"
-					>
-						<text
-							class="text-3.5 font-medium"
-							:class="form.type === 'personal' ? 'text-primary' : 'text-[#646a73]'"
-						>
-							个人认证
-						</text>
-					</view>
-					<view
-						class="flex-1 h-11 rounded-2 flex items-center justify-center border"
-						:class="
-							form.type === 'enterprise'
-								? 'bg-[#eaf2ff] border-primary'
-								: 'bg-white border-[#e5e6eb]'
-						"
-						@tap="form.type = 'enterprise'"
-					>
-						<text
-							class="text-3.5 font-medium"
-							:class="form.type === 'enterprise' ? 'text-primary' : 'text-[#646a73]'"
-						>
-							企业认证
-						</text>
-					</view>
-				</view>
-			</view>
-
-			<!-- 基本信息 -->
-			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
-				<text class="text-3.5 font-medium text-[#1f2329]">基本信息</text>
-
-				<!-- 姓名/法人姓名 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.25 text-[#646a73]">
-						{{ form.type === 'personal' ? '姓名' : '法人姓名' }}
-					</text>
-					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
-						<input
-							v-model="form.name"
-							placeholder="请输入姓名"
-							class="flex-1 text-3.5"
-						/>
-					</view>
-				</view>
-
-				<!-- 证件号码 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.25 text-[#646a73]">证件号码</text>
-					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
-						<input
-							v-model="form.id_card"
-							placeholder="请输入身份证号"
-							class="flex-1 text-3.5"
-						/>
-					</view>
-				</view>
-
-				<!-- 联系电话 -->
-				<view class="flex flex-col gap-2">
-					<text class="text-3.25 text-[#646a73]">联系电话</text>
-					<view class="h-11 bg-[#f5f7fa] rounded-2 px-3 flex items-center">
-						<input
-							v-model="form.contact_phone"
-							type="number"
-							placeholder="请输入联系电话"
-							class="flex-1 text-3.5"
-							maxlength="11"
-						/>
-					</view>
-				</view>
-			</view>
-
-			<!-- 证件照片 -->
-			<view class="bg-white rounded-3 p-4 flex flex-col gap-4">
-				<text class="text-3.5 font-medium text-[#1f2329]">证件照片</text>
-
-				<view class="flex gap-3">
-					<!-- 身份证正面 -->
-					<view class="flex-1">
-						<cl-upload
-							v-model="form.id_card_front"
-							:limit="1"
-							accept="image"
-						>
-							<view
-								class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
-							>
-								<cl-icon name="plus" :size="24" color="#9aa0a6" />
-								<text class="text-3 text-[#9aa0a6]">身份证正面</text>
-							</view>
-						</cl-upload>
-					</view>
-
-					<!-- 身份证反面 -->
-					<view class="flex-1">
-						<cl-upload
-							v-model="form.id_card_back"
-							:limit="1"
-							accept="image"
-						>
-							<view
-								class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
-							>
-								<cl-icon name="plus" :size="24" color="#9aa0a6" />
-								<text class="text-3 text-[#9aa0a6]">身份证反面</text>
-							</view>
-						</cl-upload>
-					</view>
-				</view>
-
-				<!-- 营业执照（企业认证） -->
-				<view v-if="form.type === 'enterprise'" class="flex-1">
-					<cl-upload
-						v-model="form.business_license"
-						:limit="1"
-						accept="image"
-					>
-						<view
-							class="h-25 bg-[#f5f7fa] rounded-2 border border-[#e5e6eb] flex flex-col items-center justify-center gap-2"
-						>
-							<cl-icon name="plus" :size="24" color="#9aa0a6" />
-							<text class="text-3 text-[#9aa0a6]">营业执照</text>
-						</view>
-					</cl-upload>
-				</view>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">实名认证</text>
 			</view>
 		</view>
 
-		<cl-footer>
-			<cl-button
-				:disabled="!canSubmit"
-				:loading="loading"
-				round
-				type="primary"
-				size="large"
-				@tap="handleSubmit"
-			>
-				提交认证
-			</cl-button>
-		</cl-footer>
-	</cl-page>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- 认证类型 -->
+				<view class="card type-card">
+					<text class="card-title">认证类型</text>
+					<view class="type-options">
+						<view
+							class="type-option"
+							:class="{ 'active': form.type === 'personal' }"
+							@tap="form.type = 'personal'"
+						>
+							<text class="type-text" :class="{ 'active': form.type === 'personal' }">个人认证</text>
+						</view>
+						<view
+							class="type-option"
+							:class="{ 'active': form.type === 'enterprise' }"
+							@tap="form.type = 'enterprise'"
+						>
+							<text class="type-text" :class="{ 'active': form.type === 'enterprise' }">企业认证</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 基本信息 -->
+				<view class="card info-card">
+					<text class="card-title">基本信息</text>
+
+					<!-- 姓名/法人姓名 -->
+					<view class="form-item">
+						<text class="form-label">
+							{{ form.type === 'personal' ? '姓名' : '法人姓名' }}
+						</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.name"
+								placeholder="请输入姓名"
+								class="input"
+								placeholder-class="input-placeholder"
+							/>
+						</view>
+					</view>
+
+					<!-- 证件号码 -->
+					<view class="form-item">
+						<text class="form-label">证件号码</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.id_card"
+								placeholder="请输入身份证号"
+								class="input"
+								placeholder-class="input-placeholder"
+							/>
+						</view>
+					</view>
+
+					<!-- 联系电话 -->
+					<view class="form-item">
+						<text class="form-label">联系电话</text>
+						<view class="input-wrapper">
+							<input
+								v-model="form.contact_phone"
+								type="number"
+								placeholder="请输入联系电话"
+								class="input"
+								placeholder-class="input-placeholder"
+								maxlength="11"
+							/>
+						</view>
+					</view>
+				</view>
+
+				<!-- 证件照片 -->
+				<view class="card photo-card">
+					<text class="card-title">证件照片</text>
+
+					<view class="photo-row">
+						<!-- 身份证正面 -->
+						<view class="photo-item">
+							<cl-upload
+								v-model="form.id_card_front"
+								:limit="1"
+								accept="image"
+							>
+								<view class="upload-box">
+									<text class="upload-icon">+</text>
+									<text class="upload-text">身份证正面</text>
+								</view>
+							</cl-upload>
+						</view>
+
+						<!-- 身份证反面 -->
+						<view class="photo-item">
+							<cl-upload
+								v-model="form.id_card_back"
+								:limit="1"
+								accept="image"
+							>
+								<view class="upload-box">
+									<text class="upload-icon">+</text>
+									<text class="upload-text">身份证反面</text>
+								</view>
+							</cl-upload>
+						</view>
+					</view>
+
+					<!-- 营业执照（企业认证） -->
+					<view v-if="form.type === 'enterprise'" class="photo-row-full">
+						<cl-upload
+							v-model="form.business_license"
+							:limit="1"
+							accept="image"
+						>
+							<view class="upload-box">
+								<text class="upload-icon">+</text>
+								<text class="upload-text">营业执照</text>
+							</view>
+						</cl-upload>
+					</view>
+				</view>
+
+				<!-- 提交按钮 -->
+				<view class="btn-submit" @tap="handleSubmit">
+					<text class="btn-submit-text">提交认证</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, computed } from "vue";
-import { submitCertification } from "@/services/auth";
+// import { submitCertification } from "@/services/auth";
 
 const form = ref({
 	type: "personal" as "personal" | "enterprise",
@@ -193,22 +172,28 @@ const canSubmit = computed(() => {
 // 提交认证
 async function handleSubmit() {
 	if (!canSubmit.value) {
+		uni.showToast({
+			title: "请填写完整信息",
+			icon: "none"
+		});
 		return;
 	}
 
 	try {
 		loading.value = true;
-
-		await submitCertification(form.value);
-
-		uni.showToast({
-			title: "提交成功，等待审核",
-			icon: "success"
-		});
-
+		// await submitCertification(form.value);
+		
+		// Mock success
 		setTimeout(() => {
-			uni.navigateBack();
-		}, 1500);
+			uni.showToast({
+				title: "提交成功，等待审核",
+				icon: "success"
+			});
+			setTimeout(() => {
+				uni.navigateBack();
+			}, 1500);
+		}, 1000);
+
 	} catch (error : any) {
 		uni.showToast({
 			title: error.message || "提交失败",
@@ -218,10 +203,194 @@ async function handleSubmit() {
 		loading.value = false;
 	}
 }
+
+function goBack() {
+	uni.navigateBack();
+}
 </script>
 
-<style scoped>
-input {
-	background: transparent;
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx; /* 16px */
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx; /* 12px */
+	padding: 32rpx; /* 16px */
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx; /* 16px */
+}
+
+.card-title {
+	font-size: 28rpx;
+	font-weight: 500;
+	color: #1f2329;
+}
+
+/* Type Options */
+.type-options {
+	display: flex;
+	flex-direction: row;
+	gap: 24rpx; /* 12px */
+}
+
+.type-option {
+	flex: 1;
+	height: 88rpx; /* 44px */
+	border-radius: 16rpx; /* 8px */
+	border: 2rpx solid #e5e6eb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #ffffff;
+}
+
+.type-option.active {
+	background-color: #eaf2ff;
+	border-color: #0052d9;
+}
+
+.type-text {
+	font-size: 28rpx;
+	color: #646a73;
+	font-weight: 500;
+}
+
+.type-text.active {
+	color: #0052d9;
+}
+
+/* Form Items */
+.form-item {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx; /* 8px */
+}
+
+.form-label {
+	font-size: 26rpx;
+	color: #646a73;
+}
+
+.input-wrapper {
+	height: 96rpx; /* 48px */
+	background-color: #f5f7fa;
+	border-radius: 16rpx; /* 8px */
+	display: flex;
+	align-items: center;
+	padding: 0 24rpx;
+}
+
+.input {
+	flex: 1;
+	font-size: 28rpx;
+	color: #1f2329;
+}
+
+.input-placeholder {
+	color: #c0c4cc;
+}
+
+/* Photos */
+.photo-row {
+	display: flex;
+	flex-direction: row;
+	gap: 24rpx;
+}
+
+.photo-item {
+	flex: 1;
+}
+
+.photo-row-full {
+	width: 100%;
+}
+
+.upload-box {
+	height: 200rpx; /* 100px */
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	border: 2rpx dashed #e5e6eb;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16rpx;
+}
+
+.upload-icon {
+	font-size: 48rpx;
+	color: #9aa0a6;
+}
+
+.upload-text {
+	font-size: 24rpx;
+	color: #9aa0a6;
+}
+
+/* Submit Button */
+.btn-submit {
+	height: 96rpx; /* 48px */
+	background-color: #0052d9;
+	border-radius: 16rpx; /* 8px */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 16rpx;
+}
+
+.btn-submit-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
 }
 </style>

@@ -10,6 +10,15 @@
 			}
 		},
 		{
+			"path": "pages/index/template",
+			"style": {
+				"navigationStyle": "custom"
+			},
+			"meta": {
+				"isAuth": true
+			}
+		},
+		{
 			"path": "pages/index/my-simple",
 			"style": {
 				"navigationStyle": "custom"
@@ -173,6 +182,15 @@
 					"meta": {
 						"isAuth": true
 					}
+				},
+				{
+					"path": "my-publish",
+					"style": {
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
 				}
 			]
 		},
@@ -210,6 +228,15 @@
 					"path": "logs",
 					"style": {
 						"navigationBarTitleText": "账单明细"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "bankcard",
+					"style": {
+						"navigationBarTitleText": "银行卡管理"
 					},
 					"meta": {
 						"isAuth": true
@@ -335,6 +362,15 @@
 						"navigationStyle": "custom",
 						"disableScroll": true
 					}
+				},
+				{
+					"path": "feedback",
+					"style": {
+						"navigationBarTitleText": "意见反馈"
+					},
+					"meta": {
+						"isAuth": true
+					}
 				}
 			]
 		},
@@ -426,6 +462,12 @@
 					"path": "task/detail",
 					"style": {
 						"navigationBarTitleText": "任务详情"
+					}
+				},
+				{
+					"path": "invite-record",
+					"style": {
+						"navigationBarTitleText": "邀请记录"
 					},
 					"meta": {
 						"isAuth": true
@@ -445,12 +487,6 @@
 		{
 			"root": "pages/template",
 			"pages": [
-				{
-					"path": "post/detail",
-					"style": {
-						"navigationStyle": "custom"
-					}
-				},
 				{
 					"path": "shop/goods-category",
 					"style": {
@@ -482,6 +518,12 @@
 					"path": "shop/address-edit",
 					"style": {
 						"navigationBarTitleText": "编辑地址"
+					}
+				},
+				{
+					"path": "post/detail",
+					"style": {
+						"navigationStyle": "custom"
 					}
 				}
 			]

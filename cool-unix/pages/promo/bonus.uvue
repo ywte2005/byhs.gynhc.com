@@ -1,30 +1,42 @@
 <template>
-	<cl-page>
-		<view class="bonus-page">
-			<view class="summary-card">
-				<view class="summary-row">
-					<view class="summary-item">
-						<text class="summary-value">{{ summary.total_bonus }}</text>
-						<text class="summary-label">累计分红</text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">分红中心</text>
+			</view>
+		</view>
+
+		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+			<view class="content-wrapper">
+				<!-- Summary Card -->
+				<view class="card summary-card">
+					<view class="summary-row">
+						<view class="summary-item">
+							<text class="summary-value">{{ summary.total_bonus }}</text>
+							<text class="summary-label">累计分红</text>
+						</view>
+						<view class="summary-divider"></view>
+						<view class="summary-item">
+							<text class="summary-value">{{ summary.month_bonus }}</text>
+							<text class="summary-label">本月分红</text>
+						</view>
 					</view>
-					<view class="summary-item">
-						<text class="summary-value">{{ summary.month_bonus }}</text>
-						<text class="summary-label">本月分红</text>
+					<view v-if="summary.qualified_rules.length > 0" class="qualified-info">
+						<text class="qualified-label">已达标档位：</text>
+						<text class="qualified-value">{{ summary.qualified_rules.join('、') }}</text>
 					</view>
 				</view>
-				<view v-if="summary.qualified_rules.length > 0" class="qualified-info">
-					<text class="qualified-label">已达标档位：</text>
-					<text class="qualified-value">{{ summary.qualified_rules.join('、') }}</text>
+
+				<!-- List Title -->
+				<view class="section-title">
+					<text class="title-text">分红记录</text>
 				</view>
-			</view>
 
-			<view class="section-title">
-				<text>分红记录</text>
-			</view>
-
-			<cl-list-view :auto="false" :data="list" @load="loadMore">
-				<template v-slot:item="{ item }">
-					<view class="bonus-item">
+				<!-- Bonus List -->
+				<view class="bonus-list">
+					<view v-for="(item, index) in list" :key="index" class="card bonus-item">
 						<view class="item-left">
 							<text class="item-title">团队分红</text>
 							<text class="item-time">{{ formatTime(item.createtime) }}</text>
@@ -34,14 +46,15 @@
 							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
 						</view>
 					</view>
-				</template>
-			</cl-list-view>
-
-			<view v-if="list.length == 0 && !loading" class="empty">
-				<text class="empty-text">暂无分红记录</text>
+					
+					<!-- Empty State -->
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无分红记录</text>
+					</view>
+				</view>
 			</view>
-		</view>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
@@ -81,6 +94,9 @@
 			this.loadMore();
 		},
 		methods: {
+			goBack() {
+				uni.navigateBack();
+			},
 			loadSummary() {
 				getBonusSummary()
 					.then((res : BonusSummary) => {
@@ -125,135 +141,203 @@
 	};
 </script>
 
-<style lang="scss">
-	.bonus-page {
-		padding: 20rpx;
-	}
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
 
-	.summary-card {
-		padding: 40rpx;
-		background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-		border-radius: 16rpx;
-		margin-bottom: 20rpx;
-	}
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
 
-	.summary-row {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-	}
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
 
-	.summary-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
 
-	.summary-value {
-		font-size: 48rpx;
-		font-weight: bold;
-		color: #ffffff;
-	}
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
 
-	.summary-label {
-		font-size: 26rpx;
-		color: rgba(255, 255, 255, 0.8);
-		margin-top: 10rpx;
-	}
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
 
-	.qualified-info {
-		display: flex;
-		flex-direction: row;
-		margin-top: 30rpx;
-		padding-top: 30rpx;
-		border-top: 1rpx solid rgba(255, 255, 255, 0.3);
-	}
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
 
-	.qualified-label {
-		font-size: 26rpx;
-		color: rgba(255, 255, 255, 0.8);
-	}
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
 
-	.qualified-value {
-		font-size: 26rpx;
-		color: #ffffff;
-	}
+/* Summary Card */
+.summary-card {
+	background-color: #0052d9;
+	color: #ffffff;
+}
 
-	.section-title {
-		padding: 20rpx 0;
-	}
+.summary-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+}
 
-	.section-title text {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.summary-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8rpx;
+}
 
-	.bonus-item {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 30rpx;
-		background-color: #ffffff;
-		border-radius: 12rpx;
-		margin-bottom: 16rpx;
-	}
+.summary-value {
+	font-size: 48rpx;
+	font-weight: 700;
+	color: #ffffff;
+}
 
-	.item-left {
-		display: flex;
-		flex-direction: column;
-	}
+.summary-label {
+	font-size: 26rpx;
+	color: rgba(255, 255, 255, 0.8);
+}
 
-	.item-title {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.summary-divider {
+	width: 2rpx;
+	height: 60rpx;
+	background-color: rgba(255, 255, 255, 0.2);
+}
 
-	.item-time {
-		font-size: 24rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+.qualified-info {
+	display: flex;
+	flex-direction: row;
+	margin-top: 32rpx;
+	padding-top: 24rpx;
+	border-top: 2rpx solid rgba(255, 255, 255, 0.2);
+}
 
-	.item-right {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-	}
+.qualified-label {
+	font-size: 26rpx;
+	color: rgba(255, 255, 255, 0.8);
+}
 
-	.item-amount {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #f5576c;
-	}
+.qualified-value {
+	font-size: 26rpx;
+	color: #ffffff;
+	font-weight: 600;
+}
 
-	.item-status {
-		font-size: 22rpx;
-		margin-top: 8rpx;
-	}
+/* Section Title */
+.section-title {
+	margin-top: 16rpx;
+	margin-bottom: 16rpx;
+}
 
-	.item-status.granted {
-		color: #52c41a;
-	}
+.title-text {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
 
-	.item-status.pending {
-		color: #faad14;
-	}
+/* Bonus List */
+.bonus-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
 
-	.item-status.failed {
-		color: #ff4d4f;
-	}
+.bonus-item {
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
 
-	.empty {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 100rpx 0;
-	}
+.item-left {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
 
-	.empty-text {
-		font-size: 28rpx;
-		color: #999999;
-	}
+.item-title {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.item-time {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.item-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8rpx;
+}
+
+.item-amount {
+	font-size: 32rpx;
+	font-weight: 700;
+	color: #ff3b30;
+}
+
+.item-status {
+	font-size: 24rpx;
+}
+
+.item-status.granted {
+	color: #00b578;
+}
+
+.item-status.pending {
+	color: #faad14;
+}
+
+.item-status.failed {
+	color: #f53f3f;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
 </style>

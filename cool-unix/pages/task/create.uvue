@@ -1,200 +1,208 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
-		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">发起任务</text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">发布任务</text>
 			</view>
 		</view>
 
-		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
-				<!-- 任务信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">任务信息</text>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- Task Info -->
+				<view class="card form-card">
+					<text class="card-title">任务信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">任务标题 <text class="text-[#ff3b30]">*</text></text>
-						<input 
-							v-model="form.title"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="请输入任务标题"
-							placeholder-class="text-[#c8c9cc]"
-						/>
+					<view class="form-item">
+						<text class="form-label">任务标题 <text class="required">*</text></text>
+						<view class="input-wrapper">
+							<input 
+								v-model="form.title"
+								class="input"
+								placeholder="请输入任务标题"
+								placeholder-class="input-placeholder"
+							/>
+						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">任务类目 <text class="text-[#ff3b30]">*</text></text>
-						<view 
-							@click="showCategoryPicker = true"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 flex items-center justify-between"
-						>
-							<text :class="['text-4', form.category ? 'text-[#1f2329]' : 'text-[#c8c9cc]']">
+					<view class="form-item">
+						<text class="form-label">任务类目 <text class="required">*</text></text>
+						<view class="input-wrapper picker-wrapper" @click="showCategoryPicker = true">
+							<text :class="['input', form.category ? '' : 'input-placeholder']">
 								{{ form.category || '请选择任务类目' }}
 							</text>
-							<text class="text-4 text-[#999]">→</text>
+							<text class="arrow-icon">></text>
 						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">平台名称 <text class="text-[#ff3b30]">*</text></text>
-						<input 
-							v-model="form.platform"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="如：美团、淘宝、京东等"
-							placeholder-class="text-[#c8c9cc]"
-						/>
-					</view>
-
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">任务描述 <text class="text-[#ff3b30]">*</text></text>
-						<textarea 
-							v-model="form.description"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="请详细描述任务要求和操作步骤"
-							placeholder-class="text-[#c8c9cc]"
-							:maxlength="500"
-							:show-confirm-bar="false"
-							style="height: 120px;"
-						/>
-						<text class="text-3 text-[#999] mt-1">{{ form.description.length }}/500</text>
-					</view>
-				</view>
-
-				<!-- 金额设置 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">金额设置</text>
-					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">单价（元）<text class="text-[#ff3b30]">*</text></text>
-						<input 
-							v-model="form.unitPrice"
-							type="digit"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="请输入单个任务的佣金"
-							placeholder-class="text-[#c8c9cc]"
-							@input="calculateTotal"
-						/>
-					</view>
-
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">任务数量 <text class="text-[#ff3b30]">*</text></text>
-						<input 
-							v-model="form.totalCount"
-							type="number"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="需要完成的任务数量"
-							placeholder-class="text-[#c8c9cc]"
-							@input="calculateTotal"
-						/>
-					</view>
-
-					<view class="bg-[#f5f5f5] rounded-2 p-3">
-						<view class="flex items-center justify-between mb-2">
-							<text class="text-3.5 text-[#999]">任务总额</text>
-							<text class="text-5 font-bold text-[#1f2329]">¥{{ totalAmount }}</text>
+					<view class="form-item">
+						<text class="form-label">平台名称 <text class="required">*</text></text>
+						<view class="input-wrapper">
+							<input 
+								v-model="form.platform"
+								class="input"
+								placeholder="如：美团、淘宝、京东等"
+								placeholder-class="input-placeholder"
+							/>
 						</view>
-						<view class="flex items-center justify-between mb-2">
-							<text class="text-3.5 text-[#999]">平台手续费（5%）</text>
-							<text class="text-4 text-[#ff9500]">¥{{ serviceFee }}</text>
-						</view>
-						<view class="flex items-center justify-between mb-2">
-							<text class="text-3.5 text-[#999]">保证金（10%）</text>
-							<text class="text-4 text-[#ff9500]">¥{{ depositAmount }}</text>
-						</view>
-						<view class="border-t border-[#e5e5e5] pt-2 mt-2">
-							<view class="flex items-center justify-between">
-								<text class="text-4 font-bold text-[#1f2329]">需支付总额</text>
-								<text class="text-6 font-bold text-[#ff3b30]">¥{{ payAmount }}</text>
-							</view>
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">任务描述 <text class="required">*</text></text>
+						<view class="textarea-wrapper">
+							<textarea 
+								v-model="form.description"
+								class="textarea"
+								placeholder="请详细描述任务要求和操作步骤"
+								placeholder-class="input-placeholder"
+								:maxlength="500"
+								:show-confirm-bar="false"
+							/>
+							<text class="char-count">{{ form.description.length }}/500</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 任务要求 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">任务要求</text>
+				<!-- Amount Settings -->
+				<view class="card form-card">
+					<text class="card-title">金额设置</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">完成时限（小时）<text class="text-[#ff3b30]">*</text></text>
-						<input 
-							v-model="form.timeLimit"
-							type="number"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="接单后需在多少小时内完成"
-							placeholder-class="text-[#c8c9cc]"
-						/>
+					<view class="form-item">
+						<text class="form-label">单价（元）<text class="required">*</text></text>
+						<view class="input-wrapper">
+							<input 
+								v-model="form.unitPrice"
+								type="digit"
+								class="input"
+								placeholder="请输入单个任务的佣金"
+								placeholder-class="input-placeholder"
+								@input="calculateTotal"
+							/>
+						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">凭证要求</text>
-						<view class="flex flex-wrap">
+					<view class="form-item">
+						<text class="form-label">任务数量 <text class="required">*</text></text>
+						<view class="input-wrapper">
+							<input 
+								v-model="form.totalCount"
+								type="number"
+								class="input"
+								placeholder="需要完成的任务数量"
+								placeholder-class="input-placeholder"
+								@input="calculateTotal"
+							/>
+						</view>
+					</view>
+
+					<view class="summary-box">
+						<view class="summary-row">
+							<text class="summary-label">任务总额</text>
+							<text class="summary-value">¥{{ totalAmount }}</text>
+						</view>
+						<view class="summary-row">
+							<text class="summary-label">平台手续费（5%）</text>
+							<text class="summary-sub-value">¥{{ serviceFee }}</text>
+						</view>
+						<view class="summary-row">
+							<text class="summary-label">保证金（10%）</text>
+							<text class="summary-sub-value">¥{{ depositAmount }}</text>
+						</view>
+						<view class="summary-divider"></view>
+						<view class="summary-row total-row">
+							<text class="total-label">需支付总额</text>
+							<text class="total-value">¥{{ payAmount }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- Requirements -->
+				<view class="card form-card">
+					<text class="card-title">任务要求</text>
+					
+					<view class="form-item">
+						<text class="form-label">完成时限（小时）<text class="required">*</text></text>
+						<view class="input-wrapper">
+							<input 
+								v-model="form.timeLimit"
+								type="number"
+								class="input"
+								placeholder="接单后需在多少小时内完成"
+								placeholder-class="input-placeholder"
+							/>
+						</view>
+					</view>
+
+					<view class="form-item">
+						<text class="form-label">凭证要求</text>
+						<view class="tags-wrapper">
 							<view 
 								v-for="(item, index) in proofTypes" 
 								:key="index"
 								@click="toggleProofType(item.value)"
-								:class="['border rounded-2 px-3 py-2 mr-2 mb-2', form.proofTypes.includes(item.value) ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+								class="tag-item"
+								:class="{ active: form.proofTypes.includes(item.value) }"
 							>
-								<text :class="['text-3.5', form.proofTypes.includes(item.value) ? 'text-[#07c160]' : 'text-[#646a73]']">
+								<text class="tag-text" :class="{ active: form.proofTypes.includes(item.value) }">
 									{{ item.label }}
 								</text>
 							</view>
 						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">特殊要求</text>
-						<textarea 
-							v-model="form.specialRequirement"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
-							placeholder="如有特殊要求请在此说明（选填）"
-							placeholder-class="text-[#c8c9cc]"
-							:maxlength="200"
-							:show-confirm-bar="false"
-							style="height: 80px;"
-						/>
+					<view class="form-item">
+						<text class="form-label">特殊要求</text>
+						<view class="textarea-wrapper small">
+							<textarea 
+								v-model="form.specialRequirement"
+								class="textarea"
+								placeholder="如有特殊要求请在此说明（选填）"
+								placeholder-class="input-placeholder"
+								:maxlength="200"
+								:show-confirm-bar="false"
+							/>
+						</view>
 					</view>
 				</view>
 
-				<!-- 温馨提示 -->
-				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
-					<text class="text-3.5 text-[#646a73] mt-2">• 发起任务需支付任务总额+手续费+保证金</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 任务完成后保证金将自动退还</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 请确保任务描述清晰，避免纠纷</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 恶意发布任务将被封号处理</text>
+				<!-- Tips -->
+				<view class="card tips-card">
+					<text class="tips-title">温馨提示</text>
+					<view class="tips-list">
+						<text class="tips-item">• 发起任务需支付任务总额+手续费+保证金</text>
+						<text class="tips-item">• 任务完成后保证金将自动退还</text>
+						<text class="tips-item">• 请确保任务描述清晰，避免纠纷</text>
+						<text class="tips-item">• 恶意发布任务将被封号处理</text>
+					</view>
 				</view>
 			</view>
 		</scroll-view>
 
-		<!-- 底部操作按钮 -->
-		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
-			<button 
-				@click="submitTask"
-				:class="['w-full rounded-full py-3', canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999]']"
-				:disabled="!canSubmit"
-			>
-				<text class="text-4">确认发布（¥{{ payAmount }}）</text>
-			</button>
+		<!-- Footer -->
+		<view class="footer">
+			<view class="btn-submit" :class="{ disabled: !canSubmit }" @tap="submitTask">
+				<text class="btn-submit-text">确认发布（¥{{ payAmount }}）</text>
+			</view>
 		</view>
 
-		<!-- 分类选择器 -->
-		<view v-if="showCategoryPicker" class="fixed inset-0 bg-black/50 flex items-end" @click="showCategoryPicker = false">
-			<view class="bg-white w-full rounded-t-3 p-4" @click.stop>
-				<text class="text-4 font-bold text-[#1f2329] mb-4">选择任务类目</text>
-				<view 
-					v-for="(item, index) in categories" 
-					:key="index"
-					@click="selectCategory(item)"
-					class="py-3 border-b border-[#e5e5e5]"
-				>
-					<text class="text-4 text-[#1f2329]">{{ item }}</text>
+		<!-- Category Picker Mock -->
+		<view v-if="showCategoryPicker" class="picker-mask" @click="showCategoryPicker = false">
+			<view class="picker-container" @click.stop>
+				<text class="picker-title">选择任务类目</text>
+				<scroll-view scroll-y class="picker-list">
+					<view 
+						v-for="(item, index) in categories" 
+						:key="index"
+						@click="selectCategory(item)"
+						class="picker-item"
+					>
+						<text class="picker-item-text">{{ item }}</text>
+					</view>
+				</scroll-view>
+				<view class="picker-cancel" @click="showCategoryPicker = false">
+					<text class="picker-cancel-text">取消</text>
 				</view>
-				<button @click="showCategoryPicker = false" class="w-full bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mt-4">
-					<text class="text-4">取消</text>
-				</button>
 			</view>
 		</view>
 	</view>
@@ -202,7 +210,7 @@
 
 <script setup lang="uts">
 import { ref, computed } from 'vue'
-import { createTask } from '@/services/task'
+// import { createTask } from '@/services/task'
 
 // 表单数据
 const form = ref({
@@ -288,28 +296,20 @@ const submitTask = async () => {
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
-		const res = await createTask(form.value)
+		// const res = await createTask(form.value)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
+		// Mock success
+		setTimeout(() => {
+			uni.hideLoading()
 			uni.showToast({
 				title: '发布成功',
 				icon: 'success'
 			})
-			
-			// 跳转到任务详情
 			setTimeout(() => {
-				uni.redirectTo({
-					url: `/pages/task/detail?id=${res.data.id}`
-				})
+				uni.navigateBack()
 			}, 1500)
-		} else {
-			uni.showToast({
-				title: res.message || '发布失败',
-				icon: 'none'
-			})
-		}
+		}, 1000)
+
 	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
@@ -324,3 +324,338 @@ const goBack = () => {
 	uni.navigateBack()
 }
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.card-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+	margin-bottom: 24rpx;
+}
+
+/* Form Items */
+.form-item {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+	margin-bottom: 24rpx;
+}
+
+.form-label {
+	font-size: 28rpx;
+	color: #646a73;
+}
+
+.required {
+	color: #ff3b30;
+	margin-left: 4rpx;
+}
+
+.input-wrapper {
+	height: 96rpx;
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	padding: 0 24rpx;
+}
+
+.picker-wrapper {
+	justify-content: space-between;
+}
+
+.input {
+	flex: 1;
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.input-placeholder {
+	color: #c0c4cc;
+}
+
+.arrow-icon {
+	font-size: 28rpx;
+	color: #999999;
+}
+
+.textarea-wrapper {
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	padding: 24rpx;
+}
+
+.textarea-wrapper.small {
+	padding: 16rpx 24rpx;
+}
+
+.textarea {
+	width: 100%;
+	height: 200rpx;
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.textarea-wrapper.small .textarea {
+	height: 120rpx;
+}
+
+.char-count {
+	font-size: 24rpx;
+	color: #999999;
+	text-align: right;
+	margin-top: 8rpx;
+}
+
+/* Summary Box */
+.summary-box {
+	background-color: #f5f7fa;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+
+.summary-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.summary-label {
+	font-size: 28rpx;
+	color: #646a73;
+}
+
+.summary-value {
+	font-size: 32rpx;
+	font-weight: 700;
+	color: #1f2329;
+}
+
+.summary-sub-value {
+	font-size: 30rpx;
+	color: #ff9500;
+}
+
+.summary-divider {
+	height: 2rpx;
+	background-color: #e5e5e5;
+	margin: 8rpx 0;
+}
+
+.total-label {
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #1f2329;
+}
+
+.total-value {
+	font-size: 40rpx;
+	font-weight: 700;
+	color: #ff3b30;
+}
+
+/* Tags */
+.tags-wrapper {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 16rpx;
+}
+
+.tag-item {
+	padding: 12rpx 24rpx;
+	border-radius: 12rpx;
+	border: 2rpx solid #e5e6eb;
+	background-color: #ffffff;
+}
+
+.tag-item.active {
+	border-color: #0052d9;
+	background-color: #f0f9ff;
+}
+
+.tag-text {
+	font-size: 26rpx;
+	color: #646a73;
+}
+
+.tag-text.active {
+	color: #0052d9;
+}
+
+/* Tips Card */
+.tips-card {
+	background-color: #fff7e6;
+	gap: 16rpx;
+}
+
+.tips-title {
+	font-size: 30rpx;
+	font-weight: 700;
+	color: #ed6a0c;
+}
+
+.tips-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.tips-item {
+	font-size: 26rpx;
+	color: #646a73;
+	line-height: 1.5;
+}
+
+/* Footer */
+.footer {
+	background-color: #ffffff;
+	padding: 24rpx 32rpx;
+	padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+	border-top: 2rpx solid #e5e5e5;
+}
+
+.btn-submit {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 24rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-submit.disabled {
+	background-color: #c0c4cc;
+}
+
+.btn-submit-text {
+	color: #ffffff;
+	font-size: 32rpx;
+	font-weight: 500;
+}
+
+/* Picker */
+.picker-mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 100;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+}
+
+.picker-container {
+	background-color: #ffffff;
+	border-top-left-radius: 24rpx;
+	border-top-right-radius: 24rpx;
+	padding: 32rpx;
+	padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+}
+
+.picker-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+	text-align: center;
+	margin-bottom: 32rpx;
+}
+
+.picker-list {
+	max-height: 500rpx;
+}
+
+.picker-item {
+	padding: 24rpx 0;
+	border-bottom: 2rpx solid #f5f7fa;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.picker-item-text {
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.picker-cancel {
+	margin-top: 32rpx;
+	background-color: #f5f5f5;
+	height: 96rpx;
+	border-radius: 24rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.picker-cancel-text {
+	font-size: 30rpx;
+	color: #646a73;
+}
+</style>

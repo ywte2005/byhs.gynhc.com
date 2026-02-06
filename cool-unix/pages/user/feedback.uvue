@@ -1,0 +1,312 @@
+<template>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">工单反馈</text>
+			</view>
+		</view>
+
+		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+			<view class="content-wrapper">
+				<!-- Feedback List -->
+				<view class="feedback-list">
+					<view v-for="(item, index) in list" :key="index" class="card feedback-item">
+						<view class="item-header">
+							<text class="item-type">{{ item.type }}</text>
+							<text class="item-status" :class="item.status">{{ getStatusText(item.status) }}</text>
+						</view>
+						<text class="item-content">{{ item.content }}</text>
+						<view class="item-footer">
+							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+							<view v-if="item.reply" class="item-reply">
+								<text class="reply-label">回复：</text>
+								<text class="reply-text">{{ item.reply }}</text>
+							</view>
+						</view>
+					</view>
+					
+					<!-- 空状态 -->
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无反馈记录</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- Submit Button Area -->
+		<view class="footer-action">
+			<view class="btn-submit" @tap="goToSubmit">
+				<text class="btn-text">提交反馈</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script lang="uts">
+	type FeedbackItem = {
+		id: number,
+		type: string,
+		content: string,
+		status: string,
+		createtime: number,
+		reply?: string
+	}
+
+	export default {
+		data() {
+			return {
+				list: [] as FeedbackItem[],
+				page: 1,
+				loading: false,
+				hasMore: true
+			};
+		},
+		onShow() {
+			this.page = 1;
+			this.list = [];
+			this.loadMore();
+		},
+		methods: {
+			goBack() {
+				uni.navigateBack();
+			},
+			loadMore() {
+				if (this.loading || !this.hasMore) return;
+				this.loading = true;
+
+				// Mock data
+				setTimeout(() => {
+					const mockList : FeedbackItem[] = [];
+					if (this.page === 1) {
+						mockList.push({ 
+							id: 1, 
+							type: '功能建议', 
+							content: '建议增加夜间模式', 
+							status: 'replied', 
+							createtime: 1678888888,
+							reply: '感谢建议，已排期开发'
+						});
+						mockList.push({ 
+							id: 2, 
+							type: '系统故障', 
+							content: '无法上传头像', 
+							status: 'pending', 
+							createtime: 1678889999 
+						});
+					}
+					
+					if (mockList.length > 0) {
+						this.list = this.list.concat(mockList);
+						this.page++;
+					} else {
+						this.hasMore = false;
+					}
+					this.loading = false;
+				}, 500);
+			},
+			getStatusText(status: string): string {
+				const map: UTSJSONObject = {
+					'pending': '待处理',
+					'processing': '处理中',
+					'replied': '已回复'
+				};
+				return (map[status] ?? status) as string;
+			},
+			formatTime(timestamp : number) : string {
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = (date.getMonth() + 1).toString().padStart(2, '0');
+				const d = date.getDate().toString().padStart(2, '0');
+				return `${y}-${m}-${d}`;
+			},
+			goToSubmit() {
+				// Navigate to submit page or show modal
+				uni.showToast({ title: '提交功能开发中', icon: 'none' });
+			}
+		}
+	};
+</script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	padding-bottom: 140rpx; /* Space for footer */
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Feedback List */
+.feedback-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.feedback-item {
+	gap: 16rpx;
+}
+
+.item-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.item-type {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.item-status {
+	font-size: 24rpx;
+}
+
+.item-status.pending {
+	color: #faad14;
+}
+
+.item-status.processing {
+	color: #0052d9;
+}
+
+.item-status.replied {
+	color: #00b578;
+}
+
+.item-content {
+	font-size: 28rpx;
+	color: #646a73;
+	line-height: 1.5;
+}
+
+.item-footer {
+	display: flex;
+	flex-direction: column;
+	gap: 12rpx;
+	margin-top: 12rpx;
+	padding-top: 12rpx;
+	border-top: 2rpx solid #f5f7fa;
+}
+
+.item-time {
+	font-size: 22rpx;
+	color: #999999;
+}
+
+.item-reply {
+	background-color: #f5f7fa;
+	padding: 16rpx;
+	border-radius: 8rpx;
+	display: flex;
+	flex-direction: row;
+}
+
+.reply-label {
+	font-size: 24rpx;
+	color: #1f2329;
+	font-weight: 600;
+}
+
+.reply-text {
+	font-size: 24rpx;
+	color: #646a73;
+	flex: 1;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
+
+/* Footer Action */
+.footer-action {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #ffffff;
+	padding: 24rpx 32rpx;
+	padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+	border-top: 2rpx solid #e5e5e5;
+}
+
+.btn-submit {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 16rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-text {
+	color: #ffffff;
+	font-size: 32rpx;
+	font-weight: 500;
+}
+</style>

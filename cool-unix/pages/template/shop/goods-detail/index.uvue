@@ -59,7 +59,7 @@
 		</view>
 
 		<cl-footer>
-			<view class="flex flex-row overflow-visible">
+			<view class="flex flex-row overflow-visible items-center">
 				<view class="flex flex-row mr-auto overflow-visible">
 					<view class="flex justify-center items-center px-4">
 						<cl-icon name="heart-line" :size="20"></cl-icon>
@@ -82,10 +82,14 @@
 					</view>
 				</view>
 
-				<cl-button size="large" text border :pt="{ className: '!w-[120px]' }"
-					>加入购物车</cl-button
-				>
-				<cl-button size="large" :pt="{ className: '!w-[120px]' }">立即购买</cl-button>
+				<view class="flex flex-row gap-2">
+					<view class="btn-cart" @tap="addToCart">
+						<text class="btn-text highlight">加入购物车</text>
+					</view>
+					<view class="btn-buy" @tap="buyNow">
+						<text class="btn-text">立即购买</text>
+					</view>
+				</view>
 			</view>
 		</cl-footer>
 	</cl-page>
@@ -105,6 +109,14 @@ const bannerList = ref<string[]>([
 	"https://unix.cool-js.com/images/demo/goods/banner-3.jpg",
 	"https://unix.cool-js.com/images/demo/goods/banner-4.jpg"
 ]);
+
+function addToCart() {
+	uni.showToast({ title: '已加入购物车', icon: 'success' });
+}
+
+function buyNow() {
+	uni.showToast({ title: '购买功能开发中', icon: 'none' });
+}
 </script>
 
 <style lang="scss" scoped>
@@ -114,5 +126,35 @@ const bannerList = ref<string[]>([
 	.row {
 		@apply flex flex-row items-center py-4;
 	}
+}
+
+.btn-cart {
+	height: 80rpx;
+	padding: 0 40rpx;
+	border-radius: 40rpx;
+	background-color: #e8f3ff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-buy {
+	height: 80rpx;
+	padding: 0 40rpx;
+	border-radius: 40rpx;
+	background-color: #0052d9;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-text {
+	font-size: 28rpx;
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.btn-text.highlight {
+	color: #0052d9;
 }
 </style>

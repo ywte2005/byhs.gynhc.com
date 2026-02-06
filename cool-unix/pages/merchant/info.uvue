@@ -7,7 +7,7 @@
 				<text class="text-4 ml-2">商户信息</text>
 			</view>
 			<view @click="toggleEdit">
-				<text class="text-4 text-[#07c160]">{{ isEditing ? '保存' : '编辑' }}</text>
+				<text class="text-4 text-[#0052d9]">{{ isEditing ? '保存' : '编辑' }}</text>
 			</view>
 		</view>
 
@@ -24,7 +24,7 @@
 							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
 							<text class="text-3.5 text-[#999] mt-1">商户编号：{{ merchantInfo.merchantNo }}</text>
 							<view class="flex items-center mt-2">
-								<view class="bg-[#07c160] rounded px-2 py-0.5 mr-2">
+								<view class="bg-[#0052d9] rounded px-2 py-0.5 mr-2">
 									<text class="text-3 text-white">{{ merchantInfo.level }}</text>
 								</view>
 								<view class="bg-[#ff9500] rounded px-2 py-0.5">
@@ -133,7 +133,7 @@
 					<view class="mb-4">
 						<text class="text-3.5 text-[#999] mb-2">实名认证</text>
 						<view class="flex items-center">
-							<text class="text-4 text-[#07c160] mr-2">✓ 已认证</text>
+							<text class="text-4 text-[#0052d9] mr-2">✓ 已认证</text>
 							<text class="text-3.5 text-[#999]">{{ merchantInfo.realName }}</text>
 						</view>
 					</view>
@@ -199,7 +199,7 @@
 
 					<view class="flex items-center justify-between">
 						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#07c160]">¥{{ merchantInfo.totalIncome }}</text>
+							<text class="text-5 font-bold text-[#0052d9]">¥{{ merchantInfo.totalIncome }}</text>
 							<text class="text-3.5 text-[#999] mt-1">累计收入</text>
 						</view>
 						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>

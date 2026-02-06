@@ -39,6 +39,33 @@ export class User {
 	}
 
 	/**
+	 * 登录
+	 * @param form 登录表单
+	 */
+	async login(form: any) {
+		const res: any = await request({
+			url: "/user/login",
+			method: "POST",
+			data: {
+				mobile: form.phone,
+				password: form.password,
+				type: "password"
+			}
+		});
+
+		if (res) {
+			this.setToken({
+				token: res.token,
+				expire: res.expire || 86400,
+				refreshToken: res.refreshToken || res.token,
+				refreshExpire: res.refreshExpire || 604800
+			});
+
+			await this.get();
+		}
+	}
+
+	/**
 	 * 获取用户信息（从服务端拉取最新信息并更新本地）
 	 * @returns Promise<void>
 	 */

@@ -1,7 +1,7 @@
 import { isDev, ignoreTokens, config } from "@/config";
 import { locale, t } from "../locale";
 import { isNull, isObject, parse, storage } from "../utils";
-import { useStore } from "../store";
+import { user } from "../store/user";
 
 // 请求参数类型定义
 export type RequestOptions = {
@@ -44,8 +44,6 @@ const isIgnoreToken = (url: string) => {
  */
 export function request(options: RequestOptions): Promise<any | null> {
 	let { url, method = "GET", data = {}, header = {}, timeout = 60000 } = options;
-
-	const { user } = useStore();
 
 	// 开发环境下打印请求信息
 	if (isDev) {

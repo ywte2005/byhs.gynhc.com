@@ -1,0 +1,254 @@
+<template>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">收款账户</text>
+			</view>
+			<view class="header-right" @click="addCard">
+				<text class="add-icon">+</text>
+			</view>
+		</view>
+
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<view class="card-list">
+					<view v-for="(item, index) in list" :key="index" class="card bank-item">
+						<view class="bank-icon-wrapper">
+							<text class="bank-icon">🏦</text>
+						</view>
+						<view class="bank-info">
+							<text class="bank-name">{{ item.bankName }}</text>
+							<text class="bank-type">储蓄卡</text>
+							<text class="bank-no">{{ formatCardNo(item.cardNo) }}</text>
+						</view>
+						<view class="bank-action" @click.stop="deleteCard(item.id)">
+							<text class="delete-icon">🗑️</text>
+						</view>
+					</view>
+					
+					<!-- Empty State -->
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无收款账户</text>
+						<view class="btn-add" @click="addCard">
+							<text class="btn-add-text">添加银行卡</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue'
+// import { getBankCards, deleteBankCard } from '@/services/wallet'
+
+type BankCard = {
+	id: number,
+	bankName: string,
+	cardNo: string
+}
+
+const list = ref([] as BankCard[])
+const loading = ref(false)
+
+const loadData = () => {
+	loading.value = true
+	// Mock data
+	setTimeout(() => {
+		list.value = [
+			{ id: 1, bankName: '中国工商银行', cardNo: '6222021001111888888' },
+			{ id: 2, bankName: '中国建设银行', cardNo: '6217001230006666666' }
+		]
+		loading.value = false
+	}, 500)
+}
+
+const formatCardNo = (no: string): string => {
+	return `**** **** **** ${no.slice(-4)}`
+}
+
+const goBack = () => {
+	uni.navigateBack()
+}
+
+const addCard = () => {
+	uni.showToast({ title: '添加功能开发中', icon: 'none' })
+}
+
+const deleteCard = (id: number) => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要解绑该银行卡吗？',
+		success: (res) => {
+			if (res.confirm) {
+				// Mock delete
+				list.value = list.value.filter(item => item.id !== id)
+				uni.showToast({ title: '解绑成功', icon: 'success' })
+			}
+		}
+	})
+}
+
+onMounted(() => {
+	loadData()
+})
+</script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx;
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: space-between;
+	position: relative;
+}
+
+.header-left {
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx;
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+.header-right {
+	display: flex;
+	align-items: center;
+}
+
+.add-icon {
+	font-size: 48rpx;
+	color: #0052d9;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Card List */
+.card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.bank-item {
+	flex-direction: row;
+	align-items: center;
+	gap: 24rpx;
+}
+
+.bank-icon-wrapper {
+	width: 88rpx;
+	height: 88rpx;
+	background-color: #f5f5f5;
+	border-radius: 44rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.bank-icon {
+	font-size: 40rpx;
+}
+
+.bank-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.bank-name {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.bank-type {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.bank-no {
+	font-size: 32rpx;
+	color: #1f2329;
+	font-family: monospace;
+	margin-top: 8rpx;
+}
+
+.bank-action {
+	padding: 16rpx;
+}
+
+.delete-icon {
+	font-size: 32rpx;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+	gap: 32rpx;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
+
+.btn-add {
+	padding: 20rpx 48rpx;
+	background-color: #0052d9;
+	border-radius: 40rpx;
+}
+
+.btn-add-text {
+	color: #ffffff;
+	font-size: 28rpx;
+	font-weight: 500;
+}
+</style>

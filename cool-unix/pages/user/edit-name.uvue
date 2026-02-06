@@ -1,49 +1,56 @@
 <template>
-	<cl-page>
-		<cl-topbar safe-area-top :title="t('编辑昵称')" background-color="transparent"> </cl-topbar>
-
-		<view class="p-3">
-			<cl-input
-				v-model="content"
-				autofocus
-				:placeholder="t('请输入昵称')"
-				:border="false"
-				:pt="{
-					className: '!h-[40px]'
-				}"
-			>
-				<template #append>
-					<cl-text color="info" :size="12" :pt="{ className: 'ml-2' }"
-						>{{ content.length }} / 20</cl-text
-					>
-				</template>
-			</cl-input>
-
-			<view class="p-3">
-				<cl-text color="info" :size="12">{{
-					t("请设置2-20个字符，不包括@<>/等无效字符")
-				}}</cl-text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">编辑昵称</text>
 			</view>
 		</view>
 
-		<cl-footer>
-			<cl-button size="large" :disabled="content == ''" @tap="confirm">{{
-				t("确认")
-			}}</cl-button>
-		</cl-footer>
-	</cl-page>
+		<view class="content">
+			<view class="card input-card">
+				<input
+					v-model="content"
+					class="input"
+					:placeholder="t('请输入昵称')"
+					:maxlength="20"
+					:focus="true"
+				/>
+				<text class="count">{{ content.length }} / 20</text>
+			</view>
+
+			<view class="tip-box">
+				<text class="tip-text">{{ t("请设置2-20个字符，不包括@<>/等无效字符") }}</text>
+			</view>
+
+			<view class="btn-box">
+				<button 
+					@click="confirm"
+					:class="['btn-confirm', content == '' ? 'disabled' : '']"
+					:disabled="content == ''"
+				>
+					<text class="btn-text">{{ t("确认") }}</text>
+				</button>
+			</view>
+		</view>
+	</view>
 </template>
 
 <script setup lang="ts">
 import { router, userInfo, useStore, t } from "@/.cool";
 import { useUi } from "@/uni_modules/cool-ui";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const ui = useUi();
 const { user } = useStore();
 
 // 输入框内容
 const content = ref("");
+
+function goBack() {
+	uni.navigateBack();
+}
 
 // 确认按钮点击事件
 async function confirm() {
@@ -73,7 +80,112 @@ async function confirm() {
 }
 
 // 页面加载时，设置输入框内容
-onReady(() => {
+onMounted(() => {
 	content.value = userInfo.value?.nickName ?? "";
 });
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx;
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx;
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+}
+
+.input-card {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.input {
+	flex: 1;
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.count {
+	font-size: 24rpx;
+	color: #999999;
+	margin-left: 16rpx;
+}
+
+.tip-box {
+	padding: 0 16rpx;
+}
+
+.tip-text {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.btn-box {
+	margin-top: 48rpx;
+}
+
+.btn-confirm {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 48rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-confirm.disabled {
+	background-color: #bbd3fb;
+}
+
+.btn-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
+}
+</style>

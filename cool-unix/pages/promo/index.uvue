@@ -1,100 +1,126 @@
 <template>
-	<cl-page>
-		<view class="promo-index">
-			<view class="header">
-				<view class="level-card">
-					<view class="level-info">
-						<text class="level-label">当前等级</text>
-						<text class="level-name">{{ overview != null && overview.level != null ? overview.level.name : '普通会员' }}</text>
-					</view>
-					<cl-button type="primary" size="small" @tap="goToLevel">
-						<text>升级权益</text>
-					</cl-button>
-				</view>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="promo-header">
+			<view class="header-nav">
+				<text class="nav-title">推广中心</text>
 			</view>
-
-			<view class="wallet-card">
-				<view class="wallet-item">
-					<text class="wallet-value">{{ overview != null ? overview.wallet.balance : '0.00' }}</text>
-					<text class="wallet-label">可用余额</text>
-				</view>
-				<view class="wallet-item">
-					<text class="wallet-value">{{ overview != null ? overview.wallet.total_income : '0.00' }}</text>
-					<text class="wallet-label">累计收入</text>
-				</view>
-				<view class="wallet-item">
-					<text class="wallet-value">{{ overview != null ? overview.wallet.deposit : '0.00' }}</text>
-					<text class="wallet-label">保证金</text>
-				</view>
-			</view>
-
-			<view class="menu-grid">
-				<view class="menu-item" @tap="goTo('/pages/promo/commission')">
-					<cl-icon name="money" :size="48"></cl-icon>
-					<text class="menu-text">佣金记录</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/bonus')">
-					<cl-icon name="gift" :size="48"></cl-icon>
-					<text class="menu-text">分红中心</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/performance')">
-					<cl-icon name="chart" :size="48"></cl-icon>
-					<text class="menu-text">业绩统计</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/team')">
-					<cl-icon name="team" :size="48"></cl-icon>
-					<text class="menu-text">我的团队</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/invite')">
-					<cl-icon name="share" :size="48"></cl-icon>
-					<text class="menu-text">邀请好友</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/task/list')">
-					<cl-icon name="task" :size="48"></cl-icon>
-					<text class="menu-text">互助任务</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/wallet')">
-					<cl-icon name="wallet" :size="48"></cl-icon>
-					<text class="menu-text">我的钱包</text>
-				</view>
-				<view class="menu-item" @tap="goTo('/pages/promo/level')">
-					<cl-icon name="crown" :size="48"></cl-icon>
-					<text class="menu-text">等级权益</text>
-				</view>
-			</view>
-
-			<view class="performance-card">
-				<view class="card-header">
-					<text class="card-title">本月业绩</text>
-				</view>
-				<view class="performance-row">
-					<view class="performance-item">
-						<text class="performance-value">{{ overview != null ? overview.performance.personal_total : '0.00' }}</text>
-						<text class="performance-label">个人业绩</text>
+			
+			<view class="header-card">
+				<!-- Stats -->
+				<view class="stats-row">
+					<view class="stat-item">
+						<text class="stat-num">{{ overview?.wallet?.balance || '0.00' }}</text>
+						<text class="stat-desc">可提现(元)</text>
 					</view>
-					<view class="performance-item">
-						<text class="performance-value">{{ overview != null ? overview.performance.team_total : '0.00' }}</text>
-						<text class="performance-label">团队业绩</text>
+					<view class="stat-item">
+						<text class="stat-num">{{ overview?.wallet?.total_income || '0.00' }}</text>
+						<text class="stat-desc">累计收益(元)</text>
 					</view>
-					<view class="performance-item">
-						<text class="performance-value">{{ overview != null ? overview.performance.growth : '0.00' }}</text>
-						<text class="performance-label">业绩增量</text>
+					<view class="stat-item">
+						<text class="stat-num">{{ overview?.team_count || 0 }}</text>
+						<text class="stat-desc">团队人数</text>
+					</view>
+				</view>
+
+				<!-- Quick Actions -->
+				<view class="quick-row">
+					<view class="quick-item" @tap="goTo('/pages/wallet/withdraw')">
+						<view class="quick-icon-box">
+							<text class="quick-icon">💳</text>
+						</view>
+						<text class="quick-text">立即提现</text>
+					</view>
+					<view class="quick-item" @tap="goTo('/pages/promo/invite')">
+						<view class="quick-icon-box">
+							<text class="quick-icon">👥</text>
+						</view>
+						<text class="quick-text">邀请好友</text>
+					</view>
+					<view class="quick-item" @tap="goTo('/pages/promo/commission')">
+						<view class="quick-icon-box">
+							<text class="quick-icon">💰</text>
+						</view>
+						<text class="quick-text">佣金明细</text>
+					</view>
+					<view class="quick-item" @tap="goTo('/pages/promo/team')">
+						<view class="quick-icon-box">
+							<text class="quick-icon">📊</text>
+						</view>
+						<text class="quick-text">团队管理</text>
 					</view>
 				</view>
 			</view>
 		</view>
-	</cl-page>
+
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- Level Card -->
+				<view class="card level-card" @tap="goToLevel">
+					<view class="level-left">
+						<text class="level-crown">👑</text>
+						<view class="level-info">
+							<text class="level-title">当前等级：{{ overview?.level?.name || '普通会员' }}</text>
+							<text class="level-desc">升级享受更高权益</text>
+						</view>
+					</view>
+					<view class="level-btn">
+						<text class="level-btn-text">去升级</text>
+					</view>
+				</view>
+
+				<!-- Menu Grid (Optional, if design has extra menus, otherwise stick to design) -->
+				<!-- The design mainly highlights the top card and recent list. We can keep other menus if needed or hide them. -->
+				
+				<!-- Recent List -->
+				<view class="section-title">最近动态</view>
+				<view class="recent-list">
+					<view v-for="(item, index) in recentList" :key="index" class="card recent-item">
+						<view class="recent-icon-box">
+							<text class="recent-icon">🔔</text>
+						</view>
+						<view class="recent-info">
+							<text class="recent-text">{{ item.content }}</text>
+							<text class="recent-time">{{ item.time }}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
-	import { getOverview } from "@/services/promo";
-	import type { PromoOverview } from "@/services/promo";
+	// import { getOverview } from "@/services/promo";
+	// import type { PromoOverview } from "@/services/promo";
+
+	type PromoOverview = {
+		wallet: {
+			balance: string,
+			total_income: string,
+			deposit: string
+		},
+		level: {
+			name: string
+		},
+		team_count: number,
+		performance: {
+			personal_total: string,
+			team_total: string,
+			growth: string
+		}
+	}
 
 	export default {
 		data() {
 			return {
 				overview: null as PromoOverview | null,
-				loading: false
+				loading: false,
+				recentList: [
+					{ content: '用户***加入团队', time: '10分钟前' },
+					{ content: '获得直推奖励 10.00元', time: '30分钟前' },
+					{ content: '团队成员完成任务', time: '1小时前' }
+				]
 			};
 		},
 		onShow() {
@@ -103,14 +129,26 @@
 		methods: {
 			loadData() {
 				this.loading = true;
-				getOverview()
-					.then((res : PromoOverview) => {
-						this.overview = res;
-						this.loading = false;
-					})
-					.catch(() => {
-						this.loading = false;
-					});
+				// Mock data
+				setTimeout(() => {
+					this.overview = {
+						wallet: {
+							balance: '12580.00',
+							total_income: '56800.00',
+							deposit: '5000.00'
+						},
+						level: {
+							name: 'VIP会员'
+						},
+						team_count: 156,
+						performance: {
+							personal_total: '5000.00',
+							team_total: '120000.00',
+							growth: '15%'
+						}
+					};
+					this.loading = false;
+				}, 500);
 			},
 			goTo(path : string) {
 				uni.navigateTo({ url: path });
@@ -122,131 +160,214 @@
 	};
 </script>
 
-<style lang="scss">
-	.promo-index {
-		padding: 20rpx;
-	}
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
 
-	.header {
-		margin-bottom: 20rpx;
-	}
+/* Header */
+.promo-header {
+	background-color: #0052d9;
+	padding-bottom: 48rpx;
+}
 
-	.level-card {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		padding: 30rpx;
-		background-color: #667eea;
-		border-radius: 16rpx;
-	}
+.header-nav {
+	height: 88rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	/* Status bar spacing would be handled by a safe-area view usually */
+	padding-top: 20rpx; 
+}
 
-	.level-info {
-		display: flex;
-		flex-direction: column;
-	}
+.nav-title {
+	font-size: 34rpx;
+	color: #ffffff;
+	font-weight: 600;
+}
 
-	.level-label {
-		font-size: 24rpx;
-		color: rgba(255, 255, 255, 0.8);
-	}
+.header-card {
+	margin-top: 32rpx;
+	padding: 0 32rpx;
+}
 
-	.level-name {
-		font-size: 36rpx;
-		font-weight: bold;
-		color: #ffffff;
-		margin-top: 8rpx;
-	}
+.stats-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 48rpx;
+}
 
-	.wallet-card {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		padding: 30rpx;
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		margin-bottom: 20rpx;
-	}
+.stat-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 
-	.wallet-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
+.stat-num {
+	font-size: 40rpx;
+	color: #ffffff;
+	font-weight: 700;
+}
 
-	.wallet-value {
-		font-size: 36rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.stat-desc {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.8);
+	margin-top: 8rpx;
+}
 
-	.wallet-label {
-		font-size: 24rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+.quick-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
 
-	.menu-grid {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 20rpx;
-		margin-bottom: 20rpx;
-	}
+.quick-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 
-	.menu-item {
-		width: 25%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 20rpx 0;
-	}
+.quick-icon-box {
+	width: 88rpx;
+	height: 88rpx;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 44rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 16rpx;
+}
 
-	.menu-text {
-		font-size: 24rpx;
-		color: #333333;
-		margin-top: 12rpx;
-	}
+.quick-icon {
+	font-size: 44rpx;
+}
 
-	.performance-card {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-	}
+.quick-text {
+	font-size: 24rpx;
+	color: #ffffff;
+}
 
-	.card-header {
-		margin-bottom: 20rpx;
-	}
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
 
-	.card-title {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
 
-	.performance-row {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-	}
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+}
 
-	.performance-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
+/* Level Card */
+.level-card {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	background: linear-gradient(90deg, #fff0cd 0%, #ffdb8e 100%);
+}
 
-	.performance-value {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #667eea;
-	}
+.level-left {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 24rpx;
+}
 
-	.performance-label {
-		font-size: 24rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+.level-crown {
+	font-size: 64rpx;
+}
+
+.level-info {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.level-title {
+	font-size: 32rpx;
+	color: #593e0e;
+	font-weight: 700;
+}
+
+.level-desc {
+	font-size: 24rpx;
+	color: rgba(89, 62, 14, 0.7);
+}
+
+.level-btn {
+	background-color: #593e0e;
+	padding: 12rpx 24rpx;
+	border-radius: 32rpx;
+}
+
+.level-btn-text {
+	color: #ffdb8e;
+	font-size: 24rpx;
+	font-weight: 500;
+}
+
+/* Recent List */
+.section-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+	margin-top: 16rpx;
+}
+
+.recent-list {
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+
+.recent-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 24rpx;
+	padding: 24rpx;
+}
+
+.recent-icon-box {
+	width: 80rpx;
+	height: 80rpx;
+	background-color: #f5f7fa;
+	border-radius: 40rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.recent-icon {
+	font-size: 40rpx;
+}
+
+.recent-info {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.recent-text {
+	font-size: 28rpx;
+	color: #1f2329;
+}
+
+.recent-time {
+	font-size: 24rpx;
+	color: #999999;
+}
 </style>

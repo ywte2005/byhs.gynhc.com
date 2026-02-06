@@ -4,36 +4,30 @@
 		<view class="header">
 			<view class="header-left" @click="goBack">
 				<text class="back-icon">←</text>
-				<text class="header-title">团队成员</text>
+				<text class="header-title">邀请记录</text>
 			</view>
 		</view>
 
 		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
 			<view class="content-wrapper">
-				<!-- 统计卡片 -->
-				<view class="card stat-card">
-					<view class="stat-item">
-						<text class="stat-value">{{ total }}</text>
-						<text class="stat-label">直推人数</text>
-					</view>
-				</view>
-
-				<!-- 成员列表 -->
-				<view class="member-list">
-					<view v-for="(item, index) in list" :key="index" class="card member-item">
+				<view class="record-list">
+					<view v-for="(item, index) in list" :key="index" class="card record-item">
 						<view class="item-avatar-wrapper">
 							<image class="item-avatar" :src="item.avatar || '/static/logo.png'" mode="aspectFill" />
 						</view>
 						<view class="item-info">
-							<text class="item-name">{{ item.nickname || '未命名' }}</text>
-							<text class="item-code">邀请码：{{ item.invite_code }}</text>
-							<text class="item-time">加入时间：{{ formatTime(item.createtime) }}</text>
+							<text class="item-name">{{ item.nickname || '匿名用户' }}</text>
+							<text class="item-phone">{{ item.phone }}</text>
+						</view>
+						<view class="item-right">
+							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+							<text class="item-status">已邀请</text>
 						</view>
 					</view>
 					
 					<!-- 空状态 -->
 					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无团队成员</text>
+						<text class="empty-text">暂无邀请记录</text>
 					</view>
 				</view>
 			</view>
@@ -42,22 +36,20 @@
 </template>
 
 <script lang="uts">
-	// import { getMyTeam } from "@/services/promo";
-	// import type { TeamMember } from "@/services/promo";
+	// import { getInviteRecords } from "@/services/promo";
 
-	type TeamMember = {
+	type InviteRecord = {
 		id: number,
 		nickname: string,
 		avatar: string,
-		invite_code: string,
+		phone: string,
 		createtime: number
 	}
 
 	export default {
 		data() {
 			return {
-				list: [] as TeamMember[],
-				total: 0,
+				list: [] as InviteRecord[],
 				page: 1,
 				loading: false,
 				hasMore: true
@@ -78,11 +70,10 @@
 
 				// Mock data
 				setTimeout(() => {
-					const mockList : TeamMember[] = [];
+					const mockList : InviteRecord[] = [];
 					if (this.page === 1) {
-						mockList.push({ id: 1, nickname: '用户A', avatar: '', invite_code: '888001', createtime: 1678888888 });
-						mockList.push({ id: 2, nickname: '用户B', avatar: '', invite_code: '888002', createtime: 1678889999 });
-						this.total = 12;
+						mockList.push({ id: 1, nickname: '张三', avatar: '', phone: '138****8888', createtime: 1678888888 });
+						mockList.push({ id: 2, nickname: '李四', avatar: '', phone: '139****9999', createtime: 1678889999 });
 					}
 					
 					if (mockList.length > 0) {
@@ -93,23 +84,6 @@
 					}
 					this.loading = false;
 				}, 500);
-
-				/*
-				getMyTeam(this.page, 20)
-					.then((res : { list : TeamMember[], total : number }) => {
-						this.total = res.total;
-						if (res.list.length > 0) {
-							this.list = this.list.concat(res.list);
-							this.page++;
-						} else {
-							this.hasMore = false;
-						}
-						this.loading = false;
-					})
-					.catch(() => {
-						this.loading = false;
-					});
-				*/
 			},
 			formatTime(timestamp : number) : string {
 				const date = new Date(timestamp * 1000);
@@ -171,59 +145,35 @@
 	padding: 32rpx;
 	display: flex;
 	flex-direction: column;
-	gap: 32rpx; /* 16px */
+	gap: 32rpx;
 }
 
 .card {
 	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
+	border-radius: 24rpx;
+	padding: 32rpx;
 	display: flex;
 	flex-direction: column;
 }
 
-/* Stat Card */
-.stat-card {
-	align-items: center;
-	justify-content: center;
-	padding: 48rpx 32rpx;
-}
-
-.stat-item {
+/* Record List */
+.record-list {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.stat-value {
-	font-size: 64rpx;
-	font-weight: 700;
-	color: #0052d9;
-}
-
-.stat-label {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-/* Member List */
-.member-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx; /* 12px */
-}
-
-.member-item {
-	flex-direction: row;
-	align-items: center;
 	gap: 24rpx;
 }
 
+.record-item {
+	flex-direction: row;
+	align-items: center;
+	gap: 24rpx;
+	padding: 24rpx;
+}
+
 .item-avatar-wrapper {
-	width: 96rpx;
-	height: 96rpx;
-	border-radius: 48rpx;
+	width: 80rpx;
+	height: 80rpx;
+	border-radius: 40rpx;
 	background-color: #f5f5f5;
 	overflow: hidden;
 }
@@ -246,14 +196,26 @@
 	color: #1f2329;
 }
 
-.item-code {
+.item-phone {
 	font-size: 24rpx;
 	color: #646a73;
 }
 
+.item-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8rpx;
+}
+
 .item-time {
-	font-size: 24rpx;
+	font-size: 22rpx;
 	color: #999999;
+}
+
+.item-status {
+	font-size: 24rpx;
+	color: #0052d9;
 }
 
 /* Empty State */

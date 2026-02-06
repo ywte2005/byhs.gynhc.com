@@ -1,41 +1,53 @@
 <template>
 	<cl-page>
-		<view class="wallet-page">
-			<view class="balance-card">
-				<text class="balance-label">可用余额</text>
-				<text class="balance-value">{{ balance }}</text>
-				<view class="balance-actions">
-					<cl-button type="primary" size="small">
-						<text>提现</text>
-					</cl-button>
+		<view class="page-container">
+			<!-- Header -->
+			<view class="header">
+				<view class="header-left" @click="goBack">
+					<text class="back-icon">←</text>
+					<text class="header-title">我的钱包</text>
 				</view>
 			</view>
 
-			<view class="section-title">
-				<text>资金明细</text>
-			</view>
-
-			<cl-list-view :auto="false" :data="list" @load="loadMore">
-				<template v-slot:item="{ item }">
-					<view class="wallet-item">
-						<view class="item-left">
-							<text class="item-type">{{ getBizTypeName(item.biz_type) }}</text>
-							<text class="item-remark">{{ item.remark }}</text>
-							<text class="item-time">{{ formatTime(item.createtime) }}</text>
-						</view>
-						<view class="item-right">
-							<text class="item-amount" :class="parseFloat(item.amount) >= 0 ? 'positive' : 'negative'">
-								{{ parseFloat(item.amount) >= 0 ? '+' : '' }}{{ item.amount }}
-							</text>
-							<text class="item-after">余额：{{ item.after }}</text>
+			<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+				<view class="content-wrapper">
+					<!-- Balance Card -->
+					<view class="card balance-card">
+						<text class="balance-label">可用余额</text>
+						<text class="balance-value">{{ balance }}</text>
+						<view class="balance-actions">
+							<view class="action-btn" @tap="withdraw">
+								<text class="action-text">提现</text>
+							</view>
 						</view>
 					</view>
-				</template>
-			</cl-list-view>
 
-			<view v-if="list.length == 0 && !loading" class="empty">
-				<text class="empty-text">暂无资金记录</text>
-			</view>
+					<view class="section-title">
+						<text class="title-text">资金明细</text>
+					</view>
+
+					<view class="wallet-list">
+						<view v-for="(item, index) in list" :key="index" class="card wallet-item">
+							<view class="item-left">
+								<text class="item-type">{{ getBizTypeName(item.biz_type) }}</text>
+								<text class="item-remark">{{ item.remark }}</text>
+								<text class="item-time">{{ formatTime(item.createtime) }}</text>
+							</view>
+							<view class="item-right">
+								<text class="item-amount" :class="parseFloat(item.amount) >= 0 ? 'positive' : 'negative'">
+									{{ parseFloat(item.amount) >= 0 ? '+' : '' }}{{ item.amount }}
+								</text>
+								<text class="item-after">余额：{{ item.after }}</text>
+							</view>
+						</view>
+						
+						<!-- Empty State -->
+						<view v-if="list.length == 0 && !loading" class="empty-state">
+							<text class="empty-text">暂无资金记录</text>
+						</view>
+					</view>
+				</view>
+			</scroll-view>
 		</view>
 	</cl-page>
 </template>
@@ -61,6 +73,9 @@
 			this.loadMore();
 		},
 		methods: {
+			goBack() {
+				uni.navigateBack();
+			},
 			loadBalance() {
 				getOverview()
 					.then((res : PromoOverview) => {
@@ -85,6 +100,9 @@
 					.catch(() => {
 						this.loading = false;
 					});
+			},
+			withdraw() {
+				uni.navigateTo({ url: '/pages/wallet/withdraw' });
 			},
 			getBizTypeName(type : string) : string {
 				const map : UTSJSONObject = {
@@ -112,115 +130,186 @@
 	};
 </script>
 
-<style lang="scss">
-	.wallet-page {
-		padding: 20rpx;
-	}
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
 
-	.balance-card {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 60rpx 40rpx;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		border-radius: 16rpx;
-		margin-bottom: 20rpx;
-	}
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
 
-	.balance-label {
-		font-size: 28rpx;
-		color: rgba(255, 255, 255, 0.8);
-	}
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
 
-	.balance-value {
-		font-size: 64rpx;
-		font-weight: bold;
-		color: #ffffff;
-		margin: 20rpx 0;
-	}
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
 
-	.balance-actions {
-		display: flex;
-		flex-direction: row;
-	}
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
 
-	.section-title {
-		padding: 20rpx 0;
-	}
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
 
-	.section-title text {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
 
-	.wallet-item {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 30rpx;
-		background-color: #ffffff;
-		border-radius: 12rpx;
-		margin-bottom: 16rpx;
-	}
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
 
-	.item-left {
-		display: flex;
-		flex-direction: column;
-	}
+/* Balance Card */
+.balance-card {
+	background-color: #0052d9;
+	align-items: center;
+	padding: 48rpx 32rpx;
+}
 
-	.item-type {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.balance-label {
+	font-size: 28rpx;
+	color: rgba(255, 255, 255, 0.8);
+}
 
-	.item-remark {
-		font-size: 24rpx;
-		color: #666666;
-		margin-top: 8rpx;
-	}
+.balance-value {
+	font-size: 64rpx;
+	font-weight: 700;
+	color: #ffffff;
+	margin: 16rpx 0 32rpx 0;
+}
 
-	.item-time {
-		font-size: 22rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+.balance-actions {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	justify-content: center;
+}
 
-	.item-right {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-	}
+.action-btn {
+	background-color: #ffffff;
+	padding: 12rpx 48rpx;
+	border-radius: 32rpx;
+}
 
-	.item-amount {
-		font-size: 32rpx;
-		font-weight: bold;
-	}
+.action-text {
+	font-size: 28rpx;
+	color: #0052d9;
+	font-weight: 500;
+}
 
-	.item-amount.positive {
-		color: #52c41a;
-	}
+/* Section Title */
+.section-title {
+	margin-top: 16rpx;
+	margin-bottom: 16rpx;
+}
 
-	.item-amount.negative {
-		color: #ff4d4f;
-	}
+.title-text {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
 
-	.item-after {
-		font-size: 22rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+/* Wallet List */
+.wallet-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
 
-	.empty {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 100rpx 0;
-	}
+.wallet-item {
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
 
-	.empty-text {
-		font-size: 28rpx;
-		color: #999999;
-	}
+.item-left {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.item-type {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.item-remark {
+	font-size: 24rpx;
+	color: #646a73;
+}
+
+.item-time {
+	font-size: 22rpx;
+	color: #999999;
+}
+
+.item-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8rpx;
+}
+
+.item-amount {
+	font-size: 32rpx;
+	font-weight: 700;
+}
+
+.item-amount.positive {
+	color: #00b578;
+}
+
+.item-amount.negative {
+	color: #f53f3f;
+}
+
+.item-after {
+	font-size: 22rpx;
+	color: #999999;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
 </style>

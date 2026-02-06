@@ -210,7 +210,7 @@ onReady(() => {
 
 .btn {
 	height: 88rpx;
-	background-color: #007aff;
+	background-color: #0052d9;
 	border-radius: 16rpx;
 	display: flex;
 	justify-content: center;

@@ -1,23 +1,46 @@
 <template>
-	<cl-page>
-		<view class="p-3">
-			<cl-list>
-				<cl-list-item :label="t('深色模式')">
-					<cl-switch :model-value="isDark" @change="onThemeChange"></cl-switch>
-				</cl-list-item>
-
-				<cl-list-item :label="t('多语言')" arrow hoverable @tap="setLocale"> </cl-list-item>
-
-				<cl-list-item :label="t('字体大小')" arrow hoverable @tap="setSize"> </cl-list-item>
-			</cl-list>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">通用设置</text>
+			</view>
 		</view>
+
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<view class="card setting-group">
+					<view class="setting-item">
+						<view class="item-left">
+							<text class="item-label">{{ t('深色模式') }}</text>
+						</view>
+						<cl-switch :model-value="isDark" @change="onThemeChange"></cl-switch>
+					</view>
+					<view class="divider"></view>
+					<view class="setting-item" @tap="setLocale">
+						<view class="item-left">
+							<text class="item-label">{{ t('多语言') }}</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+					<view class="divider"></view>
+					<view class="setting-item" @tap="setSize">
+						<view class="item-left">
+							<text class="item-label">{{ t('字体大小') }}</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
 
 		<!-- 语言设置 -->
 		<locale-set :ref="refs.set('localeSet')"></locale-set>
 
 		<!-- 字体大小设置 -->
 		<size-set :ref="refs.set('sizeSet')"></size-set>
-	</cl-page>
+	</view>
 </template>
 
 <script setup lang="ts">
@@ -26,6 +49,10 @@ import LocaleSet from "@/components/locale-set.uvue";
 import SizeSet from "@/components/size-set.uvue";
 
 const refs = useRefs();
+
+function goBack() {
+	uni.navigateBack();
+}
 
 function onThemeChange() {
 	toggleTheme();
@@ -39,3 +66,97 @@ function setSize() {
 	refs.open("sizeSet");
 }
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx; /* 12px */
+	padding: 0 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.setting-group {
+	padding: 0 32rpx;
+}
+
+.setting-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: 112rpx; /* 56px */
+}
+
+.item-left {
+	display: flex;
+	align-items: center;
+	gap: 24rpx;
+}
+
+.item-label {
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.item-arrow {
+	font-size: 30rpx;
+	color: #c0c4cc;
+}
+
+.divider {
+	height: 2rpx;
+	background-color: #f0f0f0;
+}
+</style>

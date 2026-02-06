@@ -1,147 +1,105 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
-		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">我的钱包</text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="wallet-header">
+			<view class="header-nav">
+				<view class="back-btn" @click="goBack">
+					<text class="back-icon">←</text>
+				</view>
+				<text class="nav-title">资金管理</text>
+				<view class="detail-btn" @click="goToLogs">
+					<text class="detail-text">明细</text>
+				</view>
 			</view>
-			<view @click="goToLogs">
-				<text class="text-4 text-[#07c160]">明细</text>
+			
+			<!-- Wallet Card -->
+			<view class="wallet-card">
+				<view class="balance-section">
+					<text class="balance-label">账户余额(元)</text>
+					<text class="balance-value">{{ walletInfo.balance }}</text>
+				</view>
+				
+				<view class="stats-row">
+					<view class="stat-item">
+						<text class="stat-val">{{ walletInfo.frozen }}</text>
+						<text class="stat-lbl">冻结金额</text>
+					</view>
+					<view class="stat-item">
+						<text class="stat-val">{{ walletInfo.totalIncome }}</text>
+						<text class="stat-lbl">累计收入</text>
+					</view>
+					<view class="stat-item">
+						<text class="stat-val">{{ walletInfo.totalExpense }}</text>
+						<text class="stat-lbl">累计支出</text>
+					</view>
+				</view>
+
+				<view class="action-row">
+					<view class="action-btn" @click="goToRecharge">
+						<text class="action-text">充值</text>
+					</view>
+					<view class="action-btn outline" @click="goToWithdraw">
+						<text class="action-text outline">提现</text>
+					</view>
+				</view>
 			</view>
 		</view>
 
-		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
-				<!-- 余额卡片 -->
-				<view class="bg-gradient-to-r from-[#07c160] to-[#05a850] rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-white mb-2">账户余额（元）</text>
-					<text class="text-8 font-bold text-white mb-4">{{ walletInfo.balance }}</text>
-					
-					<view class="flex items-center justify-between bg-white/20 rounded-2 p-3">
-						<view class="flex-1 text-center">
-							<text class="text-4 font-bold text-white">{{ walletInfo.frozen }}</text>
-							<text class="text-3 text-white mt-1">冻结金额</text>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- Menu Grid -->
+				<view class="card menu-card">
+					<view class="menu-grid">
+						<view class="menu-item" @click="goToBankCard">
+							<text class="menu-icon">💳</text>
+							<text class="menu-name">银行卡</text>
 						</view>
-						<view class="w-0.5 h-10 bg-white/30"></view>
-						<view class="flex-1 text-center">
-							<text class="text-4 font-bold text-white">{{ walletInfo.totalIncome }}</text>
-							<text class="text-3 text-white mt-1">累计收入</text>
+						<view class="menu-item" @click="goToDeposit">
+							<text class="menu-icon">🔒</text>
+							<text class="menu-name">保证金</text>
 						</view>
-						<view class="w-0.5 h-10 bg-white/30"></view>
-						<view class="flex-1 text-center">
-							<text class="text-4 font-bold text-white">{{ walletInfo.totalExpense }}</text>
-							<text class="text-3 text-white mt-1">累计支出</text>
+						<view class="menu-item" @click="goToCommission">
+							<text class="menu-icon">🎁</text>
+							<text class="menu-name">佣金</text>
+						</view>
+						<view class="menu-item" @click="goToStatistics">
+							<text class="menu-icon">📊</text>
+							<text class="menu-name">统计</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 操作按钮 -->
-				<view class="flex mb-3">
-					<button 
-						@click="goToRecharge"
-						class="flex-1 bg-[#07c160] text-white rounded-full py-3 mr-2"
-					>
-						<text class="text-4">充值</text>
-					</button>
-					<button 
-						@click="goToWithdraw"
-						class="flex-1 bg-white border border-[#07c160] text-[#07c160] rounded-full py-3"
-					>
-						<text class="text-4">提现</text>
-					</button>
-				</view>
-
-				<!-- 快捷功能 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">快捷功能</text>
-					
-					<view class="flex flex-wrap">
-						<view 
-							v-for="(item, index) in quickActions" 
-							:key="index"
-							@click="handleQuickAction(item.action)"
-							class="w-1/4 flex flex-col items-center mb-4"
-						>
-							<view class="w-12 h-12 rounded-full bg-[#f5f5f5] flex items-center justify-center mb-2">
-								<text class="text-6">{{ item.icon }}</text>
-							</view>
-							<text class="text-3.5 text-[#1f2329]">{{ item.label }}</text>
-						</view>
-					</view>
-				</view>
-
-				<!-- 今日数据 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">今日数据</text>
-					
-					<view class="flex items-center justify-between mb-3">
-						<view class="flex-1">
-							<text class="text-3.5 text-[#999]">今日收入</text>
-							<text class="text-5 font-bold text-[#07c160] mt-1">¥{{ todayData.income }}</text>
-						</view>
-						<view class="flex-1">
-							<text class="text-3.5 text-[#999]">今日支出</text>
-							<text class="text-5 font-bold text-[#ff3b30] mt-1">¥{{ todayData.expense }}</text>
-						</view>
-					</view>
-
-					<view class="flex items-center justify-between">
-						<view class="flex-1">
-							<text class="text-3.5 text-[#999]">充值金额</text>
-							<text class="text-5 font-bold text-[#5856d6] mt-1">¥{{ todayData.recharge }}</text>
-						</view>
-						<view class="flex-1">
-							<text class="text-3.5 text-[#999]">提现金额</text>
-							<text class="text-5 font-bold text-[#ff9500] mt-1">¥{{ todayData.withdraw }}</text>
-						</view>
-					</view>
-				</view>
-
-				<!-- 最近交易 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<view class="flex items-center justify-between mb-3">
-						<text class="text-4 font-bold text-[#1f2329]">最近交易</text>
+				<!-- Recent Logs -->
+				<view class="card recent-card">
+					<view class="card-header">
+						<text class="card-title">最近交易</text>
 						<view @click="goToLogs">
-							<text class="text-3.5 text-[#07c160]">查看全部 →</text>
+							<text class="more-text">查看全部 ></text>
 						</view>
 					</view>
-
-					<view 
-						v-for="(item, index) in recentLogs" 
-						:key="index"
-						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
-					>
-						<view class="flex items-center flex-1">
-							<view class="w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-3">
-								<text class="text-5">{{ item.icon }}</text>
+					
+					<view class="log-list">
+						<view 
+							v-for="(item, index) in recentLogs" 
+							:key="index"
+							class="log-item"
+						>
+							<view class="log-icon-box">
+								<text class="log-icon">{{ item.icon }}</text>
 							</view>
-							<view class="flex-1">
-								<text class="text-4 text-[#1f2329]">{{ item.title }}</text>
-								<text class="text-3 text-[#999] mt-1">{{ item.time }}</text>
+							<view class="log-info">
+								<text class="log-title">{{ item.title }}</text>
+								<text class="log-time">{{ item.time }}</text>
 							</view>
-						</view>
-						<view class="text-right">
-							<text :class="['text-5 font-bold', item.type === 'in' ? 'text-[#07c160]' : 'text-[#ff3b30]']">
+							<text :class="['log-amount', item.type === 'in' ? 'income' : 'expense']">
 								{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
 							</text>
 						</view>
+						
+						<view v-if="recentLogs.length === 0" class="empty-state">
+							<text class="empty-text">暂无交易记录</text>
+						</view>
 					</view>
-
-					<view v-if="recentLogs.length === 0" class="flex flex-col items-center justify-center py-10">
-						<text class="text-8 mb-2">📝</text>
-						<text class="text-3.5 text-[#999]">暂无交易记录</text>
-					</view>
-				</view>
-
-				<!-- 温馨提示 -->
-				<view class="bg-[#fff9e6] rounded-2 p-4">
-					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
-					<text class="text-3.5 text-[#646a73] mt-2">• 充值金额实时到账，可用于发起任务</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 提现需要1-3个工作日到账</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 冻结金额为进行中任务占用的资金</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 如有疑问请联系客服：400-123-4567</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -150,7 +108,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-import { getWalletInfo } from '@/services/wallet'
+// import { getWalletInfo, getWalletLogs } from '@/services/wallet'
 
 // 钱包信息
 const walletInfo = ref({
@@ -159,26 +117,6 @@ const walletInfo = ref({
 	totalIncome: '125,800.00',
 	totalExpense: '113,220.00'
 })
-
-// 今日数据
-const todayData = ref({
-	income: '1,250.00',
-	expense: '850.00',
-	recharge: '3,000.00',
-	withdraw: '0.00'
-})
-
-// 快捷功能
-const quickActions = [
-	{ icon: '💰', label: '充值', action: 'recharge' },
-	{ icon: '💸', label: '提现', action: 'withdraw' },
-	{ icon: '📋', label: '明细', action: 'logs' },
-	{ icon: '🔒', label: '保证金', action: 'deposit' },
-	{ icon: '🎁', label: '佣金', action: 'commission' },
-	{ icon: '📊', label: '统计', action: 'statistics' },
-	{ icon: '💳', label: '银行卡', action: 'bankcard' },
-	{ icon: '⚙️', label: '设置', action: 'settings' }
-]
 
 // 最近交易
 const recentLogs = ref([
@@ -207,90 +145,284 @@ const recentLogs = ref([
 
 // 加载钱包信息
 const loadWalletInfo = async () => {
-	try {
-		const res = await getWalletInfo()
-		if (res.code === 0) {
-			walletInfo.value = res.data
-		}
-	} catch (error) {
-		console.log('加载钱包信息失败', error)
-	}
-}
-
-// 加载今日数据
-const loadTodayData = async () => {
-	try {
-		// TODO: 实现获取今日数据接口
-		const res = { code: 0, data: {} } as any
-		if (res.code === 0) {
-			todayData.value = res.data
-		}
-	} catch (error) {
-		console.log('加载今日数据失败', error)
-	}
+	// Mock implementation
 }
 
 // 加载最近交易
 const loadRecentLogs = async () => {
-	try {
-		const res = await getWalletLogs({ page: 1, limit: 10 })
-		if (res.code === 0) {
-			recentLogs.value = res.data.list
-		}
-	} catch (error) {
-		console.log('加载最近交易失败', error)
-	}
+	// Mock implementation
 }
 
-// 处理快捷功能
-const handleQuickAction = (action: string) => {
-	const routes = {
-		recharge: '/pages/wallet/recharge',
-		withdraw: '/pages/wallet/withdraw',
-		logs: '/pages/wallet/logs',
-		deposit: '/pages/task/deposit',
-		commission: '/pages/promo/commission',
-		statistics: '/pages/wallet/statistics',
-		bankcard: '/pages/wallet/bankcard',
-		settings: '/pages/set/index'
-	}
-	
-	const url = routes[action]
-	if (url) {
-		uni.navigateTo({ url })
-	}
-}
+// Navigation
+const goBack = () => uni.navigateBack()
+const goToLogs = () => uni.navigateTo({ url: '/pages/wallet/logs' })
+const goToRecharge = () => uni.navigateTo({ url: '/pages/wallet/recharge' })
+const goToWithdraw = () => uni.navigateTo({ url: '/pages/wallet/withdraw' })
+const goToBankCard = () => uni.navigateTo({ url: '/pages/wallet/bankcard' })
+const goToDeposit = () => uni.navigateTo({ url: '/pages/task/deposit' })
+const goToCommission = () => uni.navigateTo({ url: '/pages/promo/commission' })
+const goToStatistics = () => uni.showToast({ title: '统计功能开发中', icon: 'none' })
 
-// 充值
-const goToRecharge = () => {
-	uni.navigateTo({
-		url: '/pages/wallet/recharge'
-	})
-}
-
-// 提现
-const goToWithdraw = () => {
-	uni.navigateTo({
-		url: '/pages/wallet/withdraw'
-	})
-}
-
-// 查看明细
-const goToLogs = () => {
-	uni.navigateTo({
-		url: '/pages/wallet/logs'
-	})
-}
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
-
-// 页面加载时获取数据
 onMounted(() => {
 	loadWalletInfo()
-	loadTodayData()
 	loadRecentLogs()
 })
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.wallet-header {
+	background-color: #0052d9;
+	padding-bottom: 48rpx;
+}
+
+.header-nav {
+	height: 88rpx;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20rpx 32rpx 0 32rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #ffffff;
+}
+
+.nav-title {
+	font-size: 34rpx;
+	color: #ffffff;
+	font-weight: 600;
+}
+
+.detail-text {
+	font-size: 28rpx;
+	color: #ffffff;
+}
+
+.wallet-card {
+	margin-top: 32rpx;
+	padding: 0 32rpx;
+}
+
+.balance-section {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 48rpx;
+}
+
+.balance-label {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.8);
+}
+
+.balance-value {
+	font-size: 64rpx;
+	font-weight: 700;
+	color: #ffffff;
+	margin-top: 8rpx;
+}
+
+.stats-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	margin-bottom: 48rpx;
+}
+
+.stat-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	flex: 1;
+}
+
+.stat-val {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #ffffff;
+}
+
+.stat-lbl {
+	font-size: 24rpx;
+	color: rgba(255, 255, 255, 0.8);
+	margin-top: 8rpx;
+}
+
+.action-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	gap: 24rpx;
+}
+
+.action-btn {
+	flex: 1;
+	height: 80rpx;
+	background-color: #ffffff;
+	border-radius: 40rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.action-btn.outline {
+	background-color: rgba(255, 255, 255, 0.2);
+	border: 2rpx solid #ffffff;
+}
+
+.action-text {
+	font-size: 28rpx;
+	color: #0052d9;
+	font-weight: 500;
+}
+
+.action-text.outline {
+	color: #ffffff;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Menu Grid */
+.menu-grid {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+
+.menu-item {
+	width: 25%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.menu-icon {
+	font-size: 48rpx;
+}
+
+.menu-name {
+	font-size: 24rpx;
+	color: #333333;
+}
+
+/* Recent Logs */
+.card-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24rpx;
+}
+
+.card-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
+
+.more-text {
+	font-size: 26rpx;
+	color: #999999;
+}
+
+.log-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.log-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding-bottom: 24rpx;
+	border-bottom: 2rpx solid #f5f7fa;
+}
+
+.log-icon-box {
+	width: 80rpx;
+	height: 80rpx;
+	background-color: #f5f7fa;
+	border-radius: 40rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 24rpx;
+}
+
+.log-icon {
+	font-size: 40rpx;
+}
+
+.log-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.log-title {
+	font-size: 28rpx;
+	color: #1f2329;
+}
+
+.log-time {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.log-amount {
+	font-size: 32rpx;
+	font-weight: 600;
+}
+
+.log-amount.income {
+	color: #07c160;
+}
+
+.log-amount.expense {
+	color: #ff3b30;
+}
+
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 32rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
+</style>

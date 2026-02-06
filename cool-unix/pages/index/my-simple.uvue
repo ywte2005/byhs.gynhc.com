@@ -1,26 +1,21 @@
 <template>
-	<view class="page">
-		<!-- 顶部导航栏 -->
-		<view class="navbar">
-			<view class="navbar-inner">
-				<view class="navbar-left"></view>
-				<view class="navbar-center"></view>
-				<view class="navbar-right">
-					<view class="top-icon" @tap="toSet">
-						<text class="icon-text">⚙️</text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="my-header">
+			<view class="header-nav">
+				<view class="header-left"></view>
+				<view class="header-right">
+					<view class="nav-icon" @tap="toSet">
+						<text class="nav-icon-text">⚙️</text>
 					</view>
-					<view class="top-icon" @tap="toMessage">
-						<text class="icon-text">🔔</text>
+					<view class="nav-icon" @tap="toMessage">
+						<text class="nav-icon-text">🔔</text>
 					</view>
 				</view>
 			</view>
-		</view>
 
-		<!-- 内容区域 -->
-		<scroll-view class="content" scroll-y>
-			<!-- 用户信息 -->
-			<view class="user-section" @tap="toEdit">
-				<view class="user-avatar-wrapper">
+			<view class="user-info" @tap="toEdit">
+				<view class="avatar-wrapper">
 					<image
 						class="user-avatar"
 						:src="avatarUrl || '/static/default-avatar.png'"
@@ -30,115 +25,124 @@
 						<text class="badge-text">✏️</text>
 					</view>
 				</view>
-				<view class="user-info">
-					<text class="user-name">{{ nickName || '未登录' }}</text>
-					<text v-if="isLogin" class="user-phone">{{ phone }}</text>
+				<view class="info-content">
+					<text class="user-name">{{ nickName || '点击登录' }}</text>
+					<text class="user-id" v-if="userInfo?.phone">ID: {{ userInfo?.phone }}</text>
 				</view>
+				<text class="arrow-right">></text>
 			</view>
 
-			<!-- 数据统计 -->
-			<view class="stats-section">
+			<view class="stats-row">
 				<view class="stat-item">
-					<text class="stat-value">171</text>
+					<text class="stat-num">171</text>
 					<text class="stat-label">总点击</text>
 				</view>
 				<view class="stat-item">
-					<text class="stat-value">24</text>
+					<text class="stat-num">24</text>
 					<text class="stat-label">赞</text>
 				</view>
 				<view class="stat-item">
-					<text class="stat-value">89</text>
+					<text class="stat-num">89</text>
 					<text class="stat-label">收藏</text>
 				</view>
 				<view class="stat-item">
-					<text class="stat-value">653</text>
+					<text class="stat-num">653</text>
 					<text class="stat-label">粉丝</text>
 				</view>
 			</view>
+		</view>
 
-			<!-- 快捷开关 -->
-			<view class="switch-section">
-				<view class="switch-card">
-					<view class="switch-info">
-						<text class="switch-title">接单模式</text>
-						<text class="switch-desc">已关闭</text>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- 快捷开关 -->
+				<view class="switch-row">
+					<view class="card switch-card">
+						<view class="switch-info">
+							<text class="switch-title">接单模式</text>
+							<text class="switch-desc">已关闭</text>
+						</view>
+						<switch :checked="receiveOrderMode" color="#0052d9" style="transform:scale(0.8)" @change="onReceiveOrderChange" />
 					</view>
-					<switch :checked="receiveOrderMode" @change="onReceiveOrderChange" />
-				</view>
-				<view class="switch-card">
-					<view class="switch-info">
-						<text class="switch-title">消息通知</text>
-						<text class="switch-desc">已关闭</text>
+					<view class="card switch-card">
+						<view class="switch-info">
+							<text class="switch-title">消息通知</text>
+							<text class="switch-desc">已关闭</text>
+						</view>
+						<switch :checked="notificationMode" color="#0052d9" style="transform:scale(0.8)" @change="onNotificationChange" />
 					</view>
-					<switch :checked="notificationMode" @change="onNotificationChange" />
 				</view>
-			</view>
 
-			<!-- 订单状态 -->
-			<view class="order-section">
-				<view class="order-item" @tap="toTest">
-					<text class="order-icon">💰</text>
-					<text class="order-label">待支付</text>
-				</view>
-				<view class="order-item" @tap="toTest">
-					<text class="order-icon">📦</text>
-					<text class="order-label">未发货</text>
-				</view>
-				<view class="order-item" @tap="toTest">
-					<view class="order-badge-wrapper">
-						<text class="order-icon">✈️</text>
-						<view class="order-badge">
-							<text class="badge-num">3</text>
+				<!-- 订单状态 -->
+				<view class="card order-card">
+					<view class="grid-row">
+						<view class="grid-item" @tap="toTest">
+							<text class="grid-icon">💰</text>
+							<text class="grid-label">待支付</text>
+						</view>
+						<view class="grid-item" @tap="toTest">
+							<text class="grid-icon">📦</text>
+							<text class="grid-label">未发货</text>
+						</view>
+						<view class="grid-item" @tap="toTest">
+							<view class="order-badge-wrapper">
+								<text class="grid-icon">✈️</text>
+								<view class="order-badge">
+									<text class="badge-num">3</text>
+								</view>
+							</view>
+							<text class="grid-label">已发货</text>
+						</view>
+						<view class="grid-item" @tap="toTest">
+							<text class="grid-icon">💱</text>
+							<text class="grid-label">售后/退款</text>
 						</view>
 					</view>
-					<text class="order-label">已发货</text>
 				</view>
-				<view class="order-item" @tap="toTest">
-					<text class="order-icon">💱</text>
-					<text class="order-label">售后/退款</text>
-				</view>
-			</view>
 
-			<!-- 功能列表 -->
-			<view class="list-section">
-				<view class="list-item" hover-class="list-item-hover" @tap="toWallet">
-					<view class="list-left">
-						<text class="list-icon">👛</text>
-						<text class="list-label">我的钱包</text>
+				<!-- 功能列表 -->
+				<view class="card menu-card">
+					<view class="menu-item" @tap="toWallet">
+						<view class="menu-left">
+							<text class="menu-icon">👛</text>
+							<text class="menu-label">我的钱包</text>
+						</view>
+						<text class="menu-arrow">></text>
 					</view>
-					<text class="arrow">›</text>
-				</view>
-				<view class="list-item" hover-class="list-item-hover" @tap="toTest">
-					<view class="list-left">
-						<text class="list-icon">📊</text>
-						<text class="list-label">数据看板</text>
+					<view class="divider"></view>
+					<view class="menu-item" @tap="toTest">
+						<view class="menu-left">
+							<text class="menu-icon">📊</text>
+							<text class="menu-label">数据看板</text>
+						</view>
+						<text class="menu-arrow">></text>
 					</view>
-					<text class="arrow">›</text>
-				</view>
-				<view class="list-item" hover-class="list-item-hover" @tap="toTest">
-					<view class="list-left">
-						<text class="list-icon">🕐</text>
-						<text class="list-label">历史记录</text>
+					<view class="divider"></view>
+					<view class="menu-item" @tap="toTest">
+						<view class="menu-left">
+							<text class="menu-icon">🕐</text>
+							<text class="menu-label">历史记录</text>
+						</view>
+						<text class="menu-arrow">></text>
 					</view>
-					<text class="arrow">›</text>
-				</view>
-				<view class="list-item" hover-class="list-item-hover" @tap="toTest">
-					<view class="list-left">
-						<text class="list-icon">📤</text>
-						<text class="list-label">邀请好友</text>
+					<view class="divider"></view>
+					<view class="menu-item" @tap="toTest">
+						<view class="menu-left">
+							<text class="menu-icon">📤</text>
+							<text class="menu-label">邀请好友</text>
+						</view>
+						<text class="menu-arrow">></text>
 					</view>
-					<text class="arrow">›</text>
 				</view>
-			</view>
 
-			<!-- 设置 -->
-			<view class="list-section">
-				<view class="list-item" hover-class="list-item-hover" @tap="toSet">
-					<view class="list-left">
-						<text class="list-icon">⚙️</text>
-						<text class="list-label">设置</text>
+				<!-- 设置 -->
+				<view class="card menu-card">
+					<view class="menu-item" @tap="toSet">
+						<view class="menu-left">
+							<text class="menu-icon">⚙️</text>
+							<text class="menu-label">设置</text>
+						</view>
+						<text class="menu-arrow">></text>
 					</view>
-					<text class="arrow">›</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -163,6 +167,10 @@
 
 <script setup lang="uts">
 import { ref } from 'vue'
+import { useStore } from "@/.cool"
+
+const { user } = useStore()
+const userInfo = user.info
 
 // 用户信息
 const isLogin = ref(true)
@@ -194,21 +202,21 @@ function onNotificationChange(e: any) {
 
 // 跳转到编辑资料
 function toEdit() {
-	if (!isLogin.value) {
+	if (!user.token) {
 		uni.navigateTo({
 			url: '/pages/user/login'
 		})
 		return
 	}
 	uni.navigateTo({
-		url: '/pages/user/edit-simple'
+		url: '/pages/user/edit'
 	})
 }
 
 // 跳转到设置
 function toSet() {
 	uni.navigateTo({
-		url: '/pages/set/index-simple'
+		url: '/pages/set/index'
 	})
 }
 
@@ -240,6 +248,13 @@ function toTemplate() {
 	})
 }
 
+// 跳转到数据看板
+function toPerformance() {
+	uni.navigateTo({
+		url: '/pages/promo/performance'
+	})
+}
+
 // 测试功能
 function toTest() {
 	uni.showToast({
@@ -249,208 +264,228 @@ function toTest() {
 }
 </script>
 
-<style scoped>
-.page {
-	width: 750rpx;
-	min-height: 100vh;
-	background-color: #f5f5f5;
+<style>
+.page-container {
 	display: flex;
 	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
 }
 
-/* 导航栏 */
-.navbar {
-	background-color: transparent;
+/* Header */
+.my-header {
+	background-color: #0052d9;
+	padding: 32rpx;
+	padding-top: calc(20rpx + env(safe-area-inset-top));
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
 }
 
-.navbar-inner {
-	height: 88rpx;
+.header-nav {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
-	padding: 0 30rpx;
-}
-
-.navbar-left,
-.navbar-center {
-	flex: 1;
-}
-
-.navbar-right {
-	display: flex;
-	flex-direction: row;
+	justify-content: space-between;
 	align-items: center;
 }
 
-.top-icon {
+.header-right {
+	display: flex;
+	flex-direction: row;
+	gap: 24rpx;
+}
+
+.nav-icon {
 	width: 64rpx;
 	height: 64rpx;
-	background-color: #ffffff;
-	border-radius: 16rpx;
+	background-color: rgba(255, 255, 255, 0.2);
+	border-radius: 32rpx;
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	margin-left: 20rpx;
+	justify-content: center;
 }
 
-.icon-text {
+.nav-icon-text {
 	font-size: 32rpx;
 }
 
-/* 内容区域 */
-.content {
-	flex: 1;
-	padding: 30rpx;
-	padding-bottom: 120rpx;
-}
-
-/* 用户信息 */
-.user-section {
+.user-info {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	align-items: center;
-	padding: 40rpx 0;
+	gap: 24rpx;
 }
 
-.user-avatar-wrapper {
+.avatar-wrapper {
+	width: 120rpx;
+	height: 120rpx;
+	border-radius: 60rpx;
+	background-color: #ffffff;
+	border: 4rpx solid rgba(255, 255, 255, 0.3);
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	position: relative;
-	width: 160rpx;
-	height: 160rpx;
-	margin-bottom: 30rpx;
 }
 
 .user-avatar {
-	width: 160rpx;
-	height: 160rpx;
-	border-radius: 40rpx;
+	width: 100%;
+	height: 100%;
 }
 
 .avatar-edit-badge {
 	position: absolute;
 	bottom: 0;
-	right: -6rpx;
-	width: 48rpx;
-	height: 48rpx;
-	background-color: #000000;
-	border-radius: 24rpx;
-	border: 2px solid #ffffff;
+	right: 0;
+	width: 100%;
+	height: 30%;
+	background-color: rgba(0, 0, 0, 0.5);
 	display: flex;
-	justify-content: center;
 	align-items: center;
+	justify-content: center;
 }
 
 .badge-text {
-	font-size: 24rpx;
+	font-size: 20rpx;
 }
 
-.user-info {
+.info-content {
+	flex: 1;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	gap: 8rpx;
 }
 
 .user-name {
 	font-size: 36rpx;
-	font-weight: 500;
-	color: #333333;
-	margin-bottom: 10rpx;
+	font-weight: 600;
+	color: #ffffff;
 }
 
-.user-phone {
+.user-id {
 	font-size: 24rpx;
-	color: #999999;
+	color: rgba(255, 255, 255, 0.8);
 }
 
-/* 数据统计 */
-.stats-section {
+.arrow-right {
+	font-size: 32rpx;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.stats-row {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-around;
-	padding: 40rpx 0;
-	border-bottom: 1px solid #e5e5e5;
-	margin-bottom: 30rpx;
 }
 
 .stat-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	gap: 8rpx;
 }
 
-.stat-value {
+.stat-num {
 	font-size: 36rpx;
-	font-weight: 500;
-	color: #333333;
-	margin-bottom: 10rpx;
+	font-weight: 700;
+	color: #ffffff;
 }
 
 .stat-label {
 	font-size: 24rpx;
-	color: #999999;
+	color: rgba(255, 255, 255, 0.8);
 }
 
-/* 快捷开关 */
-.switch-section {
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+	margin-top: -24rpx;
+	border-top-left-radius: 24rpx;
+	border-top-right-radius: 24rpx;
+	background-color: #f5f7fa;
+	overflow: hidden;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	padding-bottom: 120rpx; /* Tabbar height */
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Switches */
+.switch-row {
 	display: flex;
 	flex-direction: row;
-	gap: 30rpx;
-	margin-bottom: 30rpx;
+	gap: 24rpx;
 }
 
 .switch-card {
 	flex: 1;
-	background-color: #ffffff;
-	border-radius: 16rpx;
-	padding: 30rpx;
-	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
+	padding: 24rpx;
 }
 
 .switch-info {
 	display: flex;
 	flex-direction: column;
-	flex: 1;
-	margin-right: 20rpx;
+	gap: 4rpx;
 }
 
 .switch-title {
 	font-size: 28rpx;
-	color: #333333;
-	margin-bottom: 10rpx;
+	font-weight: 600;
+	color: #1f2329;
 }
 
 .switch-desc {
-	font-size: 24rpx;
+	font-size: 22rpx;
 	color: #999999;
 }
 
-/* 订单状态 */
-.order-section {
-	background-color: #ffffff;
-	border-radius: 16rpx;
-	padding: 40rpx 0;
-	margin-bottom: 30rpx;
+/* Order Card */
+.order-card {
+	padding: 40rpx 20rpx;
+}
+
+.grid-row {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-around;
 }
 
-.order-item {
+.grid-item {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 0 20rpx;
+	gap: 12rpx;
+	position: relative;
+}
+
+.grid-icon {
+	font-size: 48rpx;
+}
+
+.grid-label {
+	font-size: 24rpx;
+	color: #646a73;
 }
 
 .order-badge-wrapper {
 	position: relative;
-}
-
-.order-icon {
-	font-size: 48rpx;
-	margin-bottom: 10rpx;
 }
 
 .order-badge {
@@ -462,9 +497,9 @@ function toTest() {
 	background-color: #ff3b30;
 	border-radius: 16rpx;
 	display: flex;
-	justify-content: center;
 	align-items: center;
-	padding: 0 8rpx;
+	justify-content: center;
+	border: 2rpx solid #ffffff;
 }
 
 .badge-num {
@@ -472,59 +507,46 @@ function toTest() {
 	color: #ffffff;
 }
 
-.order-label {
-	font-size: 24rpx;
-	color: #666666;
-	text-align: center;
+/* Menu Card */
+.menu-card {
+	padding: 0 32rpx;
 }
 
-/* 功能列表 */
-.list-section {
-	background-color: #ffffff;
-	border-radius: 16rpx;
-	margin-bottom: 30rpx;
-	overflow: hidden;
-}
-
-.list-item {
+.menu-item {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
 	justify-content: space-between;
-	padding: 30rpx;
-	border-bottom: 1px solid #f5f5f5;
+	align-items: center;
+	height: 112rpx;
 }
 
-.list-item:last-child {
-	border-bottom: none;
-}
-
-.list-item-hover {
-	background-color: #f5f5f5;
-}
-
-.list-left {
+.menu-left {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	gap: 24rpx;
 }
 
-.list-icon {
+.menu-icon {
 	font-size: 40rpx;
-	margin-right: 20rpx;
 }
 
-.list-label {
+.menu-label {
 	font-size: 30rpx;
-	color: #333333;
+	color: #1f2329;
 }
 
-.arrow {
-	font-size: 40rpx;
-	color: #999999;
+.menu-arrow {
+	font-size: 30rpx;
+	color: #c0c4cc;
 }
 
-/* 底部导航栏 */
+.divider {
+	height: 2rpx;
+	background-color: #f0f0f0;
+}
+
+/* Tabbar */
 .tabbar {
 	position: fixed;
 	bottom: 0;
@@ -557,6 +579,6 @@ function toTest() {
 }
 
 .tabbar-text.active {
-	color: #007aff;
+	color: #0052d9;
 }
 </style>

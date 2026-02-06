@@ -119,13 +119,14 @@ import { getTaskList } from '@/services/task'
 // 当前分类
 const currentCategory = ref('all')
 
-// 分类列表（根据数据库中的实际分类）
+// 分类列表（与后端保持一致）
 const categories = [
 	{ label: '全部', value: 'all' },
-	{ label: '电商', value: 'ecommerce' },
-	{ label: '外卖', value: 'food' },
-	{ label: '出行', value: 'travel' },
-	{ label: '生活', value: 'life' },
+	{ label: '电商平台', value: 'ecommerce' },
+	{ label: '外卖配送', value: 'food' },
+	{ label: '出行服务', value: 'travel' },
+	{ label: '生活服务', value: 'life' },
+	{ label: '金融支付', value: 'finance' },
 	{ label: '其他', value: 'other' }
 ]
 

@@ -1,9 +1,17 @@
 <template>
-	<cl-page>
-		<view class="commission-page">
-			<cl-list-view :auto="false" :data="list" @load="loadMore">
-				<template v-slot:item="{ item }">
-					<view class="commission-item">
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">收益明细</text>
+			</view>
+		</view>
+
+		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
+			<view class="content-wrapper">
+				<view class="commission-list">
+					<view v-for="(item, index) in list" :key="index" class="card commission-item">
 						<view class="item-left">
 							<text class="item-type">{{ getRewardTypeName(item.reward_type) }}</text>
 							<text class="item-remark">{{ item.remark }}</text>
@@ -14,14 +22,15 @@
 							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
 						</view>
 					</view>
-				</template>
-			</cl-list-view>
-
-			<view v-if="list.length == 0 && !loading" class="empty">
-				<text class="empty-text">暂无佣金记录</text>
+					
+					<!-- 空状态 -->
+					<view v-if="list.length == 0 && !loading" class="empty-state">
+						<text class="empty-text">暂无收益明细</text>
+					</view>
+				</view>
 			</view>
-		</view>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
@@ -43,6 +52,9 @@
 			this.loadMore();
 		},
 		methods: {
+			goBack() {
+				uni.navigateBack();
+			},
 			loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
@@ -92,82 +104,140 @@
 	};
 </script>
 
-<style lang="scss">
-	.commission-page {
-		padding: 20rpx;
-	}
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
 
-	.commission-item {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 30rpx;
-		background-color: #ffffff;
-		border-radius: 12rpx;
-		margin-bottom: 16rpx;
-	}
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
 
-	.item-left {
-		display: flex;
-		flex-direction: column;
-	}
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
 
-	.item-type {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-	}
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
 
-	.item-remark {
-		font-size: 24rpx;
-		color: #666666;
-		margin-top: 8rpx;
-	}
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
 
-	.item-time {
-		font-size: 22rpx;
-		color: #999999;
-		margin-top: 8rpx;
-	}
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
 
-	.item-right {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-end;
-	}
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx; /* 16px */
+}
 
-	.item-amount {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #ff6b35;
-	}
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx; /* 12px */
+	padding: 32rpx; /* 16px */
+	display: flex;
+	flex-direction: column;
+}
 
-	.item-status {
-		font-size: 22rpx;
-		margin-top: 8rpx;
-	}
+/* Commission List */
+.commission-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx; /* 12px */
+}
 
-	.item-status.granted {
-		color: #52c41a;
-	}
+.commission-item {
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
 
-	.item-status.pending {
-		color: #faad14;
-	}
+.item-left {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
 
-	.item-status.failed {
-		color: #ff4d4f;
-	}
+.item-type {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #1f2329;
+}
 
-	.empty {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 100rpx 0;
-	}
+.item-remark {
+	font-size: 24rpx;
+	color: #646a73;
+}
 
-	.empty-text {
-		font-size: 28rpx;
-		color: #999999;
-	}
+.item-time {
+	font-size: 22rpx;
+	color: #999999;
+}
+
+.item-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 8rpx;
+}
+
+.item-amount {
+	font-size: 32rpx;
+	font-weight: 700;
+	color: #ff3b30;
+}
+
+.item-status {
+	font-size: 24rpx;
+}
+
+.item-status.granted {
+	color: #00b578;
+}
+
+.item-status.pending {
+	color: #faad14;
+}
+
+.item-status.failed {
+	color: #f53f3f;
+}
+
+/* Empty State */
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 64rpx 0;
+}
+
+.empty-text {
+	font-size: 28rpx;
+	color: #999999;
+}
 </style>

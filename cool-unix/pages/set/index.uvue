@@ -1,73 +1,86 @@
 <template>
-	<cl-page>
-		<view class="p-3">
-			<cl-list :pt="{ className: 'mb-3' }">
-				<cl-list-item
-					:label="t('通用设置')"
-					icon="settings-line"
-					arrow
-					hoverable
-					@tap="router.to('/pages/set/general')"
-				>
-				</cl-list-item>
-				<cl-list-item
-					:label="t('通知设置')"
-					icon="notification-4-line"
-					arrow
-					hoverable
-					@tap="router.to('/pages/set/notice')"
-				>
-				</cl-list-item>
-				<cl-list-item :label="t('隐私设置')" icon="lock-line" arrow hoverable>
-				</cl-list-item>
-			</cl-list>
-
-			<cl-list :pt="{ className: 'mb-3' }">
-				<cl-list-item
-					:label="$t('关于{name}', { name: config.name })"
-					icon="error-warning-line"
-					arrow
-					hoverable
-					:pt="{
-						label: {
-							className: 'flex-1'
-						}
-					}"
-					@tap="router.to('/pages/set/about')"
-				>
-				</cl-list-item>
-
-				<cl-list-item
-					:label="t('联系我们')"
-					icon="customer-service-line"
-					arrow
-					hoverable
-					@tap="refs.open('cs')"
-				>
-				</cl-list-item>
-			</cl-list>
-
-			<cl-list :pt="{ className: 'mb-3' }">
-				<cl-list-item hoverable justify="center" @tap="toLogout">
-					<cl-text color="error">{{ t("退出登录") }}</cl-text>
-				</cl-list-item>
-			</cl-list>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">设置</text>
+			</view>
 		</view>
+
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- Group 1 -->
+				<view class="card setting-group">
+					<view class="setting-item" @tap="router.to('/pages/set/general')">
+						<view class="item-left">
+							<text class="item-icon">⚙️</text>
+							<text class="item-label">通用设置</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+					<view class="divider"></view>
+					<view class="setting-item" @tap="router.to('/pages/set/notice')">
+						<view class="item-left">
+							<text class="item-icon">🔔</text>
+							<text class="item-label">通知设置</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+					<view class="divider"></view>
+					<view class="setting-item">
+						<view class="item-left">
+							<text class="item-icon">🔒</text>
+							<text class="item-label">隐私设置</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+				</view>
+
+				<!-- Group 2 -->
+				<view class="card setting-group">
+					<view class="setting-item" @tap="router.to('/pages/set/about')">
+						<view class="item-left">
+							<text class="item-icon">ℹ️</text>
+							<text class="item-label">关于{{ config.name }}</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+					<view class="divider"></view>
+					<view class="setting-item" @tap="refs.open('cs')">
+						<view class="item-left">
+							<text class="item-icon">🎧</text>
+							<text class="item-label">联系我们</text>
+						</view>
+						<text class="item-arrow">></text>
+					</view>
+				</view>
+
+				<!-- Logout -->
+				<view class="card logout-card" @tap="toLogout">
+					<text class="logout-text">退出登录</text>
+				</view>
+			</view>
+		</scroll-view>
 
 		<!-- 联系我们 -->
 		<contact-us :ref="refs.set('cs')"></contact-us>
-	</cl-page>
+	</view>
 </template>
 
 <script setup lang="ts">
 import { config } from "@/config";
-import { router, useRefs, useStore, t, $t } from "@/.cool";
+import { router, useRefs, useStore, t } from "@/.cool";
 import { useUi } from "@/uni_modules/cool-ui";
 import ContactUs from "./components/contact-us.uvue";
 
 const refs = useRefs();
 const ui = useUi();
 const { user } = useStore();
+
+function goBack() {
+	uni.navigateBack();
+}
 
 function toLogout() {
 	ui.showConfirm({
@@ -81,3 +94,114 @@ function toLogout() {
 	});
 }
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx;
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx; /* 12px */
+	padding: 0 32rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.setting-group {
+	padding: 0 32rpx;
+}
+
+.setting-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	height: 112rpx; /* 56px */
+}
+
+.item-left {
+	display: flex;
+	align-items: center;
+	gap: 24rpx;
+}
+
+.item-icon {
+	font-size: 40rpx;
+}
+
+.item-label {
+	font-size: 30rpx;
+	color: #1f2329;
+}
+
+.item-arrow {
+	font-size: 30rpx;
+	color: #c0c4cc;
+}
+
+.divider {
+	height: 2rpx;
+	background-color: #f0f0f0;
+}
+
+/* Logout */
+.logout-card {
+	height: 112rpx;
+	align-items: center;
+	justify-content: center;
+}
+
+.logout-text {
+	font-size: 32rpx;
+	color: #ff3b30;
+	font-weight: 500;
+}
+</style>

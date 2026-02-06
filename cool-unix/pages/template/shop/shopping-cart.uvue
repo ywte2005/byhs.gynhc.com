@@ -1,207 +1,143 @@
 <template>
-	<cl-page>
-		<cl-sticky>
-			<cl-topbar fixed safe-area-top :title="`${$t('购物车 ({num})', { num: list.length })}`">
-				<template #prepend>
-					<!-- #ifdef MP -->
-					<cl-text
-						:pt="{
-							className: 'ml-1'
-						}"
-						@tap="isDel = !isDel"
-					>
-						{{ isDel ? t("完成") : t("管理") }}
-					</cl-text>
-					<!-- #endif -->
-				</template>
-
-				<template #append>
-					<!-- #ifndef MP -->
-					<cl-text
-						:pt="{
-							className: 'mr-3'
-						}"
-						@tap="isDel = !isDel"
-					>
-						{{ isDel ? t("完成") : t("管理") }}
-					</cl-text>
-					<!-- #endif -->
-				</template>
-			</cl-topbar>
-		</cl-sticky>
-
-		<view class="p-3">
-			<view class="p-3 rounded-xl bg-white dark:!bg-surface-800 mb-3">
-				<cl-text>🔥 最新降价商品，限时优惠，抓紧抢购！</cl-text>
+	<view class="page-container">
+		<!-- Header -->
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">购物车 ({{ list.length }})</text>
 			</view>
-
-			<cl-list-item
-				v-for="(item, index) in list"
-				:key="item.id"
-				:pt="{
-					className: parseClass([
-						'rounded-2xl ',
-						[index == list.length - 1, 'mb-0', 'mb-3']
-					]),
-					inner: {
-						className: '!p-4'
-					}
-				}"
-				swipeable
-			>
-				<view class="flex flex-row flex-1">
-					<view class="flex flex-col mr-4 pt-[28px]" @tap="selectItem(item)">
-						<cl-icon
-							name="checkbox-circle-line"
-							color="primary"
-							:size="20"
-							v-if="item.checked"
-						></cl-icon>
-						<cl-icon name="checkbox-blank-circle-line" :size="20" v-else></cl-icon>
-					</view>
-
-					<cl-image :width="76" :height="76" :src="item.cover"></cl-image>
-
-					<view class="flex flex-col ml-3 flex-1">
-						<cl-text
-							:pt="{
-								className: 'mb-2 font-bold'
-							}"
-							>{{ item.name }}</cl-text
-						>
-
-						<view class="flex flex-row mb-2">
-							<view
-								class="bg-surface-100 dark:!bg-surface-700 rounded-md py-1 px-2 flex flex-row items-center"
-							>
-								<cl-text :size="12">{{ item.skuName }}</cl-text>
-								<cl-icon
-									name="arrow-down-s-line"
-									:pt="{ className: 'ml-1' }"
-								></cl-icon>
-							</view>
-						</view>
-
-						<view class="flex flex-row items-center mb-2">
-							<cl-text
-								:size="11"
-								:pt="{
-									className: 'text-red-500 mr-[1px]'
-								}"
-								>¥</cl-text
-							>
-							<cl-text
-								:size="16"
-								:pt="{
-									className: 'text-red-500 mr-auto'
-								}"
-								>{{ item.price }}</cl-text
-							>
-
-							<view
-								v-if="isDel"
-								class="p-1 bg-red-500 rounded-lg"
-								@tap="delItem(index)"
-							>
-								<cl-icon name="delete-bin-line" color="white"></cl-icon>
-							</view>
-
-							<view class="flex" v-else>
-								<cl-input-number
-									v-model="item.count"
-									:size="20"
-									:min="1"
-									:pt="{
-										op: {
-											plus: {
-												className: '!rounded-full'
-											},
-											minus: {
-												className: '!rounded-full'
-											},
-											icon: {
-												size: 14
-											}
-										},
-										value: {
-											className: '!w-[30px] rounded-full !px-0',
-											input: {
-												className: '!text-[12px]'
-											}
-										}
-									}"
-								></cl-input-number>
-							</view>
-						</view>
-
-						<cl-text :size="11" color="error" :pt="{ className: 'mb-1' }"
-							>比加入时降100元</cl-text
-						>
-
-						<cl-text :size="11">满1件可换购0.5元商品</cl-text>
-					</view>
-				</view>
-
-				<template #swipe-right>
-					<cl-button
-						type="error"
-						:pt="{
-							className: '!rounded-none h-full w-[80px]'
-						}"
-						@tap="delItem(index)"
-						>{{ t("删除") }}</cl-button
-					>
-				</template>
-			</cl-list-item>
-
-			<cl-empty v-if="list.length == 0"></cl-empty>
+			<view class="header-right" @click="isDel = !isDel">
+				<text class="header-action">{{ isDel ? t("完成") : t("管理") }}</text>
+			</view>
 		</view>
 
-		<cl-footer>
-			<view class="flex flex-row items-center h-[35px]">
-				<cl-checkbox
-					active-icon="checkbox-circle-line"
-					inactive-icon="checkbox-blank-circle-line"
-					:pt="{
-						className: 'mr-auto'
-					}"
-					:size="14"
-					v-model="selectAll"
-					@change="onSelectAllChange"
-					>{{ t("全选") }}</cl-checkbox
-				>
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
+				<!-- Notification -->
+				<view class="notification-card">
+					<text class="notification-text">🔥 最新降价商品，限时优惠，抓紧抢购！</text>
+				</view>
 
-				<template v-if="isDel">
-					<cl-button
-						type="error"
+				<!-- Cart List -->
+				<view class="cart-list">
+					<cl-list-item
+						v-for="(item, index) in list"
+						:key="item.id"
 						:pt="{
-							className: '!px-5'
+							className: 'cart-item-wrapper',
+							inner: { className: '!p-0' }
 						}"
-						@tap="delAll"
+						swipeable
 					>
-						{{ t("删除") }}
-					</cl-button>
+						<view class="cart-item">
+							<view class="checkbox-area" @tap="selectItem(item)">
+								<cl-icon
+									name="checkbox-circle-line"
+									color="#0052d9"
+									:size="40"
+									v-if="item.checked"
+								></cl-icon>
+								<cl-icon name="checkbox-blank-circle-line" :size="40" color="#c0c4cc" v-else></cl-icon>
+							</view>
+
+							<image class="item-img" :src="item.cover" mode="aspectFill"></image>
+
+							<view class="item-info">
+								<text class="item-name">{{ item.name }}</text>
+
+								<view class="item-sku">
+									<text class="sku-text">{{ item.skuName }}</text>
+									<cl-icon name="arrow-down-s-line" :size="24" color="#999"></cl-icon>
+								</view>
+
+								<view class="item-bottom">
+									<view class="price-box">
+										<text class="currency">¥</text>
+										<text class="price">{{ item.price }}</text>
+									</view>
+
+									<view class="action-box">
+										<view
+											v-if="isDel"
+											class="del-btn-icon"
+											@tap="delItem(index)"
+										>
+											<cl-icon name="delete-bin-line" color="#ffffff" :size="28"></cl-icon>
+										</view>
+
+										<cl-input-number
+											v-else
+											v-model="item.count"
+											:size="24"
+											:min="1"
+											:pt="{
+												op: {
+													plus: { className: '!bg-gray-100 !rounded-8' },
+													minus: { className: '!bg-gray-100 !rounded-8' },
+													icon: { size: 24 }
+												},
+												value: {
+													className: '!bg-transparent !w-60',
+													input: { className: '!text-28' }
+												}
+											}"
+										></cl-input-number>
+									</view>
+								</view>
+
+								<view class="tags-row">
+									<text class="tag-text">比加入时降100元</text>
+								</view>
+							</view>
+						</view>
+
+						<template #swipe-right>
+							<view class="swipe-del-btn" @tap="delItem(index)">
+								<text class="swipe-del-text">{{ t("删除") }}</text>
+							</view>
+						</template>
+					</cl-list-item>
+				</view>
+
+				<view v-if="list.length == 0" class="empty-state">
+					<cl-empty></cl-empty>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- Footer -->
+		<view class="footer-bar">
+			<view class="select-all" @tap="onSelectAllChange(!selectAll)">
+				<cl-icon
+					name="checkbox-circle-line"
+					color="#0052d9"
+					:size="40"
+					v-if="selectAll"
+				></cl-icon>
+				<cl-icon name="checkbox-blank-circle-line" :size="40" color="#c0c4cc" v-else></cl-icon>
+				<text class="select-all-text">{{ t("全选") }}</text>
+			</view>
+
+			<view class="footer-right">
+				<template v-if="isDel">
+					<view class="btn-delete" @tap="delAll">
+						<text class="btn-text">{{ t("删除") }}</text>
+					</view>
 				</template>
 
 				<template v-else>
-					<view class="flex flex-col mr-3 items-end pt-1">
-						<cl-text :size="12" color="info">{{ t("合计") }}</cl-text>
-						<cl-text color="error" :value="totalPrice" type="amount"></cl-text>
+					<view class="total-box">
+						<text class="total-label">{{ t("合计") }}</text>
+						<text class="total-price">¥{{ totalPrice }}</text>
 					</view>
 
-					<cl-button
-						type="error"
-						:pt="{
-							className: '!px-8'
-						}"
-						@tap="toSettle"
-					>
-						{{ t("去结算") }}
-					</cl-button>
+					<view class="btn-settle" @tap="toSettle">
+						<text class="btn-text">{{ t("去结算") }}</text>
+					</view>
 				</template>
 			</view>
-		</cl-footer>
-	</cl-page>
+		</view>
+	</view>
 </template>
 
 <script lang="ts" setup>
@@ -274,6 +210,10 @@ const list = ref<Goods[]>([
 // 是否全选
 const selectAll = ref(false);
 
+function goBack() {
+	uni.navigateBack();
+}
+
 /**
  * 选择/取消选择单个商品
  * @param item 需要操作的商品
@@ -290,8 +230,8 @@ function selectItem(item: Goods) {
  * @param val 是否全选
  */
 function onSelectAllChange(val: boolean) {
+	selectAll.value = val;
 	list.value.forEach((item, index, arr) => {
-		// item.checked = val; // 这样写，在 android 上无效
 		arr[index].checked = val;
 	});
 }
@@ -404,3 +344,285 @@ function toSettle() {
 	});
 }
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #0052d9;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: space-between;
+	position: relative;
+}
+
+.header-left {
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #ffffff;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #ffffff;
+	font-family: 'Inter', sans-serif;
+}
+
+.header-right {
+	display: flex;
+	align-items: center;
+}
+
+.header-action {
+	font-size: 28rpx;
+	color: #ffffff;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	padding-bottom: 120rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+/* Notification */
+.notification-card {
+	background-color: #fff7e6;
+	padding: 24rpx;
+	border-radius: 16rpx;
+}
+
+.notification-text {
+	font-size: 26rpx;
+	color: #ed6a0c;
+}
+
+/* Cart List */
+.cart-list {
+	display: flex;
+	flex-direction: column;
+	gap: 24rpx;
+}
+
+.cart-item-wrapper {
+	background-color: #ffffff;
+	border-radius: 24rpx;
+	margin-bottom: 24rpx;
+	overflow: hidden;
+}
+
+.cart-item {
+	display: flex;
+	flex-direction: row;
+	padding: 24rpx;
+}
+
+.checkbox-area {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 24rpx;
+}
+
+.item-img {
+	width: 160rpx;
+	height: 160rpx;
+	border-radius: 12rpx;
+	background-color: #f5f5f5;
+}
+
+.item-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	margin-left: 24rpx;
+	justify-content: space-between;
+}
+
+.item-name {
+	font-size: 30rpx;
+	font-weight: 600;
+	color: #1f2329;
+	line-height: 1.4;
+	margin-bottom: 12rpx;
+}
+
+.item-sku {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	background-color: #f5f7fa;
+	padding: 4rpx 12rpx;
+	border-radius: 8rpx;
+	align-self: flex-start;
+	margin-bottom: 16rpx;
+}
+
+.sku-text {
+	font-size: 24rpx;
+	color: #646a73;
+	margin-right: 8rpx;
+}
+
+.item-bottom {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.price-box {
+	display: flex;
+	flex-direction: row;
+	align-items: baseline;
+}
+
+.currency {
+	font-size: 24rpx;
+	color: #ff3b30;
+	margin-right: 2rpx;
+}
+
+.price {
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #ff3b30;
+}
+
+.action-box {
+	display: flex;
+	align-items: center;
+}
+
+.del-btn-icon {
+	width: 56rpx;
+	height: 56rpx;
+	background-color: #ff3b30;
+	border-radius: 28rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.tags-row {
+	margin-top: 8rpx;
+}
+
+.tag-text {
+	font-size: 22rpx;
+	color: #ff3b30;
+}
+
+.swipe-del-btn {
+	background-color: #ff3b30;
+	width: 140rpx;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.swipe-del-text {
+	color: #ffffff;
+	font-size: 28rpx;
+}
+
+/* Empty State */
+.empty-state {
+	padding: 64rpx 0;
+	display: flex;
+	justify-content: center;
+}
+
+/* Footer Bar */
+.footer-bar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #ffffff;
+	border-top: 1rpx solid #e5e5e5;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 24rpx 32rpx;
+	padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+	z-index: 100;
+}
+
+.select-all {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.select-all-text {
+	font-size: 28rpx;
+	color: #646a73;
+}
+
+.footer-right {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 24rpx;
+}
+
+.total-box {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.total-label {
+	font-size: 24rpx;
+	color: #646a73;
+}
+
+.total-price {
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #ff3b30;
+}
+
+.btn-settle {
+	background-color: #0052d9;
+	padding: 16rpx 48rpx;
+	border-radius: 40rpx;
+}
+
+.btn-delete {
+	background-color: #ff3b30;
+	padding: 16rpx 48rpx;
+	border-radius: 40rpx;
+}
+
+.btn-text {
+	color: #ffffff;
+	font-size: 30rpx;
+	font-weight: 600;
+}
+</style>

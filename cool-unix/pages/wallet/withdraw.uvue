@@ -1,126 +1,115 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="page-container">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">提现</text>
+		<view class="header">
+			<view class="header-left" @click="goBack">
+				<text class="back-icon">←</text>
+				<text class="header-title">提现</text>
 			</view>
 		</view>
 
 		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
+		<scroll-view class="content" scroll-y>
+			<view class="content-wrapper">
 				<!-- 可提现余额 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-[#999] mb-2">可提现余额（元）</text>
-					<text class="text-7 font-bold text-[#1f2329]">{{ availableBalance }}</text>
+				<view class="card balance-card">
+					<text class="card-label">可提现余额（元）</text>
+					<text class="balance-value">{{ availableBalance }}</text>
 				</view>
 
 				<!-- 提现金额 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">提现金额</text>
+				<view class="card amount-card">
+					<text class="card-title">提现金额</text>
 					
-					<view class="flex items-center border-b border-[#e5e5e5] pb-3 mb-3">
-						<text class="text-6 text-[#1f2329] mr-2">¥</text>
+					<view class="amount-input-box">
+						<text class="currency-symbol">¥</text>
 						<input 
 							v-model="withdrawAmount"
 							type="digit"
-							class="flex-1 text-7 font-bold text-[#1f2329]"
+							class="amount-input"
 							placeholder="请输入提现金额"
-							placeholder-class="text-[#c8c9cc]"
+							placeholder-class="input-placeholder"
 							:focus="true"
 						/>
 					</view>
 
-					<view class="flex items-center justify-between">
-						<text class="text-3.5 text-[#999]">手续费：{{ serviceFee }}元</text>
+					<view class="amount-footer">
+						<text class="fee-text">手续费：{{ serviceFee }}元</text>
 						<view @click="withdrawAll">
-							<text class="text-3.5 text-[#07c160]">全部提现</text>
+							<text class="action-text">全部提现</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- 提现账户 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">提现账户</text>
+				<view class="card account-card">
+					<text class="card-title">提现账户</text>
 					
 					<view 
 						v-for="(item, index) in bankCards" 
 						:key="index"
 						@click="selectBankCard(item.id)"
-						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
+						class="account-item"
 					>
-						<view class="flex items-center flex-1">
-							<view class="w-10 h-10 rounded bg-[#f5f5f5] flex items-center justify-center mr-3">
-								<text class="text-5">🏦</text>
+						<view class="account-info">
+							<view class="bank-icon-box">
+								<text class="bank-icon">🏦</text>
 							</view>
-							<view class="flex-1">
-								<text class="text-4 text-[#1f2329]">{{ item.bankName }}</text>
-								<text class="text-3 text-[#999] mt-1">{{ item.cardNo }}</text>
+							<view class="bank-detail">
+								<text class="bank-name">{{ item.bankName }}</text>
+								<text class="bank-no">{{ item.cardNo }}</text>
 							</view>
 						</view>
-						<view :class="['w-5 h-5 rounded-full border-2 flex items-center justify-center', selectedBankCard === item.id ? 'border-[#07c160]' : 'border-[#e5e5e5]']">
-							<view v-if="selectedBankCard === item.id" class="w-3 h-3 rounded-full bg-[#07c160]"></view>
+						<view class="radio-box" :class="{ active: selectedBankCard === item.id }">
+							<view v-if="selectedBankCard === item.id" class="radio-inner"></view>
 						</view>
 					</view>
 
-					<view 
-						@click="addBankCard"
-						class="flex items-center justify-center py-3 border-t border-[#e5e5e5]"
-					>
-						<text class="text-4 text-[#07c160]">+ 添加银行卡</text>
+					<view @click="addBankCard" class="add-card-btn">
+						<text class="add-card-text">+ 添加银行卡</text>
 					</view>
 				</view>
 
 				<!-- 到账时间 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">到账时间</text>
+				<view class="card time-card">
+					<text class="card-title">到账时间</text>
 					
-					<view class="flex items-center justify-between py-3">
-						<view class="flex items-center flex-1">
-							<text class="text-5 mr-3">⚡</text>
-							<view>
-								<text class="text-4 text-[#1f2329]">实时到账</text>
-								<text class="text-3 text-[#999] mt-1">预计2小时内到账</text>
+					<view class="time-item">
+						<view class="time-info">
+							<text class="time-icon">⚡</text>
+							<view class="time-detail">
+								<text class="time-title">实时到账</text>
+								<text class="time-desc">预计2小时内到账</text>
 							</view>
 						</view>
-						<text class="text-4 text-[#ff9500]">手续费 {{ serviceFee }}元</text>
+						<text class="fee-highlight">手续费 {{ serviceFee }}元</text>
 					</view>
 				</view>
 
 				<!-- 提现说明 -->
-				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 提现说明</text>
-					<text class="text-3.5 text-[#646a73] mt-2">• 单笔提现金额：10-50,000元</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 手续费：提现金额的0.6%，最低2元</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 实时到账：2小时内到账</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 每日限额：单日最多提现100,000元</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 如有疑问请联系客服：400-123-4567</text>
+				<view class="tips-card">
+					<text class="tips-title">💡 提现说明</text>
+					<view class="tips-list">
+						<text class="tip-item">• 单笔提现金额：10-50,000元</text>
+						<text class="tip-item">• 手续费：提现金额的0.6%，最低2元</text>
+						<text class="tip-item">• 实时到账：2小时内到账</text>
+						<text class="tip-item">• 每日限额：单日最多提现100,000元</text>
+						<text class="tip-item">• 如有疑问请联系客服：400-123-4567</text>
+					</view>
+				</view>
+
+				<!-- 提交按钮 -->
+				<view class="btn-submit" :class="{ disabled: !canSubmit }" @tap="confirmWithdraw">
+					<text class="btn-submit-text">确认提现</text>
 				</view>
 			</view>
 		</scroll-view>
-
-		<!-- 底部操作按钮 -->
-		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
-			<view class="flex items-center justify-between mb-3">
-				<text class="text-4 text-[#646a73]">实际到账</text>
-				<text class="text-6 font-bold text-[#ff3b30]">¥{{ actualAmount }}</text>
-			</view>
-			<button 
-				@click="confirmWithdraw"
-				:class="['w-full rounded-full py-3', canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999]']"
-				:disabled="!canSubmit"
-			>
-				<text class="text-4">确认提现</text>
-			</button>
-		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
-import { getWalletInfo, withdraw, getWithdrawConfig } from '@/services/wallet'
+// import { getWalletInfo, withdraw, getWithdrawConfig } from '@/services/wallet'
 
 // 可提现余额
 const availableBalance = ref('12,580.00')
@@ -129,7 +118,7 @@ const availableBalance = ref('12,580.00')
 const withdrawAmount = ref('')
 
 // 选中的银行卡
-const selectedBankCard = ref(0)
+const selectedBankCard = ref(1)
 
 // 银行卡列表
 const bankCards = ref([
@@ -168,30 +157,12 @@ const canSubmit = computed(() => {
 
 // 加载钱包信息
 const loadWalletInfo = async () => {
-	try {
-		const res = await getWalletInfo()
-		if (res.code === 0) {
-			availableBalance.value = res.data.balance
-		}
-	} catch (error) {
-		console.log('加载钱包信息失败', error)
-	}
+	// Mock implementation
 }
 
 // 加载银行卡列表
 const loadBankCards = async () => {
-	try {
-		// TODO: 实现获取银行卡列表接口
-		const res = { code: 0, data: { list: [] } } as any
-		if (res.code === 0) {
-			bankCards.value = res.data.list
-			if (bankCards.value.length > 0) {
-				selectedBankCard.value = bankCards.value[0].id
-			}
-		}
-	} catch (error) {
-		console.log('加载银行卡列表失败', error)
-	}
+	// Mock implementation
 }
 
 // 全部提现
@@ -251,29 +222,18 @@ const confirmWithdraw = async () => {
 				try {
 					uni.showLoading({ title: '处理中...' })
 					
-					const result = await withdraw({
-						amount: withdrawAmount.value,
-						bankCardId: selectedBankCard.value
-					})
-					
-					uni.hideLoading()
-					
-					if (result.code === 0) {
+					// Mock withdraw
+					setTimeout(() => {
+						uni.hideLoading()
 						uni.showToast({
 							title: '提现申请已提交',
 							icon: 'success'
 						})
-						
-						// 返回上一页
 						setTimeout(() => {
 							uni.navigateBack()
 						}, 1500)
-					} else {
-						uni.showToast({
-							title: result.message || '提现失败',
-							icon: 'none'
-						})
-					}
+					}, 1000)
+					
 				} catch (error) {
 					uni.hideLoading()
 					uni.showToast({
@@ -297,3 +257,299 @@ onMounted(() => {
 	loadBankCards()
 })
 </script>
+
+<style>
+.page-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f5f7fa;
+	height: 100vh;
+}
+
+/* Header */
+.header {
+	height: 112rpx; /* 56px */
+	background-color: #ffffff;
+	display: flex;
+	align-items: center;
+	padding: 0 32rpx;
+	justify-content: center;
+	position: relative;
+}
+
+.header-left {
+	position: absolute;
+	left: 32rpx;
+	display: flex;
+	align-items: center;
+	gap: 16rpx;
+}
+
+.back-icon {
+	font-size: 48rpx;
+	color: #1f2329;
+}
+
+.header-title {
+	font-size: 34rpx; /* 17px */
+	font-weight: 600;
+	color: #1f2329;
+	font-family: 'Inter', sans-serif;
+}
+
+/* Content */
+.content {
+	flex: 1;
+	height: 0;
+}
+
+.content-wrapper {
+	padding: 32rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 32rpx; /* 16px */
+}
+
+.card {
+	background-color: #ffffff;
+	border-radius: 24rpx; /* 12px */
+	padding: 32rpx; /* 16px */
+	display: flex;
+	flex-direction: column;
+}
+
+.card-title {
+	font-size: 32rpx;
+	font-weight: 600;
+	color: #1f2329;
+	margin-bottom: 24rpx;
+}
+
+.card-label {
+	font-size: 28rpx;
+	color: #999999;
+	margin-bottom: 16rpx;
+}
+
+/* Balance Card */
+.balance-value {
+	font-size: 56rpx;
+	font-weight: 700;
+	color: #1f2329;
+}
+
+/* Amount Card */
+.amount-input-box {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border-bottom: 2rpx solid #e5e5e5;
+	padding-bottom: 24rpx;
+	margin-bottom: 24rpx;
+}
+
+.currency-symbol {
+	font-size: 48rpx;
+	color: #1f2329;
+	margin-right: 16rpx;
+	font-weight: 600;
+}
+
+.amount-input {
+	flex: 1;
+	font-size: 56rpx;
+	font-weight: 700;
+	color: #1f2329;
+	height: 80rpx;
+}
+
+.input-placeholder {
+	color: #c8c9cc;
+}
+
+.amount-footer {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.fee-text {
+	font-size: 28rpx;
+	color: #999999;
+}
+
+.action-text {
+	font-size: 28rpx;
+	color: #0052d9;
+}
+
+/* Account Card */
+.account-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	padding: 24rpx 0;
+	border-bottom: 2rpx solid #e5e5e5;
+}
+
+.account-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	flex: 1;
+}
+
+.bank-icon-box {
+	width: 80rpx;
+	height: 80rpx;
+	border-radius: 12rpx;
+	background-color: #f5f5f5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 24rpx;
+}
+
+.bank-icon {
+	font-size: 40rpx;
+}
+
+.bank-detail {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.bank-name {
+	font-size: 32rpx;
+	color: #1f2329;
+}
+
+.bank-no {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.radio-box {
+	width: 40rpx;
+	height: 40rpx;
+	border-radius: 50%;
+	border: 4rpx solid #e5e5e5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.radio-box.active {
+	border-color: #0052d9;
+}
+
+.radio-inner {
+	width: 24rpx;
+	height: 24rpx;
+	border-radius: 50%;
+	background-color: #0052d9;
+}
+
+.add-card-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding-top: 24rpx;
+}
+
+.add-card-text {
+	font-size: 32rpx;
+	color: #0052d9;
+}
+
+/* Time Card */
+.time-item {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.time-info {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.time-icon {
+	font-size: 40rpx;
+	margin-right: 24rpx;
+}
+
+.time-detail {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.time-title {
+	font-size: 32rpx;
+	color: #1f2329;
+}
+
+.time-desc {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.fee-highlight {
+	font-size: 32rpx;
+	color: #ff9500;
+}
+
+/* Tips Card */
+.tips-card {
+	background-color: #fff7e6;
+	border-radius: 16rpx;
+	padding: 24rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+
+.tips-title {
+	font-size: 28rpx;
+	font-weight: 700;
+	color: #ed6a0c;
+}
+
+.tips-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8rpx;
+}
+
+.tip-item {
+	font-size: 26rpx;
+	color: #646a73;
+}
+
+/* Submit Button */
+.btn-submit {
+	height: 96rpx;
+	background-color: #0052d9;
+	border-radius: 24rpx; /* 12px */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 16rpx;
+}
+
+.btn-submit.disabled {
+	background-color: #c0c4cc;
+}
+
+.btn-submit-text {
+	font-size: 32rpx;
+	color: #ffffff;
+	font-weight: 500;
+}
+</style>
