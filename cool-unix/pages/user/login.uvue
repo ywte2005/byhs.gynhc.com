@@ -113,7 +113,7 @@ async function toLogin() {
 	} catch (err: any) {
 		uni.hideLoading();
 		uni.showToast({
-			title: err.msg || err.message || "登录失败",
+			title: err.msg || "登录失败",
 			icon: "none"
 		});
 	}
