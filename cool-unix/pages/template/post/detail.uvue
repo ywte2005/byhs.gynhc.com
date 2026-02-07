@@ -45,9 +45,9 @@
 						<image class="w-[68rpx] h-[68rpx] rounded-[34rpx] mr-[16rpx] bg-[#f5f5f5]" src="https://unix.cool-js.com/images/demo/avatar.jpg" mode="aspectFill" />
 						<view class="flex-1 h-[72rpx] bg-[#f5f7fa] rounded-[36rpx] flex flex-row items-center justify-between px-[24rpx]">
 							<text class="text-[28rpx] text-[#999999]">说点什么...</text>
-							<view class="flex flex-row items-center">
-								<cl-icon name="user-smile-line" :size="40" color="#646a73"></cl-icon>
-								<cl-icon name="image-circle-line" :size="40" color="#646a73" :pt="{ className: 'ml-2' }"></cl-icon>
+							<view class="flex flex-row items-center gap-[16rpx]">
+								<uni-icons type="smile" size="20" color="#646a73"></uni-icons>
+								<uni-icons type="image" size="20" color="#646a73"></uni-icons>
 							</view>
 						</view>
 					</view>
@@ -91,16 +91,16 @@
 		<!-- Footer -->
 		<view class="fixed bottom-0 left-0 right-0 bg-white border-t-[1rpx] border-[#e5e5e5] px-[32rpx] py-[16rpx] pb-[calc(16rpx+env(safe-area-inset-bottom))] flex flex-row items-center z-100">
 			<view class="flex-1 h-[72rpx] bg-[#f5f7fa] rounded-[36rpx] flex items-center px-[24rpx] mr-[24rpx]" @tap="openReply">
-				<cl-icon name="edit-line" color="#646a73" :size="32"></cl-icon>
+				<uni-icons type="compose" color="#646a73" size="16"></uni-icons>
 				<text class="text-[28rpx] text-[#999999] ml-[12rpx]">说点什么...</text>
 			</view>
 			<view class="flex flex-row gap-[32rpx]">
 				<view class="flex flex-row items-center">
-					<cl-icon name="heart-line" :size="48" color="#1f2329"></cl-icon>
+					<uni-icons type="heart" size="24" color="#1f2329"></uni-icons>
 					<text class="text-[24rpx] text-[#1f2329] ml-[8rpx]">700</text>
 				</view>
 				<view class="flex flex-row items-center">
-					<cl-icon name="chat-3-line" :size="48" color="#1f2329"></cl-icon>
+					<uni-icons type="chat" size="24" color="#1f2329"></uni-icons>
 					<text class="text-[24rpx] text-[#1f2329] ml-[8rpx]">59</text>
 				</view>
 			</view>
@@ -120,9 +120,9 @@
 				</view>
 
 				<view class="flex flex-row justify-between items-center">
-					<view class="flex flex-row">
-						<cl-icon name="image-circle-line" :size="48" color="#646a73" :pt="{ className: 'mr-4' }"></cl-icon>
-						<cl-icon name="user-smile-line" :size="48" color="#646a73"></cl-icon>
+					<view class="flex flex-row gap-[16rpx]">
+						<uni-icons type="image" size="24" color="#646a73"></uni-icons>
+						<uni-icons type="smile" size="24" color="#646a73"></uni-icons>
 					</view>
 					<view class="bg-[#0052d9] rounded-[32rpx] px-[32rpx] py-[12rpx]">
 						<text class="text-[28rpx] text-white">发送</text>

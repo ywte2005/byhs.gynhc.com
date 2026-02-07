@@ -86,7 +86,7 @@
 					<text class="text-[26rpx] text-[#999999]">没有更多了</text>
 				</view>
 				<view v-if="subtaskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-[160rpx] gap-[24rpx]">
-					<text class="text-[80rpx]">📋</text>
+					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
 					<text class="text-[32rpx] text-[#999999]">暂无任务</text>
 				</view>
 			</view>

@@ -6,7 +6,7 @@
 			<!-- Logo -->
 			<view class="flex flex-col items-center justify-center gap-[24rpx] mb-[64rpx]">
 				<view class="w-[144rpx] h-[144rpx] bg-[#0052d9] rounded-[32rpx] flex items-center justify-center">
-					<text class="text-white text-[64rpx]">🏪</text>
+					<uni-icons type="bolt-filled" size="30" color="#ffffff"></uni-icons>
 				</view>
 				<text class="text-[48rpx] font-semibold text-[#1f2329]">旺铺集</text>
 			</view>
@@ -37,11 +37,8 @@
 				</view>
 
 				<!-- Agreement -->
-				<view class="flex flex-row items-center gap-[16rpx]" @tap="form.agree = !form.agree">
-					<view class="w-[32rpx] h-[32rpx] border-[2rpx] border-[#c0c4cc] rounded-full flex items-center justify-center" :class="{ 'border-[#0052d9] bg-[#0052d9]': form.agree }">
-						<view v-if="form.agree" class="w-[12rpx] h-[24rpx] border-b-[4rpx] border-r-[4rpx] border-white rotate-45 -translate-y-[2rpx]"></view>
-					</view>
-					<text class="text-[24rpx] text-[#86909c]">已阅读并同意《用户协议》和《隐私政策》</text>
+				<view class="flex flex-row items-center gap-[16rpx]">
+					<cl-checkbox v-model="form.agree">已阅读并同意《用户协议》和《隐私政策》</cl-checkbox>
 				</view>
 
 				<!-- Login Button -->
@@ -62,7 +59,7 @@
 				</view>
 
 				<!-- Wx Login -->
-				<view class="h-[96rpx] bg-white border-[2rpx] border-[#e5e6eb] rounded-[16rpx] flex items-center justify-center" @tap="wxLogin">
+				<view class="h-[96rpx] bg-white border border-[#e5e6eb] rounded-[16rpx] flex items-center justify-center" @tap="wxLogin">
 					<text class="text-[30rpx] text-[#1f2329]">微信一键登录</text>
 				</view>
 			</view>

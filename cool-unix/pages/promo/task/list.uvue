@@ -67,7 +67,10 @@
 
 						<view class="flex flex-row justify-between items-center pt-[24rpx] border-t-[2rpx] border-[#f5f7fa]">
 							<text class="text-[24rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
-							<text class="text-[26rpx] text-[#0052d9]">查看详情 ></text>
+							<view class="flex flex-row items-center gap-[4rpx]">
+								<text class="text-[26rpx] text-[#0052d9]">查看详情</text>
+								<uni-icons type="right" size="12" color="#0052d9"></uni-icons>
+							</view>
 						</view>
 					</view>
 				</view>

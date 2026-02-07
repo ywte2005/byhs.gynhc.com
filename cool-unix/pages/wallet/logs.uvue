@@ -132,7 +132,7 @@ const tabs = [
 // 账单列表
 const logList = ref([
 	{
-		iconType: 'wallet',
+		iconType: 'wallet-filled',
 		iconColor: '#00b578',
 		title: '任务佣金',
 		time: '2025-01-30 10:30:00',
@@ -152,7 +152,7 @@ const logList = ref([
 		remark: '任务编号：T202501300001'
 	},
 	{
-		iconType: 'wallet',
+		iconType: 'wallet-filled',
 		iconColor: '#0052d9',
 		title: '充值',
 		time: '2025-01-29 15:00:00',
@@ -162,7 +162,7 @@ const logList = ref([
 		remark: '微信支付'
 	},
 	{
-		iconType: 'vip',
+		iconType: 'upload-filled',
 		iconColor: '#ff3b30',
 		title: '提现',
 		time: '2025-01-29 10:00:00',

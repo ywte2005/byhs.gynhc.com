@@ -11,7 +11,7 @@
 
 			<template #append>
 				<view class="flex items-center justify-center mr-2">
-					<cl-icon name="search-line" :size="20"></cl-icon>
+					<uni-icons type="search" size="20" color="#1f2329"></uni-icons>
 				</view>
 			</template>
 		</cl-topbar>

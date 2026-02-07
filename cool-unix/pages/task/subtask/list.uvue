@@ -9,7 +9,7 @@
 				<text class="text-[32rpx] text-[#1f2329]">共 {{ totalCount }} 个可接任务</text>
 				<view @click="showFilterDialog = true" class="flex items-center">
 					<text class="text-[28rpx] text-[#0052d9]">筛选</text>
-					<text class="text-[32rpx] text-[#0052d9] ml-[8rpx]">⚙</text>
+					<uni-icons type="settings" size="16" color="#0052d9" class="ml-[8rpx]"></uni-icons>
 				</view>
 			</view>
 		</view>
@@ -44,11 +44,13 @@
 
 					<!-- 任务要求 -->
 					<view class="flex flex-row flex-wrap gap-[24rpx] mb-[24rpx]">
-						<view class="flex items-center">
-							<text class="text-[24rpx] text-[#999999]">⏰ {{ task.timeLimit }}小时</text>
+						<view class="flex items-center gap-[4rpx]">
+							<uni-icons type="time" size="14" color="#999999"></uni-icons>
+							<text class="text-[24rpx] text-[#999999]">{{ task.timeLimit }}小时</text>
 						</view>
-						<view class="flex items-center">
-							<text class="text-[24rpx] text-[#999999]">📸 {{ task.proofCount }}张凭证</text>
+						<view class="flex items-center gap-[4rpx]">
+							<uni-icons type="camera" size="14" color="#999999"></uni-icons>
+							<text class="text-[24rpx] text-[#999999]">{{ task.proofCount }}张凭证</text>
 						</view>
 					</view>
 
@@ -75,7 +77,7 @@
 					<text class="text-[26rpx] text-[#999999]">没有更多了</text>
 				</view>
 				<view v-if="subtaskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-[160rpx] gap-[24rpx]">
-					<text class="text-[80rpx]">📋</text>
+					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
 					<text class="text-[32rpx] text-[#999999]">暂无可接任务</text>
 				</view>
 			</view>

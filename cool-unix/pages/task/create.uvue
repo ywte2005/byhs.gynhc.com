@@ -1,56 +1,39 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
-		<!-- Header -->
-		<cl-topbar title="发布任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] pb-[160rpx] flex flex-col gap-[32rpx]">
 				<!-- Task Info -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">任务信息</text>
-					
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">任务标题 <text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<!-- Task Type -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">任务类型</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="showTypePicker = true">
+							<text :class="form.type ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx]">{{ form.type || '请选择任务类型' }}</text>
+						</view>
+					</view>
+
+					<!-- Task Title -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">任务标题</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
 							<input 
 								v-model="form.title"
-								class="flex-1 text-[30rpx] text-[#1f2329]"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
 								placeholder="请输入任务标题"
-								placeholder-class="text-[#999999]"
+								placeholder-class="text-[#9aa0a6]"
 							/>
 						</view>
 					</view>
 
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">任务类目 <text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center justify-between px-[24rpx]" @click="showCategoryPicker = true">
-							<text :class="['text-[30rpx]', form.category ? 'text-[#1f2329]' : 'text-[#999999]']">
-								{{ form.category || '请选择任务类目' }}
-							</text>
-							<uni-icons type="right" size="14" color="#999999"></uni-icons>
-						</view>
-					</view>
-
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">平台名称 <text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
-							<input 
-								v-model="form.platform"
-								class="flex-1 text-[30rpx] text-[#1f2329]"
-								placeholder="如：美团、淘宝、京东等"
-								placeholder-class="text-[#999999]"
-							/>
-						</view>
-					</view>
-
+					<!-- Task Description -->
 					<view class="flex flex-col gap-[16rpx]">
-						<text class="text-[28rpx] text-[#646a73]">任务描述 <text class="text-[#ff3b30]">*</text></text>
+						<text class="text-[28rpx] font-medium text-[#1f2329]">任务描述</text>
 						<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
 							<textarea 
 								v-model="form.description"
-								class="w-full h-[200rpx] text-[30rpx] text-[#1f2329]"
-								placeholder="请详细描述任务要求和操作步骤"
-								placeholder-class="text-[#999999]"
+								class="w-full h-[200rpx] text-[28rpx] text-[#1f2329]"
+								placeholder="请输入任务描述，包括任务要求、注意事项等..."
+								placeholder-class="text-[#9aa0a6]"
 								:maxlength="500"
 								:show-confirm-bar="false"
 							/>
@@ -59,234 +42,242 @@
 					</view>
 				</view>
 
-				<!-- Amount Settings -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">金额设置</text>
+				<!-- Collection Method -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">收款方式</text>
 					
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">单价（元）<text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
-							<input 
-								v-model="form.unitPrice"
-								type="digit"
-								class="flex-1 text-[30rpx] text-[#1f2329]"
-								placeholder="请输入单个任务的佣金"
-								placeholder-class="text-[#999999]"
-								@input="calculateTotal"
-							/>
+					<!-- Tabs -->
+					<view class="flex flex-row gap-[24rpx]">
+						<view 
+							class="flex-1 h-[80rpx] rounded-[16rpx] flex items-center justify-center transition-all"
+							:class="form.collectionType === 'merchant' ? 'bg-[#eaf2ff]' : 'bg-[#f5f7fa]'"
+							@tap="form.collectionType = 'merchant'"
+						>
+							<text class="text-[28rpx]" :class="form.collectionType === 'merchant' ? 'text-[#0052d9]' : 'text-[#646a73]'">选择进件</text>
+						</view>
+						<view 
+							class="flex-1 h-[80rpx] rounded-[16rpx] flex items-center justify-center transition-all"
+							:class="form.collectionType === 'qrcode' ? 'bg-[#eaf2ff]' : 'bg-[#f5f7fa]'"
+							@tap="form.collectionType = 'qrcode'"
+						>
+							<text class="text-[28rpx]" :class="form.collectionType === 'qrcode' ? 'text-[#0052d9]' : 'text-[#646a73]'">上传收款码</text>
 						</view>
 					</view>
 
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">任务数量 <text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
-							<input 
-								v-model="form.totalCount"
-								type="number"
-								class="flex-1 text-[30rpx] text-[#1f2329]"
-								placeholder="需要完成的任务数量"
-								placeholder-class="text-[#999999]"
-								@input="calculateTotal"
-							/>
+					<!-- Merchant Select -->
+					<view v-if="form.collectionType === 'merchant'" class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">选择进件商户</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="showMerchantPicker = true">
+							<text :class="form.merchant ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx]">{{ form.merchant || '请选择进件商户' }}</text>
+							<uni-icons type="down" size="16" color="#9aa0a6"></uni-icons>
 						</view>
 					</view>
 
-					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
-						<view class="flex justify-between items-center">
-							<text class="text-[28rpx] text-[#646a73]">任务总额</text>
-							<text class="text-[32rpx] font-bold text-[#1f2329]">¥{{ totalAmount }}</text>
+					<!-- QR Upload -->
+					<view v-else class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">上传收款码</text>
+						<view 
+							class="h-[240rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center gap-[16rpx] border-[2rpx] border-dashed border-[#e5e6eb]"
+							@tap="uploadQrCode"
+						>
+							<template v-if="form.qrCode">
+								<image :src="form.qrCode" class="h-[200rpx] w-[200rpx] rounded-[16rpx]" mode="aspectFit" />
+							</template>
+							<template v-else>
+								<uni-icons type="cloud-upload" size="30" color="#9aa0a6"></uni-icons>
+								<text class="text-[24rpx] text-[#9aa0a6]">点击上传收款码图片</text>
+							</template>
 						</view>
-						<view class="flex justify-between items-center">
-							<text class="text-[28rpx] text-[#646a73]">平台手续费（5%）</text>
-							<text class="text-[30rpx] text-[#ff9500]">¥{{ serviceFee }}</text>
-						</view>
-						<view class="flex justify-between items-center">
-							<text class="text-[28rpx] text-[#646a73]">保证金（10%）</text>
-							<text class="text-[30rpx] text-[#ff9500]">¥{{ depositAmount }}</text>
-						</view>
-						<view class="h-[2rpx] bg-[#e5e5e5] my-[8rpx]"></view>
-						<view class="flex justify-between items-center">
-							<text class="text-[30rpx] font-bold text-[#1f2329]">需支付总额</text>
-							<text class="text-[40rpx] font-bold text-[#ff3b30]">¥{{ payAmount }}</text>
-						</view>
+						<text class="text-[24rpx] text-[#9aa0a6]">支持JPG、PNG格式，文件大小不超过5MB</text>
 					</view>
 				</view>
 
-				<!-- Requirements -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">任务要求</text>
+				<!-- Task Settings -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[32rpx] font-bold text-[#1f2329]">任务设置</text>
+						<view class="w-full h-[80rpx] bg-[#eaf2ff] rounded-[16rpx] flex items-center justify-center">
+							<text class="text-[28rpx] text-[#0052d9]">总预算</text>
+						</view>
+					</view>
 					
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">完成时限（小时）<text class="text-[#ff3b30]">*</text></text>
-						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
+					<!-- Total Amount -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">总金额</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
 							<input 
-								v-model="form.timeLimit"
-								type="number"
-								class="flex-1 text-[30rpx] text-[#1f2329]"
-								placeholder="接单后需在多少小时内完成"
-								placeholder-class="text-[#999999]"
+								v-model="form.totalAmount"
+								type="digit"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入总金额"
+								placeholder-class="text-[#9aa0a6]"
 							/>
 						</view>
 					</view>
 
-					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73]">凭证要求</text>
-						<view class="flex flex-row flex-wrap gap-[16rpx]">
-							<view 
-								v-for="(item, index) in proofTypes" 
-								:key="index"
-								@click="toggleProofType(item.value)"
-								class="px-[24rpx] py-[12rpx] rounded-[12rpx] border-[2rpx]"
-								:class="form.proofTypes.includes(item.value) ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e6eb] bg-white'"
-							>
-								<text class="text-[26rpx]" :class="form.proofTypes.includes(item.value) ? 'text-[#0052d9]' : 'text-[#646a73]'">
-									{{ item.label }}
-								</text>
+					<view class="flex flex-row gap-[24rpx]">
+						<!-- Start Time -->
+						<view class="flex-1 flex flex-col gap-[16rpx]">
+							<text class="text-[28rpx] font-medium text-[#1f2329]">开始时间</text>
+							<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-center" @tap="openDatePicker('start')">
+								<text :class="form.startTime ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx] whitespace-nowrap overflow-hidden">{{ form.startTime || '选择开始时间' }}</text>
+							</view>
+						</view>
+
+						<!-- End Time -->
+						<view class="flex-1 flex flex-col gap-[16rpx]">
+							<text class="text-[28rpx] font-medium text-[#1f2329]">结束时间</text>
+							<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-center" @tap="openDatePicker('end')">
+								<text :class="form.endTime ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx] whitespace-nowrap overflow-hidden">{{ form.endTime || '选择结束时间' }}</text>
 							</view>
 						</view>
 					</view>
-
-					<view class="flex flex-col gap-[16rpx]">
-						<text class="text-[28rpx] text-[#646a73]">特殊要求</text>
-						<view class="bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] py-[16rpx]">
-							<textarea 
-								v-model="form.specialRequirement"
-								class="w-full h-[120rpx] text-[30rpx] text-[#1f2329]"
-								placeholder="如有特殊要求请在此说明（选填）"
-								placeholder-class="text-[#999999]"
-								:maxlength="200"
-								:show-confirm-bar="false"
-							/>
-						</view>
-					</view>
 				</view>
 
-				<!-- Tips -->
-				<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
-					<text class="text-[30rpx] font-bold text-[#ed6a0c]">温馨提示</text>
-					<view class="flex flex-col gap-[8rpx]">
-						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 发起任务需支付任务总额+手续费+保证金</text>
-						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 任务完成后保证金将自动退还</text>
-						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 请确保任务描述清晰，避免纠纷</text>
-						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 恶意发布任务将被封号处理</text>
+
+				<!-- Footer -->
+				<view class="border-t-[2rpx] border-[#e5e5e5]">
+					<button 
+						class="w-full h-[96rpx] rounded-[16rpx] flex items-center justify-center bg-[#0052d9] active:opacity-80 disabled:opacity-50 disabled:bg-[#ccc]"
+						@tap="submitTask"
+					>
+						<text class="text-[32rpx] font-medium text-white">提交审核</text>
+					</button>
+				</view>
+
+				<!-- Notice -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">任务须知</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<view class="flex flex-row items-start gap-[12rpx]">
+							<view class="w-[8rpx] h-[8rpx] rounded-[2rpx] bg-[#0052d9] mt-[14rpx] shrink-0"></view>
+							<text class="flex-1 text-[26rpx] text-[#646a73] leading-[36rpx]">任务发布后需要平台审核，审核通过后才能开始执行</text>
+						</view>
+						<view class="flex flex-row items-start gap-[12rpx]">
+							<view class="w-[8rpx] h-[8rpx] rounded-[2rpx] bg-[#0052d9] mt-[14rpx] shrink-0"></view>
+							<text class="flex-1 text-[26rpx] text-[#646a73] leading-[36rpx]">任务金额将在审核通过后冻结，任务完成后自动结算</text>
+						</view>
+						<view class="flex flex-row items-start gap-[12rpx]">
+							<view class="w-[8rpx] h-[8rpx] rounded-[2rpx] bg-[#0052d9] mt-[14rpx] shrink-0"></view>
+							<text class="flex-1 text-[26rpx] text-[#646a73] leading-[36rpx]">请确保任务内容合法合规，违规任务将被拒绝或下架</text>
+						</view>
+						<view class="flex flex-row items-start gap-[12rpx]">
+							<view class="w-[8rpx] h-[8rpx] rounded-[2rpx] bg-[#0052d9] mt-[14rpx] shrink-0"></view>
+							<text class="flex-1 text-[26rpx] text-[#646a73] leading-[36rpx]">任务执行期间可以随时查看进度和修改设置</text>
+						</view>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
 
-		<!-- Footer -->
-		<view class="bg-white px-[32rpx] py-[24rpx] pb-[calc(24rpx+env(safe-area-inset-bottom))] border-t-[2rpx] border-[#e5e5e5]">
-			<view 
-				class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center" 
-				:class="{ 'bg-[#c0c4cc]': !canSubmit }"
-				@tap="submitTask"
-			>
-				<text class="text-[32rpx] text-white font-medium">确认发布（¥{{ payAmount }}）</text>
-			</view>
-		</view>
 
-		<!-- Category Picker Mock -->
-		<view v-if="showCategoryPicker" class="fixed inset-0 bg-black/50 z-[100] flex flex-col justify-end" @click="showCategoryPicker = false">
-			<view class="bg-white rounded-t-[24rpx] p-[32rpx] pb-[calc(32rpx+env(safe-area-inset-bottom))]" @click.stop>
-				<text class="text-[32rpx] font-bold text-[#1f2329] text-center mb-[32rpx] block">选择任务类目</text>
-				<scroll-view scroll-y class="max-h-[500rpx]">
-					<view 
-						v-for="(item, index) in categories" 
-						:key="index"
-						@click="selectCategory(item)"
-						class="py-[24rpx] border-b-[2rpx] border-[#f5f7fa] flex items-center justify-center"
-					>
-						<text class="text-[30rpx] text-[#1f2329]">{{ item }}</text>
-					</view>
-				</scroll-view>
-				<view class="mt-[32rpx] bg-[#f5f5f5] h-[96rpx] rounded-[24rpx] flex items-center justify-center" @click="showCategoryPicker = false">
-					<text class="text-[30rpx] text-[#646a73]">取消</text>
-				</view>
-			</view>
-		</view>
+		<!-- Type Picker Mock (ActionSheet) -->
+		<!-- Merchant Picker Mock (ActionSheet) -->
 	</view>
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
-// import { createTask } from '@/services/task'
+import { ref, computed, watch } from 'vue'
+import { useRefs } from "@/.cool";
+
+// Refs
+const refs = useRefs()
+const datePicker = ref<any>(null)
+
+// State
+const showTypePicker = ref(false)
+const showMerchantPicker = ref(false)
+const datePickerType = ref<'start' | 'end'>('start')
 
 // 表单数据
 const form = ref({
+	type: '',
 	title: '',
-	category: '',
-	platform: '',
 	description: '',
-	unitPrice: '',
-	totalCount: '',
-	timeLimit: '24',
-	proofTypes: ['screenshot'],
-	specialRequirement: ''
+	collectionType: 'merchant' as 'merchant' | 'qrcode',
+	merchant: '',
+	qrCode: '',
+	totalAmount: '',
+	startTime: '',
+	endTime: ''
 })
 
 // 分类列表
-const categories = ['电商', '外卖', '出行', '生活', '其他']
+const taskTypes = ['电商推广', '应用下载', '实名认证', '问卷调查', '其他']
 
-// 凭证类型
-const proofTypes = [
-	{ label: '订单截图', value: 'screenshot' },
-	{ label: '聊天记录', value: 'chat' },
-	{ label: '物流信息', value: 'logistics' },
-	{ label: '评价截图', value: 'review' }
-]
+// 商户列表
+const merchants = ['商家A', '商家B', '商家C']
 
-// 显示分类选择器
-const showCategoryPicker = ref(false)
-
-// 计算总金额
-const totalAmount = computed(() => {
-	const price = parseFloat(form.value.unitPrice) || 0
-	const count = parseInt(form.value.totalCount) || 0
-	return (price * count).toFixed(2)
-})
-
-// 计算手续费
-const serviceFee = computed(() => {
-	return (parseFloat(totalAmount.value) * 0.05).toFixed(2)
-})
-
-// 计算保证金
-const depositAmount = computed(() => {
-	return (parseFloat(totalAmount.value) * 0.1).toFixed(2)
-})
-
-// 计算需支付总额
-const payAmount = computed(() => {
-	return (parseFloat(totalAmount.value) + parseFloat(serviceFee.value) + parseFloat(depositAmount.value)).toFixed(2)
-})
-
-// 判断是否可以提交
-const canSubmit = computed(() => {
-	return form.value.title && form.value.category && form.value.platform && 
-		form.value.description && form.value.unitPrice && form.value.totalCount && 
-		form.value.timeLimit && form.value.proofTypes.length > 0
-})
-
-// 选择分类
-const selectCategory = (category: string) => {
-	form.value.category = category
-	showCategoryPicker.value = false
+// 打开日期选择
+const openDatePicker = (type: 'start' | 'end') => {
+	datePickerType.value = type
+	refs.open("datePicker")
 }
 
-// 切换凭证类型
-const toggleProofType = (value: string) => {
-	const index = form.value.proofTypes.indexOf(value)
-	if (index > -1) {
-		form.value.proofTypes.splice(index, 1)
+// 确认日期
+const onDateConfirm = (val: string) => {
+	if (datePickerType.value === 'start') {
+		form.value.startTime = val
 	} else {
-		form.value.proofTypes.push(value)
+		form.value.endTime = val
 	}
 }
 
-// 计算总额
-const calculateTotal = () => {
-	// 触发计算
+// 选择类型
+const selectType = () => {
+	uni.showActionSheet({
+		itemList: taskTypes,
+		success: (res) => {
+			form.value.type = taskTypes[res.tapIndex]
+		}
+	})
 }
+
+// 选择商户
+const selectMerchant = () => {
+	uni.showActionSheet({
+		itemList: merchants,
+		success: (res) => {
+			form.value.merchant = merchants[res.tapIndex]
+		}
+	})
+}
+
+// 监听点击
+watch(showTypePicker, (val) => {
+	if(val) {
+		selectType()
+		showTypePicker.value = false
+	}
+})
+watch(showMerchantPicker, (val) => {
+	if(val) {
+		selectMerchant()
+		showMerchantPicker.value = false
+	}
+})
+
+// 上传二维码
+const uploadQrCode = () => {
+	uni.chooseImage({
+		count: 1,
+		success: (res) => {
+			form.value.qrCode = res.tempFilePaths[0]
+		}
+	})
+}
+
+// 校验是否可提交
+const canSubmit = computed(() => {
+	const basicValid = form.value.type && form.value.title && form.value.description && 
+					   form.value.totalAmount && form.value.startTime && form.value.endTime
+	
+	const collectionValid = form.value.collectionType === 'merchant' 
+		? !!form.value.merchant 
+		: !!form.value.qrCode
+
+	return basicValid && collectionValid
+})
 
 // 提交任务
 const submitTask = async () => {
@@ -295,13 +286,11 @@ const submitTask = async () => {
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
-		// const res = await createTask(form.value)
-		
-		// Mock success
+		// Mock API call
 		setTimeout(() => {
 			uni.hideLoading()
 			uni.showToast({
-				title: '发布成功',
+				title: '提交成功',
 				icon: 'success'
 			})
 			setTimeout(() => {
@@ -312,17 +301,13 @@ const submitTask = async () => {
 	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '发布失败，请重试',
+			title: '提交失败，请重试',
 			icon: 'none'
 		})
 	}
 }
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
 </script>
 
 <style>
+/* Tailwind CSS handled */
 </style>

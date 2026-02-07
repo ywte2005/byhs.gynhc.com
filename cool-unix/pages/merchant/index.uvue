@@ -6,7 +6,7 @@
 		<!-- Merchant Info -->
 		<view class="bg-white p-[32rpx] flex flex-row items-center gap-[24rpx] m-[32rpx] rounded-[24rpx]">
 			<view class="w-[112rpx] h-[112rpx] bg-[#0052d9] rounded-[56rpx] flex items-center justify-center">
-				<text class="text-white text-[40rpx]">...</text>
+				<uni-icons type="shop" size="32" color="#ffffff"></uni-icons>
 			</view>
 			<view class="flex flex-col gap-[8rpx]">
 				<text class="text-[36rpx] font-semibold text-[#1f2329]">{{ merchantInfo.name }}</text>
@@ -18,22 +18,22 @@
 		<view class="bg-white mx-[32rpx] rounded-[24rpx] px-[32rpx] flex flex-col">
 			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('info')">
 				<text class="text-[30rpx] text-[#1f2329]">商户信息</text>
-				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
+				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 			</view>
 			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
 			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('audit')">
 				<text class="text-[30rpx] text-[#1f2329]">审核状态</text>
-				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
+				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 			</view>
 			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
 			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('wallet')">
 				<text class="text-[30rpx] text-[#1f2329]">我的钱包</text>
-				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
+				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 			</view>
 			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
 			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('tasks')">
 				<text class="text-[30rpx] text-[#1f2329]">任务管理</text>
-				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
+				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 			</view>
 		</view>
 	</view>

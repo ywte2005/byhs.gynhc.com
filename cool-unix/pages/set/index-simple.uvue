@@ -3,7 +3,7 @@
 		<!-- 顶部导航 -->
 		<view class="flex items-center justify-between px-4 py-3 bg-white">
 			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
+				<uni-icons type="left" size="24"></uni-icons>
 				<text class="text-4 ml-2">设置</text>
 			</view>
 		</view>
@@ -18,10 +18,10 @@
 						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
 					>
 						<view class="flex items-center flex-1">
-							<text class="text-5 mr-3">⚙️</text>
+							<uni-icons type="settings" size="20" class="mr-3"></uni-icons>
 							<text class="text-4 text-[#1f2329]">通用设置</text>
 						</view>
-						<text class="text-4 text-[#999]">→</text>
+						<uni-icons type="right" size="16" color="#999"></uni-icons>
 					</view>
 
 					<view 
@@ -29,10 +29,10 @@
 						class="flex items-center justify-between py-3"
 					>
 						<view class="flex items-center flex-1">
-							<text class="text-5 mr-3">🔔</text>
+							<uni-icons type="notification" size="20" class="mr-3"></uni-icons>
 							<text class="text-4 text-[#1f2329]">通知设置</text>
 						</view>
-						<text class="text-4 text-[#999]">→</text>
+						<uni-icons type="right" size="16" color="#999"></uni-icons>
 					</view>
 				</view>
 
@@ -43,10 +43,10 @@
 						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
 					>
 						<view class="flex items-center flex-1">
-							<text class="text-5 mr-3">ℹ️</text>
+							<uni-icons type="info" size="20" class="mr-3"></uni-icons>
 							<text class="text-4 text-[#1f2329]">关于我们</text>
 						</view>
-						<text class="text-4 text-[#999]">→</text>
+						<uni-icons type="right" size="16" color="#999"></uni-icons>
 					</view>
 
 					<view 
@@ -54,10 +54,10 @@
 						class="flex items-center justify-between py-3"
 					>
 						<view class="flex items-center flex-1">
-							<text class="text-5 mr-3">📞</text>
+							<uni-icons type="phone" size="20" class="mr-3"></uni-icons>
 							<text class="text-4 text-[#1f2329]">联系我们</text>
 						</view>
-						<text class="text-4 text-[#999]">→</text>
+						<uni-icons type="right" size="16" color="#999"></uni-icons>
 					</view>
 				</view>
 

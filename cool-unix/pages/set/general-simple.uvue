@@ -16,7 +16,7 @@
 						<text class="text-[32rpx] text-[#1f2329]">语言</text>
 						<view class="flex flex-row items-center">
 							<text class="text-[32rpx] text-[#999999] mr-[16rpx]">简体中文</text>
-							<text class="text-[32rpx] text-[#999999]">→</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 
@@ -24,7 +24,7 @@
 						<text class="text-[32rpx] text-[#1f2329]">字体大小</text>
 						<view class="flex flex-row items-center">
 							<text class="text-[32rpx] text-[#999999] mr-[16rpx]">标准</text>
-							<text class="text-[32rpx] text-[#999999]">→</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 				</view>

@@ -78,7 +78,7 @@
 				</view>
 
 				<view v-if="logList.length === 0" class="flex flex-col items-center justify-center py-[80rpx] gap-[16rpx]">
-					<uni-icons type="compose" size="32" color="#dcdfe6"></uni-icons>
+					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
 					<text class="text-[28rpx] text-[#999999]">暂无流水记录</text>
 				</view>
 			</view>

@@ -39,7 +39,7 @@
 					<view class="flex flex-row justify-between items-center mb-[24rpx]">
 						<view class="flex flex-row items-center gap-[24rpx]">
 							<view class="w-[80rpx] h-[80rpx] rounded-full bg-[#f5f7fa] flex items-center justify-center">
-								<text class="text-[40rpx]">{{ task.merchantAvatar }}</text>
+								<uni-icons type="shop" size="24" color="#0052d9"></uni-icons>
 							</view>
 							<view class="flex flex-col gap-[4rpx]">
 								<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ task.merchantName }}</text>
@@ -171,7 +171,7 @@ const loadTaskList = async () => {
 			// 转换后端数据格式为前端需要的格式
 			const formattedList = data.list.map((item: any) => ({
 				id: item.id,
-				merchantAvatar: '🏪',
+				merchantAvatar: '',
 				merchantName: `商户${item.from_user_id}`,
 				createTime: formatTime(item.createtime),
 				status: getTaskStatus(item.status),

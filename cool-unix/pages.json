@@ -104,7 +104,8 @@
 				{
 					"path": "register",
 					"style": {
-						"navigationBarTitleText": "新增进件"
+						"navigationBarTitleText": "新增进件",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -113,7 +114,8 @@
 				{
 					"path": "audit-status",
 					"style": {
-						"navigationBarTitleText": "审核状态"
+						"navigationBarTitleText": "审核状态",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -122,7 +124,8 @@
 				{
 					"path": "info",
 					"style": {
-						"navigationBarTitleText": "商户信息"
+						"navigationBarTitleText": "商户信息",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -136,7 +139,8 @@
 				{
 					"path": "create",
 					"style": {
-						"navigationBarTitleText": "发起任务"
+						"navigationBarTitleText": "发布主任务",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -145,7 +149,8 @@
 				{
 					"path": "detail",
 					"style": {
-						"navigationBarTitleText": "任务详情"
+						"navigationBarTitleText": "任务详情",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -154,7 +159,8 @@
 				{
 					"path": "my-tasks",
 					"style": {
-						"navigationBarTitleText": "我的任务"
+						"navigationBarTitleText": "我的任务",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -163,7 +169,8 @@
 				{
 					"path": "deposit",
 					"style": {
-						"navigationBarTitleText": "保证金管理"
+						"navigationBarTitleText": "保证金管理",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -172,7 +179,8 @@
 				{
 					"path": "subtask/list",
 					"style": {
-						"navigationBarTitleText": "可接任务"
+						"navigationBarTitleText": "可接任务",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -181,7 +189,8 @@
 				{
 					"path": "subtask/my",
 					"style": {
-						"navigationBarTitleText": "我接的任务"
+						"navigationBarTitleText": "我接的任务",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -190,7 +199,8 @@
 				{
 					"path": "subtask/detail",
 					"style": {
-						"navigationBarTitleText": "任务详情"
+						"navigationBarTitleText": "任务详情",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -199,7 +209,8 @@
 				{
 					"path": "subtask/upload",
 					"style": {
-						"navigationBarTitleText": "上传凭证"
+						"navigationBarTitleText": "上传凭证",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -222,7 +233,8 @@
 				{
 					"path": "recharge",
 					"style": {
-						"navigationBarTitleText": "充值"
+						"navigationBarTitleText": "充值",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -231,7 +243,8 @@
 				{
 					"path": "withdraw",
 					"style": {
-						"navigationBarTitleText": "提现"
+						"navigationBarTitleText": "提现",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -250,7 +263,8 @@
 				{
 					"path": "bankcard",
 					"style": {
-						"navigationBarTitleText": "银行卡管理"
+						"navigationBarTitleText": "银行卡管理",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -264,7 +278,8 @@
 				{
 					"path": "commission",
 					"style": {
-						"navigationBarTitleText": "佣金记录"
+						"navigationBarTitleText": "佣金记录",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -273,7 +288,8 @@
 				{
 					"path": "bonus",
 					"style": {
-						"navigationBarTitleText": "分红中心"
+						"navigationBarTitleText": "分红中心",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -282,7 +298,8 @@
 				{
 					"path": "performance",
 					"style": {
-						"navigationBarTitleText": "业绩统计"
+						"navigationBarTitleText": "业绩统计",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -291,7 +308,8 @@
 				{
 					"path": "level",
 					"style": {
-						"navigationBarTitleText": "等级权益"
+						"navigationBarTitleText": "等级权益",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -300,7 +318,8 @@
 				{
 					"path": "team",
 					"style": {
-						"navigationBarTitleText": "我的团队"
+						"navigationBarTitleText": "我的团队",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -309,7 +328,8 @@
 				{
 					"path": "invite",
 					"style": {
-						"navigationBarTitleText": "邀请好友"
+						"navigationBarTitleText": "邀请好友",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -318,7 +338,48 @@
 				{
 					"path": "wallet",
 					"style": {
-						"navigationBarTitleText": "我的钱包"
+						"navigationBarTitleText": "我的钱包",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "invite-record",
+					"style": {
+						"navigationBarTitleText": "邀请记录",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "task/list",
+					"style": {
+						"navigationBarTitleText": "互助任务",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "task/detail",
+					"style": {
+						"navigationBarTitleText": "任务详情",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "task/create",
+					"style": {
+						"navigationBarTitleText": "发起任务",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -332,7 +393,8 @@
 				{
 					"path": "shop/goods-category",
 					"style": {
-						"navigationBarTitleText": "商品分类"
+						"navigationBarTitleText": "商品分类",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -350,7 +412,8 @@
 				{
 					"path": "shop/address",
 					"style": {
-						"navigationBarTitleText": "收货地址"
+						"navigationBarTitleText": "收货地址",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -359,7 +422,8 @@
 				{
 					"path": "shop/address-edit",
 					"style": {
-						"navigationBarTitleText": "编辑地址"
+						"navigationBarTitleText": "编辑地址",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -382,7 +446,8 @@
 				{
 					"path": "edit",
 					"style": {
-						"navigationBarTitleText": "个人资料"
+						"navigationBarTitleText": "个人资料",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -416,7 +481,8 @@
 				{
 					"path": "about",
 					"style": {
-						"navigationBarTitleText": "关于我们"
+						"navigationBarTitleText": "关于我们",
+						"navigationStyle": "custom"
 					}
 				},
 				{
@@ -441,7 +507,8 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": "消息中心"
+						"navigationBarTitleText": "消息中心",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true

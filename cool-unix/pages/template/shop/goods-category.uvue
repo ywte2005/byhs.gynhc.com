@@ -8,9 +8,14 @@
 					:pt="{
 						className: parseClass(['flex-1 !border-[2rpx] !rounded-[24rpx] !h-[80rpx] !bg-[#f5f7fa] !border-transparent'])
 					}"
-					prefix-icon="search-line"
 					placeholder="搜索商品"
-				></cl-input>
+				>
+					<template #prefix>
+						<view class="flex items-center justify-center pl-[24rpx]">
+							<uni-icons type="search" size="20" color="#c0c4cc"></uni-icons>
+						</view>
+					</template>
+				</cl-input>
 			</view>
 
 			<view class="flex flex-row flex-1 h-0">

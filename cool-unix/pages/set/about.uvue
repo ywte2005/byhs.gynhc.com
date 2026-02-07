@@ -15,14 +15,14 @@
 						<view class="flex flex-row items-center gap-[24rpx]">
 							<text class="text-[30rpx] text-[#1f2329]">{{ t('访问官网') }}</text>
 						</view>
-						<icon name="chevron-right" :size="16" color="#c0c4cc" />
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]">
 						<view class="flex flex-row items-center gap-[24rpx]">
 							<text class="text-[30rpx] text-[#1f2329]">{{ t('版本更新') }}</text>
 						</view>
-						<icon name="chevron-right" :size="16" color="#c0c4cc" />
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 

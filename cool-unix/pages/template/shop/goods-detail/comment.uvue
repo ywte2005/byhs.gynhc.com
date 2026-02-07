@@ -3,7 +3,7 @@
 		<view class="flex flex-row items-center mb-3">
 			<cl-text>买家评论 78</cl-text>
 
-			<cl-icon name="arrow-right-s-line" :size="16" :pt="{ className: 'ml-auto' }"></cl-icon>
+			<uni-icons type="right" size="14" color="#999" class="ml-auto"></uni-icons>
 		</view>
 
 		<view class="flex flex-col">

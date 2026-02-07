@@ -47,7 +47,8 @@
 					</view>
 					
 					<!-- Empty State -->
-					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx]">
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx] gap-[24rpx]">
+						<uni-icons type="gift-filled" size="48" color="#dcdfe6"></uni-icons>
 						<text class="text-[28rpx] text-[#999999]">暂无分红记录</text>
 					</view>
 				</view>

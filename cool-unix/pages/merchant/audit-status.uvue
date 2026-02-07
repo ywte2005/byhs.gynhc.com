@@ -10,7 +10,7 @@
 				<!-- 审核中 -->
 				<view v-if="auditInfo.status === 'pending'" class="bg-white rounded-3xl p-8">
 					<view class="flex flex-col items-center py-12">
-						<text class="text-6xl mb-6">⏳</text>
+						<uni-icons type="time-filled" size="64" color="#ff9500" class="mb-6"></uni-icons>
 						<text class="text-3xl font-bold text-[#1f2329] mb-4">审核中</text>
 						<text class="text-xl text-[#646a73]">您的入驻申请正在审核中，请耐心等待</text>
 						<text class="text-xl text-[#999999] mt-4">预计1-3个工作日完成审核</text>
@@ -31,7 +31,7 @@
 				<!-- 审核通过 -->
 				<view v-if="auditInfo.status === 'approved'" class="bg-white rounded-3xl p-8">
 					<view class="flex flex-col items-center py-12">
-						<text class="text-6xl mb-6">✅</text>
+						<uni-icons type="checkbox-filled" size="64" color="#0052d9" class="mb-6"></uni-icons>
 						<text class="text-3xl font-bold text-[#0052d9] mb-4">审核通过</text>
 						<text class="text-xl text-[#646a73]">恭喜您，入驻申请已通过审核</text>
 					</view>
@@ -60,7 +60,7 @@
 				<!-- 审核驳回 -->
 				<view v-if="auditInfo.status === 'rejected'" class="bg-white rounded-3xl p-8">
 					<view class="flex flex-col items-center py-12">
-						<text class="text-6xl mb-6">❌</text>
+						<uni-icons type="clear-filled" size="64" color="#ff3b30" class="mb-6"></uni-icons>
 						<text class="text-3xl font-bold text-[#ff3b30] mb-4">审核未通过</text>
 						<text class="text-xl text-[#646a73]">很抱歉，您的入驻申请未通过审核</text>
 					</view>
@@ -128,7 +128,7 @@
 						<view class="flex items-start h-30">
 							<view class="flex flex-col items-center mr-6">
 								<view class="w-12 h-12 rounded-full bg-[#0052d9] flex items-center justify-center z-10">
-									<text class="text-lg text-white">✓</text>
+									<uni-icons type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
 								</view>
 								<view class="w-1 h-full bg-[#0052d9] -mt-2"></view>
 							</view>
@@ -141,7 +141,7 @@
 						<view class="flex items-start h-30">
 							<view class="flex flex-col items-center mr-6">
 								<view class="w-12 h-12 rounded-full bg-[#0052d9] flex items-center justify-center z-10">
-									<text class="text-lg text-white">⏳</text>
+									<uni-icons type="time-filled" size="16" color="#ffffff"></uni-icons>
 								</view>
 								<view class="w-1 h-full bg-[#e5e5e5] -mt-2"></view>
 							</view>
@@ -167,7 +167,10 @@
 
 				<!-- 温馨提示 -->
 				<view class="bg-[#fff9e6] rounded-2xl p-8 flex flex-col gap-4">
-					<text class="text-xl text-[#ed6a0c] font-bold">💡 温馨提示</text>
+					<view class="flex flex-row items-center gap-2">
+						<uni-icons type="info-filled" size="20" color="#ed6a0c"></uni-icons>
+						<text class="text-xl text-[#ed6a0c] font-bold">温馨提示</text>
+					</view>
 					<view class="flex flex-col gap-2">
 						<text class="text-lg text-[#646a73]">• 审核时间：工作日9:00-18:00</text>
 						<text class="text-lg text-[#646a73]">• 如有疑问，请联系客服：400-123-4567</text>

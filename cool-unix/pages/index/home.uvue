@@ -43,19 +43,19 @@
 				</view>
 				<view class="flex flex-col items-center" @tap="goToPage('/pages/wallet/recharge')">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
-						<uni-icons type="plus" size="22" color="#ffffff"></uni-icons>
+						<uni-icons type="plus-filled" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="text-[24rpx] text-white mt-[12rpx]">充值</text>
 				</view>
 				<view class="flex flex-col items-center" @tap="goToPage('/pages/wallet/withdraw')">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
-						<uni-icons type="vip" size="22" color="#ffffff"></uni-icons>
+						<uni-icons type="upload-filled" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="text-[24rpx] text-white mt-[12rpx]">提现</text>
 				</view>
 				<view class="flex flex-col items-center" @tap="goToPage('/pages/promo/invite')">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
-						<uni-icons type="contact" size="22" color="#ffffff"></uni-icons>
+						<uni-icons type="personadd-filled" size="22" color="#ffffff"></uni-icons>
 					</view>
 					<text class="text-[24rpx] text-white mt-[12rpx]">邀请</text>
 				</view>
@@ -107,7 +107,10 @@
 			<view class="bg-white rounded-[24rpx] p-[32rpx]">
 				<view class="flex flex-row justify-between items-center">
 					<text class="text-[32rpx] font-semibold text-[#1f2329]">平台动态</text>
-					<text class="text-[26rpx] text-[#0052d9]">查看更多 ></text>
+					<view class="flex flex-row items-center gap-[4rpx]">
+						<text class="text-[26rpx] text-[#0052d9]">查看更多</text>
+						<uni-icons type="right" size="12" color="#0052d9"></uni-icons>
+					</view>
 				</view>
 				<view class="mt-[24rpx] flex flex-col gap-[24rpx]">
 					<view class="flex flex-row gap-[24rpx]" v-for="(item, index) in statistics.news" :key="index">

@@ -16,7 +16,7 @@
 				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
 					<view class="flex items-center">
 						<view class="w-[160rpx] h-[160rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center mr-[32rpx]">
-							<text class="text-[80rpx]">🏪</text>
+							<uni-icons type="shop" size="40" color="#0052d9"></uni-icons>
 						</view>
 						<view class="flex-1">
 							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
@@ -131,7 +131,8 @@
 					<view class="flex flex-col gap-[8rpx]">
 						<text class="text-[28rpx] text-[#999999]">实名认证</text>
 						<view class="flex flex-row items-center">
-							<text class="text-[30rpx] text-[#0052d9] mr-[16rpx]">✓ 已认证</text>
+							<uni-icons type="checkbox-filled" size="16" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#0052d9] ml-[8rpx] mr-[16rpx]">已认证</text>
 							<text class="text-[28rpx] text-[#999999]">{{ merchantInfo.realName }}</text>
 						</view>
 					</view>

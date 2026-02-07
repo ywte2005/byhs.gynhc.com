@@ -15,7 +15,7 @@
 							mode="aspectFill"
 						/>
 						<view class="absolute bottom-0 -right-[6rpx] w-[48rpx] h-[48rpx] bg-black rounded-full border-[2rpx] border-white flex justify-center items-center">
-							<text class="text-[24rpx]">✏️</text>
+							<uni-icons type="compose" size="14" color="#ffffff"></uni-icons>
 						</view>
 					</view>
 				</view>
@@ -26,7 +26,7 @@
 						<text class="text-[30rpx] text-[#333333]">我的昵称</text>
 						<view class="flex flex-row items-center">
 							<text class="text-[28rpx] text-[#666666] mr-[10rpx]">{{ nickName || '未设置' }}</text>
-							<text class="text-[40rpx] text-[#999999]">›</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 					<view class="flex flex-row items-center justify-between p-[32rpx]">
@@ -45,7 +45,7 @@
 							<text class="text-[28rpx] text-[#666666] mr-[10rpx]" :class="{ 'text-[#999999]': !description }">
 								{{ description || '介绍一下自己' }}
 							</text>
-							<text class="text-[40rpx] text-[#999999]">›</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 				</view>
@@ -58,7 +58,7 @@
 							<text class="text-[28rpx] text-[#666666] mr-[10rpx]" :class="{ 'text-[#999999]': gender === null }">
 								{{ genderText }}
 							</text>
-							<text class="text-[40rpx] text-[#999999]">›</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 					<view class="flex flex-row items-center justify-between p-[32rpx] border-b-[2rpx] border-[#f5f5f5] active:bg-[#f5f5f5]" @tap="selectBirthday">
@@ -67,7 +67,7 @@
 							<text class="text-[28rpx] text-[#666666] mr-[10rpx]" :class="{ 'text-[#999999]': !birthday }">
 								{{ birthday || '选择生日' }}
 							</text>
-							<text class="text-[40rpx] text-[#999999]">›</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 					<view class="flex flex-row items-center justify-between p-[32rpx] active:bg-[#f5f5f5]" @tap="selectRegion">
@@ -76,7 +76,7 @@
 							<text class="text-[28rpx] text-[#666666] mr-[10rpx]" :class="{ 'text-[#999999]': !regionText }">
 								{{ regionText || '选择所在的地区' }}
 							</text>
-							<text class="text-[40rpx] text-[#999999]">›</text>
+							<uni-icons type="right" size="16" color="#999999"></uni-icons>
 						</view>
 					</view>
 				</view>
@@ -89,7 +89,7 @@
 				<view class="flex flex-row items-center justify-between p-[40rpx_30rpx] border-b-[2rpx] border-[#f5f5f5]">
 					<text class="text-[32rpx] font-medium text-[#333333]">选择性别</text>
 					<view class="w-[60rpx] h-[60rpx] flex justify-center items-center" @tap="showGenderPicker = false">
-						<text class="text-[40rpx] text-[#999999]">✕</text>
+						<uni-icons type="closeempty" size="24" color="#999999"></uni-icons>
 					</view>
 				</view>
 				<view class="py-[20rpx]">
@@ -100,7 +100,7 @@
 						@tap="onGenderChange(item.value)"
 					>
 						<text class="text-[30rpx] text-[#333333]">{{ item.label }}</text>
-						<text v-if="gender === item.value" class="text-[36rpx] text-[#007aff]">✓</text>
+						<uni-icons v-if="gender === item.value" type="checkmarkempty" size="20" color="#007aff"></uni-icons>
 					</view>
 				</view>
 			</view>
@@ -112,7 +112,7 @@
 				<view class="flex flex-row items-center justify-between p-[40rpx_30rpx] border-b-[2rpx] border-[#f5f5f5]">
 					<text class="text-[32rpx] font-medium text-[#333333]">选择生日</text>
 					<view class="w-[60rpx] h-[60rpx] flex justify-center items-center" @tap="showBirthdayPicker = false">
-						<text class="text-[40rpx] text-[#999999]">✕</text>
+						<uni-icons type="closeempty" size="24" color="#999999"></uni-icons>
 					</view>
 				</view>
 				<picker
@@ -134,7 +134,7 @@
 				<view class="flex flex-row items-center justify-between p-[40rpx_30rpx] border-b-[2rpx] border-[#f5f5f5]">
 					<text class="text-[32rpx] font-medium text-[#333333]">选择地区</text>
 					<view class="w-[60rpx] h-[60rpx] flex justify-center items-center" @tap="showRegionPicker = false">
-						<text class="text-[40rpx] text-[#999999]">✕</text>
+						<uni-icons type="closeempty" size="24" color="#999999"></uni-icons>
 					</view>
 				</view>
 				<picker mode="region" @change="onRegionChange">

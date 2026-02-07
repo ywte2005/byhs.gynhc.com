@@ -56,7 +56,7 @@
 				<!-- Level Card -->
 				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center justify-between bg-gradient-to-r from-[#fff0cd] to-[#ffdb8e]" @tap="goToLevel">
 					<view class="flex flex-row items-center gap-[24rpx]">
-						<text class="text-[64rpx]">👑</text>
+						<uni-icons type="vip-filled" size="32" color="#593e0e"></uni-icons>
 						<view class="flex flex-col gap-[8rpx]">
 							<text class="text-[32rpx] text-[#593e0e] font-bold">当前等级：{{ overview?.level?.name || '普通会员' }}</text>
 							<text class="text-[24rpx] text-[#593e0e]/70">升级享受更高权益</text>

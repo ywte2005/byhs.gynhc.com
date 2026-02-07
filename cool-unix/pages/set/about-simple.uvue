@@ -9,7 +9,7 @@
 				<!-- Logo和名称 -->
 				<view class="flex flex-col items-center justify-center py-[80rpx] mb-[32rpx]">
 					<view class="w-[160rpx] h-[160rpx] rounded-[32rpx] bg-[#07c160] flex items-center justify-center mb-[32rpx]">
-						<text class="text-[80rpx] text-white">🏪</text>
+						<uni-icons type="shop" size="40" color="#ffffff"></uni-icons>
 					</view>
 					<text class="text-[40rpx] font-bold text-[#1f2329] mb-[16rpx]">商户互助平台</text>
 					<text class="text-[28rpx] text-[#999999]">版本 v1.0.0</text>
@@ -27,7 +27,7 @@
 						class="flex flex-row items-center justify-between py-[24rpx]"
 					>
 						<text class="text-[32rpx] text-[#1f2329]">访问官网</text>
-						<text class="text-[32rpx] text-[#999999]">→</text>
+						<uni-icons type="right" size="16" color="#999999"></uni-icons>
 					</view>
 				</view>
 
@@ -58,7 +58,7 @@
 						class="flex flex-row items-center justify-between py-[24rpx] border-b-[2rpx] border-[#e5e5e5]"
 					>
 						<text class="text-[32rpx] text-[#1f2329]">用户协议</text>
-						<text class="text-[32rpx] text-[#999999]">→</text>
+						<uni-icons type="right" size="16" color="#999999"></uni-icons>
 					</view>
 
 					<view 
@@ -66,7 +66,7 @@
 						class="flex flex-row items-center justify-between py-[24rpx]"
 					>
 						<text class="text-[32rpx] text-[#1f2329]">隐私政策</text>
-						<text class="text-[32rpx] text-[#999999]">→</text>
+						<uni-icons type="right" size="16" color="#999999"></uni-icons>
 					</view>
 				</view>
 			</view>

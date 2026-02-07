@@ -25,14 +25,14 @@
 						mode="aspectFill"
 					/>
 					<view v-if="isLogin" class="absolute bottom-0 right-0 w-full h-[30%] bg-black/50 flex items-center justify-center">
-						<text class="text-[20rpx]">✏️</text>
+						<uni-icons type="compose" size="12" color="#ffffff"></uni-icons>
 					</view>
 				</view>
 				<view class="flex-1 flex flex-col gap-[8rpx]">
 					<text class="text-[36rpx] font-bold text-white">{{ nickName || '点击登录' }}</text>
 					<text class="text-[24rpx] text-white/80" v-if="userInfo?.phone">ID: {{ userInfo?.phone }}</text>
 				</view>
-				<text class="text-[32rpx] text-white/60">></text>
+				<uni-icons type="right" size="16" color="rgba(255,255,255,0.6)"></uni-icons>
 			</view>
 
 			<!-- Stats -->
@@ -80,16 +80,16 @@
 				<view class="bg-white rounded-[24rpx] py-[40rpx] px-[20rpx]">
 					<view class="flex flex-row justify-around">
 						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
-							<text class="text-[48rpx]">💰</text>
+							<uni-icons type="wallet" size="28" color="#0052d9"></uni-icons>
 							<text class="text-[24rpx] text-[#646a73]">待支付</text>
 						</view>
 						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
-							<text class="text-[48rpx]">📦</text>
+							<uni-icons type="gift" size="28" color="#0052d9"></uni-icons>
 							<text class="text-[24rpx] text-[#646a73]">未发货</text>
 						</view>
 						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
 							<view class="relative">
-								<text class="text-[48rpx]">✈️</text>
+								<uni-icons type="paperplane" size="28" color="#0052d9"></uni-icons>
 								<view class="absolute -top-[10rpx] -right-[10rpx] min-w-[32rpx] h-[32rpx] bg-[#ff3b30] rounded-[16rpx] flex items-center justify-center border-[2rpx] border-white">
 									<text class="text-[20rpx] text-white">3</text>
 								</view>
@@ -97,7 +97,7 @@
 							<text class="text-[24rpx] text-[#646a73]">已发货</text>
 						</view>
 						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
-							<text class="text-[48rpx]">💱</text>
+							<uni-icons type="refresh" size="28" color="#0052d9"></uni-icons>
 							<text class="text-[24rpx] text-[#646a73]">售后/退款</text>
 						</view>
 					</view>
@@ -107,34 +107,34 @@
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toWallet">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[40rpx]">👛</text>
+							<uni-icons type="wallet" size="24" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">我的钱包</text>
 						</view>
-						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[40rpx]">📊</text>
+							<uni-icons type="bars" size="24" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">数据看板</text>
 						</view>
-						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[40rpx]">🕐</text>
+							<uni-icons type="calendar" size="24" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">历史记录</text>
 						</view>
-						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[40rpx]">📤</text>
+							<uni-icons type="redo" size="24" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">邀请好友</text>
 						</view>
-						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 
@@ -142,10 +142,10 @@
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toSet">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[40rpx]">⚙️</text>
+							<uni-icons type="settings" size="24" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">设置</text>
 						</view>
-						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
 				</view>
 			</view>
@@ -154,27 +154,24 @@
 		<!-- 底部导航栏 -->
 		<view class="fixed bottom-0 left-0 right-0 h-[100rpx] bg-white border-t border-[#e5e5e5] flex flex-row pb-[env(safe-area-inset-bottom)]">
 			<view class="flex-1 flex flex-col items-center justify-center" @tap="toHome">
-				<text class="text-[44rpx] mb-[8rpx]">🏠</text>
-				<text class="text-[20rpx] text-[#999999]">首页</text>
+				<uni-icons type="home" size="24" color="#999999"></uni-icons>
+				<text class="text-[20rpx] text-[#999999] mt-[4rpx]">首页</text>
 			</view>
 			<view class="flex-1 flex flex-col items-center justify-center" @tap="toTemplate">
-				<text class="text-[44rpx] mb-[8rpx]">📋</text>
-				<text class="text-[20rpx] text-[#999999]">模板</text>
+				<uni-icons type="list" size="24" color="#999999"></uni-icons>
+				<text class="text-[20rpx] text-[#999999] mt-[4rpx]">模板</text>
 			</view>
 			<view class="flex-1 flex flex-col items-center justify-center">
-				<text class="text-[44rpx] mb-[8rpx]">👤</text>
-				<text class="text-[20rpx] text-[#0052d9]">我的</text>
-			</view>
-		</view>
-	</view>
+				<uni-icons type="person-filled" size="24" color="#0052d9"></uni-icons>
+				<text class="text-[20rpx] text-[#0052d9] mt-[4rpx]">我的</text>
 </template>
 
 <script setup lang="uts">
-import { ref } from 'vue'
-import { useStore } from "@/.cool"
+import { router, useRefs, useStore, t } from "@/.cool";
+import { useUi } from "@/uni_modules/cool-ui";
+import ContactUs from "@/pages/set/components/contact-us.uvue";
 
-const { user } = useStore()
-const userInfo = user.info
+const refs = useRefs();
 
 // 用户信息
 const isLogin = ref(true)

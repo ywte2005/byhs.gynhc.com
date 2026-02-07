@@ -64,7 +64,7 @@
 								@click="removeImage(index)"
 								class="absolute top-[8rpx] right-[8rpx] w-[40rpx] h-[40rpx] bg-black/50 rounded-full flex items-center justify-center"
 							>
-								<text class="text-[24rpx] text-white">×</text>
+								<uni-icons type="closeempty" size="12" color="#ffffff"></uni-icons>
 							</view>
 						</view>
 						
@@ -73,7 +73,7 @@
 							@click="chooseImage"
 							class="w-[192rpx] h-[192rpx] border-[2rpx] border-dashed border-[#e5e5e5] rounded-[16rpx] flex flex-col items-center justify-center bg-[#fafafa]"
 						>
-							<text class="text-[48rpx] text-[#c8c9cc]">+</text>
+							<uni-icons type="plusempty" size="30" color="#c8c9cc"></uni-icons>
 							<text class="text-[24rpx] text-[#c8c9cc] mt-[8rpx]">{{ uploadedImages.length }}/9</text>
 						</view>
 					</view>

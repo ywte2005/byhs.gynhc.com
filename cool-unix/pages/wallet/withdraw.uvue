@@ -83,7 +83,10 @@
 
 				<!-- 提现说明 -->
 				<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
-					<text class="text-[28rpx] font-bold text-[#ed6a0c]">💡 提现说明</text>
+					<view class="flex flex-row items-center gap-[8rpx]">
+						<uni-icons type="info-filled" size="16" color="#ed6a0c"></uni-icons>
+						<text class="text-[28rpx] font-bold text-[#ed6a0c]">提现说明</text>
+					</view>
 					<view class="flex flex-col gap-[8rpx]">
 						<text class="text-[26rpx] text-[#646a73]">• 单笔提现金额：10-50,000元</text>
 						<text class="text-[26rpx] text-[#646a73]">• 手续费：提现金额的0.6%，最低2元</text>

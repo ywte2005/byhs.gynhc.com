@@ -27,7 +27,8 @@
 					</view>
 					
 					<!-- 空状态 -->
-					<view v-if="list.length == 0 && !loading" class="flex justify-center items-center py-[64rpx]">
+					<view v-if="list.length == 0 && !loading" class="flex flex-col justify-center items-center py-[64rpx] gap-[24rpx]">
+						<uni-icons type="compose" size="48" color="#999999"></uni-icons>
 						<text class="text-[28rpx] text-[#999999]">暂无反馈记录</text>
 					</view>
 				</view>

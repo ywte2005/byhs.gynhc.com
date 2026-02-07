@@ -25,29 +25,16 @@
 					</view>
 
 					<view class="flex flex-row items-center pt-[32rpx] mt-[32rpx] border-t-[2rpx] border-[#f5f7fa] dark:!border-surface-700">
-						<cl-radio
-							v-model="defaultId"
-							active-icon="checkbox-circle-fill"
-							inactive-icon="checkbox-blank-circle-line"
-							:pt="{
-								className: 'max-w-[150px]',
-								icon: {
-									size: 32
-								},
-								label: {
-									size: 24
-								}
-							}"
-							:value="item.id"
-							@change="onDefaultChange(item)"
-							>{{ item.isDefault ? t("已设为默认") : t("设为默认") }}</cl-radio
-						>
+						<view class="flex flex-row items-center" @tap="onDefaultChange(item)">
+							<uni-icons :type="item.isDefault ? 'checkbox-filled' : 'circle'" size="20" :color="item.isDefault ? '#0052d9' : '#c0c4cc'"></uni-icons>
+							<text class="text-[24rpx] ml-[12rpx] text-[#646a73]">{{ item.isDefault ? t("已设为默认") : t("设为默认") }}</text>
+						</view>
 
 						<view
 							class="flex flex-row items-center justify-center ml-auto"
 							@tap="onDelete(item.id!)"
 						>
-							<cl-icon name="delete-bin-line" :size="32"></cl-icon>
+							<uni-icons type="trash" size="20" color="#646a73"></uni-icons>
 							<text class="text-[24rpx] ml-[8rpx] text-[#646a73]">{{ t("删除") }}</text>
 						</view>
 
@@ -55,7 +42,7 @@
 							class="flex flex-row items-center justify-center ml-[48rpx]"
 							@tap="toEdit(item.id!)"
 						>
-							<cl-icon name="edit-line" :size="32"></cl-icon>
+							<uni-icons type="compose" size="20" color="#646a73"></uni-icons>
 							<text class="text-[24rpx] ml-[8rpx] text-[#646a73]">{{ t("修改") }}</text>
 						</view>
 					</view>

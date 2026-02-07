@@ -1,7 +1,5 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
-		<cl-topbar title="新增进件" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- 主体类型 -->

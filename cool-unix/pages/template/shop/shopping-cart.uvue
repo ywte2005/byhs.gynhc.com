@@ -14,8 +14,9 @@
 		<scroll-view class="flex-1 h-0 -mt-[24rpx] rounded-t-[24rpx] overflow-hidden bg-[#f5f7fa]" scroll-y>
 			<view class="p-[32rpx] pb-[120rpx] flex flex-col gap-[24rpx]">
 				<!-- Notification -->
-				<view class="bg-[#fff7e6] p-[24rpx] rounded-[16rpx]">
-					<text class="text-[26rpx] text-[#ed6a0c]">🔥 最新降价商品，限时优惠，抓紧抢购！</text>
+				<view class="bg-[#fff7e6] p-[24rpx] rounded-[16rpx] flex flex-row items-center gap-[8rpx]">
+					<uni-icons type="fire-filled" size="16" color="#ed6a0c"></uni-icons>
+					<text class="text-[26rpx] text-[#ed6a0c]">最新降价商品，限时优惠，抓紧抢购！</text>
 				</view>
 
 				<!-- Cart List -->
@@ -31,13 +32,8 @@
 					>
 						<view class="flex flex-row p-[24rpx]">
 							<view class="flex items-center justify-center mr-[24rpx]" @tap="selectItem(item)">
-								<cl-icon
-									name="checkbox-circle-line"
-									color="#0052d9"
-									:size="40"
-									v-if="item.checked"
-								></cl-icon>
-								<cl-icon name="checkbox-blank-circle-line" :size="40" color="#c0c4cc" v-else></cl-icon>
+								<uni-icons type="checkbox-filled" size="24" color="#0052d9" v-if="item.checked"></uni-icons>
+								<uni-icons type="circle" size="24" color="#c0c4cc" v-else></uni-icons>
 							</view>
 
 							<image class="w-[160rpx] h-[160rpx] rounded-[12rpx] bg-[#f5f5f5]" :src="item.cover" mode="aspectFill"></image>
@@ -47,7 +43,7 @@
 
 								<view class="flex flex-row items-center bg-[#f5f7fa] px-[12rpx] py-[4rpx] rounded-[8rpx] self-start mb-[16rpx]">
 									<text class="text-[24rpx] text-[#646a73] mr-[8rpx]">{{ item.skuName }}</text>
-									<cl-icon name="arrow-down-s-line" :size="24" color="#999"></cl-icon>
+									<uni-icons type="down" size="14" color="#999"></uni-icons>
 								</view>
 
 								<view class="flex flex-row justify-between items-center">
@@ -62,7 +58,7 @@
 											class="w-[56rpx] h-[56rpx] bg-[#ff3b30] rounded-[28rpx] flex items-center justify-center"
 											@tap="delItem(index)"
 										>
-											<cl-icon name="delete-bin-line" color="#ffffff" :size="28"></cl-icon>
+											<uni-icons type="trash" color="#ffffff" size="20"></uni-icons>
 										</view>
 
 										<cl-input-number
@@ -108,13 +104,8 @@
 		<!-- Footer -->
 		<view class="fixed bottom-0 left-0 right-0 bg-white border-t-[1rpx] border-[#e5e5e5] flex flex-row items-center justify-between px-[32rpx] py-[24rpx] pb-[calc(24rpx+env(safe-area-inset-bottom))] z-100">
 			<view class="flex flex-row items-center gap-[16rpx]" @tap="onSelectAllChange(!selectAll)">
-				<cl-icon
-					name="checkbox-circle-line"
-					color="#0052d9"
-					:size="40"
-					v-if="selectAll"
-				></cl-icon>
-				<cl-icon name="checkbox-blank-circle-line" :size="40" color="#c0c4cc" v-else></cl-icon>
+				<uni-icons type="checkbox-filled" size="24" color="#0052d9" v-if="selectAll"></uni-icons>
+				<uni-icons type="circle" size="24" color="#c0c4cc" v-else></uni-icons>
 				<text class="text-[28rpx] text-[#646a73]">{{ t("全选") }}</text>
 			</view>
 

@@ -13,19 +13,19 @@
 					<view class="flex flex-row flex-wrap gap-[32rpx]">
 						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/goods-category')">
 							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#e8f3ff]">
-								<text class="text-[48rpx]">🛍️</text>
+								<uni-icons type="shop" size="32" color="#0052d9"></uni-icons>
 							</view>
 							<text class="text-[26rpx] text-[#646a73]">商品分类</text>
 						</view>
 						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/shopping-cart')">
 							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#fff7e6]">
-								<text class="text-[48rpx]">🛒</text>
+								<uni-icons type="cart" size="32" color="#faad14"></uni-icons>
 							</view>
 							<text class="text-[26rpx] text-[#646a73]">购物车</text>
 						</view>
 						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/address')">
 							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#e8ffea]">
-								<text class="text-[48rpx]">📍</text>
+								<uni-icons type="location" size="32" color="#00b578"></uni-icons>
 							</view>
 							<text class="text-[26rpx] text-[#646a73]">地址管理</text>
 						</view>
@@ -40,18 +40,18 @@
 					<view class="flex flex-col">
 						<view class="flex flex-row justify-between items-center h-[96rpx]" @tap="router.to('/pages/set/index')">
 							<view class="flex flex-row items-center gap-[24rpx]">
-								<text class="text-[40rpx]">⚙️</text>
+								<uni-icons type="settings" size="24" color="#0052d9"></uni-icons>
 								<text class="text-[30rpx] text-[#1f2329]">系统设置</text>
 							</view>
-							<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+							<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 						</view>
 						<view class="h-[2rpx] bg-[#f5f7fa]"></view>
 						<view class="flex flex-row justify-between items-center h-[96rpx]" @tap="router.to('/pages/user/feedback')">
 							<view class="flex flex-row items-center gap-[24rpx]">
-								<text class="text-[40rpx]">📝</text>
+								<uni-icons type="compose" size="24" color="#0052d9"></uni-icons>
 								<text class="text-[30rpx] text-[#1f2329]">意见反馈</text>
 							</view>
-							<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
+							<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 						</view>
 					</view>
 				</view>
@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
 import { router } from "@/.cool";
-import CustomTabbar from "./components/tabbar.uvue";
+import CustomTabbar from "@/components/custom-tabbar/custom-tabbar.uvue";
 </script>
 
 <style>
