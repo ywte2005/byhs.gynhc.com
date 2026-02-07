@@ -1,8 +1,5 @@
 <template>
 	<view class="flex flex-col bg-[#f5f7fa] h-screen">
-		<!-- Header -->
-		<cl-topbar :title="'关于' + config.name" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<view class="flex flex-col items-center py-[48rpx]">
@@ -29,7 +26,7 @@
 					</view>
 				</view>
 
-				<view class="flex justify-center py-[32rpx]">
+				<view class="flex justify-center py-[32rpx] items-center">
 					<text class="text-[24rpx] text-[#c0c4cc]">Copyright © 2025 {{ config.name }} All Rights Reserved</text>
 				</view>
 			</view>

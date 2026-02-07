@@ -29,16 +29,23 @@ export type MerchantInfo = {
 
 // 商户注册表单
 export type MerchantRegisterForm = {
+	type?: string
 	name: string
-	legal_name: string
+	legal_name?: string
 	id_card: string
 	id_card_front: string
 	id_card_back: string
-	business_license: string
-	bank_name: string
-	bank_account: string
-	bank_branch: string
+	business_license?: string
+	shop_front?: string
+	other_files?: string
+	bank_name?: string
+	bank_account?: string
+	bank_branch?: string
 	contact_phone: string
+	contact?: string
+	category?: string
+	address?: string
+	credit_code?: string
 }
 
 // 审核记录

@@ -1,10 +1,7 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
-		<!-- 顶部导航 -->
-		<cl-topbar title="消息中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<!-- 标签栏 -->
-		<view class="flex flex-row bg-white px-8 h-20">
+		<view class="flex flex-row bg-white px-8 h-10">
 			<view 
 				v-for="(tab, index) in tabs" 
 				:key="index"

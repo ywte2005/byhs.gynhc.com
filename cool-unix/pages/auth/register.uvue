@@ -1,8 +1,5 @@
 <template>
 	<view class="flex flex-col bg-white h-screen">
-		<!-- Header -->
-		<cl-topbar title="注册" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[48rpx_32rpx]">
 				<view class="flex flex-col gap-[32rpx]">

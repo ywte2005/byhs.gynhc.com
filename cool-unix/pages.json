@@ -104,7 +104,7 @@
 				{
 					"path": "register",
 					"style": {
-						"navigationBarTitleText": "商户入驻"
+						"navigationBarTitleText": "新增进件"
 					},
 					"meta": {
 						"isAuth": true
@@ -441,7 +441,7 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": ""
+						"navigationBarTitleText": "消息中心"
 					},
 					"meta": {
 						"isAuth": true

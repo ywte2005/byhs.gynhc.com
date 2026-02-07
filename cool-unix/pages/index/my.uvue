@@ -1,15 +1,6 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
-		<!-- Header -->
-		<cl-topbar title="我的" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
-			<template #append>
-				<view class="w-[48rpx] h-[48rpx] flex items-center justify-center mr-[16rpx]" @tap="toQrCode">
-					<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
-				</view>
-			</template>
-		</cl-topbar>
-
-		<view class="bg-[#0052d9] px-[32rpx] pb-[48rpx] pt-[24rpx]">
+		<view class="bg-[#0052d9] px-[32rpx] pb-[48rpx] pt-[58rpx]">
 			<view class="flex flex-row items-center gap-[24rpx]" @tap="toEdit">
 				<view class="w-[128rpx] h-[128rpx] rounded-[64rpx] bg-white overflow-hidden flex items-center justify-center">
 					<image class="w-full h-full" :src="userInfo?.avatarUrl || '/static/logo.png'" mode="aspectFill" />
@@ -23,6 +14,11 @@
 						<view class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-[#fff7e6]/20">
 							<text class="text-[22rpx] text-[#faad14]">商户</text>
 						</view>
+					</view>
+				</view>
+				<view class="flex flex-col gap-[12rpx]">
+					<view class="w-[48rpx] h-[48rpx] flex items-center justify-center mr-[16rpx]" @tap="toQrCode">
+						<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
 					</view>
 				</view>
 			</view>
@@ -85,7 +81,7 @@
 					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
 					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toAgreement">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<uni-icons type="smallcircle" size="22" color="#0052d9"></uni-icons>
+							<uni-icons type="help" size="22" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">用户协议</text>
 						</view>
 						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
