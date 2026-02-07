@@ -4,7 +4,7 @@
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- Avatar & Basic Info -->
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col shadow-sm">
-					<view class="flex justify-center py-[48rpx] pb-[32rpx]">
+					<view class="flex justify-center py-[48rpx] pb-[32rpx] items-center">
 						<view class="relative w-[180rpx] h-[180rpx] rounded-full border-[6rpx] border-white shadow-md" @click="uploadAvatar">
 							<!-- #ifdef MP-WEIXIN -->
 							<button
@@ -21,7 +21,7 @@
 					</view>
 
 					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="openEdit('nickName')">
-						<text class="text-[30rpx] text-[#1f2329]">我的昵称</text>
+						<text class="text-[30rpx] text-[#1f2329]">昵称</text>
 						<view class="flex flex-row items-center gap-[8rpx]">
 							<text class="text-[28rpx] text-[#646a73]">{{ userInfo?.nickName || '未设置' }}</text>
 							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>

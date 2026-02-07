@@ -1,8 +1,5 @@
 <template>
 	<view class="flex flex-col bg-[#f5f7fa] h-screen">
-		<!-- Header -->
-		<cl-topbar title="工单反馈" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
 			<view class="p-[32rpx] pb-[140rpx] flex flex-col gap-[32rpx]">
 				<!-- Feedback List -->

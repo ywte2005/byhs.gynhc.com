@@ -1,8 +1,5 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
-		<!-- Header -->
-		<cl-topbar title="通知设置" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
-
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">

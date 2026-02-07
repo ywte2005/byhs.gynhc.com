@@ -41,6 +41,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 // import { getBankCards, deleteBankCard } from '@/services/wallet'
 
 type BankCard = {
@@ -54,14 +55,24 @@ const loading = ref(false)
 
 const loadData = () => {
 	loading.value = true
-	// Mock data
-	setTimeout(() => {
-		list.value = [
-			{ id: 1, bankName: '中国工商银行', cardNo: '6222021001111888888' },
-			{ id: 2, bankName: '中国建设银行', cardNo: '6217001230006666666' }
-		]
-		loading.value = false
-	}, 500)
+	try {
+		const cards = uni.getStorageSync('mock_bank_cards')
+		if (cards) {
+			// @ts-ignore
+			list.value = cards
+		} else {
+			const defaultCards = [
+				{ id: 1, bankName: '中国工商银行', cardNo: '6222021001111888888', name: '张三', mobile: '13800138000' },
+				{ id: 2, bankName: '中国建设银行', cardNo: '6217001230006666666', name: '张三', mobile: '13800138000' }
+			]
+			uni.setStorageSync('mock_bank_cards', defaultCards)
+			// @ts-ignore
+			list.value = defaultCards
+		}
+	} catch (e) {
+		console.error(e)
+	}
+	loading.value = false
 }
 
 const formatCardNo = (no: string): string => {
@@ -69,7 +80,9 @@ const formatCardNo = (no: string): string => {
 }
 
 const addCard = () => {
-	uni.showToast({ title: '添加功能开发中', icon: 'none' })
+	uni.navigateTo({
+		url: '/pages/wallet/add-card'
+	})
 }
 
 const deleteCard = (id: number) => {
@@ -80,13 +93,21 @@ const deleteCard = (id: number) => {
 			if (res.confirm) {
 				// Mock delete
 				list.value = list.value.filter(item => item.id !== id)
+				
+				// Update storage
+				try {
+					uni.setStorageSync('mock_bank_cards', list.value)
+				} catch (e) {
+					console.error(e)
+				}
+
 				uni.showToast({ title: '解绑成功', icon: 'success' })
 			}
 		}
 	})
 }
 
-onMounted(() => {
+onShow(() => {
 	loadData()
 })
 </script>

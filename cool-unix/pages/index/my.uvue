@@ -55,7 +55,7 @@
 					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toSettings">
 						<view class="flex flex-row items-center gap-[24rpx]">
 							<uni-icons type="settings" size="22" color="#0052d9"></uni-icons>
-							<text class="text-[30rpx] text-[#1f2329]">设置</text>
+							<text class="text-[30rpx] text-[#1f2329]">系统设置</text>
 						</view>
 						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
@@ -137,8 +137,7 @@ function toAbout() {
 }
 
 function toAgreement() {
-	// 暂时跳转到关于页面或者提示
-	uni.showToast({ title: '用户协议功能开发中', icon: 'none' });
+	uni.navigateTo({ url: '/pages/public/agreement' });
 }
 
 onShow(() => {

@@ -7,47 +7,52 @@
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- Amount Card -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">充值金额</text>
-					<view class="flex flex-row items-center border-b-[2rpx] border-[#e5e5e5] pb-[16rpx] mb-[24rpx]">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">充值金额</text>
+					
+					<!-- Input Area -->
+					<view class="bg-[#f5f7fa] h-[112rpx] rounded-[16rpx] px-[32rpx] flex flex-row items-center">
 						<text class="text-[48rpx] text-[#1f2329] font-semibold mr-[16rpx]">¥</text>
 						<input
 							v-model="amount"
 							type="digit"
-							class="flex-1 text-[48rpx] font-semibold text-[#1f2329] h-[64rpx]"
+							class="flex-1 text-[48rpx] font-semibold text-[#1f2329] h-[112rpx]"
 							placeholder="请输入充值金额"
-							placeholder-class="text-[#c0c4cc]"
+							placeholder-class="text-[#c0c4cc] text-[32rpx] font-normal"
 						/>
 					</view>
+
+					<!-- Quick Amounts -->
 					<view class="flex flex-row flex-wrap gap-[16rpx]">
 						<view
 							v-for="(item, index) in quickAmounts"
 							:key="index"
-							class="w-[200rpx] h-[80rpx] rounded-[12rpx] border-[2rpx] flex items-center justify-center bg-white"
-							:class="amount === item ? 'border-[#0052d9] bg-[#eaf2ff]' : 'border-[#e5e6eb]'"
+							class="w-[30%] flex-1 min-w-[180rpx] h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx]"
+							:class="amount === item ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-[#f5f7fa] border-transparent'"
 							@tap="amount = item"
 						>
-							<text class="text-[28rpx]" :class="amount === item ? 'text-[#0052d9] font-medium' : 'text-[#1f2329]'">{{ item }}元</text>
+							<text class="text-[28rpx]" :class="amount === item ? 'text-[#0052d9] font-medium' : 'text-[#646a73]'">¥{{ item }}</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Pay Card -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">支付方式</text>
-					<view class="flex flex-col">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">支付方式</text>
+					<view class="flex flex-col gap-[24rpx]">
 						<view
 							v-for="(item, index) in payMethods"
 							:key="index"
-							class="flex flex-row items-center justify-between py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
+							class="flex flex-row items-center justify-between p-[32rpx] rounded-[16rpx] bg-[#f5f7fa] border-[2rpx]"
+							:class="payType === item.value ? 'border-[#0052d9] bg-[#eaf2ff]' : 'border-transparent'"
 							@tap="payType = item.value"
 						>
-							<view class="flex flex-row items-center gap-[16rpx]">
-								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
-								<text class="text-[30rpx] text-[#1f2329]">{{ item.name }}</text>
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<uni-icons :type="item.iconType" size="32" :color="item.iconColor"></uni-icons>
+								<text class="text-[28rpx] text-[#1f2329]">{{ item.name }}</text>
 							</view>
-							<view class="w-[40rpx] h-[40rpx] rounded-full border-[4rpx] flex items-center justify-center" :class="payType === item.value ? 'border-[#0052d9]' : 'border-[#e5e6eb]'">
-								<view v-if="payType === item.value" class="w-[24rpx] h-[24rpx] rounded-full bg-[#0052d9]"></view>
+							<view class="w-[40rpx] h-[40rpx] rounded-full border-[2rpx] flex items-center justify-center bg-white" :class="payType === item.value ? 'border-[#0052d9]' : 'border-[#e5e6eb]'">
+								<view v-if="payType === item.value" class="w-[20rpx] h-[20rpx] rounded-full bg-[#0052d9]"></view>
 							</view>
 						</view>
 					</view>
@@ -55,7 +60,7 @@
 
 				<!-- Submit Button -->
 				<view class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center mt-[16rpx]" @tap="handleSubmit">
-					<text class="text-[32rpx] text-white font-medium">确认充值</text>
+					<text class="text-[32rpx] text-white font-semibold">立即充值</text>
 				</view>
 			</view>
 		</scroll-view>

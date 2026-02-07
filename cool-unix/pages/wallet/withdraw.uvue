@@ -7,98 +7,101 @@
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- 可提现余额 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[28rpx] text-[#999999] mb-[16rpx]">可提现余额（元）</text>
-					<text class="text-[56rpx] font-bold text-[#1f2329]">{{ availableBalance }}</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[12rpx]">
+					<text class="text-[28rpx] text-[#646a73]">可提现余额</text>
+					<text class="text-[48rpx] font-bold text-[#1f2329]">¥{{ availableBalance }}</text>
 				</view>
 
 				<!-- 提现金额 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">提现金额</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">提现金额</text>
 					
-					<view class="flex flex-row items-center border-b-[2rpx] border-[#e5e5e5] pb-[24rpx] mb-[24rpx]">
-						<text class="text-[48rpx] text-[#1f2329] mr-[16rpx] font-semibold">¥</text>
-						<input 
-							v-model="withdrawAmount"
-							type="digit"
-							class="flex-1 text-[56rpx] font-bold text-[#1f2329] h-[80rpx]"
-							placeholder="请输入提现金额"
-							placeholder-class="text-[#c8c9cc]"
-							:focus="true"
-						/>
-					</view>
-
-					<view class="flex flex-row justify-between items-center">
-						<text class="text-[28rpx] text-[#999999]">手续费：{{ serviceFee }}元</text>
-						<view @click="withdrawAll">
-							<text class="text-[28rpx] text-[#0052d9]">全部提现</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<view class="bg-[#f5f7fa] h-[112rpx] rounded-[16rpx] px-[32rpx] flex flex-row items-center">
+							<text class="text-[40rpx] text-[#1f2329] font-semibold mr-[16rpx]">¥</text>
+							<input 
+								v-model="withdrawAmount"
+								type="digit"
+								class="flex-1 text-[40rpx] font-semibold text-[#1f2329] h-[112rpx]"
+								placeholder="请输入提现金额"
+								placeholder-class="text-[#9aa0a6] text-[32rpx] font-normal"
+							/>
+						</view>
+						<view class="flex flex-row justify-end">
+							<view class="bg-[#eaf2ff] px-[24rpx] h-[64rpx] rounded-[12rpx] flex items-center justify-center" @tap="withdrawAll">
+								<text class="text-[26rpx] text-[#0052d9]">全部提现</text>
+							</view>
 						</view>
 					</view>
 				</view>
 
 				<!-- 提现账户 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">提现账户</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">提现账户</text>
 					
-					<view 
-						v-for="(item, index) in bankCards" 
-						:key="index"
-						@click="selectBankCard(item.id)"
-						class="flex flex-row items-center justify-between py-[24rpx] border-b-[2rpx] border-[#e5e5e5]"
-					>
-						<view class="flex flex-row items-center flex-1">
-							<view class="w-[80rpx] h-[80rpx] rounded-[12rpx] bg-[#f5f5f5] flex items-center justify-center mr-[24rpx]">
-								<uni-icons type="home" size="20" color="#0052d9"></uni-icons>
+					<view class="flex flex-col gap-[24rpx]">
+						<view 
+							v-for="(item, index) in bankCards" 
+							:key="index"
+							@tap="selectBankCard(item.id)"
+							class="flex flex-row items-center justify-between p-[32rpx] rounded-[16rpx] bg-[#f5f7fa] border-[2rpx]"
+							:class="selectedBankCard === item.id ? 'border-[#0052d9] bg-[#eaf2ff]' : 'border-transparent'"
+						>
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<view class="w-[80rpx] h-[80rpx] rounded-[12rpx] bg-white flex items-center justify-center">
+									<uni-icons type="home-filled" size="40" color="#0052d9"></uni-icons>
+								</view>
+								<view class="flex flex-col gap-[8rpx]">
+									<text class="text-[30rpx] font-medium text-[#1f2329]">{{ item.bankName }}</text>
+									<text class="text-[24rpx] text-[#999999]">{{ item.cardNo }}</text>
+								</view>
 							</view>
-							<view class="flex flex-col gap-[8rpx]">
-								<text class="text-[32rpx] text-[#1f2329]">{{ item.bankName }}</text>
-								<text class="text-[24rpx] text-[#999999]">{{ item.cardNo }}</text>
+							<view class="w-[40rpx] h-[40rpx] rounded-full border-[2rpx] flex items-center justify-center bg-white" :class="selectedBankCard === item.id ? 'border-[#0052d9]' : 'border-[#e5e6eb]'">
+								<view v-if="selectedBankCard === item.id" class="w-[20rpx] h-[20rpx] rounded-full bg-[#0052d9]"></view>
 							</view>
 						</view>
-						<view class="w-[40rpx] h-[40rpx] rounded-full border-[4rpx] flex items-center justify-center" :class="selectedBankCard === item.id ? 'border-[#0052d9]' : 'border-[#e5e5e5]'">
-							<view v-if="selectedBankCard === item.id" class="w-[24rpx] h-[24rpx] rounded-full bg-[#0052d9]"></view>
-						</view>
-					</view>
 
-					<view @click="addBankCard" class="flex items-center justify-center pt-[24rpx]">
-						<text class="text-[32rpx] text-[#0052d9]">+ 添加银行卡</text>
+						<view @tap="addBankCard" class="flex items-center justify-center h-[80rpx] border-[2rpx] border-dashed border-[#0052d9] rounded-[16rpx] bg-[#f5f7fa]">
+							<text class="text-[28rpx] text-[#0052d9] font-medium">+ 添加银行卡</text>
+						</view>
 					</view>
 				</view>
 
-				<!-- 到账时间 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">到账时间</text>
+				<!-- 费用说明 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">费用说明</text>
 					
-					<view class="flex flex-row justify-between items-center">
-						<view class="flex flex-row items-center gap-[24rpx]">
-							<uni-icons type="bolt" size="20" color="#faad14"></uni-icons>
-							<view class="flex flex-col gap-[8rpx]">
-								<text class="text-[32rpx] text-[#1f2329]">实时到账</text>
-								<text class="text-[24rpx] text-[#999999]">预计2小时内到账</text>
-							</view>
+					<view class="flex flex-col gap-[24rpx]">
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[28rpx] text-[#646a73]">提现金额</text>
+							<text class="text-[28rpx] text-[#1f2329]">¥{{ parseFloat(withdrawAmount || '0').toFixed(2) }}</text>
 						</view>
-						<text class="text-[32rpx] text-[#ff9500]">手续费 {{ serviceFee }}元</text>
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[28rpx] text-[#646a73]">手续费</text>
+							<text class="text-[28rpx] text-[#1f2329]">¥{{ serviceFee }}</text>
+						</view>
+						<view class="h-[2rpx] bg-[#e5e6eb]"></view>
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">实际到账</text>
+							<text class="text-[30rpx] font-semibold text-[#0052d9]">¥{{ actualAmount }}</text>
+						</view>
 					</view>
 				</view>
 
-				<!-- 提现说明 -->
+				<!-- 温馨提示 -->
 				<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
-					<view class="flex flex-row items-center gap-[8rpx]">
-						<uni-icons type="info-filled" size="16" color="#ed6a0c"></uni-icons>
-						<text class="text-[28rpx] font-bold text-[#ed6a0c]">提现说明</text>
-					</view>
+					<text class="text-[26rpx] font-bold text-[#faad14]">温馨提示</text>
 					<view class="flex flex-col gap-[8rpx]">
-						<text class="text-[26rpx] text-[#646a73]">• 单笔提现金额：10-50,000元</text>
-						<text class="text-[26rpx] text-[#646a73]">• 手续费：提现金额的0.6%，最低2元</text>
-						<text class="text-[26rpx] text-[#646a73]">• 实时到账：2小时内到账</text>
-						<text class="text-[26rpx] text-[#646a73]">• 每日限额：单日最多提现100,000元</text>
-						<text class="text-[26rpx] text-[#646a73]">• 如有疑问请联系客服：400-123-4567</text>
+						<text class="text-[24rpx] text-[#9aa0a6]">• 提现金额最低¥10，最高¥50,000</text>
+						<text class="text-[24rpx] text-[#9aa0a6]">• 手续费：提现金额的0.6%，最低2元</text>
+						<text class="text-[24rpx] text-[#9aa0a6]">• 工作日2小时内到账，节假日顺延</text>
+						<text class="text-[24rpx] text-[#9aa0a6]">• 每日提现次数限制3次</text>
 					</view>
 				</view>
 
 				<!-- 提交按钮 -->
-				<view class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center mt-[16rpx]" :class="{ 'bg-[#c0c4cc]': !canSubmit }" @tap="confirmWithdraw">
-					<text class="text-[32rpx] text-white font-medium">确认提现</text>
+				<view class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center mt-[16rpx]" :class="{ 'opacity-50': !canSubmit }" @tap="confirmWithdraw">
+					<text class="text-[32rpx] text-white font-semibold">确认提现</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -107,6 +110,7 @@
 
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 // import { getWalletInfo, withdraw, getWithdrawConfig } from '@/services/wallet'
 
 // 可提现余额
@@ -135,6 +139,7 @@ const bankCards = ref([
 // 计算手续费
 const serviceFee = computed(() => {
 	const amount = parseFloat(withdrawAmount.value) || 0
+	if (amount === 0) return '0.00'
 	const fee = amount * 0.006
 	return Math.max(fee, 2).toFixed(2)
 })
@@ -160,7 +165,49 @@ const loadWalletInfo = async () => {
 
 // 加载银行卡列表
 const loadBankCards = async () => {
-	// Mock implementation
+	try {
+		const cards = uni.getStorageSync('mock_bank_cards')
+		if (cards) {
+			// @ts-ignore
+			bankCards.value = cards.map((item: any) => ({
+				id: item.id,
+				bankName: item.bankName,
+				cardNo: `尾号 ${item.cardNo.slice(-4)}`
+			}))
+			
+			// 如果当前选中的卡不在列表中（比如被删除了），默认选中第一张
+			if (bankCards.value.length > 0) {
+				const exists = bankCards.value.find(item => item.id === selectedBankCard.value)
+				if (!exists) {
+					selectedBankCard.value = bankCards.value[0].id
+				}
+			} else {
+				selectedBankCard.value = 0
+			}
+		} else {
+			// Initialize default data if storage is empty
+			const defaultCards = [
+				{
+					id: 1,
+					bankName: '中国工商银行',
+					cardNo: '6222021001111888888',
+					name: '张三',
+					mobile: '13800138000'
+				},
+				{
+					id: 2,
+					bankName: '中国建设银行',
+					cardNo: '6217001230006666666',
+					name: '张三',
+					mobile: '13800138000'
+				}
+			]
+			uni.setStorageSync('mock_bank_cards', defaultCards)
+			loadBankCards() // Reload from storage
+		}
+	} catch (e) {
+		console.error(e)
+	}
 }
 
 // 全部提现
@@ -175,9 +222,8 @@ const selectBankCard = (id: number) => {
 
 // 添加银行卡
 const addBankCard = () => {
-	uni.showToast({
-		title: '添加银行卡功能开发中',
-		icon: 'none'
+	uni.navigateTo({
+		url: '/pages/wallet/add-card'
 	})
 }
 
@@ -245,7 +291,7 @@ const confirmWithdraw = async () => {
 }
 
 // 页面加载时获取数据
-onMounted(() => {
+onShow(() => {
 	loadWalletInfo()
 	loadBankCards()
 })

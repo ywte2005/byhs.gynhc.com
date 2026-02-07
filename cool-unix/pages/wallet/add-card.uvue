@@ -1,0 +1,142 @@
+<template>
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
+		<cl-topbar title="添加银行卡" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<!-- 提示信息 -->
+				<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] flex flex-row items-start gap-[12rpx]">
+					<uni-icons type="info-filled" size="16" color="#faad14" class="mt-[4rpx]"></uni-icons>
+					<text class="flex-1 text-[26rpx] text-[#faad14] leading-[1.5]">请绑定本人的银行卡，暂不支持信用卡。为了您的资金安全，绑定后不可随意修改。</text>
+				</view>
+
+				<!-- 表单区域 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">持卡人姓名</text>
+						<view class="bg-[#f5f7fa] h-[88rpx] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input
+								v-model="form.name"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入持卡人姓名"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">银行卡号</text>
+						<view class="bg-[#f5f7fa] h-[88rpx] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input
+								v-model="form.cardNo"
+								type="number"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入银行卡号"
+								placeholder-class="text-[#9aa0a6]"
+								:maxlength="19"
+							/>
+							<uni-icons v-if="form.cardNo" type="clear" size="18" color="#c0c4cc" @click="form.cardNo = ''"></uni-icons>
+						</view>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">开户银行</text>
+						<picker :range="banks" @change="onBankChange">
+							<view class="bg-[#f5f7fa] h-[88rpx] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between">
+								<text class="text-[28rpx]" :class="form.bankName ? 'text-[#1f2329]' : 'text-[#9aa0a6]'">
+									{{ form.bankName || '请选择开户银行' }}
+								</text>
+								<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+							</view>
+						</picker>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">预留手机号</text>
+						<view class="bg-[#f5f7fa] h-[88rpx] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input
+								v-model="form.mobile"
+								type="number"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入银行预留手机号"
+								placeholder-class="text-[#9aa0a6]"
+								:maxlength="11"
+							/>
+						</view>
+					</view>
+				</view>
+
+				<!-- 提交按钮 -->
+				<view 
+					class="h-[96rpx] rounded-[24rpx] flex items-center justify-center mt-[32rpx]"
+					:class="canSubmit ? 'bg-[#0052d9]' : 'bg-[#c0c4cc]'"
+					@click="submit"
+				>
+					<text class="text-[32rpx] text-white font-semibold">确认绑定</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed } from 'vue'
+
+const form = ref({
+	name: '',
+	cardNo: '',
+	bankName: '',
+	mobile: ''
+})
+
+const banks = ['中国工商银行', '中国农业银行', '中国银行', '中国建设银行', '招商银行', '交通银行', '浦发银行', '民生银行', '平安银行', '兴业银行']
+
+const onBankChange = (e: any) => {
+	const index = e.detail.value as number
+	form.value.bankName = banks[index]
+}
+
+const canSubmit = computed(() => {
+	return form.value.name && form.value.cardNo.length >= 16 && form.value.bankName && form.value.mobile.length === 11
+})
+
+const submit = () => {
+	if (!canSubmit.value) return
+	
+	uni.showLoading({ title: '绑定中...' })
+	
+	// Mock submit
+	setTimeout(() => {
+		// Save to mock storage
+		try {
+			const cards = uni.getStorageSync('mock_bank_cards') || []
+			const newCard = {
+				id: Date.now(),
+				bankName: form.value.bankName,
+				cardNo: form.value.cardNo,
+				name: form.value.name,
+				mobile: form.value.mobile
+			}
+			// @ts-ignore
+			cards.unshift(newCard)
+			uni.setStorageSync('mock_bank_cards', cards)
+		} catch (e) {
+			console.error(e)
+		}
+
+		uni.hideLoading()
+		uni.showToast({
+			title: '绑定成功',
+			icon: 'success'
+		})
+		
+		// 返回上一页并刷新
+		setTimeout(() => {
+			uni.navigateBack()
+		}, 1500)
+	}, 1500)
+}
+</script>
+
+<style>
+</style>

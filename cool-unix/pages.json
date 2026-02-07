@@ -104,8 +104,7 @@
 				{
 					"path": "register",
 					"style": {
-						"navigationBarTitleText": "新增进件",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "新增进件"
 					},
 					"meta": {
 						"isAuth": true
@@ -139,8 +138,7 @@
 				{
 					"path": "create",
 					"style": {
-						"navigationBarTitleText": "发布主任务",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "发布主任务"
 					},
 					"meta": {
 						"isAuth": true
@@ -264,6 +262,16 @@
 					"path": "bankcard",
 					"style": {
 						"navigationBarTitleText": "银行卡管理",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "add-card",
+					"style": {
+						"navigationBarTitleText": "添加银行卡",
 						"navigationStyle": "custom"
 					},
 					"meta": {
@@ -446,8 +454,7 @@
 				{
 					"path": "edit",
 					"style": {
-						"navigationBarTitleText": "个人资料",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "个人资料"
 					},
 					"meta": {
 						"isAuth": true
@@ -456,8 +463,7 @@
 				{
 					"path": "feedback",
 					"style": {
-						"navigationBarTitleText": "工单反馈",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "工单反馈"
 					},
 					"meta": {
 						"isAuth": true
@@ -471,8 +477,7 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": "设置",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "系统设置"
 					},
 					"meta": {
 						"isAuth": true
@@ -481,22 +486,19 @@
 				{
 					"path": "about",
 					"style": {
-						"navigationBarTitleText": "关于我们",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "关于我们"
 					}
 				},
 				{
 					"path": "general",
 					"style": {
-						"navigationBarTitleText": "通用设置",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "通用设置"
 					}
 				},
 				{
 					"path": "notice",
 					"style": {
-						"navigationBarTitleText": "通知设置",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "通知设置"
 					}
 				}
 			]
@@ -507,8 +509,7 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": "消息中心",
-						"navigationStyle": "custom"
+						"navigationBarTitleText": "消息中心"
 					},
 					"meta": {
 						"isAuth": true
