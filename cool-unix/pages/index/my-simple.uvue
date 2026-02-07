@@ -1,165 +1,169 @@
 <template>
-	<view class="page-container">
-		<!-- Header -->
-		<view class="my-header">
-			<view class="header-nav">
-				<view class="header-left"></view>
-				<view class="header-right">
-					<view class="nav-icon" @tap="toSet">
-						<text class="nav-icon-text">⚙️</text>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<!-- Header Wrapper with Blue Background -->
+		<view class="bg-[#0052d9] pb-[32rpx]">
+			<!-- Topbar -->
+			<cl-topbar :title="''" :show-back="false" background-color="transparent" color="#ffffff" safe-area-top :border="false">
+				<template #append>
+					<view class="flex flex-row gap-[24rpx] mr-[32rpx]">
+						<view class="w-[64rpx] h-[64rpx] bg-white/20 rounded-[32rpx] flex items-center justify-center" @tap="toSet">
+							<uni-icons type="settings" size="20" color="#ffffff"></uni-icons>
+						</view>
+						<view class="w-[64rpx] h-[64rpx] bg-white/20 rounded-[32rpx] flex items-center justify-center" @tap="toMessage">
+							<uni-icons type="notification" size="20" color="#ffffff"></uni-icons>
+						</view>
 					</view>
-					<view class="nav-icon" @tap="toMessage">
-						<text class="nav-icon-text">🔔</text>
-					</view>
-				</view>
-			</view>
+				</template>
+			</cl-topbar>
 
-			<view class="user-info" @tap="toEdit">
-				<view class="avatar-wrapper">
+			<!-- User Info -->
+			<view class="flex flex-row items-center gap-[24rpx] px-[32rpx] mt-[12rpx]" @tap="toEdit">
+				<view class="w-[120rpx] h-[120rpx] rounded-[60rpx] bg-white border-[4rpx] border-white/30 flex items-center justify-center overflow-hidden relative">
 					<image
-						class="user-avatar"
+						class="w-full h-full"
 						:src="avatarUrl || '/static/default-avatar.png'"
 						mode="aspectFill"
 					/>
-					<view v-if="isLogin" class="avatar-edit-badge">
-						<text class="badge-text">✏️</text>
+					<view v-if="isLogin" class="absolute bottom-0 right-0 w-full h-[30%] bg-black/50 flex items-center justify-center">
+						<text class="text-[20rpx]">✏️</text>
 					</view>
 				</view>
-				<view class="info-content">
-					<text class="user-name">{{ nickName || '点击登录' }}</text>
-					<text class="user-id" v-if="userInfo?.phone">ID: {{ userInfo?.phone }}</text>
+				<view class="flex-1 flex flex-col gap-[8rpx]">
+					<text class="text-[36rpx] font-bold text-white">{{ nickName || '点击登录' }}</text>
+					<text class="text-[24rpx] text-white/80" v-if="userInfo?.phone">ID: {{ userInfo?.phone }}</text>
 				</view>
-				<text class="arrow-right">></text>
+				<text class="text-[32rpx] text-white/60">></text>
 			</view>
 
-			<view class="stats-row">
-				<view class="stat-item">
-					<text class="stat-num">171</text>
-					<text class="stat-label">总点击</text>
+			<!-- Stats -->
+			<view class="flex flex-row justify-around mt-[32rpx]">
+				<view class="flex flex-col items-center gap-[8rpx]">
+					<text class="text-[36rpx] font-bold text-white">171</text>
+					<text class="text-[24rpx] text-white/80">总点击</text>
 				</view>
-				<view class="stat-item">
-					<text class="stat-num">24</text>
-					<text class="stat-label">赞</text>
+				<view class="flex flex-col items-center gap-[8rpx]">
+					<text class="text-[36rpx] font-bold text-white">24</text>
+					<text class="text-[24rpx] text-white/80">赞</text>
 				</view>
-				<view class="stat-item">
-					<text class="stat-num">89</text>
-					<text class="stat-label">收藏</text>
+				<view class="flex flex-col items-center gap-[8rpx]">
+					<text class="text-[36rpx] font-bold text-white">89</text>
+					<text class="text-[24rpx] text-white/80">收藏</text>
 				</view>
-				<view class="stat-item">
-					<text class="stat-num">653</text>
-					<text class="stat-label">粉丝</text>
+				<view class="flex flex-col items-center gap-[8rpx]">
+					<text class="text-[36rpx] font-bold text-white">653</text>
+					<text class="text-[24rpx] text-white/80">粉丝</text>
 				</view>
 			</view>
 		</view>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0 -mt-[24rpx] rounded-t-[24rpx] bg-[#f5f7fa] overflow-hidden" scroll-y>
+			<view class="p-[32rpx] pb-[120rpx] flex flex-col gap-[24rpx]">
 				<!-- 快捷开关 -->
-				<view class="switch-row">
-					<view class="card switch-card">
-						<view class="switch-info">
-							<text class="switch-title">接单模式</text>
-							<text class="switch-desc">已关闭</text>
+				<view class="flex flex-row gap-[24rpx]">
+					<view class="flex-1 flex flex-row items-center justify-between p-[24rpx] bg-white rounded-[24rpx]">
+						<view class="flex flex-col gap-[4rpx]">
+							<text class="text-[28rpx] font-bold text-[#1f2329]">接单模式</text>
+							<text class="text-[22rpx] text-[#999999]">已关闭</text>
 						</view>
 						<switch :checked="receiveOrderMode" color="#0052d9" style="transform:scale(0.8)" @change="onReceiveOrderChange" />
 					</view>
-					<view class="card switch-card">
-						<view class="switch-info">
-							<text class="switch-title">消息通知</text>
-							<text class="switch-desc">已关闭</text>
+					<view class="flex-1 flex flex-row items-center justify-between p-[24rpx] bg-white rounded-[24rpx]">
+						<view class="flex flex-col gap-[4rpx]">
+							<text class="text-[28rpx] font-bold text-[#1f2329]">消息通知</text>
+							<text class="text-[22rpx] text-[#999999]">已关闭</text>
 						</view>
 						<switch :checked="notificationMode" color="#0052d9" style="transform:scale(0.8)" @change="onNotificationChange" />
 					</view>
 				</view>
 
 				<!-- 订单状态 -->
-				<view class="card order-card">
-					<view class="grid-row">
-						<view class="grid-item" @tap="toTest">
-							<text class="grid-icon">💰</text>
-							<text class="grid-label">待支付</text>
+				<view class="bg-white rounded-[24rpx] py-[40rpx] px-[20rpx]">
+					<view class="flex flex-row justify-around">
+						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
+							<text class="text-[48rpx]">💰</text>
+							<text class="text-[24rpx] text-[#646a73]">待支付</text>
 						</view>
-						<view class="grid-item" @tap="toTest">
-							<text class="grid-icon">📦</text>
-							<text class="grid-label">未发货</text>
+						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
+							<text class="text-[48rpx]">📦</text>
+							<text class="text-[24rpx] text-[#646a73]">未发货</text>
 						</view>
-						<view class="grid-item" @tap="toTest">
-							<view class="order-badge-wrapper">
-								<text class="grid-icon">✈️</text>
-								<view class="order-badge">
-									<text class="badge-num">3</text>
+						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
+							<view class="relative">
+								<text class="text-[48rpx]">✈️</text>
+								<view class="absolute -top-[10rpx] -right-[10rpx] min-w-[32rpx] h-[32rpx] bg-[#ff3b30] rounded-[16rpx] flex items-center justify-center border-[2rpx] border-white">
+									<text class="text-[20rpx] text-white">3</text>
 								</view>
 							</view>
-							<text class="grid-label">已发货</text>
+							<text class="text-[24rpx] text-[#646a73]">已发货</text>
 						</view>
-						<view class="grid-item" @tap="toTest">
-							<text class="grid-icon">💱</text>
-							<text class="grid-label">售后/退款</text>
+						<view class="flex flex-col items-center gap-[12rpx] relative" @tap="toTest">
+							<text class="text-[48rpx]">💱</text>
+							<text class="text-[24rpx] text-[#646a73]">售后/退款</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- 功能列表 -->
-				<view class="card menu-card">
-					<view class="menu-item" @tap="toWallet">
-						<view class="menu-left">
-							<text class="menu-icon">👛</text>
-							<text class="menu-label">我的钱包</text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toWallet">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[40rpx]">👛</text>
+							<text class="text-[30rpx] text-[#1f2329]">我的钱包</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toTest">
-						<view class="menu-left">
-							<text class="menu-icon">📊</text>
-							<text class="menu-label">数据看板</text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[40rpx]">📊</text>
+							<text class="text-[30rpx] text-[#1f2329]">数据看板</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toTest">
-						<view class="menu-left">
-							<text class="menu-icon">🕐</text>
-							<text class="menu-label">历史记录</text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[40rpx]">🕐</text>
+							<text class="text-[30rpx] text-[#1f2329]">历史记录</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toTest">
-						<view class="menu-left">
-							<text class="menu-icon">📤</text>
-							<text class="menu-label">邀请好友</text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toTest">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[40rpx]">📤</text>
+							<text class="text-[30rpx] text-[#1f2329]">邀请好友</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 					</view>
 				</view>
 
 				<!-- 设置 -->
-				<view class="card menu-card">
-					<view class="menu-item" @tap="toSet">
-						<view class="menu-left">
-							<text class="menu-icon">⚙️</text>
-							<text class="menu-label">设置</text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toSet">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[40rpx]">⚙️</text>
+							<text class="text-[30rpx] text-[#1f2329]">设置</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- 底部导航栏 -->
-		<view class="tabbar">
-			<view class="tabbar-item" @tap="toHome">
-				<text class="tabbar-icon">🏠</text>
-				<text class="tabbar-text">首页</text>
+		<view class="fixed bottom-0 left-0 right-0 h-[100rpx] bg-white border-t border-[#e5e5e5] flex flex-row pb-[env(safe-area-inset-bottom)]">
+			<view class="flex-1 flex flex-col items-center justify-center" @tap="toHome">
+				<text class="text-[44rpx] mb-[8rpx]">🏠</text>
+				<text class="text-[20rpx] text-[#999999]">首页</text>
 			</view>
-			<view class="tabbar-item" @tap="toTemplate">
-				<text class="tabbar-icon">📋</text>
-				<text class="tabbar-text">模板</text>
+			<view class="flex-1 flex flex-col items-center justify-center" @tap="toTemplate">
+				<text class="text-[44rpx] mb-[8rpx]">📋</text>
+				<text class="text-[20rpx] text-[#999999]">模板</text>
 			</view>
-			<view class="tabbar-item active">
-				<text class="tabbar-icon">👤</text>
-				<text class="tabbar-text active">我的</text>
+			<view class="flex-1 flex flex-col items-center justify-center">
+				<text class="text-[44rpx] mb-[8rpx]">👤</text>
+				<text class="text-[20rpx] text-[#0052d9]">我的</text>
 			</view>
 		</view>
 	</view>

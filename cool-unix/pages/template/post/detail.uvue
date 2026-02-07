@@ -1,22 +1,19 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#ffffff"></uni-icons>
-				<image class="header-avatar" src="https://unix.cool-js.com/images/demo/avatar.jpg" mode="aspectFill" />
-				<text class="header-name">神仙都没用</text>
-			</view>
-			<view class="header-right">
-				<view class="btn-follow">
-					<text class="btn-follow-text">立即关注</text>
+		<cl-topbar title="帖子详情" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
+			<template #append>
+				<view class="flex items-center px-[32rpx] h-full">
+					<view class="border-[2rpx] border-[#0052d9] rounded-[32rpx] px-[24rpx] py-[8rpx] flex items-center justify-center">
+						<text class="text-[24rpx] text-[#0052d9] font-medium">立即关注</text>
+					</view>
 				</view>
-			</view>
-		</view>
+			</template>
+		</cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<view class="banner-box">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] pb-[120rpx] flex flex-col gap-[24rpx]">
+				<view class="rounded-[24rpx] overflow-hidden">
 					<cl-banner
 						height="500rpx"
 						:list="bannerList"
@@ -27,60 +24,60 @@
 					></cl-banner>
 				</view>
 
-				<view class="card info-card">
-					<text class="info-title">雪地旅行商务团价格表</text>
-					<text class="info-desc">对于不想做攻略的小伙伴来说定制团真的是最佳选择。雪地自驾没有经验的真心不建议。费用清晰明了。预算很准确，收费很合理。</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[34rpx] font-bold text-[#1f2329] mb-[16rpx]">雪地旅行商务团价格表</text>
+					<text class="text-[28rpx] text-[#646a73] leading-[1.6] mb-[24rpx]">对于不想做攻略的小伙伴来说定制团真的是最佳选择。雪地自驾没有经验的真心不建议。费用清晰明了。预算很准确，收费很合理。</text>
 					
-					<view class="info-footer">
-						<view class="location-tag">
-							<text class="location-text">哈尔滨 · 圣 · 索菲亚教堂</text>
+					<view class="flex flex-row justify-between items-center">
+						<view class="border-[2rpx] border-[#e5e6eb] rounded-[8rpx] px-[12rpx] py-[4rpx]">
+							<text class="text-[24rpx] text-[#646a73]">哈尔滨 · 圣 · 索菲亚教堂</text>
 						</view>
-						<text class="info-time">编辑于2天前</text>
+						<text class="text-[24rpx] text-[#999999]">编辑于2天前</text>
 					</view>
 				</view>
 
 				<!-- 评论 -->
-				<view class="card comment-card">
-					<text class="comment-count">共 10 条评论</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[28rpx] text-[#1f2329] mb-[24rpx]">共 10 条评论</text>
 
 					<!-- 评论输入框 -->
-					<view class="reply-box" @tap="openReply()">
-						<image class="reply-avatar" src="https://unix.cool-js.com/images/demo/avatar.jpg" mode="aspectFill" />
-						<view class="reply-input">
-							<text class="reply-placeholder">说点什么...</text>
-							<view class="reply-icons">
-								<cl-icon name="user-smile-line" :size="20" color="#646a73"></cl-icon>
-								<cl-icon name="image-circle-line" :size="20" color="#646a73" :pt="{ className: 'ml-2' }"></cl-icon>
+					<view class="flex flex-row items-center mb-[32rpx]" @tap="openReply()">
+						<image class="w-[68rpx] h-[68rpx] rounded-[34rpx] mr-[16rpx] bg-[#f5f5f5]" src="https://unix.cool-js.com/images/demo/avatar.jpg" mode="aspectFill" />
+						<view class="flex-1 h-[72rpx] bg-[#f5f7fa] rounded-[36rpx] flex flex-row items-center justify-between px-[24rpx]">
+							<text class="text-[28rpx] text-[#999999]">说点什么...</text>
+							<view class="flex flex-row items-center">
+								<cl-icon name="user-smile-line" :size="40" color="#646a73"></cl-icon>
+								<cl-icon name="image-circle-line" :size="40" color="#646a73" :pt="{ className: 'ml-2' }"></cl-icon>
 							</view>
 						</view>
 					</view>
 
-					<view class="comment-list">
-						<view class="comment-item" v-for="item in commentList" :key="item.id">
-							<image class="comment-avatar" :src="item.avatar" mode="aspectFill" />
-							<view class="comment-right">
-								<view class="comment-header">
-									<text class="comment-name">{{ item.name }}</text>
-									<view v-if="item.isAuthor" class="author-tag">
-										<text class="author-tag-text">作者</text>
+					<view class="flex flex-col gap-[32rpx]">
+						<view class="flex flex-row" v-for="item in commentList" :key="item.id">
+							<image class="w-[68rpx] h-[68rpx] rounded-[34rpx] mr-[16rpx] bg-[#f5f5f5]" :src="item.avatar" mode="aspectFill" />
+							<view class="flex-1 flex flex-col">
+								<view class="flex flex-row items-center mb-[8rpx]">
+									<text class="text-[28rpx] text-[#646a73]">{{ item.name }}</text>
+									<view v-if="item.isAuthor" class="border-[2rpx] border-[#0052d9] rounded-[4rpx] px-[8rpx] ml-[12rpx]">
+										<text class="text-[20rpx] text-[#0052d9]">作者</text>
 									</view>
 								</view>
-								<text class="comment-content">{{ item.content }}</text>
-								<text class="comment-time">{{ item.time }}</text>
+								<text class="text-[28rpx] text-[#1f2329] leading-[1.5] mb-[8rpx]">{{ item.content }}</text>
+								<text class="text-[24rpx] text-[#999999]">{{ item.time }}</text>
 
 								<!-- 回复列表 -->
-								<view class="sub-comment-list" v-if="item.reply.length > 0">
-									<view class="sub-comment-item" v-for="reply in item.reply" :key="reply.id">
-										<image class="sub-comment-avatar" :src="reply.avatar" mode="aspectFill" />
-										<view class="sub-comment-right">
-											<view class="comment-header">
-												<text class="comment-name">{{ reply.name }}</text>
-												<view v-if="reply.isAuthor" class="author-tag">
-													<text class="author-tag-text">作者</text>
+								<view class="mt-[16rpx] flex flex-col gap-[16rpx]" v-if="item.reply.length > 0">
+									<view class="flex flex-row" v-for="reply in item.reply" :key="reply.id">
+										<image class="w-[48rpx] h-[48rpx] rounded-[24rpx] mr-[16rpx] bg-[#f5f5f5]" :src="reply.avatar" mode="aspectFill" />
+										<view class="flex-1 flex flex-col">
+											<view class="flex flex-row items-center mb-[8rpx]">
+												<text class="text-[28rpx] text-[#646a73]">{{ reply.name }}</text>
+												<view v-if="reply.isAuthor" class="border-[2rpx] border-[#0052d9] rounded-[4rpx] px-[8rpx] ml-[12rpx]">
+													<text class="text-[20rpx] text-[#0052d9]">作者</text>
 												</view>
 											</view>
-											<text class="comment-content">{{ reply.content }}</text>
-											<text class="comment-time">{{ reply.time }}</text>
+											<text class="text-[28rpx] text-[#1f2329] leading-[1.5] mb-[8rpx]">{{ reply.content }}</text>
+											<text class="text-[24rpx] text-[#999999]">{{ reply.time }}</text>
 										</view>
 									</view>
 								</view>
@@ -92,27 +89,27 @@
 		</scroll-view>
 
 		<!-- Footer -->
-		<view class="footer">
-			<view class="footer-left" @tap="openReply">
-				<cl-icon name="edit-line" color="#646a73" :size="16"></cl-icon>
-				<text class="footer-input-text">说点什么...</text>
+		<view class="fixed bottom-0 left-0 right-0 bg-white border-t-[1rpx] border-[#e5e5e5] px-[32rpx] py-[16rpx] pb-[calc(16rpx+env(safe-area-inset-bottom))] flex flex-row items-center z-100">
+			<view class="flex-1 h-[72rpx] bg-[#f5f7fa] rounded-[36rpx] flex items-center px-[24rpx] mr-[24rpx]" @tap="openReply">
+				<cl-icon name="edit-line" color="#646a73" :size="32"></cl-icon>
+				<text class="text-[28rpx] text-[#999999] ml-[12rpx]">说点什么...</text>
 			</view>
-			<view class="footer-right">
-				<view class="action-item">
-					<cl-icon name="heart-line" :size="24" color="#1f2329"></cl-icon>
-					<text class="action-text">700</text>
+			<view class="flex flex-row gap-[32rpx]">
+				<view class="flex flex-row items-center">
+					<cl-icon name="heart-line" :size="48" color="#1f2329"></cl-icon>
+					<text class="text-[24rpx] text-[#1f2329] ml-[8rpx]">700</text>
 				</view>
-				<view class="action-item">
-					<cl-icon name="chat-3-line" :size="24" color="#1f2329"></cl-icon>
-					<text class="action-text">59</text>
+				<view class="flex flex-row items-center">
+					<cl-icon name="chat-3-line" :size="48" color="#1f2329"></cl-icon>
+					<text class="text-[24rpx] text-[#1f2329] ml-[8rpx]">59</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 回复弹窗 -->
 		<cl-popup v-model="replyVisible" direction="bottom" ref="replyPopupRef">
-			<view class="popup-content">
-				<view class="popup-input-box">
+			<view class="bg-white p-[32rpx] pb-[calc(32rpx+env(safe-area-inset-bottom))]">
+				<view class="bg-[#f5f7fa] rounded-[16rpx] p-[16rpx] h-[200rpx] mb-[24rpx]">
 					<cl-textarea
 						placeholder="说点什么..."
 						:border="false"
@@ -122,13 +119,13 @@
 					></cl-textarea>
 				</view>
 
-				<view class="popup-toolbar">
-					<view class="toolbar-icons">
-						<cl-icon name="image-circle-line" :size="24" color="#646a73" :pt="{ className: 'mr-4' }"></cl-icon>
-						<cl-icon name="user-smile-line" :size="24" color="#646a73"></cl-icon>
+				<view class="flex flex-row justify-between items-center">
+					<view class="flex flex-row">
+						<cl-icon name="image-circle-line" :size="48" color="#646a73" :pt="{ className: 'mr-4' }"></cl-icon>
+						<cl-icon name="user-smile-line" :size="48" color="#646a73"></cl-icon>
 					</view>
-					<view class="btn-send">
-						<text class="btn-send-text">发送</text>
+					<view class="bg-[#0052d9] rounded-[32rpx] px-[32rpx] py-[12rpx]">
+						<text class="text-[28rpx] text-white">发送</text>
 					</view>
 				</view>
 			</view>
@@ -300,348 +297,4 @@ function closeReply() {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx;
-	background-color: #0052d9;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 32rpx;
-	position: relative;
-}
-
-.header-left {
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #ffffff;
-}
-
-.header-avatar {
-	width: 64rpx;
-	height: 64rpx;
-	border-radius: 32rpx;
-	background-color: #ffffff;
-}
-
-.header-name {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #ffffff;
-}
-
-.header-right {
-	display: flex;
-	align-items: center;
-}
-
-.btn-follow {
-	background-color: transparent;
-	border: 2rpx solid #ffffff;
-	border-radius: 32rpx;
-	padding: 8rpx 24rpx;
-}
-
-.btn-follow-text {
-	font-size: 24rpx;
-	color: #ffffff;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	padding-bottom: 120rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.banner-box {
-	border-radius: 24rpx;
-	overflow: hidden;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Info Card */
-.info-title {
-	font-size: 34rpx;
-	font-weight: 700;
-	color: #1f2329;
-	margin-bottom: 16rpx;
-}
-
-.info-desc {
-	font-size: 28rpx;
-	color: #646a73;
-	line-height: 1.6;
-	margin-bottom: 24rpx;
-}
-
-.info-footer {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.location-tag {
-	border: 2rpx solid #e5e6eb;
-	border-radius: 8rpx;
-	padding: 4rpx 12rpx;
-}
-
-.location-text {
-	font-size: 24rpx;
-	color: #646a73;
-}
-
-.info-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-/* Comment Card */
-.comment-count {
-	font-size: 28rpx;
-	color: #1f2329;
-	margin-bottom: 24rpx;
-}
-
-.reply-box {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin-bottom: 32rpx;
-}
-
-.reply-avatar {
-	width: 68rpx;
-	height: 68rpx;
-	border-radius: 34rpx;
-	margin-right: 16rpx;
-	background-color: #f5f5f5;
-}
-
-.reply-input {
-	flex: 1;
-	height: 72rpx;
-	background-color: #f5f7fa;
-	border-radius: 36rpx;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 24rpx;
-}
-
-.reply-placeholder {
-	font-size: 28rpx;
-	color: #999999;
-}
-
-.reply-icons {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.comment-list {
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.comment-item {
-	display: flex;
-	flex-direction: row;
-}
-
-.comment-avatar {
-	width: 68rpx;
-	height: 68rpx;
-	border-radius: 34rpx;
-	margin-right: 16rpx;
-	background-color: #f5f5f5;
-}
-
-.comment-right {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-}
-
-.comment-header {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	margin-bottom: 8rpx;
-}
-
-.comment-name {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.author-tag {
-	border: 2rpx solid #0052d9;
-	border-radius: 4rpx;
-	padding: 0 8rpx;
-	margin-left: 12rpx;
-}
-
-.author-tag-text {
-	font-size: 20rpx;
-	color: #0052d9;
-}
-
-.comment-content {
-	font-size: 28rpx;
-	color: #1f2329;
-	line-height: 1.5;
-	margin-bottom: 8rpx;
-}
-
-.comment-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-.sub-comment-list {
-	margin-top: 16rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.sub-comment-item {
-	display: flex;
-	flex-direction: row;
-}
-
-.sub-comment-avatar {
-	width: 48rpx;
-	height: 48rpx;
-	border-radius: 24rpx;
-	margin-right: 16rpx;
-	background-color: #f5f5f5;
-}
-
-.sub-comment-right {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Footer */
-.footer {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background-color: #ffffff;
-	border-top: 1rpx solid #e5e5e5;
-	padding: 16rpx 32rpx;
-	padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	z-index: 100;
-}
-
-.footer-left {
-	flex: 1;
-	height: 72rpx;
-	background-color: #f5f7fa;
-	border-radius: 36rpx;
-	display: flex;
-	align-items: center;
-	padding: 0 24rpx;
-	margin-right: 24rpx;
-}
-
-.footer-input-text {
-	font-size: 28rpx;
-	color: #999999;
-	margin-left: 12rpx;
-}
-
-.footer-right {
-	display: flex;
-	flex-direction: row;
-	gap: 32rpx;
-}
-
-.action-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.action-text {
-	font-size: 24rpx;
-	color: #1f2329;
-	margin-left: 8rpx;
-}
-
-/* Popup */
-.popup-content {
-	background-color: #ffffff;
-	padding: 32rpx;
-	padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
-}
-
-.popup-input-box {
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	padding: 16rpx;
-	height: 200rpx;
-	margin-bottom: 24rpx;
-}
-
-.popup-toolbar {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.toolbar-icons {
-	display: flex;
-	flex-direction: row;
-}
-
-.btn-send {
-	background-color: #0052d9;
-	border-radius: 32rpx;
-	padding: 12rpx 32rpx;
-}
-
-.btn-send-text {
-	font-size: 28rpx;
-	color: #ffffff;
-}
 </style>

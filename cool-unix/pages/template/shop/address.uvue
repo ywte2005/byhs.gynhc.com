@@ -1,81 +1,74 @@
 <template>
-	<cl-page>
-		<view class="p-3">
-			<view
-				class="flex flex-col bg-white rounded-2xl p-4 mb-3 dark:!bg-surface-800"
-				:class="{
-					'!mb-0': index == addressList.length - 1
-				}"
-				v-for="(item, index) in addressList"
-				:key="item.id"
-			>
-				<view class="flex flex-col">
-					<cl-text
-						:size="16"
-						:pt="{
-							className: 'mb-2'
-						}"
-						>{{ item.province }} {{ item.city }} {{ item.district }}
-						{{ item.address }}</cl-text
-					>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="地址管理" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-					<view class="flex flex-row">
-						<cl-text :size="12">{{ item.contact }}</cl-text>
-						<cl-text
-							type="phone"
-							mask
-							:size="12"
-							color="info"
-							:value="item.phone"
-							:pt="{ className: 'ml-3' }"
-						></cl-text>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[24rpx] flex flex-col gap-[24rpx]">
+				<view
+					class="flex flex-col bg-white rounded-[24rpx] p-[32rpx] dark:!bg-surface-800"
+					v-for="(item, index) in addressList"
+					:key="item.id"
+				>
+					<view class="flex flex-col">
+						<text class="text-[32rpx] text-[#1f2329] leading-[1.5] mb-[16rpx]">{{ item.province }} {{ item.city }} {{ item.district }} {{ item.address }}</text>
+
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[24rpx] text-[#646a73]">{{ item.contact }}</text>
+							<cl-text
+								type="phone"
+								mask
+								:size="24"
+								color="info"
+								:value="item.phone"
+							></cl-text>
+						</view>
+					</view>
+
+					<view class="flex flex-row items-center pt-[32rpx] mt-[32rpx] border-t-[2rpx] border-[#f5f7fa] dark:!border-surface-700">
+						<cl-radio
+							v-model="defaultId"
+							active-icon="checkbox-circle-fill"
+							inactive-icon="checkbox-blank-circle-line"
+							:pt="{
+								className: 'max-w-[150px]',
+								icon: {
+									size: 32
+								},
+								label: {
+									size: 24
+								}
+							}"
+							:value="item.id"
+							@change="onDefaultChange(item)"
+							>{{ item.isDefault ? t("已设为默认") : t("设为默认") }}</cl-radio
+						>
+
+						<view
+							class="flex flex-row items-center justify-center ml-auto"
+							@tap="onDelete(item.id!)"
+						>
+							<cl-icon name="delete-bin-line" :size="32"></cl-icon>
+							<text class="text-[24rpx] ml-[8rpx] text-[#646a73]">{{ t("删除") }}</text>
+						</view>
+
+						<view
+							class="flex flex-row items-center justify-center ml-[48rpx]"
+							@tap="toEdit(item.id!)"
+						>
+							<cl-icon name="edit-line" :size="32"></cl-icon>
+							<text class="text-[24rpx] ml-[8rpx] text-[#646a73]">{{ t("修改") }}</text>
+						</view>
 					</view>
 				</view>
 
-				<view class="flex flex-row pt-4 mt-4 dark:!border-surface-700">
-					<cl-radio
-						v-model="defaultId"
-						active-icon="checkbox-circle-fill"
-						inactive-icon="checkbox-blank-circle-line"
-						:pt="{
-							className: 'max-w-[150px]',
-							icon: {
-								size: 16
-							},
-							label: {
-								size: 12
-							}
-						}"
-						:value="item.id"
-						@change="onDefaultChange(item)"
-						>{{ item.isDefault ? t("已设为默认") : t("设为默认") }}</cl-radio
-					>
-
-					<view
-						class="flex flex-row items-center justify-center ml-auto"
-						@tap="onDelete(item.id!)"
-					>
-						<cl-icon name="delete-bin-line"></cl-icon>
-						<cl-text :size="12" :pt="{ className: 'ml-2' }">{{ t("删除") }}</cl-text>
-					</view>
-
-					<view
-						class="flex flex-row items-center justify-center ml-6"
-						@tap="toEdit(item.id!)"
-					>
-						<cl-icon name="edit-line"></cl-icon>
-						<cl-text :size="12" :pt="{ className: 'ml-2' }">{{ t("修改") }}</cl-text>
-					</view>
-				</view>
+				<cl-empty v-if="list.length == 0"></cl-empty>
 			</view>
-
-			<cl-empty v-if="list.length == 0"></cl-empty>
-		</view>
+		</scroll-view>
 
 		<cl-footer>
 			<cl-button size="large" @tap="toAdd()">{{ t("添加地址") }}</cl-button>
 		</cl-footer>
-	</cl-page>
+	</view>
 </template>
 
 <script lang="ts" setup>
@@ -212,3 +205,6 @@ onReady(() => {
 	});
 });
 </script>
+
+<style>
+</style>

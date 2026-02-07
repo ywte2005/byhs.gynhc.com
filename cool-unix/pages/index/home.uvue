@@ -1,119 +1,124 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col min-h-screen bg-[#f5f7fa] pb-[120rpx]">
 		<!-- 顶部导航 -->
-		<view class="top-bar">
-			<text class="title">旺铺集</text>
-			<view class="actions">
-				<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
-				<uni-icons type="notification" size="24" color="#ffffff"></uni-icons>
-			</view>
-		</view>
+		<cl-topbar title="旺铺集" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
+			<template #append>
+				<view class="flex flex-row gap-[16rpx] mr-[8rpx]">
+					<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
+					<uni-icons type="notification" size="24" color="#ffffff"></uni-icons>
+				</view>
+			</template>
+		</cl-topbar>
 
 		<!-- 余额卡片 -->
-		<view class="balance-card">
-			<view class="balance-row">
-				<view class="balance-item">
-					<text class="amount-large">¥{{ formatMoney(statistics.wallet.balance) }}</text>
-					<text class="label">可用余额</text>
+		<view class="bg-[#0052d9] p-[40rpx_32rpx_48rpx_32rpx] flex flex-col gap-[32rpx]">
+			<view class="flex flex-row justify-between">
+				<view class="flex flex-col items-center">
+					<text class="text-[48rpx] font-bold text-white">¥{{ formatMoney(statistics.wallet.balance) }}</text>
+					<text class="text-[24rpx] text-white/70 mt-[8rpx]">可用余额</text>
 				</view>
-				<view class="balance-item">
-					<text class="amount-medium">¥{{ formatMoney(statistics.wallet.frozen) }}</text>
-					<text class="label">冻结金额</text>
+				<view class="flex flex-col items-center">
+					<text class="text-[32rpx] font-semibold text-white">¥{{ formatMoney(statistics.wallet.frozen) }}</text>
+					<text class="text-[24rpx] text-white/70 mt-[8rpx]">冻结金额</text>
 				</view>
-				<view class="balance-item">
-					<text class="amount-medium">¥{{ formatMoney(statistics.wallet.pending) }}</text>
-					<text class="label">待结算</text>
+				<view class="flex flex-col items-center">
+					<text class="text-[32rpx] font-semibold text-white">¥{{ formatMoney(statistics.wallet.pending) }}</text>
+					<text class="text-[24rpx] text-white/70 mt-[8rpx]">待结算</text>
 				</view>
 			</view>
 
 			<!-- 快捷入口 -->
-			<view class="quick-actions">
-				<view class="action-item" @tap="goToPage('/pages/merchant/register')">
-					<view class="action-icon">
+			<view class="flex flex-row justify-around">
+				<view class="flex flex-col items-center" @tap="goToPage('/pages/merchant/register')">
+					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="compose" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="action-label">进件</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">进件</text>
 				</view>
-				<view class="action-item" @tap="goToPage('/pages/task/create')">
-					<view class="action-icon">
+				<view class="flex flex-col items-center" @tap="goToPage('/pages/task/create')">
+					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="sound" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="action-label">发布任务</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">发布任务</text>
 				</view>
-				<view class="action-item" @tap="goToPage('/pages/wallet/recharge')">
-					<view class="action-icon">
+				<view class="flex flex-col items-center" @tap="goToPage('/pages/wallet/recharge')">
+					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="plus" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="action-label">充值</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">充值</text>
 				</view>
-				<view class="action-item" @tap="goToPage('/pages/wallet/withdraw')">
-					<view class="action-icon">
+				<view class="flex flex-col items-center" @tap="goToPage('/pages/wallet/withdraw')">
+					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="vip" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="action-label">提现</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">提现</text>
 				</view>
-				<view class="action-item" @tap="goToPage('/pages/promo/invite')">
-					<view class="action-icon">
+				<view class="flex flex-col items-center" @tap="goToPage('/pages/promo/invite')">
+					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="contact" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="action-label">邀请</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">邀请</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 待办事项 -->
-		<view class="section">
-			<text class="section-title">待办事项</text>
-			<view class="todo-row">
-				<view class="todo-card">
-					<text class="todo-number primary">{{ statistics.todo.pending_merchant }}</text>
-					<text class="todo-label">待审核进件</text>
+		<view class="px-[32rpx] pt-[32rpx] flex flex-col gap-[24rpx]">
+			<text class="text-[32rpx] font-semibold text-[#1f2329]">待办事项</text>
+			<view class="flex flex-row gap-[24rpx]">
+				<view class="flex-1 bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center">
+					<text class="text-[56rpx] font-bold text-[#0052d9]">{{ statistics.todo.pending_merchant }}</text>
+					<text class="text-[26rpx] text-[#646a73] mt-[16rpx]">待审核进件</text>
 				</view>
-				<view class="todo-card">
-					<text class="todo-number warning">{{ statistics.todo.pending_task }}</text>
-					<text class="todo-label">待验收任务</text>
+				<view class="flex-1 bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center">
+					<text class="text-[56rpx] font-bold text-[#faad14]">{{ statistics.todo.pending_task }}</text>
+					<text class="text-[26rpx] text-[#646a73] mt-[16rpx]">待验收任务</text>
 				</view>
-				<view class="todo-card">
-					<text class="todo-number danger">{{ statistics.todo.pending_withdraw }}</text>
-					<text class="todo-label">待处理提现</text>
+				<view class="flex-1 bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center">
+					<text class="text-[56rpx] font-bold text-[#e34d59]">{{ statistics.todo.pending_withdraw }}</text>
+					<text class="text-[26rpx] text-[#646a73] mt-[16rpx]">待处理提现</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 今日数据 -->
-		<view class="section">
-			<view class="data-card">
-				<text class="section-title">今日数据</text>
-				<view class="data-row">
-					<view class="data-item bg-blue">
-						<text class="data-number primary">{{ statistics.today.accepted }}</text>
-						<text class="data-label">已接任务</text>
+		<view class="px-[32rpx] pt-[32rpx] flex flex-col gap-[24rpx]">
+			<view class="bg-white rounded-[24rpx] p-[32rpx]">
+				<text class="text-[32rpx] font-semibold text-[#1f2329]">今日数据</text>
+				<view class="flex flex-row gap-[16rpx] mt-[24rpx]">
+					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#f8f9ff]">
+						<text class="text-[40rpx] font-bold text-[#0052d9]">{{ statistics.today.accepted }}</text>
+						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">已接任务</text>
 					</view>
-					<view class="data-item bg-green">
-						<text class="data-number success">{{ statistics.today.completed }}</text>
-						<text class="data-label">已完成</text>
+					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#f0f9f4]">
+						<text class="text-[40rpx] font-bold text-[#00b578]">{{ statistics.today.completed }}</text>
+						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">已完成</text>
 					</view>
-					<view class="data-item bg-yellow">
-						<text class="data-number warning">¥{{ formatMoney(statistics.today.income) }}</text>
-						<text class="data-label">今日收入</text>
+					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#fff8e1]">
+						<text class="text-[40rpx] font-bold text-[#faad14]">¥{{ formatMoney(statistics.today.income) }}</text>
+						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">今日收入</text>
 					</view>
 				</view>
 			</view>
 		</view>
 
 		<!-- 平台动态 -->
-		<view class="section news-section">
-			<view class="news-card">
-				<view class="news-header">
-					<text class="section-title">平台动态</text>
-					<text class="more-link">查看更多 ></text>
+		<view class="px-[32rpx] pt-[32rpx] flex flex-col gap-[24rpx] pb-[160rpx]">
+			<view class="bg-white rounded-[24rpx] p-[32rpx]">
+				<view class="flex flex-row justify-between items-center">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">平台动态</text>
+					<text class="text-[26rpx] text-[#0052d9]">查看更多 ></text>
 				</view>
-				<view class="news-list">
-					<view class="news-item" v-for="(item, index) in statistics.news" :key="index">
-						<view class="dot" :class="item.type"></view>
-						<view class="news-content">
-							<text class="news-title">{{ item.title }}</text>
-							<text class="news-date">{{ formatDate(item.createtime) }}</text>
+				<view class="mt-[24rpx] flex flex-col gap-[24rpx]">
+					<view class="flex flex-row gap-[24rpx]" v-for="(item, index) in statistics.news" :key="index">
+						<view class="w-[12rpx] h-[12rpx] rounded-full mt-[12rpx]" :class="[
+							item.type === 'primary' ? 'bg-[#0052d9]' : '',
+							item.type === 'success' ? 'bg-[#00b578]' : '',
+							item.type === 'warning' ? 'bg-[#faad14]' : ''
+						]"></view>
+						<view class="flex-1 flex flex-col">
+							<text class="text-[28rpx] text-[#1f2329]">{{ item.title }}</text>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[8rpx]">{{ formatDate(item.createtime) }}</text>
 						</view>
 					</view>
 				</view>
@@ -121,30 +126,14 @@
 		</view>
 
 		<!-- 底部导航栏 -->
-		<view class="tabbar">
-			<view class="tab-item active" @tap="goToPage('/pages/index/home')">
-				<uni-icons type="home" size="24" color="#0052d9"></uni-icons>
-				<text class="tab-label active">首页</text>
-			</view>
-			<view class="tab-item" @tap="goToPage('/pages/task/index')">
-				<uni-icons type="compose" size="24" color="#646a73"></uni-icons>
-				<text class="tab-label">任务</text>
-			</view>
-			<view class="tab-item" @tap="goToPage('/pages/promo/index')">
-				<uni-icons type="contact" size="24" color="#646a73"></uni-icons>
-				<text class="tab-label">推广</text>
-			</view>
-			<view class="tab-item" @tap="goToPage('/pages/merchant/index')">
-				<uni-icons type="person" size="24" color="#646a73"></uni-icons>
-				<text class="tab-label">我的</text>
-			</view>
-		</view>
+		<custom-tabbar></custom-tabbar>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue';
 import { getStatistics } from '@/services/index';
+import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 定义组件选项
 defineOptions({
@@ -213,327 +202,4 @@ onMounted(() => {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	min-height: 100vh;
-	padding-bottom: 120rpx;
-}
-
-/* 顶部导航 */
-.top-bar {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 112rpx; /* 56px */
-	background-color: #0052d9;
-	padding: 0 32rpx; /* 16px */
-}
-
-.title {
-	font-size: 36rpx; /* 18px */
-	font-weight: 600;
-	color: #ffffff;
-	font-family: 'Inter', sans-serif;
-}
-
-.actions {
-	display: flex;
-	flex-direction: row;
-	gap: 32rpx; /* 16px */
-}
-
-
-
-/* 余额卡片 */
-.balance-card {
-	background-color: #0052d9;
-	padding: 40rpx 32rpx 48rpx 32rpx; /* 20px 16px 24px 16px */
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx; /* 16px */
-}
-
-.balance-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-
-.balance-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.amount-large {
-	font-size: 48rpx;
-	font-weight: 700;
-	color: #ffffff;
-}
-
-.amount-medium {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #ffffff;
-}
-
-.label {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.7);
-	margin-top: 8rpx;
-}
-
-/* 快捷入口 */
-.quick-actions {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	/* Removed margin-top as it is handled by balance-card gap */
-}
-
-.action-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.action-icon {
-	width: 88rpx;
-	height: 88rpx;
-	background-color: rgba(255, 255, 255, 0.2);
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-
-
-.action-label {
-	font-size: 24rpx;
-	color: #ffffff;
-	margin-top: 12rpx;
-}
-
-/* 通用区块 */
-.section {
-	padding: 32rpx 32rpx 0 32rpx; /* 16px 16px 0 16px */
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx; /* 12px */
-}
-
-.section-title {
-	font-size: 32rpx; /* 16px */
-	font-weight: 600;
-	color: #1f2329;
-}
-
-/* 待办事项 */
-.todo-row {
-	display: flex;
-	flex-direction: row;
-	gap: 24rpx; /* 12px */
-}
-
-.todo-card {
-	flex: 1;
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.todo-number {
-	font-size: 56rpx;
-	font-weight: 700;
-}
-
-.todo-number.primary {
-	color: #0052d9;
-}
-
-.todo-number.warning {
-	color: #faad14;
-}
-
-.todo-number.danger {
-	color: #e34d59;
-}
-
-.todo-label {
-	font-size: 26rpx;
-	color: #646a73;
-	margin-top: 16rpx;
-}
-
-/* 今日数据 */
-.data-card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-}
-
-.data-row {
-	display: flex;
-	flex-direction: row;
-	gap: 16rpx; /* 8px? Design says gap 12 for cards, checking data-row specifically */
-	margin-top: 24rpx;
-}
-
-.data-item {
-	flex: 1;
-	border-radius: 16rpx;
-	padding: 24rpx;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.data-item.bg-blue {
-	background-color: #f8f9ff;
-}
-
-.data-item.bg-green {
-	background-color: #f0f9f4;
-}
-
-.data-item.bg-yellow {
-	background-color: #fff8e1;
-}
-
-.data-number {
-	font-size: 40rpx;
-	font-weight: 700;
-}
-
-.data-number.primary {
-	color: #0052d9;
-}
-
-.data-number.success {
-	color: #00b578;
-}
-
-.data-number.warning {
-	color: #faad14;
-}
-
-.data-label {
-	font-size: 24rpx;
-	color: #646a73;
-	margin-top: 8rpx;
-}
-
-/* 平台动态 */
-.news-section {
-	padding-bottom: 160rpx;
-}
-
-.news-card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-}
-
-.news-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.more-link {
-	font-size: 26rpx;
-	color: #0052d9;
-}
-
-.news-list {
-	margin-top: 24rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.news-item {
-	display: flex;
-	flex-direction: row;
-	gap: 24rpx;
-}
-
-.dot {
-	width: 12rpx;
-	height: 12rpx;
-	border-radius: 50%;
-	margin-top: 12rpx;
-}
-
-.dot.primary {
-	background-color: #0052d9;
-}
-
-.dot.success {
-	background-color: #00b578;
-}
-
-.dot.warning {
-	background-color: #faad14;
-}
-
-.news-content {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-}
-
-.news-title {
-	font-size: 28rpx;
-	color: #1f2329;
-}
-
-.news-date {
-	font-size: 24rpx;
-	color: #9aa0a6;
-	margin-top: 8rpx;
-}
-
-/* 底部导航栏 */
-.tabbar {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	border-top: 1px solid #e5e6eb;
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	padding-bottom: env(safe-area-inset-bottom);
-}
-
-.tab-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	flex: 1;
-}
-
-
-
-.tab-label {
-	font-size: 20rpx;
-	color: #646a73;
-	margin-top: 4rpx;
-}
-
-.tab-label.active {
-	color: #0052d9;
-}
 </style>

@@ -1,55 +1,54 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">分红中心</text>
-			</view>
-		</view>
+		<cl-topbar title="分红中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- Summary Card -->
-				<view class="card summary-card">
-					<view class="summary-row">
-						<view class="summary-item">
-							<text class="summary-value">{{ summary.total_bonus }}</text>
-							<text class="summary-label">累计分红</text>
+				<view class="bg-[#0052d9] rounded-[24rpx] p-[32rpx] flex flex-col">
+					<view class="flex flex-row justify-around items-center">
+						<view class="flex flex-col items-center gap-[8rpx]">
+							<text class="text-[48rpx] font-bold text-white">{{ summary.total_bonus }}</text>
+							<text class="text-[26rpx] text-white/80">累计分红</text>
 						</view>
-						<view class="summary-divider"></view>
-						<view class="summary-item">
-							<text class="summary-value">{{ summary.month_bonus }}</text>
-							<text class="summary-label">本月分红</text>
+						<view class="w-[2rpx] h-[60rpx] bg-white/20"></view>
+						<view class="flex flex-col items-center gap-[8rpx]">
+							<text class="text-[48rpx] font-bold text-white">{{ summary.month_bonus }}</text>
+							<text class="text-[26rpx] text-white/80">本月分红</text>
 						</view>
 					</view>
-					<view v-if="summary.qualified_rules.length > 0" class="qualified-info">
-						<text class="qualified-label">已达标档位：</text>
-						<text class="qualified-value">{{ summary.qualified_rules.join('、') }}</text>
+					<view v-if="summary.qualified_rules.length > 0" class="flex flex-row mt-[32rpx] pt-[24rpx] border-t-[2rpx] border-white/20">
+						<text class="text-[26rpx] text-white/80">已达标档位：</text>
+						<text class="text-[26rpx] text-white font-semibold">{{ summary.qualified_rules.join('、') }}</text>
 					</view>
 				</view>
 
 				<!-- List Title -->
-				<view class="section-title">
-					<text class="title-text">分红记录</text>
+				<view class="my-[16rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">分红记录</text>
 				</view>
 
 				<!-- Bonus List -->
-				<view class="bonus-list">
-					<view v-for="(item, index) in list" :key="index" class="card bonus-item">
-						<view class="item-left">
-							<text class="item-title">团队分红</text>
-							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row justify-between items-center">
+						<view class="flex flex-col gap-[8rpx]">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">团队分红</text>
+							<text class="text-[24rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
 						</view>
-						<view class="item-right">
-							<text class="item-amount">+{{ item.amount }}</text>
-							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
+						<view class="flex flex-col items-end gap-[8rpx]">
+							<text class="text-[32rpx] font-bold text-[#ff3b30]">+{{ item.amount }}</text>
+							<text class="text-[24rpx]" :class="{
+								'text-[#00b578]': item.status === 'granted',
+								'text-[#faad14]': item.status === 'pending',
+								'text-[#f53f3f]': item.status === 'failed'
+							}">{{ getStatusName(item.status) }}</text>
 						</view>
 					</view>
 					
 					<!-- Empty State -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无分红记录</text>
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无分红记录</text>
 					</view>
 				</view>
 			</view>
@@ -94,9 +93,6 @@
 			this.loadMore();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadSummary() {
 				getBonusSummary()
 					.then((res : BonusSummary) => {
@@ -142,202 +138,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Summary Card */
-.summary-card {
-	background-color: #0052d9;
-	color: #ffffff;
-}
-
-.summary-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: center;
-}
-
-.summary-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8rpx;
-}
-
-.summary-value {
-	font-size: 48rpx;
-	font-weight: 700;
-	color: #ffffff;
-}
-
-.summary-label {
-	font-size: 26rpx;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.summary-divider {
-	width: 2rpx;
-	height: 60rpx;
-	background-color: rgba(255, 255, 255, 0.2);
-}
-
-.qualified-info {
-	display: flex;
-	flex-direction: row;
-	margin-top: 32rpx;
-	padding-top: 24rpx;
-	border-top: 2rpx solid rgba(255, 255, 255, 0.2);
-}
-
-.qualified-label {
-	font-size: 26rpx;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.qualified-value {
-	font-size: 26rpx;
-	color: #ffffff;
-	font-weight: 600;
-}
-
-/* Section Title */
-.section-title {
-	margin-top: 16rpx;
-	margin-bottom: 16rpx;
-}
-
-.title-text {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-/* Bonus List */
-.bonus-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.bonus-item {
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.item-left {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.item-title {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.item-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-.item-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 8rpx;
-}
-
-.item-amount {
-	font-size: 32rpx;
-	font-weight: 700;
-	color: #ff3b30;
-}
-
-.item-status {
-	font-size: 24rpx;
-}
-
-.item-status.granted {
-	color: #00b578;
-}
-
-.item-status.pending {
-	color: #faad14;
-}
-
-.item-status.failed {
-	color: #f53f3f;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>

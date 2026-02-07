@@ -125,9 +125,4 @@ const logout = () => {
 		}
 	})
 }
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
 </script>

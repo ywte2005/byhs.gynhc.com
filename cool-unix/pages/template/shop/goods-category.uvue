@@ -1,55 +1,38 @@
 <template>
-	<cl-page>
-		<view class="flex flex-col h-full">
-			<view class="flex flex-row p-3">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="商品分类" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<view class="flex flex-col flex-1 h-0">
+			<view class="p-[24rpx] bg-white">
 				<cl-input
 					:pt="{
-						className: parseClass(['flex-1 !border-2 !rounded-xl'])
+						className: parseClass(['flex-1 !border-[2rpx] !rounded-[24rpx] !h-[80rpx] !bg-[#f5f7fa] !border-transparent'])
 					}"
 					prefix-icon="search-line"
-					placeholder="iPhone 16 Pro Max"
+					placeholder="搜索商品"
 				></cl-input>
 			</view>
 
-			<view class="flex flex-row flex-1">
+			<view class="flex flex-row flex-1 h-0">
 				<!-- 左侧分类列表 -->
-				<view class="h-full w-[100px] bg-white dark:bg-surface-800 mr-2 rounded-tr-xl">
+				<view class="h-full w-[200rpx] bg-[#f5f7fa]">
 					<scroll-view direction="vertical" :show-scrollbar="false" class="h-full">
 						<view
-							class="h-[50px] p-2"
+							class="h-[100rpx] flex items-center justify-center"
 							v-for="(item, index) in list"
 							:key="item.label"
 							@click="onCategoryChange(index)"
+							:class="categoryActive == index ? 'bg-white' : ''"
 						>
-							<view
-								class="flex flex-row items-center justify-center h-full rounded-lg"
-								:class="[
-									categoryActive == index
-										? isDark
-											? 'bg-blue-900'
-											: 'bg-blue-50'
-										: ''
-								]"
-							>
-								<cl-text
-									:pt="{
-										className: parseClass([
-											[
-												categoryActive == index,
-												isDark ? '!text-white' : '!text-blue-600',
-												isDark ? '!text-surface-300' : '!text-surface-500'
-											]
-										])
-									}"
-									>{{ item.label }}</cl-text
-								>
+							<view class="flex flex-row items-center justify-center w-full border-l-[8rpx]" :class="categoryActive == index ? 'border-[#0052d9]' : 'border-transparent'">
+								<text :class="['text-[28rpx]', categoryActive == index ? 'text-[#0052d9] font-bold' : 'text-[#646a73]']">{{ item.label }}</text>
 							</view>
 						</view>
 					</scroll-view>
 				</view>
 
 				<!-- 右侧商品列表 -->
-				<view class="flex-1">
+				<view class="flex-1 h-full bg-white">
 					<scroll-view
 						direction="vertical"
 						:scroll-into-view="scrollIntoView"
@@ -57,51 +40,39 @@
 						class="h-full"
 						@scroll="onScroll"
 					>
-						<view class="pr-2">
+						<view class="p-[24rpx]">
 							<view
-								class="category-item flex rounded-xl bg-white dark:bg-surface-800 mb-2 pb-3"
+								class="flex flex-col mb-[32rpx]"
 								v-for="(item, index) in list"
 								:key="item.label"
 								:id="`category-item-${index}`"
 							>
-								<cl-text
-									:pt="{
-										className: 'p-3'
-									}"
-									>{{ item.label }}</cl-text
-								>
+								<text class="text-[28rpx] font-bold text-[#1f2329] mb-[24rpx]">{{ item.label }}</text>
 
-								<view class="px-1">
-									<cl-row :gutter="10">
-										<cl-col
-											v-for="goods in item.list"
-											:key="goods.name"
-											:span="8"
-										>
-											<view class="flex items-center flex-col justify-center" @tap="toDetail">
-												<cl-image :src="goods.image"></cl-image>
-												<cl-text
-													:size="12"
-													:ellipsis="true"
-													:pt="{ className: 'text-center mt-2' }"
-													>{{ goods.name }}</cl-text
-												>
-											</view>
-										</cl-col>
-									</cl-row>
-								</view>
+								<cl-row :gutter="20">
+									<cl-col
+										v-for="goods in item.list"
+										:key="goods.name"
+										:span="8"
+									>
+										<view class="flex flex-col items-center mb-[24rpx]" @tap="toDetail">
+											<cl-image :src="goods.image" :size="140" class="rounded-[16rpx] mb-[12rpx]"></cl-image>
+											<text class="text-[24rpx] text-[#1f2329] text-center w-full truncate">{{ goods.name }}</text>
+										</view>
+									</cl-col>
+								</cl-row>
 							</view>
 						</view>
 					</scroll-view>
 				</view>
 			</view>
 		</view>
-	</cl-page>
+	</view>
 </template>
 
 <script setup lang="ts">
-import { isDark, parseClass } from "@/.cool";
-import { getCurrentInstance, ref } from "vue";
+import { isDark, parseClass, router } from "@/.cool";
+import { getCurrentInstance, ref, onReady } from "vue";
 
 const { proxy } = getCurrentInstance()!;
 
@@ -317,6 +288,11 @@ function onScroll(e: UniScrollEvent) {
 	});
 }
 
+// 跳转详情
+function toDetail() {
+	router.to("/pages/template/shop/goods-detail/index");
+}
+
 // 初始化
 function init() {
 	uni.createSelectorQuery()
@@ -336,13 +312,4 @@ onReady(() => {
 </script>
 
 <style>
-.bg-blue-50 {
-	background-color: #e8f3ff;
-}
-.bg-blue-900 {
-	background-color: #003399;
-}
-.text-blue-600 {
-	color: #0052d9 !important;
-}
 </style>

@@ -1,98 +1,96 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="promo-header">
-			<view class="header-nav">
-				<text class="nav-title">推广中心</text>
-			</view>
-			
-			<view class="header-card">
+		<cl-topbar title="推广中心" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top></cl-topbar>
+
+		<view class="bg-[#0052d9] pb-[48rpx]">
+			<view class="mt-[32rpx] px-[32rpx]">
 				<!-- Stats -->
-				<view class="stats-row">
-					<view class="stat-item">
-						<text class="stat-num">{{ overview?.wallet?.balance || '0.00' }}</text>
-						<text class="stat-desc">可提现(元)</text>
+				<view class="flex flex-row justify-between mb-[48rpx]">
+					<view class="flex flex-col items-center">
+						<text class="text-[40rpx] text-white font-bold">{{ overview?.wallet?.balance || '0.00' }}</text>
+						<text class="text-[24rpx] text-white/80 mt-[8rpx]">可提现(元)</text>
 					</view>
-					<view class="stat-item">
-						<text class="stat-num">{{ overview?.wallet?.total_income || '0.00' }}</text>
-						<text class="stat-desc">累计收益(元)</text>
+					<view class="flex flex-col items-center">
+						<text class="text-[40rpx] text-white font-bold">{{ overview?.wallet?.total_income || '0.00' }}</text>
+						<text class="text-[24rpx] text-white/80 mt-[8rpx]">累计收益(元)</text>
 					</view>
-					<view class="stat-item">
-						<text class="stat-num">{{ overview?.team_count || 0 }}</text>
-						<text class="stat-desc">团队人数</text>
+					<view class="flex flex-col items-center">
+						<text class="text-[40rpx] text-white font-bold">{{ overview?.team_count || 0 }}</text>
+						<text class="text-[24rpx] text-white/80 mt-[8rpx]">团队人数</text>
 					</view>
 				</view>
 
 				<!-- Quick Actions -->
-				<view class="quick-row">
-					<view class="quick-item" @tap="goTo('/pages/wallet/withdraw')">
-						<view class="quick-icon-box">
+				<view class="flex flex-row justify-between">
+					<view class="flex flex-col items-center" @tap="goTo('/pages/wallet/withdraw')">
+						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
 							<uni-icons type="vip" size="22" color="#0052d9"></uni-icons>
 						</view>
-						<text class="quick-text">立即提现</text>
+						<text class="text-[24rpx] text-white">立即提现</text>
 					</view>
-					<view class="quick-item" @tap="goTo('/pages/promo/invite')">
-						<view class="quick-icon-box">
+					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/invite')">
+						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
 							<uni-icons type="contact" size="22" color="#00b578"></uni-icons>
 						</view>
-						<text class="quick-text">邀请好友</text>
+						<text class="text-[24rpx] text-white">邀请好友</text>
 					</view>
-					<view class="quick-item" @tap="goTo('/pages/promo/commission')">
-						<view class="quick-icon-box">
+					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/commission')">
+						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
 							<uni-icons type="wallet" size="22" color="#faad14"></uni-icons>
 						</view>
-						<text class="quick-text">佣金明细</text>
+						<text class="text-[24rpx] text-white">佣金明细</text>
 					</view>
-					<view class="quick-item" @tap="goTo('/pages/promo/team')">
-						<view class="quick-icon-box">
+					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/team')">
+						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
 							<uni-icons type="bars" size="22" color="#5856d6"></uni-icons>
 						</view>
-						<text class="quick-text">团队管理</text>
+						<text class="text-[24rpx] text-white">团队管理</text>
 					</view>
 				</view>
 			</view>
 		</view>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- Level Card -->
-				<view class="card level-card" @tap="goToLevel">
-					<view class="level-left">
-						<text class="level-crown">👑</text>
-						<view class="level-info">
-							<text class="level-title">当前等级：{{ overview?.level?.name || '普通会员' }}</text>
-							<text class="level-desc">升级享受更高权益</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center justify-between bg-gradient-to-r from-[#fff0cd] to-[#ffdb8e]" @tap="goToLevel">
+					<view class="flex flex-row items-center gap-[24rpx]">
+						<text class="text-[64rpx]">👑</text>
+						<view class="flex flex-col gap-[8rpx]">
+							<text class="text-[32rpx] text-[#593e0e] font-bold">当前等级：{{ overview?.level?.name || '普通会员' }}</text>
+							<text class="text-[24rpx] text-[#593e0e]/70">升级享受更高权益</text>
 						</view>
 					</view>
-					<view class="level-btn">
-						<text class="level-btn-text">去升级</text>
+					<view class="bg-[#593e0e] px-[24rpx] py-[12rpx] rounded-[32rpx]">
+						<text class="text-[#ffdb8e] text-[24rpx] font-medium">去升级</text>
 					</view>
 				</view>
 
-				<!-- Menu Grid (Optional, if design has extra menus, otherwise stick to design) -->
-				<!-- The design mainly highlights the top card and recent list. We can keep other menus if needed or hide them. -->
-				
 				<!-- Recent List -->
-				<view class="section-title">最近动态</view>
-				<view class="recent-list">
-					<view v-for="(item, index) in recentList" :key="index" class="card recent-item">
-						<view class="recent-icon-box">
+				<view class="text-[32rpx] font-semibold text-[#1f2329] mt-[16rpx]">最近动态</view>
+				<view class="flex flex-col gap-[16rpx]">
+					<view v-for="(item, index) in recentList" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
+						<view class="w-[80rpx] h-[80rpx] bg-[#f5f7fa] rounded-[40rpx] flex items-center justify-center">
 							<uni-icons type="notification" size="20" color="#0052d9"></uni-icons>
 						</view>
-						<view class="recent-info">
-							<text class="recent-text">{{ item.content }}</text>
-							<text class="recent-time">{{ item.time }}</text>
+						<view class="flex flex-col gap-[8rpx]">
+							<text class="text-[28rpx] text-[#1f2329]">{{ item.content }}</text>
+							<text class="text-[24rpx] text-[#999999]">{{ item.time }}</text>
 						</view>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
+
+		<custom-tabbar></custom-tabbar>
 	</view>
 </template>
 
 <script lang="uts">
 	// import { getOverview } from "@/services/promo";
 	// import type { PromoOverview } from "@/services/promo";
+	import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 	type PromoOverview = {
 		wallet: {
@@ -112,6 +110,9 @@
 	}
 
 	export default {
+		components: {
+			CustomTabbar
+		},
 		data() {
 			return {
 				overview: null as PromoOverview | null,
@@ -161,213 +162,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.promo-header {
-	background-color: #0052d9;
-	padding-bottom: 48rpx;
-}
-
-.header-nav {
-	height: 88rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	/* Status bar spacing would be handled by a safe-area view usually */
-	padding-top: 20rpx; 
-}
-
-.nav-title {
-	font-size: 34rpx;
-	color: #ffffff;
-	font-weight: 600;
-}
-
-.header-card {
-	margin-top: 32rpx;
-	padding: 0 32rpx;
-}
-
-.stats-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	margin-bottom: 48rpx;
-}
-
-.stat-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.stat-num {
-	font-size: 40rpx;
-	color: #ffffff;
-	font-weight: 700;
-}
-
-.stat-desc {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.8);
-	margin-top: 8rpx;
-}
-
-.quick-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-
-.quick-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.quick-icon-box {
-	width: 88rpx;
-	height: 88rpx;
-	background-color: rgba(255, 255, 255, 0.2);
-	border-radius: 44rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-bottom: 16rpx;
-}
-
-.quick-icon {
-	font-size: 44rpx;
-}
-
-.quick-text {
-	font-size: 24rpx;
-	color: #ffffff;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-}
-
-/* Level Card */
-.level-card {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	background: linear-gradient(90deg, #fff0cd 0%, #ffdb8e 100%);
-}
-
-.level-left {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.level-crown {
-	font-size: 64rpx;
-}
-
-.level-info {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.level-title {
-	font-size: 32rpx;
-	color: #593e0e;
-	font-weight: 700;
-}
-
-.level-desc {
-	font-size: 24rpx;
-	color: rgba(89, 62, 14, 0.7);
-}
-
-.level-btn {
-	background-color: #593e0e;
-	padding: 12rpx 24rpx;
-	border-radius: 32rpx;
-}
-
-.level-btn-text {
-	color: #ffdb8e;
-	font-size: 24rpx;
-	font-weight: 500;
-}
-
-/* Recent List */
-.section-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-	margin-top: 16rpx;
-}
-
-.recent-list {
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.recent-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-	padding: 24rpx;
-}
-
-.recent-icon-box {
-	width: 80rpx;
-	height: 80rpx;
-	background-color: #f5f7fa;
-	border-radius: 40rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.recent-icon {
-	font-size: 40rpx;
-}
-
-.recent-info {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.recent-text {
-	font-size: 28rpx;
-	color: #1f2329;
-}
-
-.recent-time {
-	font-size: 24rpx;
-	color: #999999;
-}
 </style>

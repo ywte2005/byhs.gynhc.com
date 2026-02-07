@@ -1,113 +1,94 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="user-info" @tap="toEdit">
-				<view class="avatar-wrapper">
-					<image class="avatar" :src="userInfo?.avatarUrl || '/static/logo.png'" mode="aspectFill" />
+		<cl-topbar title="我的" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
+			<template #append>
+				<view class="w-[48rpx] h-[48rpx] flex items-center justify-center mr-[16rpx]" @tap="toQrCode">
+					<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
 				</view>
-				<view class="info-content">
-					<text class="user-name">{{ userInfo?.nickName || '点击登录' }}</text>
-					<text class="user-id" v-if="userInfo?.phone">ID: {{ userInfo?.phone }}</text>
-				</view>
-				<text class="arrow-right">></text>
-			</view>
+			</template>
+		</cl-topbar>
 
-			<view class="stats-row">
-				<view class="stat-item" @tap="toWallet">
-					<text class="stat-num">{{ walletInfo.balance || '0.00' }}</text>
-					<text class="stat-label">余额</text>
+		<view class="bg-[#0052d9] px-[32rpx] pb-[48rpx] pt-[24rpx]">
+			<view class="flex flex-row items-center gap-[24rpx]" @tap="toEdit">
+				<view class="w-[128rpx] h-[128rpx] rounded-[64rpx] bg-white overflow-hidden flex items-center justify-center">
+					<image class="w-full h-full" :src="userInfo?.avatarUrl || '/static/logo.png'" mode="aspectFill" />
 				</view>
-				<view class="stat-item">
-					<text class="stat-num">0</text>
-					<text class="stat-label">积分</text>
-				</view>
-				<view class="stat-item">
-					<text class="stat-num">0</text>
-					<text class="stat-label">优惠券</text>
-				</view>
-				<view class="stat-item">
-					<text class="stat-num">0</text>
-					<text class="stat-label">收藏</text>
+				<view class="flex-1 flex flex-col gap-[12rpx]">
+					<text class="text-[40rpx] font-semibold text-white">{{ userInfo?.nickName || '点击登录' }}</text>
+					<view class="flex flex-row gap-[16rpx]" v-if="userInfo?.phone">
+						<view class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-white/20">
+							<text class="text-[22rpx] text-white">已认证</text>
+						</view>
+						<view class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-[#fff7e6]/20">
+							<text class="text-[22rpx] text-[#faad14]">商户</text>
+						</view>
+					</view>
 				</view>
 			</view>
 		</view>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<!-- Orders -->
-				<view class="card order-card">
-					<view class="card-header" @tap="toOrder">
-						<text class="card-title">我的订单</text>
-						<view class="more-box">
-							<text class="more-text">全部订单</text>
-							<text class="more-arrow">></text>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] pb-[120rpx] flex flex-col gap-[24rpx]">
+				<!-- Menu Group 1 -->
+				<view class="bg-white rounded-[24rpx] flex flex-col overflow-hidden">
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toEdit">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="person" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">个人资料</text>
 						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
-					<view class="grid-row">
-						<view class="grid-item">
-							<text class="grid-icon">💳</text>
-							<text class="grid-label">待支付</text>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toCert">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="vip" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">实名认证</text>
 						</view>
-						<view class="grid-item">
-							<text class="grid-icon">📦</text>
-							<text class="grid-label">待发货</text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toFeedback">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="headphones" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">工单反馈</text>
 						</view>
-						<view class="grid-item">
-							<text class="grid-icon">🚚</text>
-							<text class="grid-label">待收货</text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toSettings">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="settings" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">设置</text>
 						</view>
-						<view class="grid-item">
-							<text class="grid-icon">💬</text>
-							<text class="grid-label">待评价</text>
-						</view>
-						<view class="grid-item">
-							<text class="grid-icon">🎧</text>
-							<text class="grid-label">售后</text>
-						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
 				</view>
 
-				<!-- Functions -->
-				<view class="card menu-card">
-					<view class="menu-item" @tap="toWallet">
-						<view class="menu-left">
-							<text class="menu-icon">💰</text>
-							<text class="menu-label">我的钱包</text>
+				<!-- Menu Group 2 -->
+				<view class="bg-white rounded-[24rpx] flex flex-col overflow-hidden">
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toMessage">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="notification" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">消息通知</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toPromo">
-						<view class="menu-left">
-							<text class="menu-icon">🎁</text>
-							<text class="menu-label">推广中心</text>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toAbout">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="info" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">关于我们</text>
 						</view>
-						<text class="menu-arrow">></text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toMerchant">
-						<view class="menu-left">
-							<text class="menu-icon">🏪</text>
-							<text class="menu-label">商户中心</text>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toAgreement">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="smallcircle" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">用户协议</text>
 						</view>
-						<text class="menu-arrow">></text>
-					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toAddress">
-						<view class="menu-left">
-							<text class="menu-icon">📍</text>
-							<text class="menu-label">地址管理</text>
-						</view>
-						<text class="menu-arrow">></text>
-					</view>
-					<view class="divider"></view>
-					<view class="menu-item" @tap="toSettings">
-						<view class="menu-left">
-							<text class="menu-icon">⚙️</text>
-							<text class="menu-label">设置</text>
-						</view>
-						<text class="menu-arrow">></text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
 				</view>
 			</view>
@@ -120,14 +101,12 @@
 
 <script setup lang="ts">
 import { useStore } from "@/.cool";
-import CustomTabbar from "./components/tabbar.uvue";
+import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 import { onShow } from "@dcloudio/uni-app";
 import { ref } from "vue";
-import { getWalletInfo } from "@/services/wallet";
 
 const { user } = useStore();
 const userInfo = user.info;
-const walletInfo = ref({ balance: '0.00' });
 
 function toEdit() {
 	if (!user.token) {
@@ -137,252 +116,39 @@ function toEdit() {
 	uni.navigateTo({ url: '/pages/user/edit' });
 }
 
-function toWallet() {
-	uni.navigateTo({ url: '/pages/wallet/index' });
+function toQrCode() {
+	uni.showToast({ title: '我的二维码', icon: 'none' });
 }
 
-function toOrder() {
-	uni.showToast({ title: '订单功能开发中', icon: 'none' });
+function toCert() {
+	uni.navigateTo({ url: '/pages/auth/certification' });
 }
 
-function toPromo() {
-	uni.navigateTo({ url: '/pages/promo/index' });
-}
-
-function toMerchant() {
-	uni.navigateTo({ url: '/pages/merchant/index' });
-}
-
-function toAddress() {
-	uni.navigateTo({ url: '/pages/template/shop/address' });
+function toFeedback() {
+	uni.navigateTo({ url: '/pages/user/feedback' });
 }
 
 function toSettings() {
 	uni.navigateTo({ url: '/pages/set/index' });
 }
 
+function toMessage() {
+	uni.navigateTo({ url: '/pages/message/index' });
+}
+
+function toAbout() {
+	uni.navigateTo({ url: '/pages/set/about' });
+}
+
+function toAgreement() {
+	// 暂时跳转到关于页面或者提示
+	uni.showToast({ title: '用户协议功能开发中', icon: 'none' });
+}
+
 onShow(() => {
 	user.get();
-	if (user.token) {
-		getWalletInfo().then(res => {
-			if (res.code === 0) {
-				walletInfo.value = res.data;
-			}
-		}).catch(() => {});
-	}
 });
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.my-header {
-	background-color: #0052d9;
-	padding: 48rpx 32rpx;
-	padding-top: calc(48rpx + env(safe-area-inset-top));
-	display: flex;
-	flex-direction: column;
-	gap: 48rpx;
-}
-
-.user-info {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.avatar-wrapper {
-	width: 120rpx;
-	height: 120rpx;
-	border-radius: 60rpx;
-	background-color: #ffffff;
-	border: 4rpx solid rgba(255, 255, 255, 0.3);
-	overflow: hidden;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.avatar {
-	width: 100%;
-	height: 100%;
-}
-
-.info-content {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.user-name {
-	font-size: 36rpx;
-	font-weight: 600;
-	color: #ffffff;
-}
-
-.user-id {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.arrow-right {
-	font-size: 32rpx;
-	color: rgba(255, 255, 255, 0.6);
-}
-
-.stats-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-}
-
-.stat-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8rpx;
-}
-
-.stat-num {
-	font-size: 36rpx;
-	font-weight: 700;
-	color: #ffffff;
-}
-
-.stat-label {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-	margin-top: -24rpx;
-	border-top-left-radius: 24rpx;
-	border-top-right-radius: 24rpx;
-	background-color: #f5f7fa;
-	overflow: hidden;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	padding-bottom: 120rpx; /* Tabbar height */
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 0 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Order Card */
-.order-card {
-	padding: 32rpx;
-}
-
-.card-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 32rpx;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.more-box {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 4rpx;
-}
-
-.more-text {
-	font-size: 26rpx;
-	color: #999999;
-}
-
-.more-arrow {
-	font-size: 26rpx;
-	color: #999999;
-}
-
-.grid-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-}
-
-.grid-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 12rpx;
-}
-
-.grid-icon {
-	font-size: 48rpx;
-}
-
-.grid-label {
-	font-size: 24rpx;
-	color: #646a73;
-}
-
-/* Menu Card */
-.menu-card {
-	padding: 0 32rpx;
-}
-
-.menu-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 112rpx;
-}
-
-.menu-left {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.menu-icon {
-	font-size: 40rpx;
-}
-
-.menu-label {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.menu-arrow {
-	font-size: 30rpx;
-	color: #c0c4cc;
-}
-
-.divider {
-	height: 2rpx;
-	background-color: #f0f0f0;
-}
 </style>

@@ -1,31 +1,30 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">收益明细</text>
-			</view>
-		</view>
+		<cl-topbar title="收益明细" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-			<view class="content-wrapper">
-				<view class="commission-list">
-					<view v-for="(item, index) in list" :key="index" class="card commission-item">
-						<view class="item-left">
-							<text class="item-type">{{ getRewardTypeName(item.reward_type) }}</text>
-							<text class="item-remark">{{ item.remark }}</text>
-							<text class="item-time">{{ formatTime(item.createtime) }}</text>
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row justify-between items-center">
+						<view class="flex flex-col gap-[8rpx]">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ getRewardTypeName(item.reward_type) }}</text>
+							<text class="text-[24rpx] text-[#646a73]">{{ item.remark }}</text>
+							<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
 						</view>
-						<view class="item-right">
-							<text class="item-amount">+{{ item.amount }}</text>
-							<text class="item-status" :class="item.status">{{ getStatusName(item.status) }}</text>
+						<view class="flex flex-col items-end gap-[8rpx]">
+							<text class="text-[32rpx] font-bold text-[#ff3b30]">+{{ item.amount }}</text>
+							<text class="text-[24rpx]" :class="{
+								'text-[#00b578]': item.status === 'granted',
+								'text-[#faad14]': item.status === 'pending',
+								'text-[#f53f3f]': item.status === 'failed'
+							}">{{ getStatusName(item.status) }}</text>
 						</view>
 					</view>
 					
 					<!-- 空状态 -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无收益明细</text>
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无收益明细</text>
 					</view>
 				</view>
 			</view>
@@ -52,9 +51,6 @@
 			this.loadMore();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
@@ -105,136 +101,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx; /* 16px */
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-	display: flex;
-	flex-direction: column;
-}
-
-/* Commission List */
-.commission-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx; /* 12px */
-}
-
-.commission-item {
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.item-left {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.item-type {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.item-remark {
-	font-size: 24rpx;
-	color: #646a73;
-}
-
-.item-time {
-	font-size: 22rpx;
-	color: #999999;
-}
-
-.item-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 8rpx;
-}
-
-.item-amount {
-	font-size: 32rpx;
-	font-weight: 700;
-	color: #ff3b30;
-}
-
-.item-status {
-	font-size: 24rpx;
-}
-
-.item-status.granted {
-	color: #00b578;
-}
-
-.item-status.pending {
-	color: #faad14;
-}
-
-.item-status.failed {
-	color: #f53f3f;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>

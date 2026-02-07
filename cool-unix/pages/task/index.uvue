@@ -1,120 +1,125 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<text class="text-5 font-bold text-[#1f2329]">任务大厅</text>
-			<view @click="goToMyTasks">
-				<text class="text-4 text-[#07c160]">我的任务</text>
-			</view>
-		</view>
+		<cl-topbar title="任务大厅" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
+			<template #append>
+				<view class="bg-white/20 px-[24rpx] py-[12rpx] rounded-full mr-[16rpx]" @click="goToMyTasks">
+					<text class="text-white text-[24rpx]">我的任务</text>
+				</view>
+			</template>
+		</cl-topbar>
 
 		<!-- 筛选栏 -->
-		<view class="bg-white px-4 py-3 mb-2">
-			<scroll-view class="flex" scroll-x>
-				<view class="flex">
+		<view class="bg-white py-[24rpx] border-b-[2rpx] border-[#f0f0f0]">
+			<scroll-view class="w-full" scroll-x :show-scrollbar="false">
+				<view class="flex flex-row px-[32rpx] gap-[16rpx]">
 					<view 
 						v-for="(item, index) in categories" 
 						:key="index"
 						@click="selectCategory(item.value)"
-						:class="['px-4 py-2 rounded-full mr-2', currentCategory === item.value ? 'bg-[#07c160] text-white' : 'bg-[#f5f5f5] text-[#646a73]']"
+						class="px-[32rpx] py-[12rpx] rounded-[32rpx] flex-shrink-0"
+						:class="[currentCategory === item.value ? 'bg-[#0052d9]' : 'bg-[#f5f7fa]']"
 					>
-						<text :class="['text-3.5', currentCategory === item.value ? 'text-white' : 'text-[#646a73]']">{{ item.label }}</text>
+						<text class="text-[28rpx]" :class="[currentCategory === item.value ? 'text-white' : 'text-[#646a73]']">{{ item.label }}</text>
 					</view>
 				</view>
 			</scroll-view>
 		</view>
 
 		<!-- 任务列表 -->
-		<scroll-view class="flex-1" scroll-y @scrolltolower="loadMore">
-			<view class="px-4 py-2">
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx_32rpx_24rpx_32rpx] flex flex-col gap-[24rpx]">
 				<view 
 					v-for="(task, index) in taskList" 
 					:key="index"
 					@click="goToDetail(task.id)"
-					class="bg-white rounded-2 p-4 mb-3"
+					class="bg-white rounded-[24rpx] p-[32rpx] shadow-[0_2rpx_12rpx_rgba(0,0,0,0.03)]"
 				>
 					<!-- 任务头部 -->
-					<view class="flex items-center justify-between mb-3">
-						<view class="flex items-center">
-							<view class="w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-3">
-								<text class="text-5">{{ task.merchantAvatar }}</text>
+					<view class="flex flex-row justify-between items-center mb-[24rpx]">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<view class="w-[80rpx] h-[80rpx] rounded-full bg-[#f5f7fa] flex items-center justify-center">
+								<text class="text-[40rpx]">{{ task.merchantAvatar }}</text>
 							</view>
-							<view>
-								<text class="text-4 font-bold text-[#1f2329]">{{ task.merchantName }}</text>
-								<text class="text-3 text-[#999] mt-0.5">{{ task.createTime }}</text>
+							<view class="flex flex-col gap-[4rpx]">
+								<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ task.merchantName }}</text>
+								<text class="text-[24rpx] text-[#9aa0a6]">{{ task.createTime }}</text>
 							</view>
 						</view>
-						<view :class="['px-2 py-1 rounded', getStatusColor(task.status)]">
-							<text class="text-3 text-white">{{ getStatusText(task.status) }}</text>
+						<view class="px-[16rpx] py-[6rpx] rounded-[8rpx]" :class="getStatusClass(task.status)">
+							<text class="text-[24rpx]" :class="getStatusTextClass(task.status)">{{ getStatusText(task.status) }}</text>
 						</view>
 					</view>
 
 					<!-- 任务信息 -->
-					<view class="mb-3">
-						<text class="text-4.5 font-bold text-[#1f2329]">{{ task.title }}</text>
-						<text class="text-3.5 text-[#646a73] mt-2">{{ task.description }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[12rpx] block">{{ task.title }}</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.5] block">{{ task.description }}</text>
 					</view>
 
 					<!-- 任务标签 -->
-					<view class="flex flex-wrap mb-3">
-						<view class="bg-[#f0f9ff] px-2 py-1 rounded mr-2 mb-2">
-							<text class="text-3 text-[#07c160]">{{ task.category }}</text>
+					<view class="flex flex-row flex-wrap gap-[16rpx] mb-[24rpx]">
+						<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#e6f0ff]">
+							<text class="text-[24rpx] text-[#0052d9]">{{ task.category }}</text>
 						</view>
-						<view class="bg-[#fff9e6] px-2 py-1 rounded mr-2 mb-2">
-							<text class="text-3 text-[#ed6a0c]">{{ task.platform }}</text>
+						<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#fffbe6]">
+							<text class="text-[24rpx] text-[#faad14]">{{ task.platform }}</text>
 						</view>
 					</view>
 
 					<!-- 任务数据 -->
-					<view class="flex items-center justify-between border-t border-[#e5e5e5] pt-3">
-						<view class="flex-1">
-							<text class="text-3 text-[#999]">单价</text>
-							<text class="text-5 font-bold text-[#ff3b30] ml-1">¥{{ task.unitPrice }}</text>
+					<view class="flex flex-row justify-between items-center pt-[24rpx] border-t-[2rpx] border-[#f5f7fa]">
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[24rpx] text-[#9aa0a6]">单价</text>
+							<text class="text-[32rpx] font-semibold text-[#e34d59]">¥{{ task.unitPrice }}</text>
 						</view>
-						<view class="flex-1">
-							<text class="text-3 text-[#999]">总数</text>
-							<text class="text-4 font-bold text-[#1f2329] ml-1">{{ task.totalCount }}</text>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[24rpx] text-[#9aa0a6]">总数</text>
+							<text class="text-[28rpx] font-semibold text-[#1f2329]">{{ task.totalCount }}</text>
 						</view>
-						<view class="flex-1">
-							<text class="text-3 text-[#999]">剩余</text>
-							<text class="text-4 font-bold text-[#07c160] ml-1">{{ task.remainCount }}</text>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[24rpx] text-[#9aa0a6]">剩余</text>
+							<text class="text-[28rpx] font-semibold text-[#00b578]">{{ task.remainCount }}</text>
 						</view>
-						<view class="flex-1 text-right">
-							<text class="text-3 text-[#999]">进度</text>
-							<text class="text-4 font-bold text-[#5856d6] ml-1">{{ task.progress }}%</text>
+						<view class="flex-1 flex flex-col items-end gap-[8rpx]">
+							<text class="text-[24rpx] text-[#9aa0a6]">进度</text>
+							<text class="text-[28rpx] font-semibold text-[#0052d9]">{{ task.progress }}%</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 加载更多 -->
-				<view v-if="loading" class="flex justify-center py-4">
-					<text class="text-3.5 text-[#999]">加载中...</text>
+				<!-- 加载状态 -->
+				<view v-if="loading" class="flex flex-col items-center justify-center py-[48rpx]">
+					<text class="text-[28rpx] text-[#9aa0a6]">加载中...</text>
 				</view>
-				<view v-if="!hasMore && taskList.length > 0" class="flex justify-center py-4">
-					<text class="text-3.5 text-[#999]">没有更多了</text>
+				<view v-if="!hasMore && taskList.length > 0" class="flex flex-col items-center justify-center py-[48rpx]">
+					<text class="text-[28rpx] text-[#9aa0a6]">没有更多了</text>
 				</view>
-				<view v-if="taskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-20">
-					<uni-icons type="compose" size="40" color="#999999"></uni-icons>
-					<text class="text-4 text-[#999] mt-3">暂无任务</text>
+				<view v-if="taskList.length === 0 && !loading" class="flex flex-col items-center justify-center pt-[120rpx] pb-[48rpx]">
+					<uni-icons type="compose" size="48" color="#c0c4cc"></uni-icons>
+					<text class="text-[28rpx] text-[#9aa0a6] mt-[24rpx]">暂无任务</text>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- 底部操作栏 -->
-		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+		<view class="p-[24rpx_32rpx] bg-white border-t-[2rpx] border-[#f0f0f0] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
 			<button 
 				@click="goToCreate"
-				class="w-full bg-[#07c160] text-white rounded-full py-3"
+				class="bg-[#0052d9] rounded-[48rpx] h-[88rpx] flex items-center justify-center"
 			>
-				<text class="text-4">发起任务</text>
+				<text class="text-[32rpx] text-white font-semibold">发起任务</text>
 			</button>
 		</view>
+
+		<custom-tabbar></custom-tabbar>
 	</view>
 </template>
 
-<script setup lang="uts">
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getTaskList } from '@/services/task'
+import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 当前分类
 const currentCategory = ref('all')
@@ -246,14 +251,23 @@ const getStatusText = (status: string): string => {
 	return statusMap[status] || '未知'
 }
 
-// 获取状态颜色
-const getStatusColor = (status: string): string => {
-	const colorMap = {
-		ongoing: 'bg-[#07c160]',
-		completed: 'bg-[#999]',
-		cancelled: 'bg-[#ff3b30]'
+// 获取状态样式类
+const getStatusClass = (status: string): string => {
+	const classMap = {
+		ongoing: 'bg-[#e6f0ff]',
+		completed: 'bg-[#f5f5f5]',
+		cancelled: 'bg-[#fff0ed]'
 	}
-	return colorMap[status] || 'bg-[#999]'
+	return classMap[status] || 'bg-[#f5f5f5]'
+}
+
+const getStatusTextClass = (status: string): string => {
+	const classMap = {
+		ongoing: 'text-[#0052d9]',
+		completed: 'text-[#909399]',
+		cancelled: 'text-[#e34d59]'
+	}
+	return classMap[status] || 'text-[#909399]'
 }
 
 // 进入任务详情
@@ -277,8 +291,10 @@ const goToCreate = () => {
 	})
 }
 
-// 页面加载时获取任务列表
 onMounted(() => {
 	loadTaskList()
 })
 </script>
+
+<style>
+</style>

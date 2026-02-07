@@ -1,123 +1,118 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">商户入驻</text>
-			</view>
-		</view>
+		<cl-topbar title="商户入驻" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 进度指示器 -->
-		<view class="bg-white px-4 py-4 mb-2">
-			<view class="flex justify-between items-center">
+		<view class="bg-white px-[32rpx] py-[32rpx] mb-[16rpx]">
+			<view class="flex flex-row justify-between items-center">
 				<view class="flex flex-col items-center flex-1">
-					<view :class="['w-8 h-8 rounded-full flex items-center justify-center', step >= 1 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
-						<text :class="['text-3.5', step >= 1 ? 'text-white' : 'text-[#999]']">1</text>
+					<view :class="['w-[64rpx] h-[64rpx] rounded-full flex items-center justify-center', step >= 1 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
+						<text :class="['text-[28rpx]', step >= 1 ? 'text-white' : 'text-[#999999]']">1</text>
 					</view>
-					<text :class="['text-3 mt-1', step >= 1 ? 'text-[#0052d9]' : 'text-[#999]']">选择类型</text>
+					<text :class="['text-[24rpx] mt-[8rpx]', step >= 1 ? 'text-[#0052d9]' : 'text-[#999999]']">选择类型</text>
 				</view>
-				<view class="flex-1 h-0.5 bg-[#e5e5e5] mx-2" :style="{ backgroundColor: step >= 2 ? '#0052d9' : '#e5e5e5' }"></view>
+				<view class="flex-1 h-[4rpx] bg-[#e5e5e5] mx-[16rpx]" :style="{ backgroundColor: step >= 2 ? '#0052d9' : '#e5e5e5' }"></view>
 				<view class="flex flex-col items-center flex-1">
-					<view :class="['w-8 h-8 rounded-full flex items-center justify-center', step >= 2 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
-						<text :class="['text-3.5', step >= 2 ? 'text-white' : 'text-[#999]']">2</text>
+					<view :class="['w-[64rpx] h-[64rpx] rounded-full flex items-center justify-center', step >= 2 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
+						<text :class="['text-[28rpx]', step >= 2 ? 'text-white' : 'text-[#999999]']">2</text>
 					</view>
-					<text :class="['text-3 mt-1', step >= 2 ? 'text-[#0052d9]' : 'text-[#999]']">填写信息</text>
+					<text :class="['text-[24rpx] mt-[8rpx]', step >= 2 ? 'text-[#0052d9]' : 'text-[#999999]']">填写信息</text>
 				</view>
-				<view class="flex-1 h-0.5 bg-[#e5e5e5] mx-2" :style="{ backgroundColor: step >= 3 ? '#0052d9' : '#e5e5e5' }"></view>
+				<view class="flex-1 h-[4rpx] bg-[#e5e5e5] mx-[16rpx]" :style="{ backgroundColor: step >= 3 ? '#0052d9' : '#e5e5e5' }"></view>
 				<view class="flex flex-col items-center flex-1">
-					<view :class="['w-8 h-8 rounded-full flex items-center justify-center', step >= 3 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
-						<text :class="['text-3.5', step >= 3 ? 'text-white' : 'text-[#999]']">3</text>
+					<view :class="['w-[64rpx] h-[64rpx] rounded-full flex items-center justify-center', step >= 3 ? 'bg-[#0052d9]' : 'bg-[#e5e5e5]']">
+						<text :class="['text-[28rpx]', step >= 3 ? 'text-white' : 'text-[#999999]']">3</text>
 					</view>
-					<text :class="['text-3 mt-1', step >= 3 ? 'text-[#0052d9]' : 'text-[#999]']">提交审核</text>
+					<text :class="['text-[24rpx] mt-[8rpx]', step >= 3 ? 'text-[#0052d9]' : 'text-[#999999]']">提交审核</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
+		<scroll-view class="flex-1 h-0" scroll-y>
 			<!-- 步骤1：选择商户类型 -->
-			<view v-if="step === 1" class="px-4 py-4">
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">选择商户类型</text>
+			<view v-if="step === 1" class="p-[32rpx]">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">选择商户类型</text>
 					
 					<view 
 						v-for="(item, index) in merchantTypes" 
 						:key="index"
 						@click="selectType(item.value)"
-						:class="['border rounded-2 p-4 mb-3', form.type === item.value ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+						:class="['border-[2rpx] rounded-[16rpx] p-[32rpx] mb-[24rpx]', form.type === item.value ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
 					>
-						<view class="flex items-center justify-between">
+						<view class="flex flex-row items-center justify-between">
 							<view class="flex-1">
-								<text class="text-4 font-bold text-[#1f2329]">{{ item.label }}</text>
-								<text class="text-3.5 text-[#646a73] mt-1">{{ item.desc }}</text>
+								<text class="text-[32rpx] font-bold text-[#1f2329] block">{{ item.label }}</text>
+								<text class="text-[28rpx] text-[#646a73] mt-[8rpx] block">{{ item.desc }}</text>
 							</view>
-							<view :class="['w-5 h-5 rounded-full border-2 flex items-center justify-center', form.type === item.value ? 'border-[#0052d9]' : 'border-[#e5e5e5]']">
-								<view v-if="form.type === item.value" class="w-3 h-3 rounded-full bg-[#0052d9]"></view>
+							<view :class="['w-[40rpx] h-[40rpx] rounded-full border-[4rpx] flex items-center justify-center', form.type === item.value ? 'border-[#0052d9]' : 'border-[#e5e5e5]']">
+								<view v-if="form.type === item.value" class="w-[24rpx] h-[24rpx] rounded-full bg-[#0052d9]"></view>
 							</view>
 						</view>
 					</view>
 				</view>
 
-				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-[#ed6a0c]">💡 温馨提示</text>
-					<text class="text-3.5 text-[#646a73] mt-2">• 个人商户：适合个体经营者，审核较快</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 企业商户：需提供营业执照，享受更多权益</text>
+				<view class="bg-[#fff9e6] rounded-[16rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[28rpx] text-[#ed6a0c]">💡 温馨提示</text>
+					<text class="text-[28rpx] text-[#646a73] mt-[16rpx] block">• 个人商户：适合个体经营者，审核较快</text>
+					<text class="text-[28rpx] text-[#646a73] mt-[8rpx] block">• 企业商户：需提供营业执照，享受更多权益</text>
 				</view>
 			</view>
 
 			<!-- 步骤2：填写商户信息 -->
-			<view v-if="step === 2" class="px-4 py-4">
+			<view v-if="step === 2" class="p-[32rpx]">
 				<!-- 基本信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">基本信息</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">基本信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">商户名称 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">商户名称 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.name"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入商户名称"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">联系人 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">联系人 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.contact"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入联系人姓名"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">联系电话 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">联系电话 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.phone"
 							type="number"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入联系电话"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">经营地址 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">经营地址 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.address"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入经营地址"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">经营类目 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">经营类目 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.category"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="如：餐饮、零售、服务等"
 							placeholder-class="text-[#c8c9cc]"
 						/>
@@ -125,34 +120,34 @@
 				</view>
 
 				<!-- 企业信息（仅企业商户） -->
-				<view v-if="form.type === 'enterprise'" class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">企业信息</text>
+				<view v-if="form.type === 'enterprise'" class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">企业信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">统一社会信用代码 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">统一社会信用代码 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.creditCode"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入18位统一社会信用代码"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">法人姓名 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">法人姓名 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.legalPerson"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入法人姓名"
 							placeholder-class="text-[#c8c9cc]"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">法人身份证号 <text class="text-[#ff3b30]">*</text></text>
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">法人身份证号 <text class="text-[#ff3b30]">*</text></text>
 						<input 
 							v-model="form.legalIdCard"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="border-[2rpx] border-[#e5e5e5] rounded-[16rpx] px-[24rpx] py-[20rpx] text-[32rpx]"
 							placeholder="请输入法人身份证号"
 							placeholder-class="text-[#c8c9cc]"
 						/>
@@ -160,106 +155,106 @@
 				</view>
 
 				<!-- 证件上传 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">证件上传</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">证件上传</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">身份证正面 <text class="text-[#ff3b30]">*</text></text>
-						<view class="flex items-center mt-2">
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">身份证正面 <text class="text-[#ff3b30]">*</text></text>
+						<view class="flex flex-row items-center mt-[16rpx]">
 							<view 
 								@click="uploadImage('idCardFront')"
-								class="w-24 h-24 border-2 border-dashed border-[#e5e5e5] rounded-2 flex items-center justify-center bg-[#fafafa]"
+								class="w-[192rpx] h-[192rpx] border-[2rpx] border-dashed border-[#e5e5e5] rounded-[16rpx] flex items-center justify-center bg-[#fafafa]"
 							>
-								<text v-if="!form.idCardFront" class="text-10 text-[#c8c9cc]">+</text>
-								<image v-else :src="form.idCardFront" class="w-full h-full rounded-2" mode="aspectFill" />
+								<text v-if="!form.idCardFront" class="text-[80rpx] text-[#c8c9cc]">+</text>
+								<image v-else :src="form.idCardFront" class="w-full h-full rounded-[16rpx]" mode="aspectFill" />
 							</view>
-							<text class="text-3 text-[#999] ml-3">请上传清晰的身份证正面照片</text>
+							<text class="text-[24rpx] text-[#999999] ml-[24rpx]">请上传清晰的身份证正面照片</text>
 						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">身份证反面 <text class="text-[#ff3b30]">*</text></text>
-						<view class="flex items-center mt-2">
+					<view class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">身份证反面 <text class="text-[#ff3b30]">*</text></text>
+						<view class="flex flex-row items-center mt-[16rpx]">
 							<view 
 								@click="uploadImage('idCardBack')"
-								class="w-24 h-24 border-2 border-dashed border-[#e5e5e5] rounded-2 flex items-center justify-center bg-[#fafafa]"
+								class="w-[192rpx] h-[192rpx] border-[2rpx] border-dashed border-[#e5e5e5] rounded-[16rpx] flex items-center justify-center bg-[#fafafa]"
 							>
-								<text v-if="!form.idCardBack" class="text-10 text-[#c8c9cc]">+</text>
-								<image v-else :src="form.idCardBack" class="w-full h-full rounded-2" mode="aspectFill" />
+								<text v-if="!form.idCardBack" class="text-[80rpx] text-[#c8c9cc]">+</text>
+								<image v-else :src="form.idCardBack" class="w-full h-full rounded-[16rpx]" mode="aspectFill" />
 							</view>
-							<text class="text-3 text-[#999] ml-3">请上传清晰的身份证反面照片</text>
+							<text class="text-[24rpx] text-[#999999] ml-[24rpx]">请上传清晰的身份证反面照片</text>
 						</view>
 					</view>
 
-					<view v-if="form.type === 'enterprise'" class="mb-4">
-						<text class="text-3.5 text-[#646a73] mb-2">营业执照 <text class="text-[#ff3b30]">*</text></text>
-						<view class="flex items-center mt-2">
+					<view v-if="form.type === 'enterprise'" class="mb-[32rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">营业执照 <text class="text-[#ff3b30]">*</text></text>
+						<view class="flex flex-row items-center mt-[16rpx]">
 							<view 
 								@click="uploadImage('businessLicense')"
-								class="w-24 h-24 border-2 border-dashed border-[#e5e5e5] rounded-2 flex items-center justify-center bg-[#fafafa]"
+								class="w-[192rpx] h-[192rpx] border-[2rpx] border-dashed border-[#e5e5e5] rounded-[16rpx] flex items-center justify-center bg-[#fafafa]"
 							>
-								<text v-if="!form.businessLicense" class="text-10 text-[#c8c9cc]">+</text>
-								<image v-else :src="form.businessLicense" class="w-full h-full rounded-2" mode="aspectFill" />
+								<text v-if="!form.businessLicense" class="text-[80rpx] text-[#c8c9cc]">+</text>
+								<image v-else :src="form.businessLicense" class="w-full h-full rounded-[16rpx]" mode="aspectFill" />
 							</view>
-							<text class="text-3 text-[#999] ml-3">请上传清晰的营业执照照片</text>
+							<text class="text-[24rpx] text-[#999999] ml-[24rpx]">请上传清晰的营业执照照片</text>
 						</view>
 					</view>
 				</view>
 			</view>
 
 			<!-- 步骤3：确认提交 -->
-			<view v-if="step === 3" class="px-4 py-4">
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">确认信息</text>
+			<view v-if="step === 3" class="p-[32rpx]">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">确认信息</text>
 					
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">商户类型</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.type === 'personal' ? '个人商户' : '企业商户' }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">商户类型</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.type === 'personal' ? '个人商户' : '企业商户' }}</text>
 					</view>
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">商户名称</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.name }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">商户名称</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.name }}</text>
 					</view>
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">联系人</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.contact }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">联系人</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.contact }}</text>
 					</view>
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">联系电话</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.phone }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">联系电话</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.phone }}</text>
 					</view>
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">经营地址</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.address }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">经营地址</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.address }}</text>
 					</view>
-					<view class="mb-3">
-						<text class="text-3.5 text-[#999]">经营类目</text>
-						<text class="text-4 text-[#1f2329] ml-2">{{ form.category }}</text>
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">经营类目</text>
+						<text class="text-[32rpx] text-[#1f2329] ml-[16rpx]">{{ form.category }}</text>
 					</view>
 				</view>
 
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">入驻费用</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">入驻费用</text>
 					
-					<view class="flex items-center justify-between mb-3">
-						<text class="text-3.5 text-[#999]">入驻费</text>
-						<text class="text-5 text-[#ff3b30] font-bold">¥{{ form.type === 'personal' ? '500' : '1000' }}</text>
+					<view class="flex flex-row items-center justify-between mb-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">入驻费</text>
+						<text class="text-[40rpx] text-[#ff3b30] font-bold">¥{{ form.type === 'personal' ? '500' : '1000' }}</text>
 					</view>
-					<view class="border-t border-[#e5e5e5] pt-3">
-						<text class="text-3 text-[#999]">• 入驻费用一次性收取，终身有效</text>
-						<text class="text-3 text-[#999] mt-1">• 审核通过后将触发推广奖励</text>
-						<text class="text-3 text-[#999] mt-1">• 如审核不通过，费用将原路退回</text>
+					<view class="border-t-[2rpx] border-[#e5e5e5] pt-[24rpx]">
+						<text class="text-[24rpx] text-[#999999] block">• 入驻费用一次性收取，终身有效</text>
+						<text class="text-[24rpx] text-[#999999] mt-[8rpx] block">• 审核通过后将触发推广奖励</text>
+						<text class="text-[24rpx] text-[#999999] mt-[8rpx] block">• 如审核不通过，费用将原路退回</text>
 					</view>
 				</view>
 
-				<view class="flex items-start mb-4">
+				<view class="flex flex-row items-start mb-[32rpx]">
 					<view 
 						@click="form.agree = !form.agree"
-						:class="['w-4 h-4 rounded border flex items-center justify-center mr-2 mt-0.5', form.agree ? 'bg-[#0052d9] border-[#0052d9]' : 'border-[#e5e5e5]']"
+						:class="['w-[32rpx] h-[32rpx] rounded-[8rpx] border-[2rpx] flex items-center justify-center mr-[16rpx] mt-[4rpx]', form.agree ? 'bg-[#0052d9] border-[#0052d9]' : 'border-[#e5e5e5]']"
 					>
-						<text v-if="form.agree" class="text-3 text-white">✓</text>
+						<text v-if="form.agree" class="text-[24rpx] text-white">✓</text>
 					</view>
-					<text class="text-3.5 text-[#646a73] flex-1">
+					<text class="text-[28rpx] text-[#646a73] flex-1">
 						我已阅读并同意
 						<text class="text-[#0052d9]">《商户入驻协议》</text>
 						和
@@ -270,21 +265,21 @@
 		</scroll-view>
 
 		<!-- 底部操作按钮 -->
-		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
-			<view class="flex">
+		<view class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e5e5] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+			<view class="flex flex-row gap-[24rpx]">
 				<button 
 					v-if="step > 1"
 					@click="prevStep"
-					class="flex-1 bg-white border border-[#e5e5e5] text-[#1f2329] rounded-full py-3 mr-2"
+					class="flex-1 bg-white border-[2rpx] border-[#e5e5e5] text-[#1f2329] rounded-[48rpx] h-[88rpx] flex items-center justify-center"
 				>
-					<text class="text-4">上一步</text>
+					<text class="text-[32rpx]">上一步</text>
 				</button>
 				<button 
 					@click="nextStep"
-					:class="['flex-1 rounded-full py-3', canNext ? 'bg-[#0052d9] text-white' : 'bg-[#e5e5e5] text-[#999]']"
+					:class="['flex-1 rounded-[48rpx] h-[88rpx] flex items-center justify-center', canNext ? 'bg-[#0052d9] text-white' : 'bg-[#e5e5e5] text-[#999999]']"
 					:disabled="!canNext"
 				>
-					<text class="text-4">{{ step === 3 ? '提交审核' : '下一步' }}</text>
+					<text class="text-[32rpx]">{{ step === 3 ? '提交审核' : '下一步' }}</text>
 				</button>
 			</view>
 		</view>
@@ -430,9 +425,7 @@ const submitForm = async () => {
 		})
 	}
 }
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
 </script>
+
+<style>
+</style>

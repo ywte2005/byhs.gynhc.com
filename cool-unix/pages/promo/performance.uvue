@@ -1,60 +1,55 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">业绩统计</text>
-			</view>
-		</view>
+		<cl-topbar title="业绩统计" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- Month Selector -->
-				<view class="card month-card">
-					<view class="month-btn" @tap="prevMonth">
-						<text class="month-btn-text">上月</text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] py-[24rpx] flex flex-row justify-between items-center">
+					<view class="px-[24rpx] py-[12rpx]" @tap="prevMonth">
+						<text class="text-[28rpx] text-[#0052d9]">上月</text>
 					</view>
-					<text class="current-month">{{ currentMonth }}</text>
-					<view class="month-btn" @tap="nextMonth">
-						<text class="month-btn-text">下月</text>
+					<text class="text-[34rpx] font-semibold text-[#1f2329]">{{ currentMonth }}</text>
+					<view class="px-[24rpx] py-[12rpx]" @tap="nextMonth">
+						<text class="text-[28rpx] text-[#0052d9]">下月</text>
 					</view>
 				</view>
 
 				<!-- Performance Data -->
-				<view class="card data-card">
-					<view class="data-row">
-						<view class="data-item">
-							<text class="data-value">{{ performance.personal_total }}</text>
-							<text class="data-label">个人业绩</text>
+				<view class="bg-white rounded-[24rpx] p-[48rpx_32rpx] flex flex-col">
+					<view class="flex flex-row justify-around items-center">
+						<view class="flex flex-col items-center gap-[8rpx] flex-1">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ performance.personal_total }}</text>
+							<text class="text-[26rpx] text-[#646a73]">个人业绩</text>
 						</view>
-						<view class="data-divider"></view>
-						<view class="data-item">
-							<text class="data-value">{{ performance.team_total }}</text>
-							<text class="data-label">团队业绩</text>
+						<view class="w-[2rpx] h-[60rpx] bg-[#f0f0f0]"></view>
+						<view class="flex flex-col items-center gap-[8rpx] flex-1">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ performance.team_total }}</text>
+							<text class="text-[26rpx] text-[#646a73]">团队业绩</text>
 						</view>
 					</view>
-					<view class="data-row mt-24">
-						<view class="data-item">
-							<text class="data-value">{{ performance.growth }}</text>
-							<text class="data-label">业绩增量</text>
+					<view class="flex flex-row justify-around items-center mt-[48rpx]">
+						<view class="flex flex-col items-center gap-[8rpx] flex-1">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ performance.growth }}</text>
+							<text class="text-[26rpx] text-[#646a73]">业绩增量</text>
 						</view>
-						<view class="data-divider"></view>
-						<view class="data-item">
-							<text class="data-value">{{ performance.direct_count }}</text>
-							<text class="data-label">直推人数</text>
+						<view class="w-[2rpx] h-[60rpx] bg-[#f0f0f0]"></view>
+						<view class="flex flex-col items-center gap-[8rpx] flex-1">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ performance.direct_count }}</text>
+							<text class="text-[26rpx] text-[#646a73]">直推人数</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Tips -->
-				<view class="card tips-card">
-					<text class="tips-title">业绩说明</text>
-					<view class="tips-list">
-						<text class="tips-item">• 个人业绩：您本人产生的业绩总额</text>
-						<text class="tips-item">• 团队业绩：您及下级团队的业绩总额</text>
-						<text class="tips-item">• 业绩增量：本月业绩减去上月业绩</text>
-						<text class="tips-item">• 直推人数：您直接邀请的用户数量</text>
+				<view class="flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-semibold text-[#1f2329]">业绩说明</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 个人业绩：您本人产生的业绩总额</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 团队业绩：您及下级团队的业绩总额</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 业绩增量：本月业绩减去上月业绩</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 直推人数：您直接邀请的用户数量</text>
 					</view>
 				</view>
 			</view>
@@ -91,9 +86,6 @@
 			this.loadData();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			getCurrentMonth() : string {
 				const now = new Date();
 				const y = now.getFullYear();
@@ -137,146 +129,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Month Card */
-.month-card {
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding: 24rpx 32rpx;
-}
-
-.month-btn {
-	padding: 12rpx 24rpx;
-}
-
-.month-btn-text {
-	font-size: 28rpx;
-	color: #0052d9;
-}
-
-.current-month {
-	font-size: 34rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-/* Data Card */
-.data-card {
-	padding: 48rpx 32rpx;
-}
-
-.data-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: center;
-}
-
-.mt-24 {
-	margin-top: 48rpx;
-}
-
-.data-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8rpx;
-	flex: 1;
-}
-
-.data-value {
-	font-size: 40rpx;
-	font-weight: 700;
-	color: #1f2329;
-}
-
-.data-label {
-	font-size: 26rpx;
-	color: #646a73;
-}
-
-.data-divider {
-	width: 2rpx;
-	height: 60rpx;
-	background-color: #f0f0f0;
-}
-
-/* Tips Card */
-.tips-card {
-	gap: 24rpx;
-}
-
-.tips-title {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.tips-list {
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.tips-item {
-	font-size: 26rpx;
-	color: #646a73;
-	line-height: 1.5;
-}
 </style>

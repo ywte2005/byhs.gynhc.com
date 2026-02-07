@@ -1,66 +1,61 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">充值</text>
-			</view>
-		</view>
+		<cl-topbar title="充值" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- Content -->
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- Amount Card -->
-				<view class="card amount-card">
-					<text class="card-title">充值金额</text>
-					<view class="input-box">
-						<text class="currency-symbol">¥</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">充值金额</text>
+					<view class="flex flex-row items-center border-b-[2rpx] border-[#e5e5e5] pb-[16rpx] mb-[24rpx]">
+						<text class="text-[48rpx] text-[#1f2329] font-semibold mr-[16rpx]">¥</text>
 						<input
 							v-model="amount"
 							type="digit"
-							class="amount-input"
+							class="flex-1 text-[48rpx] font-semibold text-[#1f2329] h-[64rpx]"
 							placeholder="请输入充值金额"
-							placeholder-class="input-placeholder"
+							placeholder-class="text-[#c0c4cc]"
 						/>
 					</view>
-					<view class="quick-grid">
+					<view class="flex flex-row flex-wrap gap-[16rpx]">
 						<view
 							v-for="(item, index) in quickAmounts"
 							:key="index"
-							class="quick-item"
-							:class="{ active: amount === item }"
+							class="w-[200rpx] h-[80rpx] rounded-[12rpx] border-[2rpx] flex items-center justify-center bg-white"
+							:class="amount === item ? 'border-[#0052d9] bg-[#eaf2ff]' : 'border-[#e5e6eb]'"
 							@tap="amount = item"
 						>
-							<text class="quick-text" :class="{ active: amount === item }">{{ item }}元</text>
+							<text class="text-[28rpx]" :class="amount === item ? 'text-[#0052d9] font-medium' : 'text-[#1f2329]'">{{ item }}元</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Pay Card -->
-				<view class="card pay-card">
-					<text class="card-title">支付方式</text>
-					<view class="pay-list">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[32rpx] font-semibold text-[#1f2329] mb-[24rpx]">支付方式</text>
+					<view class="flex flex-col">
 						<view
 							v-for="(item, index) in payMethods"
 							:key="index"
-							class="pay-item"
+							class="flex flex-row items-center justify-between py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
 							@tap="payType = item.value"
 						>
-							<view class="pay-left">
+							<view class="flex flex-row items-center gap-[16rpx]">
 								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
-								<text class="pay-name">{{ item.name }}</text>
+								<text class="text-[30rpx] text-[#1f2329]">{{ item.name }}</text>
 							</view>
-							<view class="radio-box" :class="{ active: payType === item.value }">
-								<view v-if="payType === item.value" class="radio-inner"></view>
+							<view class="w-[40rpx] h-[40rpx] rounded-full border-[4rpx] flex items-center justify-center" :class="payType === item.value ? 'border-[#0052d9]' : 'border-[#e5e6eb]'">
+								<view v-if="payType === item.value" class="w-[24rpx] h-[24rpx] rounded-full bg-[#0052d9]"></view>
 							</view>
 						</view>
 					</view>
 				</view>
 
 				<!-- Submit Button -->
-				<view class="btn-submit" @tap="handleSubmit">
-					<text class="btn-submit-text">确认充值</text>
+				<view class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center mt-[16rpx]" @tap="handleSubmit">
+					<text class="text-[32rpx] text-white font-medium">确认充值</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -81,10 +76,6 @@ const payMethods = [
 	{ name: "支付宝支付", value: "alipay", iconType: "wallet", iconColor: "#1677FF" },
 	{ name: "银行卡支付", value: "bank", iconType: "vip", iconColor: "#faad14" }
 ];
-
-function goBack() {
-	uni.navigateBack();
-}
 
 async function handleSubmit() {
 	if (!amount.value) {
@@ -112,191 +103,4 @@ async function handleSubmit() {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-	display: flex;
-	flex-direction: column;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-	margin-bottom: 24rpx;
-}
-
-/* Amount Card */
-.input-box {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	border-bottom: 2rpx solid #e5e5e5;
-	padding-bottom: 16rpx;
-	margin-bottom: 24rpx;
-}
-
-.currency-symbol {
-	font-size: 48rpx;
-	color: #1f2329;
-	font-weight: 600;
-	margin-right: 16rpx;
-}
-
-.amount-input {
-	flex: 1;
-	font-size: 48rpx;
-	font-weight: 600;
-	color: #1f2329;
-	height: 64rpx;
-}
-
-.input-placeholder {
-	color: #c0c4cc;
-}
-
-.quick-grid {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 16rpx;
-}
-
-.quick-item {
-	width: 200rpx; /* (Total width - gaps) / 3 approx */
-	height: 80rpx;
-	border-radius: 12rpx;
-	border: 2rpx solid #e5e6eb;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background-color: #ffffff;
-}
-
-.quick-item.active {
-	border-color: #0052d9;
-	background-color: #eaf2ff;
-}
-
-.quick-text {
-	font-size: 28rpx;
-	color: #1f2329;
-}
-
-.quick-text.active {
-	color: #0052d9;
-	font-weight: 500;
-}
-
-/* Pay Card */
-.pay-list {
-	display: flex;
-	flex-direction: column;
-}
-
-.pay-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	padding: 24rpx 0;
-	border-bottom: 2rpx solid #f5f7fa;
-}
-
-.pay-left {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.pay-name {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.radio-box {
-	width: 40rpx;
-	height: 40rpx;
-	border-radius: 50%;
-	border: 4rpx solid #e5e6eb;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.radio-box.active {
-	border-color: #0052d9;
-}
-
-.radio-inner {
-	width: 24rpx;
-	height: 24rpx;
-	border-radius: 50%;
-	background-color: #0052d9;
-}
-
-/* Submit Button */
-.btn-submit {
-	height: 96rpx;
-	background-color: #0052d9;
-	border-radius: 24rpx; /* 12px */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-top: 16rpx;
-}
-
-.btn-submit-text {
-	font-size: 32rpx;
-	color: #ffffff;
-	font-weight: 500;
-}
 </style>

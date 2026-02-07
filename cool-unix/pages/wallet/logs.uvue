@@ -1,124 +1,114 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="text-4 ml-2">账单明细</text>
-			</view>
-			<view @click="showFilterDialog = true">
-				<text class="text-4 text-[#07c160]">筛选</text>
-			</view>
-		</view>
+		<cl-topbar title="资金流水" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
+			<template #append>
+				<view class="flex items-center px-4 h-full" @click="showFilterDialog = true">
+					<text class="text-lg text-[#0052d9]">筛选</text>
+				</view>
+			</template>
+		</cl-topbar>
 
 		<!-- 标签栏 -->
-		<view class="bg-white px-4 py-3 mb-2">
-			<view class="flex">
+		<view class="bg-white px-8 py-6 border-b-2 border-[#f5f7fa]">
+			<view class="flex flex-row gap-6">
 				<view 
 					v-for="(tab, index) in tabs" 
 					:key="index"
 					@click="selectTab(tab.value)"
-					class="flex-1 text-center"
+					class="flex-1 flex flex-col items-center justify-center px-6 py-4 rounded-lg"
 				>
-					<text :class="['text-4', currentTab === tab.value ? 'text-[#07c160] font-bold' : 'text-[#646a73]']">
+					<text :class="['text-lg', currentTab === tab.value ? 'text-[#0052d9] font-medium' : 'text-[#646a73]']">
 						{{ tab.label }}
 					</text>
-					<view v-if="currentTab === tab.value" class="w-8 h-1 bg-[#07c160] rounded-full mx-auto mt-2"></view>
+					<view v-if="currentTab === tab.value" class="w-10 h-1 bg-[#0052d9] rounded-sm mt-3"></view>
 				</view>
 			</view>
 		</view>
 
 		<!-- 账单列表 -->
-		<scroll-view class="flex-1" scroll-y @scrolltolower="loadMore">
-			<view class="px-4 py-2">
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[24rpx_32rpx] flex flex-col gap-[24rpx]">
 				<view 
 					v-for="(item, index) in logList" 
 					:key="index"
-					class="bg-white rounded-2 p-4 mb-3"
+					class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col"
 				>
-					<view class="flex items-center justify-between mb-2">
-						<view class="flex items-center flex-1">
-							<view class="w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-3">
+					<view class="flex flex-row justify-between items-center">
+						<view class="flex flex-row items-center gap-[24rpx] flex-1">
+							<view class="w-[80rpx] h-[80rpx] bg-[#f5f7fa] rounded-[40rpx] flex items-center justify-center">
 								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
 							</view>
-							<view class="flex-1">
-								<text class="text-4 font-bold text-[#1f2329]">{{ item.title }}</text>
-								<text class="text-3 text-[#999] mt-1">{{ item.time }}</text>
+							<view class="flex flex-col gap-[8rpx]">
+								<text class="text-[30rpx] text-[#1f2329] font-semibold">{{ item.title }}</text>
+								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
 							</view>
 						</view>
-						<view class="text-right">
-							<text :class="['text-5 font-bold', item.type === 'in' ? 'text-[#07c160]' : 'text-[#ff3b30]']">
+						<view class="flex flex-col items-end gap-[8rpx]">
+							<text class="text-[32rpx] font-semibold" :class="[item.type === 'in' ? 'text-[#00b578]' : 'text-[#e34d59]']">
 								{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
 							</text>
-							<text class="text-3 text-[#999] mt-1">余额：{{ item.balance }}</text>
+							<text class="text-[24rpx] text-[#9aa0a6]">余额：{{ item.balance }}</text>
 						</view>
 					</view>
 
-					<view v-if="item.remark" class="bg-[#f5f5f5] rounded-2 p-2 mt-2">
-						<text class="text-3 text-[#646a73]">{{ item.remark }}</text>
+					<view v-if="item.remark" class="mt-[24rpx] bg-[#f5f7fa] px-[24rpx] py-[16rpx] rounded-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">{{ item.remark }}</text>
 					</view>
 				</view>
 
 				<!-- 加载更多 -->
-				<view v-if="loading" class="flex justify-center py-4">
-					<text class="text-3.5 text-[#999]">加载中...</text>
+				<view v-if="loading" class="flex justify-center py-[32rpx]">
+					<text class="text-[26rpx] text-[#9aa0a6]">加载中...</text>
 				</view>
-				<view v-if="!hasMore && logList.length > 0" class="flex justify-center py-4">
-					<text class="text-3.5 text-[#999]">没有更多了</text>
+				<view v-if="!hasMore && logList.length > 0" class="flex justify-center py-[32rpx]">
+					<text class="text-[26rpx] text-[#9aa0a6]">没有更多了</text>
 				</view>
-				<view v-if="logList.length === 0 && !loading" class="flex flex-col items-center justify-center py-20">
-					<uni-icons type="compose" size="40" color="#999999"></uni-icons>
-					<text class="text-4 text-[#999] mt-3">暂无账单记录</text>
+				<view v-if="logList.length === 0 && !loading" class="flex flex-col items-center justify-center py-[120rpx] gap-[24rpx]">
+					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
+					<text class="text-[28rpx] text-[#9aa0a6]">暂无账单记录</text>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- 筛选对话框 -->
-		<view v-if="showFilterDialog" class="fixed inset-0 bg-black/50 flex items-end" @click="showFilterDialog = false">
-			<view class="bg-white w-full rounded-t-3 p-4" @click.stop>
-				<text class="text-4 font-bold text-[#1f2329] mb-4">筛选条件</text>
+		<view v-if="showFilterDialog" class="fixed inset-0 bg-black/50 z-[999] flex flex-col justify-end" @click="showFilterDialog = false">
+			<view class="bg-white rounded-t-[32rpx] p-[32rpx] pb-[calc(32rpx+env(safe-area-inset-bottom))]" @click.stop>
+				<text class="text-[34rpx] font-semibold text-[#1f2329] mb-[32rpx] block text-center">筛选条件</text>
 				
-				<view class="mb-4">
-					<text class="text-3.5 text-[#646a73] mb-2">交易类型</text>
-					<view class="flex flex-wrap mt-2">
+				<view class="mb-[32rpx]">
+					<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">交易类型</text>
+					<view class="flex flex-row flex-wrap gap-[24rpx]">
 						<view 
 							v-for="(item, index) in transactionTypes" 
 							:key="index"
 							@click="filter.type = item.value"
-							:class="['border rounded-full px-4 py-2 mr-2 mb-2', filter.type === item.value ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+							class="px-[32rpx] py-[12rpx] bg-[#f5f7fa] rounded-[32rpx] border-[2rpx] border-transparent"
+							:class="[filter.type === item.value ? 'bg-[#f0f6ff] border-[#0052d9]' : '']"
 						>
-							<text :class="['text-3.5', filter.type === item.value ? 'text-[#07c160]' : 'text-[#646a73]']">{{ item.label }}</text>
+							<text class="text-[26rpx] text-[#646a73]" :class="[filter.type === item.value ? 'text-[#0052d9] font-medium' : '']">{{ item.label }}</text>
 						</view>
 					</view>
 				</view>
 
-				<view class="mb-4">
-					<text class="text-3.5 text-[#646a73] mb-2">时间范围</text>
-					<view class="flex flex-wrap mt-2">
+				<view class="mb-[32rpx]">
+					<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">时间范围</text>
+					<view class="flex flex-row flex-wrap gap-[24rpx]">
 						<view 
 							v-for="(item, index) in timeRanges" 
 							:key="index"
 							@click="filter.timeRange = item.value"
-							:class="['border rounded-full px-4 py-2 mr-2 mb-2', filter.timeRange === item.value ? 'border-[#07c160] bg-[#f0f9ff]' : 'border-[#e5e5e5]']"
+							class="px-[32rpx] py-[12rpx] bg-[#f5f7fa] rounded-[32rpx] border-[2rpx] border-transparent"
+							:class="[filter.timeRange === item.value ? 'bg-[#f0f6ff] border-[#0052d9]' : '']"
 						>
-							<text :class="['text-3.5', filter.timeRange === item.value ? 'text-[#07c160]' : 'text-[#646a73]']">{{ item.label }}</text>
+							<text class="text-[26rpx] text-[#646a73]" :class="[filter.timeRange === item.value ? 'text-[#0052d9] font-medium' : '']">{{ item.label }}</text>
 						</view>
 					</view>
 				</view>
 
-				<view class="flex">
-					<button 
-						@click="resetFilter"
-						class="flex-1 bg-[#f5f5f5] text-[#646a73] rounded-full py-3 mr-2"
-					>
-						<text class="text-4">重置</text>
-					</button>
-					<button 
-						@click="applyFilter"
-						class="flex-1 bg-[#07c160] text-white rounded-full py-3"
-					>
-						<text class="text-4">确定</text>
-					</button>
+				<view class="flex flex-row gap-[24rpx] mt-[48rpx]">
+					<button class="flex-1 h-[88rpx] rounded-[44rpx] flex items-center justify-center text-[30rpx] border-none bg-[#f5f7fa] text-[#646a73]" @click="resetFilter">重置</button>
+					<button class="flex-1 h-[88rpx] rounded-[44rpx] flex items-center justify-center text-[30rpx] border-none bg-[#0052d9] text-white" @click="applyFilter">确定</button>
 				</view>
 			</view>
 		</view>
@@ -252,40 +242,42 @@ const loadLogList = async () => {
 	} catch (error) {
 		loading.value = false
 		console.log('加载账单列表失败', error)
+		uni.showToast({
+			title: '加载账单列表失败',
+			icon: 'error'
+		})
 	}
 }
 
 // 加载更多
 const loadMore = () => {
-	if (!loading.value && hasMore.value) {
-		page.value++
-		loadLogList()
-	}
+  if (!loading.value && hasMore.value) {
+    page.value++
+    loadLogList()
+  }
 }
 
 // 重置筛选
 const resetFilter = () => {
-	filter.value = {
-		type: 'all',
-		timeRange: 'all'
-	}
+  filter.value = {
+    type: 'all',
+    timeRange: 'all'
+  }
 }
 
 // 应用筛选
 const applyFilter = () => {
-	showFilterDialog.value = false
-	page.value = 1
-	logList.value = []
-	loadLogList()
-}
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
+  showFilterDialog.value = false
+  page.value = 1
+  logList.value = []
+  loadLogList()
 }
 
 // 页面加载时获取账单列表
 onMounted(() => {
-	loadLogList()
+  loadLogList()
 })
 </script>
+
+<style>
+</style>

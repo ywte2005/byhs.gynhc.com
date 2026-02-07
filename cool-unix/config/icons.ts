@@ -119,6 +119,7 @@ export const IconUnicode: Record<IconName, string> = {
   'settings': '\ue917',
   'log-out': '\ue918',
   'shield-check': '\ue919',
+  'headphones': '\ue952',
   'phone': '\ue91a',
   'mail': '\ue91b',
   'map-pin': '\ue91c',

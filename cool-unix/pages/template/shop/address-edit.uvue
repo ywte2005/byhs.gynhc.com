@@ -1,53 +1,57 @@
 <template>
-	<cl-page>
-		<view class="p-3">
-			<view class="p-4 bg-white rounded-2xl dark:!bg-surface-800 mb-3">
-				<cl-form ref="formRef" v-model="formData" :rules="rules" :disabled="saving">
-					<cl-form-item :label="t('收货人')" prop="contact" required>
-						<cl-input
-							v-model="formData.contact"
-							:placeholder="t('请输入收货人姓名')"
-						></cl-input>
-					</cl-form-item>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar :title="id ? '编辑地址' : '添加地址'" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-					<cl-form-item :label="t('手机号')" prop="phone" required>
-						<cl-input
-							v-model="formData.phone"
-							:placeholder="t('请输入手机号')"
-							:maxlength="11"
-							type="number"
-						></cl-input>
-					</cl-form-item>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[24rpx]">
+				<view class="p-[32rpx] bg-white rounded-[24rpx] dark:!bg-surface-800 mb-[24rpx]">
+					<cl-form ref="formRef" v-model="formData" :rules="rules" :disabled="saving">
+						<cl-form-item :label="t('收货人')" prop="contact" required>
+							<cl-input
+								v-model="formData.contact"
+								:placeholder="t('请输入收货人姓名')"
+							></cl-input>
+						</cl-form-item>
 
-					<cl-form-item :label="t('地区')" prop="province" required>
-						<cl-cascader
-							v-model="regions"
-							:placeholder="t('选择省市区')"
-							:options="pcaOptions"
-							@change="onRegionsChange"
-						></cl-cascader>
-					</cl-form-item>
+						<cl-form-item :label="t('手机号')" prop="phone" required>
+							<cl-input
+								v-model="formData.phone"
+								:placeholder="t('请输入手机号')"
+								:maxlength="11"
+								type="number"
+							></cl-input>
+						</cl-form-item>
 
-					<cl-form-item :label="t('详细地址')" prop="address" required>
-						<cl-textarea
-							v-model="formData.address"
-							:placeholder="t('小区楼栋、门牌号、村等')"
-						></cl-textarea>
-					</cl-form-item>
-				</cl-form>
+						<cl-form-item :label="t('地区')" prop="province" required>
+							<cl-cascader
+								v-model="regions"
+								:placeholder="t('选择省市区')"
+								:options="pcaOptions"
+								@change="onRegionsChange"
+							></cl-cascader>
+						</cl-form-item>
+
+						<cl-form-item :label="t('详细地址')" prop="address" required>
+							<cl-textarea
+								v-model="formData.address"
+								:placeholder="t('小区楼栋、门牌号、村等')"
+							></cl-textarea>
+						</cl-form-item>
+					</cl-form>
+				</view>
+
+				<cl-list>
+					<cl-list-item :label="t('默认地址')">
+						<cl-switch v-model="formData.isDefault"></cl-switch>
+					</cl-list-item>
+				</cl-list>
 			</view>
-
-			<cl-list>
-				<cl-list-item :label="t('默认地址')">
-					<cl-switch v-model="formData.isDefault"></cl-switch>
-				</cl-list-item>
-			</cl-list>
-		</view>
+		</scroll-view>
 
 		<cl-footer>
 			<cl-button size="large" @tap="save()">{{ t("保存") }}</cl-button>
 		</cl-footer>
-	</cl-page>
+	</view>
 </template>
 
 <script lang="ts" setup>
@@ -194,3 +198,6 @@ onReady(() => {
 	}
 });
 </script>
+
+<style>
+</style>

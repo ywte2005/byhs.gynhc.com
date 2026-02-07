@@ -1,38 +1,36 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">收款账户</text>
-			</view>
-			<view class="header-right" @click="addCard">
-				<uni-icons type="plus" size="24" color="#0052d9"></uni-icons>
-			</view>
-		</view>
+		<cl-topbar title="收款账户" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
+			<template #append>
+				<view class="flex items-center px-[32rpx] h-full" @click="addCard">
+					<uni-icons type="plus" size="24" color="#0052d9"></uni-icons>
+				</view>
+			</template>
+		</cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<view class="card-list">
-					<view v-for="(item, index) in list" :key="index" class="card bank-item">
-						<view class="bank-icon-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
+						<view class="w-[88rpx] h-[88rpx] bg-[#f5f5f5] rounded-[44rpx] flex items-center justify-center">
 							<uni-icons type="home" size="20" color="#0052d9"></uni-icons>
 						</view>
-						<view class="bank-info">
-							<text class="bank-name">{{ item.bankName }}</text>
-							<text class="bank-type">储蓄卡</text>
-							<text class="bank-no">{{ formatCardNo(item.cardNo) }}</text>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[32rpx] font-semibold text-[#1f2329]">{{ item.bankName }}</text>
+							<text class="text-[24rpx] text-[#999999]">储蓄卡</text>
+							<text class="text-[32rpx] text-[#1f2329] font-mono mt-[8rpx]">{{ formatCardNo(item.cardNo) }}</text>
 						</view>
-						<view class="bank-action" @click.stop="deleteCard(item.id)">
+						<view class="p-[16rpx] flex items-center justify-center" @click.stop="deleteCard(item.id)">
 							<uni-icons type="trash" size="16" color="#ff3b30"></uni-icons>
 						</view>
 					</view>
 					
 					<!-- Empty State -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无收款账户</text>
-						<view class="btn-add" @click="addCard">
-							<text class="btn-add-text">添加银行卡</text>
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx] gap-[32rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无收款账户</text>
+						<view class="px-[48rpx] py-[20rpx] bg-[#0052d9] rounded-[40rpx]" @click="addCard">
+							<text class="text-white text-[28rpx] font-medium">添加银行卡</text>
 						</view>
 					</view>
 				</view>
@@ -70,10 +68,6 @@ const formatCardNo = (no: string): string => {
 	return `**** **** **** ${no.slice(-4)}`
 }
 
-const goBack = () => {
-	uni.navigateBack()
-}
-
 const addCard = () => {
 	uni.showToast({ title: '添加功能开发中', icon: 'none' })
 }
@@ -98,142 +92,4 @@ onMounted(() => {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx;
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: space-between;
-	position: relative;
-}
-
-.header-left {
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.header-title {
-	font-size: 34rpx;
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-.header-right {
-	display: flex;
-	align-items: center;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Card List */
-.card-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.bank-item {
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.bank-icon-wrapper {
-	width: 88rpx;
-	height: 88rpx;
-	background-color: #f5f5f5;
-	border-radius: 44rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.bank-info {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.bank-name {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.bank-type {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-.bank-no {
-	font-size: 32rpx;
-	color: #1f2329;
-	font-family: monospace;
-	margin-top: 8rpx;
-}
-
-.bank-action {
-	padding: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-	gap: 32rpx;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
-
-.btn-add {
-	padding: 20rpx 48rpx;
-	background-color: #0052d9;
-	border-radius: 40rpx;
-}
-
-.btn-add-text {
-	color: #ffffff;
-	font-size: 28rpx;
-	font-weight: 500;
-}
 </style>

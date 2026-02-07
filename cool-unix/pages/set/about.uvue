@@ -1,41 +1,36 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">关于{{ config.name }}</text>
-			</view>
-		</view>
+		<cl-topbar :title="'关于' + config.name" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<view class="logo-section">
-					<view class="logo-box">
-						<image src="/static/logo.png" class="logo-img" mode="aspectFit" />
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<view class="flex flex-col items-center py-[48rpx]">
+					<view class="w-[160rpx] h-[160rpx] bg-white rounded-[32rpx] flex items-center justify-center shadow-[0_4rpx_12rpx_rgba(0,0,0,0.05)] mb-[24rpx]">
+						<image src="/static/logo.png" class="w-[120rpx] h-[120rpx]" mode="aspectFit" />
 					</view>
-					<text class="app-name">{{ config.name }}</text>
-					<text class="app-version">Version {{ config.version }}</text>
+					<text class="text-[36rpx] font-semibold text-[#1f2329] mb-[8rpx]">{{ config.name }}</text>
+					<text class="text-[26rpx] text-[#999999]">Version {{ config.version }}</text>
 				</view>
 
-				<view class="card menu-group">
-					<view class="menu-item" @tap="toWebSite">
-						<view class="item-left">
-							<text class="item-label">{{ t('访问官网') }}</text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
+					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="toWebSite">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[30rpx] text-[#1f2329]">{{ t('访问官网') }}</text>
 						</view>
-						<text class="item-arrow">></text>
+						<icon name="chevron-right" :size="16" color="#c0c4cc" />
 					</view>
-					<view class="divider"></view>
-					<view class="menu-item">
-						<view class="item-left">
-							<text class="item-label">{{ t('版本更新') }}</text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx]">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<text class="text-[30rpx] text-[#1f2329]">{{ t('版本更新') }}</text>
 						</view>
-						<text class="item-arrow">></text>
+						<icon name="chevron-right" :size="16" color="#c0c4cc" />
 					</view>
 				</view>
 
-				<view class="copyright">
-					<text class="copyright-text">Copyright © 2025 {{ config.name }} All Rights Reserved</text>
+				<view class="flex justify-center py-[32rpx]">
+					<text class="text-[24rpx] text-[#c0c4cc]">Copyright © 2025 {{ config.name }} All Rights Reserved</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -46,10 +41,7 @@
 import { config } from "@/config";
 import { $t, t } from "@/.cool";
 import { openWeb } from "@/uni_modules/cool-open-web";
-
-function goBack() {
-	uni.navigateBack();
-}
+import Icon from "@/components/icon.uvue";
 
 function toWebSite() {
 	openWeb(config.website);
@@ -57,145 +49,4 @@ function toWebSite() {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-/* Logo Section */
-.logo-section {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 48rpx 0;
-}
-
-.logo-box {
-	width: 160rpx;
-	height: 160rpx;
-	background-color: #ffffff;
-	border-radius: 32rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-	margin-bottom: 24rpx;
-}
-
-.logo-img {
-	width: 120rpx;
-	height: 120rpx;
-}
-
-.app-name {
-	font-size: 36rpx;
-	font-weight: 600;
-	color: #1f2329;
-	margin-bottom: 8rpx;
-}
-
-.app-version {
-	font-size: 26rpx;
-	color: #999999;
-}
-
-/* Menu Group */
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 0 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-.menu-group {
-	padding: 0 32rpx;
-}
-
-.menu-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 112rpx; /* 56px */
-}
-
-.item-left {
-	display: flex;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.item-label {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.item-arrow {
-	font-size: 30rpx;
-	color: #c0c4cc;
-}
-
-.divider {
-	height: 2rpx;
-	background-color: #f0f0f0;
-}
-
-/* Copyright */
-.copyright {
-	display: flex;
-	justify-content: center;
-	padding: 32rpx 0;
-}
-
-.copyright-text {
-	font-size: 24rpx;
-	color: #c0c4cc;
-}
 </style>

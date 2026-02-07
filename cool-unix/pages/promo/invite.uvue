@@ -1,59 +1,54 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">邀请好友</text>
-			</view>
-		</view>
+		<cl-topbar title="邀请好友" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- 海报/邀请码卡片 -->
-				<view class="card poster-card">
-					<view class="poster-content">
-						<text class="invite-label">我的邀请码</text>
-						<text class="invite-code">{{ inviteCode }}</text>
-						<view class="qr-placeholder">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center gap-[32rpx]">
+					<view class="flex flex-col items-center gap-[24rpx] w-full">
+						<text class="text-[28rpx] text-[#646a73]">我的邀请码</text>
+						<text class="text-[64rpx] font-bold text-[#1f2329] tracking-widest">{{ inviteCode }}</text>
+						<view class="w-[320rpx] h-[320rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center gap-[16rpx]">
 							<uni-icons type="scan" size="32" color="#999999"></uni-icons>
-							<text class="qr-text">邀请二维码</text>
+							<text class="text-[26rpx] text-[#646a73]">邀请二维码</text>
 						</view>
 					</view>
 					
-					<view class="btn-share" @tap="copyCode">
-						<text class="btn-share-text">复制邀请码</text>
+					<view class="w-full h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center" @tap="copyCode">
+						<text class="text-[32rpx] text-white font-medium">复制邀请码</text>
 					</view>
 				</view>
 
 				<!-- 绑定上级 -->
-				<view class="card bind-card">
-					<text class="card-title">绑定上级</text>
-					<view class="input-wrapper">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">绑定上级</text>
+					<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex items-center px-[24rpx]">
 						<input 
-							class="input" 
+							class="flex-1 text-[28rpx] text-[#1f2329]" 
 							v-model="parentCode" 
 							placeholder="请输入上级邀请码" 
-							placeholder-class="input-placeholder"
+							placeholder-class="text-[#c0c4cc]"
 						/>
 					</view>
 					<view 
-						class="btn-bind" 
-						:class="{ 'disabled': parentCode.length == 0 }"
+						class="h-[88rpx] rounded-[16rpx] flex items-center justify-center" 
+						:class="parentCode.length == 0 ? 'bg-[#c0c4cc]' : 'bg-[#0052d9]'"
 						@tap="bindParent"
 					>
-						<text class="btn-bind-text">确认绑定</text>
+						<text class="text-[30rpx] text-white font-medium">确认绑定</text>
 					</view>
 				</view>
 
 				<!-- 邀请说明 -->
-				<view class="card tips-card">
-					<text class="card-title">邀请说明</text>
-					<view class="tips-list">
-						<text class="tips-item">1. 分享您的邀请码给好友</text>
-						<text class="tips-item">2. 好友注册后输入您的邀请码绑定</text>
-						<text class="tips-item">3. 好友产生业绩您可获得相应奖励</text>
-						<text class="tips-item">4. 绑定后不可更改，请谨慎操作</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">邀请说明</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">1. 分享您的邀请码给好友</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">2. 好友注册后输入您的邀请码绑定</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">3. 好友产生业绩您可获得相应奖励</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">4. 绑定后不可更改，请谨慎操作</text>
 					</view>
 				</view>
 			</view>
@@ -75,9 +70,6 @@
 			this.loadInviteCode();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadInviteCode() {
 				getMyInviteCode()
 					.then((res : { invite_code : string }) => {
@@ -128,191 +120,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Poster Card */
-.poster-card {
-	align-items: center;
-	gap: 32rpx;
-}
-
-.poster-content {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 24rpx;
-	width: 100%;
-}
-
-.invite-label {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.invite-code {
-	font-size: 64rpx;
-	font-weight: 700;
-	color: #1f2329;
-	letter-spacing: 4rpx;
-}
-
-.qr-placeholder {
-	width: 300rpx;
-	height: 300rpx;
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 16rpx;
-}
-
-.qr-icon {
-	font-size: 64rpx;
-}
-
-.qr-text {
-	font-size: 24rpx;
-	color: #9aa0a6;
-}
-
-.btn-share {
-	width: 100%;
-	height: 96rpx; /* 48px */
-	background-color: #0052d9;
-	border-radius: 16rpx; /* 8px */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-share-text {
-	font-size: 32rpx;
-	color: #ffffff;
-	font-weight: 500;
-}
-
-/* Bind Card */
-.bind-card {
-	gap: 24rpx;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.input-wrapper {
-	height: 96rpx;
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	padding: 0 24rpx;
-}
-
-.input {
-	flex: 1;
-	font-size: 28rpx;
-	color: #1f2329;
-}
-
-.input-placeholder {
-	color: #c0c4cc;
-}
-
-.btn-bind {
-	height: 88rpx;
-	background-color: #0052d9;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-bind.disabled {
-	background-color: #c0c4cc;
-}
-
-.btn-bind-text {
-	font-size: 30rpx;
-	color: #ffffff;
-	font-weight: 500;
-}
-
-/* Tips Card */
-.tips-card {
-	gap: 24rpx;
-}
-
-.tips-list {
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.tips-item {
-	font-size: 26rpx;
-	color: #646a73;
-	line-height: 1.5;
-}
 </style>

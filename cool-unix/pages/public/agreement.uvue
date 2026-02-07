@@ -1,0 +1,45 @@
+<template>
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
+		<!-- Header -->
+		<cl-topbar title="用户协议" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<view class="bg-white rounded-[24rpx] p-[40rpx_32rpx] flex flex-col min-h-[500rpx]">
+					<text class="text-[36rpx] font-semibold text-[#1f2329] text-center mb-[16rpx]">旺铺集用户协议</text>
+					<text class="text-[24rpx] text-[#999999] text-center mb-[40rpx]">更新日期：2025年02月06日</text>
+					
+					<view class="flex flex-col gap-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">欢迎您使用旺铺集平台服务！</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">在您注册成为旺铺集用户之前，请认真阅读本《用户协议》（以下简称“协议”），确保您充分理解本协议中各条款。请您审慎阅读并选择接受或不接受本协议。</text>
+						
+						<text class="text-[30rpx] font-semibold text-[#1f2329] mt-[16rpx]">一、账号注册</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">1. 您确认，在您开始注册程序使用旺铺集平台服务前，您应当具备中华人民共和国法律规定的与您行为相适应的民事行为能力。</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">2. 您注册成功后，旺铺集将为您开通一个账户，作为您使用旺铺集平台服务的唯一身份标识。</text>
+						
+						<text class="text-[30rpx] font-semibold text-[#1f2329] mt-[16rpx]">二、服务内容</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">1. 旺铺集具体服务内容由旺铺集根据实际情况提供，包括但不限于：任务发布、任务承接、资金管理、推广赚佣等。</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">2. 旺铺集有权随时审核或删除用户发布/传播的涉嫌违法或违反社会主义精神文明，或者被旺铺集认为不妥当的内容（包括但不限于文字、语音、图片、视频、图文等）。</text>
+						
+						<text class="text-[30rpx] font-semibold text-[#1f2329] mt-[16rpx]">三、用户行为规范</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">1. 您在使用本服务时须遵守法律法规，不得利用本服务从事违法违规行为。</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">2. 您不得利用本服务制作、上载、复制、发送、传播敏感信息和违反国家法律法规的信息。</text>
+						
+						<text class="text-[30rpx] font-semibold text-[#1f2329] mt-[16rpx]">四、隐私保护</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">1. 保护用户个人信息是旺铺集的一项基本原则，旺铺集将会采取合理的措施保护用户的个人信息。</text>
+						
+						<text class="text-[30rpx] font-semibold text-[#1f2329] mt-[16rpx]">五、其他</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">1. 本协议之效力、解释、变更、执行与争议解决均适用中华人民共和国法律。</text>
+						<text class="text-[28rpx] text-[#646a73] leading-[1.6] text-justify">2. 因本协议产生之争议，双方应友好协商解决；协商不成的，任何一方均有权向旺铺集所在地人民法院提起诉讼。</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="ts">
+</script>
+
+<style>
+</style>

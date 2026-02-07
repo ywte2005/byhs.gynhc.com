@@ -1,33 +1,28 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">邀请记录</text>
-			</view>
-		</view>
+		<cl-topbar title="邀请记录" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-			<view class="content-wrapper">
-				<view class="record-list">
-					<view v-for="(item, index) in list" :key="index" class="card record-item">
-						<view class="item-avatar-wrapper">
-							<image class="item-avatar" :src="item.avatar || '/static/logo.png'" mode="aspectFill" />
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
+						<view class="w-[80rpx] h-[80rpx] rounded-[40rpx] bg-[#f5f5f5] overflow-hidden">
+							<image class="w-full h-full" :src="item.avatar || '/static/logo.png'" mode="aspectFill" />
 						</view>
-						<view class="item-info">
-							<text class="item-name">{{ item.nickname || '匿名用户' }}</text>
-							<text class="item-phone">{{ item.phone }}</text>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ item.nickname || '匿名用户' }}</text>
+							<text class="text-[24rpx] text-[#646a73]">{{ item.phone }}</text>
 						</view>
-						<view class="item-right">
-							<text class="item-time">{{ formatTime(item.createtime) }}</text>
-							<text class="item-status">已邀请</text>
+						<view class="flex flex-col items-end gap-[8rpx]">
+							<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
+							<text class="text-[24rpx] text-[#0052d9]">已邀请</text>
 						</view>
 					</view>
 					
 					<!-- 空状态 -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无邀请记录</text>
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无邀请记录</text>
 					</view>
 				</view>
 			</view>
@@ -61,9 +56,6 @@
 			this.loadMore();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
@@ -97,134 +89,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Record List */
-.record-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.record-item {
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-	padding: 24rpx;
-}
-
-.item-avatar-wrapper {
-	width: 80rpx;
-	height: 80rpx;
-	border-radius: 40rpx;
-	background-color: #f5f5f5;
-	overflow: hidden;
-}
-
-.item-avatar {
-	width: 100%;
-	height: 100%;
-}
-
-.item-info {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.item-name {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.item-phone {
-	font-size: 24rpx;
-	color: #646a73;
-}
-
-.item-right {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 8rpx;
-}
-
-.item-time {
-	font-size: 22rpx;
-	color: #999999;
-}
-
-.item-status {
-	font-size: 24rpx;
-	color: #0052d9;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>

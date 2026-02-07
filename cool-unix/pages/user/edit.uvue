@@ -1,82 +1,76 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">编辑资料</text>
-			</view>
-		</view>
+		<cl-topbar title="个人资料" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<!-- Avatar -->
-				<view class="avatar-section">
-					<view class="avatar-wrapper" @click="uploadAvatar">
-						<!-- #ifdef MP-WEIXIN -->
-						<button
-							class="avatar-btn"
-							open-type="chooseAvatar"
-							@chooseavatar="uploadAvatar"
-						></button>
-						<!-- #endif -->
-						<image class="avatar-img" :src="userInfo?.avatarUrl || '/static/logo.png'" mode="aspectFill" />
-						<view class="edit-icon-box">
-							<text class="edit-icon">✏️</text>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<!-- Avatar & Basic Info -->
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col shadow-sm">
+					<view class="flex justify-center py-[48rpx] pb-[32rpx]">
+						<view class="relative w-[180rpx] h-[180rpx] rounded-full border-[6rpx] border-white shadow-md" @click="uploadAvatar">
+							<!-- #ifdef MP-WEIXIN -->
+							<button
+								class="absolute inset-0 opacity-0 z-10"
+								open-type="chooseAvatar"
+								@chooseavatar="uploadAvatar"
+							></button>
+							<!-- #endif -->
+							<image class="w-full h-full rounded-full bg-[#f5f5f5]" :src="userInfo?.avatarUrl || '/static/logo.png'" mode="aspectFill" />
+							<view class="absolute bottom-0 right-0 w-[56rpx] h-[56rpx] bg-[#0052d9] rounded-full border-[4rpx] border-white flex items-center justify-center shadow-lg">
+								<uni-icons type="camera-filled" size="14" color="#ffffff"></uni-icons>
+							</view>
+						</view>
+					</view>
+
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="openEdit('nickName')">
+						<text class="text-[30rpx] text-[#1f2329]">我的昵称</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73]">{{ userInfo?.nickName || '未设置' }}</text>
+							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>
+						</view>
+					</view>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]">
+						<text class="text-[30rpx] text-[#1f2329]">手机号</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73]">{{ userInfo?.phone || '未绑定' }}</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- Info List -->
-				<view class="card info-list">
-					<view class="info-item" @click="router.to('/pages/user/edit-name')">
-						<text class="item-label">我的昵称</text>
-						<view class="item-right">
-							<text class="item-value">{{ userInfo?.nickName || '未设置' }}</text>
-							<text class="item-arrow">></text>
-						</view>
-					</view>
-					<view class="divider"></view>
-					<view class="info-item">
-						<text class="item-label">手机号</text>
-						<view class="item-right">
-							<text class="item-value">{{ userInfo?.phone || '未绑定' }}</text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col shadow-sm">
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="openEdit('description')">
+						<text class="text-[30rpx] text-[#1f2329]">简介</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73] max-w-[400rpx] truncate">{{ userInfo?.description || '介绍一下自己' }}</text>
+							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>
 						</view>
 					</view>
 				</view>
 
-				<view class="card info-list">
-					<view class="info-item" @click="router.to('/pages/user/edit-description')">
-						<text class="item-label">简介</text>
-						<view class="item-right">
-							<text class="item-value desc-text">{{ userInfo?.description || '介绍一下自己' }}</text>
-							<text class="item-arrow">></text>
+				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col shadow-sm">
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="open('gender')">
+						<text class="text-[30rpx] text-[#1f2329]">性别</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73]">{{ genderText }}</text>
+							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>
 						</view>
 					</view>
-				</view>
-
-				<view class="card info-list">
-					<view class="info-item" @click="open('gender')">
-						<text class="item-label">性别</text>
-						<view class="item-right">
-							<text class="item-value">{{ genderText }}</text>
-							<text class="item-arrow">></text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="open('birthday')">
+						<text class="text-[30rpx] text-[#1f2329]">生日</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73]">{{ userInfo?.birthday || '选择生日' }}</text>
+							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>
 						</view>
 					</view>
-					<view class="divider"></view>
-					<view class="info-item" @click="open('birthday')">
-						<text class="item-label">生日</text>
-						<view class="item-right">
-							<text class="item-value">{{ userInfo?.birthday || '选择生日' }}</text>
-							<text class="item-arrow">></text>
-						</view>
-					</view>
-					<view class="divider"></view>
-					<view class="info-item" @click="open('region')">
-						<text class="item-label">地区</text>
-						<view class="item-right">
-							<text class="item-value">{{ regionText || '选择地区' }}</text>
-							<text class="item-arrow">></text>
+					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
+					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]" @click="open('region')">
+						<text class="text-[30rpx] text-[#1f2329]">地区</text>
+						<view class="flex flex-row items-center gap-[8rpx]">
+							<text class="text-[28rpx] text-[#646a73]">{{ regionText || '选择地区' }}</text>
+							<uni-icons type="right" size="20" color="#c0c4cc"></uni-icons>
 						</view>
 					</view>
 				</view>
@@ -109,6 +103,36 @@
 			:show-trigger="false"
 			@change="onRegionChange"
 		></cl-cascader>
+
+		<!-- 编辑弹窗 -->
+		<cl-popup ref="popup" direction="center" :padding="0" border-radius="24rpx">
+			<view class="w-[600rpx] bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+				<text class="text-[32rpx] font-semibold text-[#1f2329] text-center mb-[32rpx]">{{ editType === 'nickName' ? '修改昵称' : '修改简介' }}</text>
+
+				<view class="mb-[32rpx]">
+					<cl-input
+						v-if="editType === 'nickName'"
+						v-model="editValue"
+						placeholder="请输入昵称"
+						:maxlength="20"
+						clearable
+					/>
+					<cl-textarea
+						v-else
+						v-model="editValue"
+						placeholder="介绍一下自己"
+						:maxlength="100"
+						count
+						height="200rpx"
+					/>
+				</view>
+
+				<view class="flex flex-row gap-[24rpx]">
+					<view class="flex-1 h-[80rpx] rounded-[12rpx] flex items-center justify-center text-[28rpx] bg-[#f5f7fa] text-[#646a73]" @tap="closeEdit">取消</view>
+					<view class="flex-1 h-[80rpx] rounded-[12rpx] flex items-center justify-center text-[28rpx] bg-[#0052d9] text-white" @tap="saveEdit">保存</view>
+				</view>
+			</view>
+		</cl-popup>
 	</view>
 </template>
 
@@ -121,6 +145,40 @@ import pca from "@/.cool/data/pca.json";
 const { user } = useStore();
 const ui = useUi();
 const refs = useRefs();
+
+// 编辑相关
+const popup = ref<any>(null);
+const editType = ref<"nickName" | "description">("nickName");
+const editValue = ref("");
+
+function openEdit(type: "nickName" | "description") {
+	editType.value = type;
+	editValue.value = userInfo.value?.[type] || "";
+	popup.value?.open();
+}
+
+function closeEdit() {
+	popup.value?.close();
+}
+
+function saveEdit() {
+	if (!editValue.value) {
+		ui.showToast({
+			message: t("内容不能为空"),
+		});
+		return;
+	}
+
+	user.update({
+		[editType.value]: editValue.value,
+	});
+
+	ui.showToast({
+		message: t("修改成功"),
+	});
+
+	closeEdit();
+}
 
 // 今天
 const today = dayUts().format("YYYY-MM-DD");
@@ -229,169 +287,7 @@ function uploadAvatar(e: any) {
 	});
 	// #endif
 }
-
-function goBack() {
-	uni.navigateBack();
-}
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-/* Avatar Section */
-.avatar-section {
-	display: flex;
-	justify-content: center;
-	padding: 32rpx 0;
-}
-
-.avatar-wrapper {
-	position: relative;
-	width: 160rpx;
-	height: 160rpx;
-	border: 4rpx solid #007aff;
-	border-radius: 80rpx;
-}
-
-.avatar-btn {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-	z-index: 10;
-}
-
-.avatar-img {
-	width: 100%;
-	height: 100%;
-	border-radius: 80rpx;
-	background-color: #f5f5f5;
-}
-
-.edit-icon-box {
-	position: absolute;
-	bottom: 0;
-	right: 0;
-	width: 48rpx;
-	height: 48rpx;
-	background-color: #007aff;
-	border-radius: 50%;
-	border: 2rpx solid #ffffff;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.edit-icon {
-	font-size: 24rpx;
-	color: #ffffff;
-}
-
-/* Info List */
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 0 32rpx;
-	display: flex;
-	flex-direction: column;
-	box-shadow: 0 0 10rpx rgba(0, 0, 0, 0.1);
-}
-
-.info-list {
-	padding: 0 32rpx;
-}
-
-.info-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 112rpx;
-	padding: 0 16rpx;
-}
-
-.item-label {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.item-right {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8rpx;
-}
-
-.item-value {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.desc-text {
-	max-width: 400rpx;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.item-arrow {
-	font-size: 30rpx;
-	color: #c0c4cc;
-}
-
-.divider {
-	height: 2rpx;
-	background-color: #f0f0f0;
-}
 </style>

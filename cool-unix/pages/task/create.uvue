@@ -1,164 +1,159 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">发布任务</text>
-			</view>
-		</view>
+		<cl-topbar title="发布任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] pb-[160rpx] flex flex-col gap-[32rpx]">
 				<!-- Task Info -->
-				<view class="card form-card">
-					<text class="card-title">任务信息</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">任务信息</text>
 					
-					<view class="form-item">
-						<text class="form-label">任务标题 <text class="required">*</text></text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">任务标题 <text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input 
 								v-model="form.title"
-								class="input"
+								class="flex-1 text-[30rpx] text-[#1f2329]"
 								placeholder="请输入任务标题"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 							/>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">任务类目 <text class="required">*</text></text>
-						<view class="input-wrapper picker-wrapper" @click="showCategoryPicker = true">
-							<text :class="['input', form.category ? '' : 'input-placeholder']">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">任务类目 <text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center justify-between px-[24rpx]" @click="showCategoryPicker = true">
+							<text :class="['text-[30rpx]', form.category ? 'text-[#1f2329]' : 'text-[#999999]']">
 								{{ form.category || '请选择任务类目' }}
 							</text>
 							<uni-icons type="right" size="14" color="#999999"></uni-icons>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">平台名称 <text class="required">*</text></text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">平台名称 <text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input 
 								v-model="form.platform"
-								class="input"
+								class="flex-1 text-[30rpx] text-[#1f2329]"
 								placeholder="如：美团、淘宝、京东等"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 							/>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">任务描述 <text class="required">*</text></text>
-						<view class="textarea-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#646a73]">任务描述 <text class="text-[#ff3b30]">*</text></text>
+						<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
 							<textarea 
 								v-model="form.description"
-								class="textarea"
+								class="w-full h-[200rpx] text-[30rpx] text-[#1f2329]"
 								placeholder="请详细描述任务要求和操作步骤"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 								:maxlength="500"
 								:show-confirm-bar="false"
 							/>
-							<text class="char-count">{{ form.description.length }}/500</text>
+							<text class="text-[24rpx] text-[#999999] text-right mt-[8rpx] block">{{ form.description.length }}/500</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Amount Settings -->
-				<view class="card form-card">
-					<text class="card-title">金额设置</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">金额设置</text>
 					
-					<view class="form-item">
-						<text class="form-label">单价（元）<text class="required">*</text></text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">单价（元）<text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input 
 								v-model="form.unitPrice"
 								type="digit"
-								class="input"
+								class="flex-1 text-[30rpx] text-[#1f2329]"
 								placeholder="请输入单个任务的佣金"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 								@input="calculateTotal"
 							/>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">任务数量 <text class="required">*</text></text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">任务数量 <text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input 
 								v-model="form.totalCount"
 								type="number"
-								class="input"
+								class="flex-1 text-[30rpx] text-[#1f2329]"
 								placeholder="需要完成的任务数量"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 								@input="calculateTotal"
 							/>
 						</view>
 					</view>
 
-					<view class="summary-box">
-						<view class="summary-row">
-							<text class="summary-label">任务总额</text>
-							<text class="summary-value">¥{{ totalAmount }}</text>
+					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
+						<view class="flex justify-between items-center">
+							<text class="text-[28rpx] text-[#646a73]">任务总额</text>
+							<text class="text-[32rpx] font-bold text-[#1f2329]">¥{{ totalAmount }}</text>
 						</view>
-						<view class="summary-row">
-							<text class="summary-label">平台手续费（5%）</text>
-							<text class="summary-sub-value">¥{{ serviceFee }}</text>
+						<view class="flex justify-between items-center">
+							<text class="text-[28rpx] text-[#646a73]">平台手续费（5%）</text>
+							<text class="text-[30rpx] text-[#ff9500]">¥{{ serviceFee }}</text>
 						</view>
-						<view class="summary-row">
-							<text class="summary-label">保证金（10%）</text>
-							<text class="summary-sub-value">¥{{ depositAmount }}</text>
+						<view class="flex justify-between items-center">
+							<text class="text-[28rpx] text-[#646a73]">保证金（10%）</text>
+							<text class="text-[30rpx] text-[#ff9500]">¥{{ depositAmount }}</text>
 						</view>
-						<view class="summary-divider"></view>
-						<view class="summary-row total-row">
-							<text class="total-label">需支付总额</text>
-							<text class="total-value">¥{{ payAmount }}</text>
+						<view class="h-[2rpx] bg-[#e5e5e5] my-[8rpx]"></view>
+						<view class="flex justify-between items-center">
+							<text class="text-[30rpx] font-bold text-[#1f2329]">需支付总额</text>
+							<text class="text-[40rpx] font-bold text-[#ff3b30]">¥{{ payAmount }}</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Requirements -->
-				<view class="card form-card">
-					<text class="card-title">任务要求</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">任务要求</text>
 					
-					<view class="form-item">
-						<text class="form-label">完成时限（小时）<text class="required">*</text></text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">完成时限（小时）<text class="text-[#ff3b30]">*</text></text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input 
 								v-model="form.timeLimit"
 								type="number"
-								class="input"
+								class="flex-1 text-[30rpx] text-[#1f2329]"
 								placeholder="接单后需在多少小时内完成"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 							/>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">凭证要求</text>
-						<view class="tags-wrapper">
+					<view class="flex flex-col gap-[16rpx] mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73]">凭证要求</text>
+						<view class="flex flex-row flex-wrap gap-[16rpx]">
 							<view 
 								v-for="(item, index) in proofTypes" 
 								:key="index"
 								@click="toggleProofType(item.value)"
-								class="tag-item"
-								:class="{ active: form.proofTypes.includes(item.value) }"
+								class="px-[24rpx] py-[12rpx] rounded-[12rpx] border-[2rpx]"
+								:class="form.proofTypes.includes(item.value) ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e6eb] bg-white'"
 							>
-								<text class="tag-text" :class="{ active: form.proofTypes.includes(item.value) }">
+								<text class="text-[26rpx]" :class="form.proofTypes.includes(item.value) ? 'text-[#0052d9]' : 'text-[#646a73]'">
 									{{ item.label }}
 								</text>
 							</view>
 						</view>
 					</view>
 
-					<view class="form-item">
-						<text class="form-label">特殊要求</text>
-						<view class="textarea-wrapper small">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#646a73]">特殊要求</text>
+						<view class="bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] py-[16rpx]">
 							<textarea 
 								v-model="form.specialRequirement"
-								class="textarea"
+								class="w-full h-[120rpx] text-[30rpx] text-[#1f2329]"
 								placeholder="如有特殊要求请在此说明（选填）"
-								placeholder-class="input-placeholder"
+								placeholder-class="text-[#999999]"
 								:maxlength="200"
 								:show-confirm-bar="false"
 							/>
@@ -167,41 +162,45 @@
 				</view>
 
 				<!-- Tips -->
-				<view class="card tips-card">
-					<text class="tips-title">温馨提示</text>
-					<view class="tips-list">
-						<text class="tips-item">• 发起任务需支付任务总额+手续费+保证金</text>
-						<text class="tips-item">• 任务完成后保证金将自动退还</text>
-						<text class="tips-item">• 请确保任务描述清晰，避免纠纷</text>
-						<text class="tips-item">• 恶意发布任务将被封号处理</text>
+				<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] flex flex-col gap-[16rpx]">
+					<text class="text-[30rpx] font-bold text-[#ed6a0c]">温馨提示</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 发起任务需支付任务总额+手续费+保证金</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 任务完成后保证金将自动退还</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 请确保任务描述清晰，避免纠纷</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 恶意发布任务将被封号处理</text>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- Footer -->
-		<view class="footer">
-			<view class="btn-submit" :class="{ disabled: !canSubmit }" @tap="submitTask">
-				<text class="btn-submit-text">确认发布（¥{{ payAmount }}）</text>
+		<view class="bg-white px-[32rpx] py-[24rpx] pb-[calc(24rpx+env(safe-area-inset-bottom))] border-t-[2rpx] border-[#e5e5e5]">
+			<view 
+				class="h-[96rpx] bg-[#0052d9] rounded-[24rpx] flex items-center justify-center" 
+				:class="{ 'bg-[#c0c4cc]': !canSubmit }"
+				@tap="submitTask"
+			>
+				<text class="text-[32rpx] text-white font-medium">确认发布（¥{{ payAmount }}）</text>
 			</view>
 		</view>
 
 		<!-- Category Picker Mock -->
-		<view v-if="showCategoryPicker" class="picker-mask" @click="showCategoryPicker = false">
-			<view class="picker-container" @click.stop>
-				<text class="picker-title">选择任务类目</text>
-				<scroll-view scroll-y class="picker-list">
+		<view v-if="showCategoryPicker" class="fixed inset-0 bg-black/50 z-[100] flex flex-col justify-end" @click="showCategoryPicker = false">
+			<view class="bg-white rounded-t-[24rpx] p-[32rpx] pb-[calc(32rpx+env(safe-area-inset-bottom))]" @click.stop>
+				<text class="text-[32rpx] font-bold text-[#1f2329] text-center mb-[32rpx] block">选择任务类目</text>
+				<scroll-view scroll-y class="max-h-[500rpx]">
 					<view 
 						v-for="(item, index) in categories" 
 						:key="index"
 						@click="selectCategory(item)"
-						class="picker-item"
+						class="py-[24rpx] border-b-[2rpx] border-[#f5f7fa] flex items-center justify-center"
 					>
-						<text class="picker-item-text">{{ item }}</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ item }}</text>
 					</view>
 				</scroll-view>
-				<view class="picker-cancel" @click="showCategoryPicker = false">
-					<text class="picker-cancel-text">取消</text>
+				<view class="mt-[32rpx] bg-[#f5f5f5] h-[96rpx] rounded-[24rpx] flex items-center justify-center" @click="showCategoryPicker = false">
+					<text class="text-[30rpx] text-[#646a73]">取消</text>
 				</view>
 			</view>
 		</view>
@@ -326,317 +325,4 @@ const goBack = () => {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-	margin-bottom: 24rpx;
-}
-
-/* Form Items */
-.form-item {
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-	margin-bottom: 24rpx;
-}
-
-.form-label {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.required {
-	color: #ff3b30;
-	margin-left: 4rpx;
-}
-
-.input-wrapper {
-	height: 96rpx;
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	padding: 0 24rpx;
-}
-
-.picker-wrapper {
-	justify-content: space-between;
-	align-items: center;
-}
-
-.textarea-wrapper {
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	padding: 24rpx;
-}
-
-.textarea-wrapper.small {
-	padding: 16rpx 24rpx;
-}
-
-.textarea {
-	width: 100%;
-	height: 200rpx;
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.textarea-wrapper.small .textarea {
-	height: 120rpx;
-}
-
-.char-count {
-	font-size: 24rpx;
-	color: #999999;
-	text-align: right;
-	margin-top: 8rpx;
-}
-
-/* Summary Box */
-.summary-box {
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	padding: 24rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.summary-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.summary-label {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.summary-value {
-	font-size: 32rpx;
-	font-weight: 700;
-	color: #1f2329;
-}
-
-.summary-sub-value {
-	font-size: 30rpx;
-	color: #ff9500;
-}
-
-.summary-divider {
-	height: 2rpx;
-	background-color: #e5e5e5;
-	margin: 8rpx 0;
-}
-
-.total-label {
-	font-size: 30rpx;
-	font-weight: 700;
-	color: #1f2329;
-}
-
-.total-value {
-	font-size: 40rpx;
-	font-weight: 700;
-	color: #ff3b30;
-}
-
-/* Tags */
-.tags-wrapper {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 16rpx;
-}
-
-.tag-item {
-	padding: 12rpx 24rpx;
-	border-radius: 12rpx;
-	border: 2rpx solid #e5e6eb;
-	background-color: #ffffff;
-}
-
-.tag-item.active {
-	border-color: #0052d9;
-	background-color: #f0f9ff;
-}
-
-.tag-text {
-	font-size: 26rpx;
-	color: #646a73;
-}
-
-.tag-text.active {
-	color: #0052d9;
-}
-
-/* Tips Card */
-.tips-card {
-	background-color: #fff7e6;
-	gap: 16rpx;
-}
-
-.tips-title {
-	font-size: 30rpx;
-	font-weight: 700;
-	color: #ed6a0c;
-}
-
-.tips-list {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.tips-item {
-	font-size: 26rpx;
-	color: #646a73;
-	line-height: 1.5;
-}
-
-/* Footer */
-.footer {
-	background-color: #ffffff;
-	padding: 24rpx 32rpx;
-	padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-	border-top: 2rpx solid #e5e5e5;
-}
-
-.btn-submit {
-	height: 96rpx;
-	background-color: #0052d9;
-	border-radius: 24rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-submit.disabled {
-	background-color: #c0c4cc;
-}
-
-.btn-submit-text {
-	color: #ffffff;
-	font-size: 32rpx;
-	font-weight: 500;
-}
-
-/* Picker */
-.picker-mask {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-color: rgba(0, 0, 0, 0.5);
-	z-index: 100;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-}
-
-.picker-container {
-	background-color: #ffffff;
-	border-top-left-radius: 24rpx;
-	border-top-right-radius: 24rpx;
-	padding: 32rpx;
-	padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
-}
-
-.picker-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-	text-align: center;
-	margin-bottom: 32rpx;
-}
-
-.picker-list {
-	max-height: 500rpx;
-}
-
-.picker-item {
-	padding: 24rpx 0;
-	border-bottom: 2rpx solid #f5f7fa;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.picker-item-text {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.picker-cancel {
-	margin-top: 32rpx;
-	background-color: #f5f5f5;
-	height: 96rpx;
-	border-radius: 24rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.picker-cancel-text {
-	font-size: 30rpx;
-	color: #646a73;
-}
 </style>

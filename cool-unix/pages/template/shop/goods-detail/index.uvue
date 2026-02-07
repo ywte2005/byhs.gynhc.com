@@ -13,81 +13,81 @@
 			}"
 		/>
 
-		<view class="card dark:!bg-surface-700" id="info">
+		<view class="p-[32rpx] bg-white mb-[24rpx] dark:!bg-surface-700" id="info">
 			<Info />
 		</view>
 
-		<view class="card !py-1 dark:!bg-surface-700">
+		<view class="p-[32rpx] !py-[8rpx] bg-white mb-[24rpx] dark:!bg-surface-700">
 			<view
-				class="row border border-solid border-t-0 border-l-0 border-r-0 border-b-surface-100 dark:border-surface-600"
+				class="flex flex-row items-center py-[32rpx] border-b-[2rpx] border-[#f5f7fa] dark:border-surface-600"
 			>
-				<cl-icon name="apps-line" :size="16"></cl-icon>
+				<cl-icon name="apps-line" :size="32"></cl-icon>
 
-				<view class="flex-1 ml-3">
+				<view class="flex-1 ml-[24rpx]">
 					<cl-text>已选：黑色 128GB + 碎屏险</cl-text>
 				</view>
 
-				<cl-icon name="arrow-right-s-line" :size="16"></cl-icon>
+				<cl-icon name="arrow-right-s-line" :size="32"></cl-icon>
 			</view>
 
 			<view
-				class="row !items-start border border-solid border-t-0 border-l-0 border-r-0 border-b-surface-100 dark:border-surface-600"
+				class="flex flex-row items-start py-[32rpx] border-b-[2rpx] border-[#f5f7fa] dark:border-surface-600"
 			>
-				<cl-icon name="truck-line" :size="16" :pt="{ className: '!mt-1' }"></cl-icon>
+				<cl-icon name="truck-line" :size="32" :pt="{ className: '!mt-[4rpx]' }"></cl-icon>
 
-				<view class="flex-1 ml-3">
+				<view class="flex-1 ml-[24rpx]">
 					<cl-text color="info">预计11月1日 周三 送达</cl-text>
-					<cl-text color="info" :pt="{ className: '!mt-1' }">深圳益田假日广场</cl-text>
+					<cl-text color="info" :pt="{ className: '!mt-[4rpx]' }">深圳益田假日广场</cl-text>
 				</view>
 			</view>
 
-			<view class="row">
-				<cl-icon name="shield-check-line" :size="16"></cl-icon>
+			<view class="flex flex-row items-center py-[32rpx]">
+				<cl-icon name="shield-check-line" :size="32"></cl-icon>
 
-				<view class="flex-1 ml-3">
+				<view class="flex-1 ml-[24rpx]">
 					<cl-text color="info">7天无理由退货 · 正品保证 · 极速发货 · 无忧售后</cl-text>
 				</view>
 			</view>
 		</view>
 
-		<view class="card dark:!bg-surface-700" id="comment">
+		<view class="p-[32rpx] bg-white mb-[24rpx] dark:!bg-surface-700" id="comment">
 			<Comment />
 		</view>
 
-		<view class="card !p-0 dark:!bg-surface-700" id="desc">
+		<view class="bg-white mb-[24rpx] dark:!bg-surface-700" id="desc">
 			<Desc />
 		</view>
 
 		<cl-footer>
 			<view class="flex flex-row overflow-visible items-center">
 				<view class="flex flex-row mr-auto overflow-visible">
-					<view class="flex justify-center items-center px-4">
-						<cl-icon name="heart-line" :size="20"></cl-icon>
-						<cl-text :size="12" :pt="{ className: 'mt-1' }">收藏</cl-text>
+					<view class="flex justify-center items-center px-[32rpx]">
+						<cl-icon name="heart-line" :size="40"></cl-icon>
+						<cl-text :size="24" :pt="{ className: 'mt-[4rpx]' }">收藏</cl-text>
 					</view>
 
 					<view
-						class="flex justify-center items-center px-4 overflow-visible"
+						class="flex justify-center items-center px-[32rpx] overflow-visible"
 						@tap="router.to('/pages/template/shop/shopping-cart')"
 					>
-						<cl-icon name="shopping-cart-line" :size="20"></cl-icon>
-						<cl-text :size="12" :pt="{ className: 'mt-1' }">购物车</cl-text>
+						<cl-icon name="shopping-cart-line" :size="40"></cl-icon>
+						<cl-text :size="24" :pt="{ className: 'mt-[4rpx]' }">购物车</cl-text>
 
 						<cl-badge
 							type="error"
 							:value="3"
 							position
-							:pt="{ className: '!right-[12px] !top-[-4px] !scale-80' }"
+							:pt="{ className: '!right-[24rpx] !top-[-8rpx] !scale-80' }"
 						></cl-badge>
 					</view>
 				</view>
 
-				<view class="flex flex-row gap-2">
-					<view class="btn-cart" @tap="addToCart">
-						<text class="btn-text highlight">加入购物车</text>
+				<view class="flex flex-row gap-[16rpx]">
+					<view class="h-[80rpx] px-[40rpx] rounded-[40rpx] bg-[#e8f3ff] flex items-center justify-center" @tap="addToCart">
+						<text class="text-[28rpx] text-[#0052d9] font-bold">加入购物车</text>
 					</view>
-					<view class="btn-buy" @tap="buyNow">
-						<text class="btn-text">立即购买</text>
+					<view class="h-[80rpx] px-[40rpx] rounded-[40rpx] bg-[#0052d9] flex items-center justify-center" @tap="buyNow">
+						<text class="text-[28rpx] text-white font-bold">立即购买</text>
 					</view>
 				</view>
 			</view>
@@ -119,42 +119,5 @@ function buyNow() {
 }
 </script>
 
-<style lang="scss" scoped>
-.card {
-	@apply p-4 bg-white mb-3;
-
-	.row {
-		@apply flex flex-row items-center py-4;
-	}
-}
-
-.btn-cart {
-	height: 80rpx;
-	padding: 0 40rpx;
-	border-radius: 40rpx;
-	background-color: #e8f3ff;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-buy {
-	height: 80rpx;
-	padding: 0 40rpx;
-	border-radius: 40rpx;
-	background-color: #0052d9;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-text {
-	font-size: 28rpx;
-	color: #ffffff;
-	font-weight: 600;
-}
-
-.btn-text.highlight {
-	color: #0052d9;
-}
+<style>
 </style>

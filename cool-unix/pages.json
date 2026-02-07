@@ -35,6 +35,36 @@
 			"meta": {
 				"isAuth": true
 			}
+		},
+		{
+			"path": "pages/task/index",
+			"style": {
+				"navigationBarTitleText": "任务大厅",
+				"navigationStyle": "custom"
+			},
+			"meta": {
+				"isAuth": true
+			}
+		},
+		{
+			"path": "pages/wallet/index",
+			"style": {
+				"navigationBarTitleText": "我的钱包",
+				"navigationStyle": "custom"
+			},
+			"meta": {
+				"isAuth": true
+			}
+		},
+		{
+			"path": "pages/promo/index",
+			"style": {
+				"navigationBarTitleText": "推广中心",
+				"navigationStyle": "custom"
+			},
+			"meta": {
+				"isAuth": true
+			}
 		}
 	],
 	"subPackages": [
@@ -64,7 +94,8 @@
 				{
 					"path": "index",
 					"style": {
-						"navigationBarTitleText": "商户中心"
+						"navigationBarTitleText": "商户中心",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -102,15 +133,6 @@
 		{
 			"root": "pages/task",
 			"pages": [
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "任务大厅"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
 				{
 					"path": "create",
 					"style": {
@@ -198,15 +220,6 @@
 			"root": "pages/wallet",
 			"pages": [
 				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "我的钱包"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
 					"path": "recharge",
 					"style": {
 						"navigationBarTitleText": "充值"
@@ -227,7 +240,8 @@
 				{
 					"path": "logs",
 					"style": {
-						"navigationBarTitleText": "账单明细"
+						"navigationBarTitleText": "资金流水",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true
@@ -245,147 +259,8 @@
 			]
 		},
 		{
-			"root": "pages/message",
-			"pages": [
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "消息中心"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				}
-			]
-		},
-		{
-			"root": "pages/set",
-			"pages": [
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "设置"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "general",
-					"style": {
-						"navigationBarTitleText": "通用设置"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "notice",
-					"style": {
-						"navigationBarTitleText": "通知设置"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "about",
-					"style": {
-						"navigationBarTitleText": ""
-					},
-					"meta": {
-						"isAuth": true
-					}
-				}
-			]
-		},
-		{
-			"root": "pages/user",
-			"pages": [
-				{
-					"path": "edit-simple",
-					"style": {
-						"navigationStyle": "custom"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "edit",
-					"style": {
-						"navigationBarTitleText": "编辑资料"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "edit-name-simple",
-					"style": {
-						"navigationStyle": "custom"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "edit-name",
-					"style": {
-						"navigationStyle": "custom"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "edit-description-simple",
-					"style": {
-						"navigationStyle": "custom"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "edit-description",
-					"style": {
-						"navigationStyle": "custom"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "login",
-					"style": {
-						"navigationStyle": "custom",
-						"disableScroll": true
-					}
-				},
-				{
-					"path": "feedback",
-					"style": {
-						"navigationBarTitleText": "意见反馈"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				}
-			]
-		},
-		{
 			"root": "pages/promo",
 			"pages": [
-				{
-					"path": "index",
-					"style": {
-						"navigationBarTitleText": "推广中心"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
 				{
 					"path": "commission",
 					"style": {
@@ -435,39 +310,6 @@
 					"path": "invite",
 					"style": {
 						"navigationBarTitleText": "邀请好友"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "task/list",
-					"style": {
-						"navigationBarTitleText": "互助任务"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "task/create",
-					"style": {
-						"navigationBarTitleText": "发起任务"
-					},
-					"meta": {
-						"isAuth": true
-					}
-				},
-				{
-					"path": "task/detail",
-					"style": {
-						"navigationBarTitleText": "任务详情"
-					}
-				},
-				{
-					"path": "invite-record",
-					"style": {
-						"navigationBarTitleText": "邀请记录"
 					},
 					"meta": {
 						"isAuth": true
@@ -527,6 +369,97 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pages/user",
+			"pages": [
+				{
+					"path": "login",
+					"style": {
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "edit",
+					"style": {
+						"navigationBarTitleText": "个人资料"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "feedback",
+					"style": {
+						"navigationBarTitleText": "工单反馈",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/set",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "设置",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "about",
+					"style": {
+						"navigationBarTitleText": "关于我们"
+					}
+				},
+				{
+					"path": "general",
+					"style": {
+						"navigationBarTitleText": "通用设置",
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "notice",
+					"style": {
+						"navigationBarTitleText": "通知设置",
+						"navigationStyle": "custom"
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/message",
+			"pages": [
+				{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": ""
+					},
+					"meta": {
+						"isAuth": true
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/public",
+			"pages": [
+				{
+					"path": "agreement",
+					"style": {
+						"navigationBarTitleText": "用户协议",
+						"navigationStyle": "custom"
+					}
+				}
+			]
 		}
 	],
 	"globalStyle": {
@@ -552,20 +485,22 @@
 		"list": [
 			{
 				"pagePath": "pages/index/home",
-				"iconPath": "/static/icon/tabbar/home.png",
-				"selectedIconPath": "/static/icon/tabbar/home2.png",
 				"text": "首页"
 			},
 			{
-				"pagePath": "pages/index/template",
-				"iconPath": "/static/icon/tabbar/template.png",
-				"selectedIconPath": "/static/icon/tabbar/template2.png",
-				"text": "模板"
+				"pagePath": "pages/task/index",
+				"text": "任务"
+			},
+			{
+				"pagePath": "pages/wallet/index",
+				"text": "资金"
+			},
+			{
+				"pagePath": "pages/promo/index",
+				"text": "推广"
 			},
 			{
 				"pagePath": "pages/index/my",
-				"iconPath": "/static/icon/tabbar/my.png",
-				"selectedIconPath": "/static/icon/tabbar/my2.png",
 				"text": "我的"
 			}
 		]

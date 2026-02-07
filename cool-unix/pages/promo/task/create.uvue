@@ -1,60 +1,64 @@
 <template>
-	<cl-page>
-		<view class="task-create-page">
-			<view class="config-card">
-				<text class="card-title">任务配置说明</text>
-				<view class="config-row">
-					<text class="config-label">单任务金额：</text>
-					<text class="config-value">¥{{ config.split_amount }}</text>
-				</view>
-				<view class="config-row">
-					<text class="config-label">服务费比例：</text>
-					<text class="config-value">{{ (parseFloat(config.service_fee_ratio) * 100).toFixed(2) }}%</text>
-				</view>
-			</view>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="发起任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-			<view class="form-card">
-				<view class="form-item">
-					<text class="form-label">任务总金额</text>
-					<view class="form-input-wrap">
-						<input class="form-input" type="digit" v-model="totalAmount" placeholder="请输入任务总金额" />
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[20rpx] flex flex-col gap-[20rpx]">
+				<view class="bg-[#f0f5ff] rounded-[16rpx] p-[30rpx] flex flex-col">
+					<text class="text-[30rpx] font-bold text-[#333333] mb-[20rpx]">任务配置说明</text>
+					<view class="flex flex-row mb-[10rpx]">
+						<text class="text-[26rpx] text-[#666666]">单任务金额：</text>
+						<text class="text-[26rpx] text-[#667eea] font-bold">¥{{ config.split_amount }}</text>
+					</view>
+					<view class="flex flex-row mb-[10rpx]">
+						<text class="text-[26rpx] text-[#666666]">服务费比例：</text>
+						<text class="text-[26rpx] text-[#667eea] font-bold">{{ (parseFloat(config.service_fee_ratio) * 100).toFixed(2) }}%</text>
 					</view>
 				</view>
 
-				<view class="form-item">
-					<text class="form-label">开始时间</text>
-					<picker mode="date" :value="startTime" @change="onStartTimeChange">
-						<view class="form-picker">
-							<text :class="startTime.length > 0 ? '' : 'placeholder'">{{ startTime.length > 0 ? startTime : '请选择开始时间' }}</text>
+				<view class="bg-white rounded-[16rpx] p-[30rpx] flex flex-col gap-[30rpx]">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#333333]">任务总金额</text>
+						<view class="bg-[#f5f5f5] rounded-[12rpx] h-[88rpx] px-[24rpx] flex items-center">
+							<input class="flex-1 h-[88rpx] text-[30rpx]" type="digit" v-model="totalAmount" placeholder="请输入任务总金额" />
 						</view>
-					</picker>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#333333]">开始时间</text>
+						<picker mode="date" :value="startTime" @change="onStartTimeChange">
+							<view class="bg-[#f5f5f5] rounded-[12rpx] h-[88rpx] px-[24rpx] flex items-center">
+								<text class="text-[30rpx]" :class="startTime.length > 0 ? 'text-[#333333]' : 'text-[#999999]'">{{ startTime.length > 0 ? startTime : '请选择开始时间' }}</text>
+							</view>
+						</picker>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#333333]">结束时间</text>
+						<picker mode="date" :value="endTime" @change="onEndTimeChange">
+							<view class="bg-[#f5f5f5] rounded-[12rpx] h-[88rpx] px-[24rpx] flex items-center">
+								<text class="text-[30rpx]" :class="endTime.length > 0 ? 'text-[#333333]' : 'text-[#999999]'">{{ endTime.length > 0 ? endTime : '请选择结束时间' }}</text>
+							</view>
+						</picker>
+					</view>
 				</view>
 
-				<view class="form-item">
-					<text class="form-label">结束时间</text>
-					<picker mode="date" :value="endTime" @change="onEndTimeChange">
-						<view class="form-picker">
-							<text :class="endTime.length > 0 ? '' : 'placeholder'">{{ endTime.length > 0 ? endTime : '请选择结束时间' }}</text>
-						</view>
-					</picker>
+				<view class="bg-white rounded-[16rpx] p-[30rpx] flex flex-col gap-[10rpx]">
+					<text class="text-[30rpx] font-bold text-[#333333] mb-[10rpx]">注意事项</text>
+					<text class="text-[26rpx] text-[#666666] leading-[48rpx]">1. 创建任务需缴纳等额保证金</text>
+					<text class="text-[26rpx] text-[#666666] leading-[48rpx]">2. 任务完成后扣除服务费并退还保证金</text>
+					<text class="text-[26rpx] text-[#666666] leading-[48rpx]">3. 保证金余额不足将暂停任务分配</text>
+					<text class="text-[26rpx] text-[#666666] leading-[48rpx]">4. 创建后可手动启动任务</text>
+				</view>
+
+				<view class="py-[20rpx]">
+					<cl-button type="primary" :disabled="!canSubmit" @tap="submitTask">
+						<text>确认创建</text>
+					</cl-button>
 				</view>
 			</view>
-
-			<view class="tips-card">
-				<text class="tips-title">注意事项</text>
-				<text class="tips-item">1. 创建任务需缴纳等额保证金</text>
-				<text class="tips-item">2. 任务完成后扣除服务费并退还保证金</text>
-				<text class="tips-item">3. 保证金余额不足将暂停任务分配</text>
-				<text class="tips-item">4. 创建后可手动启动任务</text>
-			</view>
-
-			<view class="footer-actions">
-				<cl-button type="primary" :disabled="!canSubmit" @tap="submitTask">
-					<text>确认创建</text>
-				</cl-button>
-			</view>
-		</view>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
@@ -128,113 +132,5 @@
 	};
 </script>
 
-<style lang="scss">
-	.task-create-page {
-		padding: 20rpx;
-	}
-
-	.config-card {
-		background-color: #f0f5ff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.card-title {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-		margin-bottom: 20rpx;
-	}
-
-	.config-row {
-		display: flex;
-		flex-direction: row;
-		margin-bottom: 10rpx;
-	}
-
-	.config-label {
-		font-size: 26rpx;
-		color: #666666;
-	}
-
-	.config-value {
-		font-size: 26rpx;
-		color: #667eea;
-		font-weight: bold;
-	}
-
-	.form-card {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.form-item {
-		margin-bottom: 30rpx;
-	}
-
-	.form-item:last-child {
-		margin-bottom: 0;
-	}
-
-	.form-label {
-		font-size: 28rpx;
-		color: #333333;
-		margin-bottom: 16rpx;
-	}
-
-	.form-input-wrap {
-		background-color: #f5f5f5;
-		border-radius: 12rpx;
-	}
-
-	.form-input {
-		height: 88rpx;
-		padding: 0 24rpx;
-		font-size: 30rpx;
-	}
-
-	.form-picker {
-		height: 88rpx;
-		background-color: #f5f5f5;
-		border-radius: 12rpx;
-		display: flex;
-		align-items: center;
-		padding: 0 24rpx;
-	}
-
-	.form-picker text {
-		font-size: 30rpx;
-		color: #333333;
-	}
-
-	.form-picker .placeholder {
-		color: #999999;
-	}
-
-	.tips-card {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.tips-title {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-		margin-bottom: 20rpx;
-	}
-
-	.tips-item {
-		font-size: 26rpx;
-		color: #666666;
-		line-height: 48rpx;
-	}
-
-	.footer-actions {
-		padding: 20rpx 0;
-	}
+<style>
 </style>

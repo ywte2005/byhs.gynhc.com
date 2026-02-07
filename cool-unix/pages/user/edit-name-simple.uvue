@@ -1,49 +1,38 @@
 <template>
-	<view class="page">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航栏 -->
-		<view class="navbar">
-			<view class="navbar-inner">
-				<view class="navbar-left" @tap="goBack">
-					<text class="icon">←</text>
-				</view>
-				<view class="navbar-center">
-					<text class="navbar-title">编辑昵称</text>
-				</view>
-				<view class="navbar-right"></view>
-			</view>
-		</view>
+		<cl-topbar title="编辑昵称" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 内容区域 -->
-		<view class="content">
+		<view class="p-[32rpx] flex-1 h-0">
 			<!-- 输入框 -->
-			<view class="input-section">
+			<view class="bg-white rounded-[16rpx] p-[32rpx] mb-[32rpx]">
 				<input
-					class="input"
+					class="w-full h-[80rpx] text-[32rpx] text-[#333333]"
 					v-model="nickName"
 					placeholder="请输入昵称"
 					:maxlength="20"
 					:focus="true"
 				/>
-				<view class="input-counter">
-					<text class="counter-text">{{ nickName.length }} / 20</text>
+				<view class="flex justify-end mt-[20rpx]">
+					<text class="text-[24rpx] text-[#999999]">{{ nickName.length }} / 20</text>
 				</view>
 			</view>
 
 			<!-- 提示信息 -->
-			<view class="tip-section">
-				<text class="tip-text">请设置2-20个字符，不包括@&lt;&gt;/等无效字符</text>
+			<view class="px-[32rpx]">
+				<text class="text-[24rpx] text-[#999999] leading-[40rpx]">请设置2-20个字符，不包括@&lt;&gt;/等无效字符</text>
 			</view>
 		</view>
 
 		<!-- 底部按钮 -->
-		<view class="footer">
+		<view class="p-[32rpx] bg-white border-t-[2rpx] border-[#f5f5f5]">
 			<view
-				class="btn"
-				:class="{ 'btn-disabled': !canSubmit }"
-				hover-class="btn-hover"
+				class="h-[88rpx] bg-[#0052d9] rounded-[16rpx] flex justify-center items-center active:opacity-80"
+				:class="{ 'bg-[#cccccc] opacity-60': !canSubmit }"
 				@tap="confirm"
 			>
-				<text class="btn-text">确认</text>
+				<text class="text-[32rpx] text-white font-medium">确认</text>
 			</view>
 		</view>
 	</view>
@@ -59,11 +48,6 @@ const nickName = ref('')
 const canSubmit = computed((): boolean => {
 	return nickName.value.length >= 2 && nickName.value.length <= 20
 })
-
-// 返回上一页
-function goBack() {
-	uni.navigateBack()
-}
 
 // 确认
 function confirm() {
@@ -108,127 +92,5 @@ onReady(() => {
 })
 </script>
 
-<style scoped>
-.page {
-	width: 750rpx;
-	min-height: 100vh;
-	background-color: #f5f5f5;
-	display: flex;
-	flex-direction: column;
-}
-
-/* 导航栏 */
-.navbar {
-	background-color: #ffffff;
-	border-bottom: 1px solid #e5e5e5;
-}
-
-.navbar-inner {
-	height: 88rpx;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	padding: 0 30rpx;
-}
-
-.navbar-left,
-.navbar-right {
-	width: 120rpx;
-}
-
-.navbar-left {
-	display: flex;
-	align-items: center;
-}
-
-.icon {
-	font-size: 48rpx;
-	color: #333333;
-}
-
-.navbar-center {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-}
-
-.navbar-title {
-	font-size: 36rpx;
-	font-weight: 500;
-	color: #333333;
-}
-
-/* 内容区域 */
-.content {
-	flex: 1;
-	padding: 30rpx;
-}
-
-/* 输入框区域 */
-.input-section {
-	background-color: #ffffff;
-	border-radius: 16rpx;
-	padding: 30rpx;
-	margin-bottom: 30rpx;
-}
-
-.input {
-	width: 100%;
-	height: 80rpx;
-	font-size: 32rpx;
-	color: #333333;
-}
-
-.input-counter {
-	display: flex;
-	justify-content: flex-end;
-	margin-top: 20rpx;
-}
-
-.counter-text {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-/* 提示信息 */
-.tip-section {
-	padding: 0 30rpx;
-}
-
-.tip-text {
-	font-size: 24rpx;
-	color: #999999;
-	line-height: 40rpx;
-}
-
-/* 底部按钮 */
-.footer {
-	padding: 30rpx;
-	background-color: #ffffff;
-	border-top: 1px solid #f5f5f5;
-}
-
-.btn {
-	height: 88rpx;
-	background-color: #0052d9;
-	border-radius: 16rpx;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.btn-hover {
-	opacity: 0.8;
-}
-
-.btn-disabled {
-	background-color: #cccccc;
-	opacity: 0.6;
-}
-
-.btn-text {
-	font-size: 32rpx;
-	color: #ffffff;
-	font-weight: 500;
-}
+<style>
 </style>

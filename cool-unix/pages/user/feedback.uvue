@@ -1,44 +1,43 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">工单反馈</text>
-			</view>
-		</view>
+		<cl-topbar title="工单反馈" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] pb-[140rpx] flex flex-col gap-[32rpx]">
 				<!-- Feedback List -->
-				<view class="feedback-list">
-					<view v-for="(item, index) in list" :key="index" class="card feedback-item">
-						<view class="item-header">
-							<text class="item-type">{{ item.type }}</text>
-							<text class="item-status" :class="item.status">{{ getStatusText(item.status) }}</text>
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[16rpx]">
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ item.type }}</text>
+							<text class="text-[24rpx]" :class="{
+								'text-[#faad14]': item.status === 'pending',
+								'text-[#0052d9]': item.status === 'processing',
+								'text-[#00b578]': item.status === 'replied'
+							}">{{ getStatusText(item.status) }}</text>
 						</view>
-						<text class="item-content">{{ item.content }}</text>
-						<view class="item-footer">
-							<text class="item-time">{{ formatTime(item.createtime) }}</text>
-							<view v-if="item.reply" class="item-reply">
-								<text class="reply-label">回复：</text>
-								<text class="reply-text">{{ item.reply }}</text>
+						<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ item.content }}</text>
+						<view class="flex flex-col gap-[12rpx] mt-[12rpx] pt-[12rpx] border-t-[2rpx] border-[#f5f7fa]">
+							<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
+							<view v-if="item.reply" class="bg-[#f5f7fa] p-[16rpx] rounded-[8rpx] flex flex-row">
+								<text class="text-[24rpx] font-semibold text-[#1f2329]">回复：</text>
+								<text class="text-[24rpx] text-[#646a73] flex-1">{{ item.reply }}</text>
 							</view>
 						</view>
 					</view>
 					
 					<!-- 空状态 -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无反馈记录</text>
+					<view v-if="list.length == 0 && !loading" class="flex justify-center items-center py-[64rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无反馈记录</text>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- Submit Button Area -->
-		<view class="footer-action">
-			<view class="btn-submit" @tap="goToSubmit">
-				<text class="btn-text">提交反馈</text>
+		<view class="fixed bottom-0 left-0 right-0 bg-white px-[32rpx] pb-[calc(24rpx+env(safe-area-inset-bottom))] py-[24rpx] border-t-[2rpx] border-[#e5e5e5]">
+			<view class="h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center" @tap="goToSubmit">
+				<text class="text-white text-[32rpx] font-medium">提交反馈</text>
 			</view>
 		</view>
 	</view>
@@ -69,9 +68,6 @@
 			this.loadMore();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
@@ -130,183 +126,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	padding-bottom: 140rpx; /* Space for footer */
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Feedback List */
-.feedback-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.feedback-item {
-	gap: 16rpx;
-}
-
-.item-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.item-type {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.item-status {
-	font-size: 24rpx;
-}
-
-.item-status.pending {
-	color: #faad14;
-}
-
-.item-status.processing {
-	color: #0052d9;
-}
-
-.item-status.replied {
-	color: #00b578;
-}
-
-.item-content {
-	font-size: 28rpx;
-	color: #646a73;
-	line-height: 1.5;
-}
-
-.item-footer {
-	display: flex;
-	flex-direction: column;
-	gap: 12rpx;
-	margin-top: 12rpx;
-	padding-top: 12rpx;
-	border-top: 2rpx solid #f5f7fa;
-}
-
-.item-time {
-	font-size: 22rpx;
-	color: #999999;
-}
-
-.item-reply {
-	background-color: #f5f7fa;
-	padding: 16rpx;
-	border-radius: 8rpx;
-	display: flex;
-	flex-direction: row;
-}
-
-.reply-label {
-	font-size: 24rpx;
-	color: #1f2329;
-	font-weight: 600;
-}
-
-.reply-text {
-	font-size: 24rpx;
-	color: #646a73;
-	flex: 1;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
-
-/* Footer Action */
-.footer-action {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	background-color: #ffffff;
-	padding: 24rpx 32rpx;
-	padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-	border-top: 2rpx solid #e5e5e5;
-}
-
-.btn-submit {
-	height: 96rpx;
-	background-color: #0052d9;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-text {
-	color: #ffffff;
-	font-size: 32rpx;
-	font-weight: 500;
-}
 </style>

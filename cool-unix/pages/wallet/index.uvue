@@ -1,144 +1,132 @@
 <template>
-	<view class="page-container">
-		<!-- Header -->
-		<view class="wallet-header">
-			<view class="header-nav">
-				<view class="back-btn" @click="goBack">
-					<uni-icons type="left" size="24" color="#ffffff"></uni-icons>
-				</view>
-				<text class="nav-title">资金管理</text>
-				<view class="detail-btn" @click="goToLogs">
-					<text class="detail-text">明细</text>
-				</view>
-			</view>
-			
-			<!-- Wallet Card -->
-			<view class="wallet-card">
-				<view class="balance-section">
-					<text class="balance-label">账户余额(元)</text>
-					<text class="balance-value">{{ walletInfo.balance }}</text>
-				</view>
-				
-				<view class="stats-row">
-					<view class="stat-item">
-						<text class="stat-val">{{ walletInfo.frozen }}</text>
-						<text class="stat-lbl">冻结金额</text>
-					</view>
-					<view class="stat-item">
-						<text class="stat-val">{{ walletInfo.totalIncome }}</text>
-						<text class="stat-lbl">累计收入</text>
-					</view>
-					<view class="stat-item">
-						<text class="stat-val">{{ walletInfo.totalExpense }}</text>
-						<text class="stat-lbl">累计支出</text>
-					</view>
-				</view>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<!-- 顶部导航 -->
+		<cl-topbar title="资金管理" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top></cl-topbar>
 
-				<view class="action-row">
-					<view class="action-btn" @click="goToRecharge">
-						<text class="action-text">充值</text>
+		<scroll-view class="flex-1 h-0 bg-[#f5f7fa]" scroll-y>
+			<view class="flex flex-col gap-[24rpx]">
+				<!-- 资产卡片 -->
+				<view class="bg-[#0052d9] p-[40rpx_32rpx_48rpx_32rpx] flex flex-col rounded-bl-[32rpx] rounded-br-[32rpx]">
+					<view class="flex flex-col items-center mb-[48rpx]">
+						<text class="text-[26rpx] text-white/70">可用余额(元)</text>
+						<text class="text-[72rpx] font-bold text-white mt-[16rpx] font-['DIN_Alternate']">{{ walletInfo.balance }}</text>
 					</view>
-					<view class="action-btn outline" @click="goToWithdraw">
-						<text class="action-text outline">提现</text>
+					
+					<view class="flex flex-row justify-between mb-[48rpx] px-[48rpx]">
+						<view class="flex flex-col items-center">
+							<text class="text-[32rpx] font-semibold text-white">¥{{ walletInfo.frozen }}</text>
+							<text class="text-[24rpx] text-white/70 mt-[8rpx]">冻结金额</text>
+						</view>
+						<view class="flex flex-col items-center">
+							<text class="text-[32rpx] font-semibold text-white">¥{{ walletInfo.pending }}</text>
+							<text class="text-[24rpx] text-white/70 mt-[8rpx]">待结算</text>
+						</view>
 					</view>
-				</view>
-			</view>
-		</view>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<!-- Menu Grid -->
-				<view class="card menu-card">
-					<view class="menu-grid">
-						<view class="menu-item" @click="goToBankCard">
-							<uni-icons type="vip" size="24" color="#0052d9"></uni-icons>
-							<text class="menu-name">银行卡</text>
+					<view class="flex flex-row justify-center gap-[48rpx]">
+						<view class="w-[200rpx] h-[80rpx] bg-white rounded-[40rpx] flex flex-row items-center justify-center gap-[12rpx]" @click="goToRecharge">
+							<uni-icons type="plus-filled" size="18" color="#0052d9"></uni-icons>
+							<text class="text-[28rpx] text-[#0052d9] font-medium leading-none">充值</text>
 						</view>
-						<view class="menu-item" @click="goToDeposit">
-							<uni-icons type="locked" size="24" color="#0052d9"></uni-icons>
-							<text class="menu-name">保证金</text>
-						</view>
-						<view class="menu-item" @click="goToCommission">
-							<uni-icons type="gift" size="24" color="#0052d9"></uni-icons>
-							<text class="menu-name">佣金</text>
-						</view>
-						<view class="menu-item" @click="goToStatistics">
-							<uni-icons type="bars" size="24" color="#0052d9"></uni-icons>
-							<text class="menu-name">统计</text>
+						<view class="w-[200rpx] h-[80rpx] bg-white/10 border-[2rpx] border-solid border-white/25 rounded-[40rpx] flex flex-row items-center justify-center gap-[12rpx]" @click="goToWithdraw">
+							<uni-icons type="arrow-up" size="18" color="#ffffff"></uni-icons>
+							<text class="text-[28rpx] text-white font-medium leading-none">提现</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- Recent Logs -->
-				<view class="card recent-card">
-					<view class="card-header">
-						<text class="card-title">最近交易</text>
-						<view @click="goToLogs">
-							<text class="more-text">查看全部 ></text>
+				<!-- 菜单列表 -->
+				<view class="mx-[32rpx] bg-white rounded-[24rpx] px-[32rpx]">
+					<view class="flex flex-col">
+						<view class="flex flex-row items-center justify-between h-[112rpx]" @click="goToLogs">
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<uni-icons type="list" size="22" color="#0052d9"></uni-icons>
+								<text class="text-[30rpx] text-[#1f2329]">资金流水</text>
+							</view>
+							<uni-icons type="right" size="16" color="#9aa0a6"></uni-icons>
+						</view>
+						<view class="h-[2rpx] bg-[#f5f7fa]"></view>
+						<view class="flex flex-row items-center justify-between h-[112rpx]" @click="goToDeposit">
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<uni-icons type="locked" size="22" color="#0052d9"></uni-icons>
+								<text class="text-[30rpx] text-[#1f2329]">保证金管理</text>
+							</view>
+							<uni-icons type="right" size="16" color="#9aa0a6"></uni-icons>
+						</view>
+						<view class="h-[2rpx] bg-[#f5f7fa]"></view>
+						<view class="flex flex-row items-center justify-between h-[112rpx]" @click="goToCommission">
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<uni-icons type="compose" size="22" color="#0052d9"></uni-icons>
+								<text class="text-[30rpx] text-[#1f2329]">结算单</text>
+							</view>
+							<uni-icons type="right" size="16" color="#9aa0a6"></uni-icons>
+						</view>
+					</view>
+				</view>
+
+				<!-- 最近交易 -->
+				<view class="mx-[32rpx] bg-white rounded-[24rpx] p-[32rpx] mb-[32rpx]">
+					<view class="flex flex-row justify-between items-center mb-[24rpx]">
+						<text class="text-[30rpx] font-semibold text-[#1f2329]">最近交易</text>
+						<view @click="goToLogs" class="flex flex-row items-center gap-[4rpx]">
+							<text class="text-[26rpx] text-[#0052d9]">查看全部</text>
+							<uni-icons type="right" size="14" color="#0052d9"></uni-icons>
 						</view>
 					</view>
 					
-					<view class="log-list">
+					<view class="flex flex-col gap-[24rpx]">
 						<view 
 							v-for="(item, index) in recentLogs" 
 							:key="index"
-							class="log-item"
+							class="flex flex-row items-center justify-between"
 						>
-							<view class="log-icon-box">
-								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
+							<view class="flex flex-col gap-[8rpx]">
+								<text class="text-[30rpx] text-[#1f2329]">{{ item.title }}</text>
+								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
 							</view>
-							<view class="log-info">
-								<text class="log-title">{{ item.title }}</text>
-								<text class="log-time">{{ item.time }}</text>
-							</view>
-							<text :class="['log-amount', item.type === 'in' ? 'income' : 'expense']">
-								{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
+							<text class="text-[30rpx] font-semibold" :class="[item.type === 'in' ? 'text-[#00b578]' : 'text-[#e34d59]']">
+								{{ item.type === 'in' ? '+' : '-' }}¥{{ item.amount }}
 							</text>
 						</view>
 						
-						<view v-if="recentLogs.length === 0" class="empty-state">
-							<text class="empty-text">暂无交易记录</text>
+						<view v-if="recentLogs.length === 0" class="flex items-center justify-center py-[48rpx]">
+							<text class="text-[26rpx] text-[#9aa0a6]">暂无交易记录</text>
 						</view>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
+
+		<custom-tabbar></custom-tabbar>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-// import { getWalletInfo, getWalletLogs } from '@/services/wallet'
+import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 钱包信息
 const walletInfo = ref({
 	balance: '12,580.00',
 	frozen: '2,500.00',
-	totalIncome: '125,800.00',
-	totalExpense: '113,220.00'
+	pending: '5,320.00'
 })
 
 // 最近交易
 const recentLogs = ref([
 	{
-		iconType: 'wallet',
-		iconColor: '#00b578',
 		title: '任务佣金',
 		time: '2025-01-30 10:30:00',
 		type: 'in',
 		amount: '15.00'
 	},
 	{
-		iconType: 'compose',
-		iconColor: '#faad14',
 		title: '发起任务',
 		time: '2025-01-30 09:00:00',
 		type: 'out',
 		amount: '1,500.00'
 	},
 	{
-		iconType: 'wallet',
-		iconColor: '#0052d9',
 		title: '充值',
 		time: '2025-01-29 15:00:00',
 		type: 'in',
@@ -164,7 +152,6 @@ const goToWithdraw = () => uni.navigateTo({ url: '/pages/wallet/withdraw' })
 const goToBankCard = () => uni.navigateTo({ url: '/pages/wallet/bankcard' })
 const goToDeposit = () => uni.navigateTo({ url: '/pages/task/deposit' })
 const goToCommission = () => uni.navigateTo({ url: '/pages/promo/commission' })
-const goToStatistics = () => uni.showToast({ title: '统计功能开发中', icon: 'none' })
 
 onMounted(() => {
 	loadWalletInfo()
@@ -173,255 +160,4 @@ onMounted(() => {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.wallet-header {
-	background-color: #0052d9;
-	padding-bottom: 48rpx;
-}
-
-.header-nav {
-	height: 88rpx;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 20rpx 32rpx 0 32rpx;
-}
-
-.back-btn {
-	display: flex;
-	align-items: center;
-}
-
-.nav-title {
-	font-size: 34rpx;
-	color: #ffffff;
-	font-weight: 600;
-}
-
-.detail-text {
-	font-size: 28rpx;
-	color: #ffffff;
-}
-
-.wallet-card {
-	margin-top: 32rpx;
-	padding: 0 32rpx;
-}
-
-.balance-section {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	margin-bottom: 48rpx;
-}
-
-.balance-label {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.balance-value {
-	font-size: 64rpx;
-	font-weight: 700;
-	color: #ffffff;
-	margin-top: 8rpx;
-}
-
-.stats-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	margin-bottom: 48rpx;
-}
-
-.stat-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	flex: 1;
-}
-
-.stat-val {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #ffffff;
-}
-
-.stat-lbl {
-	font-size: 24rpx;
-	color: rgba(255, 255, 255, 0.8);
-	margin-top: 8rpx;
-}
-
-.action-row {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	gap: 24rpx;
-}
-
-.action-btn {
-	flex: 1;
-	height: 80rpx;
-	background-color: #ffffff;
-	border-radius: 40rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.action-btn.outline {
-	background-color: rgba(255, 255, 255, 0.2);
-	border: 2rpx solid #ffffff;
-}
-
-.action-text {
-	font-size: 28rpx;
-	color: #0052d9;
-	font-weight: 500;
-}
-
-.action-text.outline {
-	color: #ffffff;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-/* Menu Grid */
-.menu-grid {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-}
-
-.menu-item {
-	width: 25%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 16rpx;
-}
-
-/* Menu icon styles removed - using uni-icons */
-
-.menu-name {
-	font-size: 24rpx;
-	color: #333333;
-}
-
-/* Recent Logs */
-.card-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 24rpx;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.more-text {
-	font-size: 26rpx;
-	color: #999999;
-}
-
-.log-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.log-item {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-	padding-bottom: 24rpx;
-	border-bottom: 2rpx solid #f5f7fa;
-}
-
-.log-icon-box {
-	width: 80rpx;
-	height: 80rpx;
-	background-color: #f5f7fa;
-	border-radius: 40rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-right: 24rpx;
-}
-
-/* Log icon styles removed - using uni-icons */
-
-.log-info {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.log-title {
-	font-size: 28rpx;
-	color: #1f2329;
-}
-
-.log-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-.log-amount {
-	font-size: 32rpx;
-	font-weight: 600;
-}
-
-.log-amount.income {
-	color: #07c160;
-}
-
-.log-amount.expense {
-	color: #ff3b30;
-}
-
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 32rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>

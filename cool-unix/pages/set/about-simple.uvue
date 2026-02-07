@@ -1,77 +1,72 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">关于我们</text>
-			</view>
-		</view>
+		<cl-topbar title="关于我们" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- Logo和名称 -->
-				<view class="flex flex-col items-center justify-center py-10 mb-4">
-					<view class="w-20 h-20 rounded-2 bg-[#07c160] flex items-center justify-center mb-4">
-						<text class="text-10 text-white">🏪</text>
+				<view class="flex flex-col items-center justify-center py-[80rpx] mb-[32rpx]">
+					<view class="w-[160rpx] h-[160rpx] rounded-[32rpx] bg-[#07c160] flex items-center justify-center mb-[32rpx]">
+						<text class="text-[80rpx] text-white">🏪</text>
 					</view>
-					<text class="text-5 font-bold text-[#1f2329] mb-2">商户互助平台</text>
-					<text class="text-3.5 text-[#999]">版本 v1.0.0</text>
+					<text class="text-[40rpx] font-bold text-[#1f2329] mb-[16rpx]">商户互助平台</text>
+					<text class="text-[28rpx] text-[#999999]">版本 v1.0.0</text>
 				</view>
 
 				<!-- 平台信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<view class="py-3 border-b border-[#e5e5e5]">
-						<text class="text-3.5 text-[#999] mb-2">平台简介</text>
-						<text class="text-3.5 text-[#646a73] mt-2">商户互助刷单平台，实现商户之间互助完成刷单任务，配套完整的推广分销、等级权益、佣金分润体系。</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<view class="py-[24rpx] border-b-[2rpx] border-[#e5e5e5]">
+						<text class="text-[28rpx] text-[#999999] mb-[16rpx] block">平台简介</text>
+						<text class="text-[28rpx] text-[#646a73] mt-[16rpx] block leading-relaxed">商户互助刷单平台，实现商户之间互助完成刷单任务，配套完整的推广分销、等级权益、佣金分润体系。</text>
 					</view>
 
 					<view 
 						@click="visitWebsite"
-						class="flex items-center justify-between py-3"
+						class="flex flex-row items-center justify-between py-[24rpx]"
 					>
-						<text class="text-4 text-[#1f2329]">访问官网</text>
-						<text class="text-4 text-[#999]">→</text>
+						<text class="text-[32rpx] text-[#1f2329]">访问官网</text>
+						<text class="text-[32rpx] text-[#999999]">→</text>
 					</view>
 				</view>
 
 				<!-- 联系方式 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">联系方式</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">联系方式</text>
 					
-					<view class="py-3 border-b border-[#e5e5e5]">
-						<text class="text-3.5 text-[#999]">客服电话</text>
-						<text class="text-4 text-[#1f2329] mt-1">400-123-4567</text>
+					<view class="py-[24rpx] border-b-[2rpx] border-[#e5e5e5]">
+						<text class="text-[28rpx] text-[#999999]">客服电话</text>
+						<text class="text-[32rpx] text-[#1f2329] mt-[8rpx] block">400-123-4567</text>
 					</view>
 
-					<view class="py-3 border-b border-[#e5e5e5]">
-						<text class="text-3.5 text-[#999]">客服邮箱</text>
-						<text class="text-4 text-[#1f2329] mt-1">service@example.com</text>
+					<view class="py-[24rpx] border-b-[2rpx] border-[#e5e5e5]">
+						<text class="text-[28rpx] text-[#999999]">客服邮箱</text>
+						<text class="text-[32rpx] text-[#1f2329] mt-[8rpx] block">service@example.com</text>
 					</view>
 
-					<view class="py-3">
-						<text class="text-3.5 text-[#999]">工作时间</text>
-						<text class="text-4 text-[#1f2329] mt-1">周一至周日 9:00-18:00</text>
+					<view class="py-[24rpx]">
+						<text class="text-[28rpx] text-[#999999]">工作时间</text>
+						<text class="text-[32rpx] text-[#1f2329] mt-[8rpx] block">周一至周日 9:00-18:00</text>
 					</view>
 				</view>
 
 				<!-- 法律信息 -->
-				<view class="bg-white rounded-2 p-4">
+				<view class="bg-white rounded-[24rpx] p-[32rpx]">
 					<view 
 						@click="viewAgreement('user')"
-						class="flex items-center justify-between py-3 border-b border-[#e5e5e5]"
+						class="flex flex-row items-center justify-between py-[24rpx] border-b-[2rpx] border-[#e5e5e5]"
 					>
-						<text class="text-4 text-[#1f2329]">用户协议</text>
-						<text class="text-4 text-[#999]">→</text>
+						<text class="text-[32rpx] text-[#1f2329]">用户协议</text>
+						<text class="text-[32rpx] text-[#999999]">→</text>
 					</view>
 
 					<view 
 						@click="viewAgreement('privacy')"
-						class="flex items-center justify-between py-3"
+						class="flex flex-row items-center justify-between py-[24rpx]"
 					>
-						<text class="text-4 text-[#1f2329]">隐私政策</text>
-						<text class="text-4 text-[#999]">→</text>
+						<text class="text-[32rpx] text-[#1f2329]">隐私政策</text>
+						<text class="text-[32rpx] text-[#999999]">→</text>
 					</view>
 				</view>
 			</view>
@@ -79,7 +74,7 @@
 	</view>
 </template>
 
-<script setup lang="uts">
+<script setup lang="ts">
 // 访问官网
 const visitWebsite = () => {
 	uni.showToast({
@@ -95,9 +90,7 @@ const viewAgreement = (type: string) => {
 		icon: 'none'
 	})
 }
-
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
 </script>
+
+<style>
+</style>

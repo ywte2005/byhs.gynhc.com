@@ -1,62 +1,74 @@
 <template>
-	<cl-page>
-		<view class="task-detail-page">
-			<view v-if="task != null" class="task-content">
-				<view class="status-card" :class="task.status">
-					<text class="status-text">{{ getStatusName(task.status) }}</text>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="任务详情" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[20rpx] flex flex-col gap-[20rpx]">
+				<view v-if="task != null" class="flex flex-col gap-[20rpx]">
+					<view class="flex items-center justify-center p-[40rpx] rounded-[16rpx] mb-[20rpx]"
+						:class="{
+							'bg-gradient-to-br from-[#ffecd2] to-[#fcb69f]': task?.status == 'pending',
+							'bg-gradient-to-br from-[#667eea] to-[#764ba2]': task?.status == 'running',
+							'bg-gradient-to-br from-[#11998e] to-[#38ef7d]': task?.status == 'completed',
+							'bg-gradient-to-br from-[#ff6b6b] to-[#feca57]': task?.status == 'paused',
+							'bg-[#f5f5f5]': task?.status == 'cancelled'
+						}"
+					>
+						<text class="text-[36rpx] font-bold" :class="task?.status == 'cancelled' ? 'text-[#999999]' : 'text-white'">{{ getStatusName(task!.status) }}</text>
+					</view>
+
+					<view class="bg-white rounded-[16rpx] p-[30rpx] flex flex-col">
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">任务金额</text>
+							<text class="text-[32rpx] font-bold text-[#667eea]">¥{{ task!.total_amount }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">保证金</text>
+							<text class="text-[28rpx] text-[#333333]">¥{{ task!.deposit_amount }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">已完成</text>
+							<text class="text-[28rpx] text-[#333333]">¥{{ task!.completed_amount }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">服务费</text>
+							<text class="text-[28rpx] text-[#333333]">¥{{ task!.service_fee }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">开始时间</text>
+							<text class="text-[28rpx] text-[#333333]">{{ formatTime(task!.start_time) }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx] border-b-[1rpx] border-[#f5f5f5]">
+							<text class="text-[28rpx] text-[#666666]">结束时间</text>
+							<text class="text-[28rpx] text-[#333333]">{{ formatTime(task!.end_time) }}</text>
+						</view>
+						<view class="flex flex-row justify-between py-[16rpx]">
+							<text class="text-[28rpx] text-[#666666]">创建时间</text>
+							<text class="text-[28rpx] text-[#333333]">{{ formatTime(task!.createtime) }}</text>
+						</view>
+					</view>
+
+					<view class="bg-white rounded-[16rpx] p-[30rpx] flex flex-col mb-[20rpx]">
+						<text class="text-[30rpx] font-bold text-[#333333] mb-[20rpx]">完成进度</text>
+						<view class="h-[20rpx] bg-[#f0f0f0] rounded-[10rpx] overflow-hidden mb-[16rpx]">
+							<view class="h-full bg-gradient-to-r from-[#667eea] to-[#764ba2] rounded-[10rpx]" :style="{ width: progressPercent + '%' }"></view>
+						</view>
+						<text class="text-[26rpx] text-[#667eea] text-right">{{ progressPercent }}%</text>
+					</view>
+
+					<view v-if="task!.status == 'pending'" class="py-[20rpx]">
+						<cl-button type="primary" @tap="startTask">
+							<text>启动任务</text>
+						</cl-button>
+					</view>
 				</view>
 
-				<view class="info-card">
-					<view class="info-row">
-						<text class="info-label">任务金额</text>
-						<text class="info-value highlight">¥{{ task.total_amount }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">保证金</text>
-						<text class="info-value">¥{{ task.deposit_amount }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">已完成</text>
-						<text class="info-value">¥{{ task.completed_amount }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">服务费</text>
-						<text class="info-value">¥{{ task.service_fee }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">开始时间</text>
-						<text class="info-value">{{ formatTime(task.start_time) }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">结束时间</text>
-						<text class="info-value">{{ formatTime(task.end_time) }}</text>
-					</view>
-					<view class="info-row">
-						<text class="info-label">创建时间</text>
-						<text class="info-value">{{ formatTime(task.createtime) }}</text>
-					</view>
-				</view>
-
-				<view class="progress-card">
-					<text class="card-title">完成进度</text>
-					<view class="progress-bar">
-						<view class="progress-fill" :style="{ width: progressPercent + '%' }"></view>
-					</view>
-					<text class="progress-text">{{ progressPercent }}%</text>
-				</view>
-
-				<view v-if="task.status == 'pending'" class="action-card">
-					<cl-button type="primary" @tap="startTask">
-						<text>启动任务</text>
-					</cl-button>
+				<view v-else class="flex items-center justify-center py-[100rpx]">
+					<text class="text-[28rpx] text-[#999999]">加载中...</text>
 				</view>
 			</view>
-
-			<view v-else class="loading">
-				<text>加载中...</text>
-			</view>
-		</view>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
@@ -80,8 +92,8 @@
 		computed: {
 			progressPercent() : number {
 				if (this.task == null) return 0;
-				const total = parseFloat(this.task.total_amount);
-				const completed = parseFloat(this.task.completed_amount);
+				const total = parseFloat(this.task!.total_amount);
+				const completed = parseFloat(this.task!.completed_amount);
 				if (total <= 0) return 0;
 				return Math.round((completed / total) * 100);
 			}
@@ -92,9 +104,20 @@
 		methods: {
 			loadData() {
 				if (this.task_id <= 0) {
-					uni.showToast({ title: '参数错误', icon: 'none' });
-					return;
+					// uni.showToast({ title: '参数错误', icon: 'none' });
+					// Just try loading by getting page options
+					const pages = getCurrentPages();
+					const currentPage = pages[pages.length - 1];
+					// @ts-ignore
+					const options = currentPage.options as UTSJSONObject;
+					if (options['task_id'] != null) {
+						// @ts-ignore
+						this.task_id = parseInt(options['task_id'] as string);
+					}
 				}
+				
+				if (this.task_id <= 0) return;
+
 				getTaskDetail(this.task_id)
 					.then((res : TaskDetail) => {
 						this.task = res;
@@ -148,132 +171,5 @@
 	};
 </script>
 
-<style lang="scss">
-	.task-detail-page {
-		padding: 20rpx;
-	}
-
-	.status-card {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 40rpx;
-		border-radius: 16rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.status-card.pending {
-		background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-	}
-
-	.status-card.running {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	}
-
-	.status-card.completed {
-		background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-	}
-
-	.status-card.paused {
-		background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
-	}
-
-	.status-card.cancelled {
-		background-color: #f5f5f5;
-	}
-
-	.status-text {
-		font-size: 36rpx;
-		font-weight: bold;
-		color: #ffffff;
-	}
-
-	.status-card.cancelled .status-text {
-		color: #999999;
-	}
-
-	.info-card {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.info-row {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		padding: 16rpx 0;
-		border-bottom: 1rpx solid #f5f5f5;
-	}
-
-	.info-row:last-child {
-		border-bottom: none;
-	}
-
-	.info-label {
-		font-size: 28rpx;
-		color: #666666;
-	}
-
-	.info-value {
-		font-size: 28rpx;
-		color: #333333;
-	}
-
-	.info-value.highlight {
-		font-size: 32rpx;
-		font-weight: bold;
-		color: #667eea;
-	}
-
-	.progress-card {
-		background-color: #ffffff;
-		border-radius: 16rpx;
-		padding: 30rpx;
-		margin-bottom: 20rpx;
-	}
-
-	.card-title {
-		font-size: 30rpx;
-		font-weight: bold;
-		color: #333333;
-		margin-bottom: 20rpx;
-	}
-
-	.progress-bar {
-		height: 20rpx;
-		background-color: #f0f0f0;
-		border-radius: 10rpx;
-		overflow: hidden;
-		margin-bottom: 16rpx;
-	}
-
-	.progress-fill {
-		height: 100%;
-		background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-		border-radius: 10rpx;
-	}
-
-	.progress-text {
-		font-size: 26rpx;
-		color: #667eea;
-		text-align: right;
-	}
-
-	.action-card {
-		padding: 20rpx 0;
-	}
-
-	.loading {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		padding: 100rpx 0;
-	}
-
-	.loading text {
-		font-size: 28rpx;
-		color: #999999;
-	}
+<style>
 </style>

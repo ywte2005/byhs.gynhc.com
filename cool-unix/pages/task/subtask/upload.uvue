@@ -1,130 +1,132 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="text-4 ml-2">上传凭证</text>
-			</view>
-		</view>
+		<cl-topbar title="上传凭证" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- 任务信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-2">{{ taskInfo.title }}</text>
-					<text class="text-3.5 text-[#646a73]">{{ taskInfo.description }}</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx]">
+					<text class="text-[36rpx] font-bold text-[#1f2329] mb-[16rpx] block">{{ taskInfo.title }}</text>
+					<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ taskInfo.description }}</text>
 					
-					<view class="flex items-center justify-between mt-3 pt-3 border-t border-[#e5e5e5]">
-						<view>
-							<text class="text-3 text-[#999]">佣金</text>
-							<text class="text-5 font-bold text-[#ff3b30] ml-1">¥{{ taskInfo.commission }}</text>
+					<view class="flex flex-row items-center justify-between mt-[24rpx] pt-[24rpx] border-t-[2rpx] border-[#e5e5e5]">
+						<view class="flex flex-row items-baseline">
+							<text class="text-[24rpx] text-[#999999]">佣金</text>
+							<text class="text-[40rpx] font-bold text-[#ff3b30] ml-[8rpx]">¥{{ taskInfo.commission }}</text>
 						</view>
-						<view>
-							<text class="text-3 text-[#999]">剩余时间</text>
-							<text class="text-4 font-bold text-[#ff9500] ml-1">{{ taskInfo.remainTime }}</text>
+						<view class="flex flex-row items-baseline">
+							<text class="text-[24rpx] text-[#999999]">剩余时间</text>
+							<text class="text-[32rpx] font-bold text-[#ff9500] ml-[8rpx]">{{ taskInfo.remainTime }}</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- 凭证要求 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">凭证要求</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">凭证要求</text>
 					
-					<view class="mb-3">
-						<text class="text-3.5 text-[#646a73] mb-2">需要上传的凭证类型</text>
-						<view class="flex flex-wrap mt-2">
+					<view class="mb-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73] mb-[16rpx] block">需要上传的凭证类型</text>
+						<view class="flex flex-row flex-wrap gap-[16rpx]">
 							<view 
 								v-for="(item, index) in taskInfo.proofTypes" 
 								:key="index"
-								class="bg-[#f0f9ff] px-2 py-1 rounded mr-2 mb-2"
+								class="bg-[#f0f9ff] px-[16rpx] py-[8rpx] rounded-[8rpx]"
 							>
-								<text class="text-3 text-[#07c160]">{{ item }}</text>
+								<text class="text-[24rpx] text-[#07c160]">{{ item }}</text>
 							</view>
 						</view>
 					</view>
 
-					<view v-if="taskInfo.specialRequirement" class="bg-[#fff9e6] rounded-2 p-3">
-						<text class="text-3 text-[#ed6a0c] font-bold">特殊要求</text>
-						<text class="text-3.5 text-[#646a73] mt-1">{{ taskInfo.specialRequirement }}</text>
+					<view v-if="taskInfo.specialRequirement" class="bg-[#fff9e6] rounded-[16rpx] p-[24rpx]">
+						<text class="text-[24rpx] text-[#ed6a0c] font-bold block">特殊要求</text>
+						<text class="text-[28rpx] text-[#646a73] mt-[8rpx] block leading-relaxed">{{ taskInfo.specialRequirement }}</text>
 					</view>
 				</view>
 
 				<!-- 上传图片 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">上传图片 <text class="text-[#ff3b30]">*</text></text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx]">
+					<view class="flex flex-row items-center mb-[24rpx]">
+						<text class="text-[32rpx] font-bold text-[#1f2329]">上传图片</text>
+						<text class="text-[32rpx] text-[#ff3b30] ml-[8rpx]">*</text>
+					</view>
 					
-					<view class="flex flex-wrap">
+					<view class="flex flex-row flex-wrap gap-[16rpx]">
 						<view 
 							v-for="(img, index) in uploadedImages" 
 							:key="index"
-							class="w-24 h-24 rounded-2 mr-2 mb-2 overflow-hidden relative"
+							class="w-[192rpx] h-[192rpx] rounded-[16rpx] overflow-hidden relative"
 						>
 							<image :src="img" class="w-full h-full" mode="aspectFill" />
 							<view 
 								@click="removeImage(index)"
-								class="absolute top-1 right-1 w-6 h-6 bg-black/50 rounded-full flex items-center justify-center"
+								class="absolute top-[8rpx] right-[8rpx] w-[40rpx] h-[40rpx] bg-black/50 rounded-full flex items-center justify-center"
 							>
-								<text class="text-3 text-white">×</text>
+								<text class="text-[24rpx] text-white">×</text>
 							</view>
 						</view>
 						
 						<view 
 							v-if="uploadedImages.length < 9"
 							@click="chooseImage"
-							class="w-24 h-24 border-2 border-dashed border-[#e5e5e5] rounded-2 flex flex-col items-center justify-center bg-[#fafafa]"
+							class="w-[192rpx] h-[192rpx] border-[2rpx] border-dashed border-[#e5e5e5] rounded-[16rpx] flex flex-col items-center justify-center bg-[#fafafa]"
 						>
-							<text class="text-8 text-[#c8c9cc]">+</text>
-							<text class="text-3 text-[#c8c9cc] mt-1">{{ uploadedImages.length }}/9</text>
+							<text class="text-[48rpx] text-[#c8c9cc]">+</text>
+							<text class="text-[24rpx] text-[#c8c9cc] mt-[8rpx]">{{ uploadedImages.length }}/9</text>
 						</view>
 					</view>
 
-					<text class="text-3 text-[#999] mt-2">• 最多上传9张图片</text>
-					<text class="text-3 text-[#999] mt-1">• 请确保图片清晰可见</text>
+					<view class="mt-[16rpx] flex flex-col gap-[8rpx]">
+						<text class="text-[24rpx] text-[#999999]">• 最多上传9张图片</text>
+						<text class="text-[24rpx] text-[#999999]">• 请确保图片清晰可见</text>
+					</view>
 				</view>
 
 				<!-- 文字说明 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">文字说明</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">文字说明</text>
 					
 					<textarea 
 						v-model="proofNote"
-						class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+						class="w-full border-[2rpx] border-[#e5e5e5] rounded-[16rpx] p-[24rpx] text-[30rpx] h-[200rpx]"
 						placeholder="请补充说明任务完成情况（选填）"
 						placeholder-class="text-[#c8c9cc]"
 						:maxlength="200"
 						:show-confirm-bar="false"
-						style="height: 100px;"
 					/>
-					<text class="text-3 text-[#999] mt-1">{{ proofNote.length }}/200</text>
+					<text class="text-[24rpx] text-[#999999] mt-[8rpx] text-right block">{{ proofNote.length }}/200</text>
 				</view>
 
 				<!-- 温馨提示 -->
-				<view class="bg-[#fff9e6] rounded-2 p-4 mb-3">
-					<text class="text-3.5 text-[#ed6a0c] font-bold mb-2">💡 温馨提示</text>
-					<text class="text-3.5 text-[#646a73] mt-2">• 请按要求上传真实有效的凭证</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 上传虚假凭证将被封号处理</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 提交后等待商户确认</text>
-					<text class="text-3.5 text-[#646a73] mt-1">• 确认通过后佣金自动到账</text>
+				<view class="bg-[#fff9e6] rounded-[24rpx] p-[32rpx]">
+					<text class="text-[28rpx] text-[#ed6a0c] font-bold mb-[16rpx] block">温馨提示</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[26rpx] text-[#646a73]">• 请按要求上传真实有效的凭证</text>
+						<text class="text-[26rpx] text-[#646a73]">• 上传虚假凭证将被封号处理</text>
+						<text class="text-[26rpx] text-[#646a73]">• 提交后等待商户确认</text>
+						<text class="text-[26rpx] text-[#646a73]">• 确认通过后佣金自动到账</text>
+					</view>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- 底部操作按钮 -->
-		<view class="bg-white px-4 py-3 border-t border-[#e5e5e5]">
+		<view class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e5e5] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
 			<button 
 				@click="submitProof"
-				:class="['w-full rounded-full py-3', canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999]']"
+				class="w-full rounded-full h-[88rpx] flex items-center justify-center"
+				:class="[canSubmit ? 'bg-[#07c160] text-white' : 'bg-[#e5e5e5] text-[#999999]']"
 				:disabled="!canSubmit"
 			>
-				<text class="text-4">提交凭证</text>
+				<text class="text-[32rpx] font-bold">提交凭证</text>
 			</button>
 		</view>
 	</view>
 </template>
 
-<script setup lang="uts">
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getSubTaskDetail, uploadProof } from '@/services/task'
 
@@ -231,23 +233,6 @@ const submitProof = async () => {
 	}
 }
 
-// 返回
-const goBack = () => {
-	if (uploadedImages.value.length > 0 || proofNote.value) {
-		uni.showModal({
-			title: '提示',
-			content: '确定要放弃当前编辑的内容吗？',
-			success: (res) => {
-				if (res.confirm) {
-					uni.navigateBack()
-				}
-			}
-		})
-	} else {
-		uni.navigateBack()
-	}
-}
-
 // 页面加载时获取任务信息
 onMounted(() => {
 	// 获取子任务ID
@@ -261,3 +246,6 @@ onMounted(() => {
 	}
 })
 </script>
+
+<style>
+</style>

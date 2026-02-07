@@ -1,39 +1,34 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">团队成员</text>
-			</view>
-		</view>
+		<cl-topbar title="团队成员" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- 统计卡片 -->
-				<view class="card stat-card">
-					<view class="stat-item">
-						<text class="stat-value">{{ total }}</text>
-						<text class="stat-label">直推人数</text>
+				<view class="bg-white rounded-[24rpx] p-[48rpx] flex flex-col items-center justify-center">
+					<view class="flex flex-col items-center gap-[16rpx]">
+						<text class="text-[64rpx] font-bold text-[#0052d9]">{{ total }}</text>
+						<text class="text-[28rpx] text-[#646a73]">直推人数</text>
 					</view>
 				</view>
 
 				<!-- 成员列表 -->
-				<view class="member-list">
-					<view v-for="(item, index) in list" :key="index" class="card member-item">
-						<view class="item-avatar-wrapper">
-							<image class="item-avatar" :src="item.avatar || '/static/logo.png'" mode="aspectFill" />
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
+						<view class="w-[96rpx] h-[96rpx] rounded-[48rpx] bg-[#f5f5f5] overflow-hidden">
+							<image class="w-full h-full" :src="item.avatar || '/static/logo.png'" mode="aspectFill" />
 						</view>
-						<view class="item-info">
-							<text class="item-name">{{ item.nickname || '未命名' }}</text>
-							<text class="item-code">邀请码：{{ item.invite_code }}</text>
-							<text class="item-time">加入时间：{{ formatTime(item.createtime) }}</text>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ item.nickname || '未命名' }}</text>
+							<text class="text-[24rpx] text-[#646a73]">邀请码：{{ item.invite_code }}</text>
+							<text class="text-[24rpx] text-[#999999]">加入时间：{{ formatTime(item.createtime) }}</text>
 						</view>
 					</view>
 					
 					<!-- 空状态 -->
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无团队成员</text>
+					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx]">
+						<text class="text-[28rpx] text-[#999999]">暂无团队成员</text>
 					</view>
 				</view>
 			</view>
@@ -69,9 +64,6 @@
 			this.loadMore();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
@@ -105,149 +97,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx; /* 16px */
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-	display: flex;
-	flex-direction: column;
-}
-
-/* Stat Card */
-.stat-card {
-	align-items: center;
-	justify-content: center;
-	padding: 48rpx 32rpx;
-}
-
-.stat-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.stat-value {
-	font-size: 64rpx;
-	font-weight: 700;
-	color: #0052d9;
-}
-
-.stat-label {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-/* Member List */
-.member-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx; /* 12px */
-}
-
-.member-item {
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.item-avatar-wrapper {
-	width: 96rpx;
-	height: 96rpx;
-	border-radius: 48rpx;
-	background-color: #f5f5f5;
-	overflow: hidden;
-}
-
-.item-avatar {
-	width: 100%;
-	height: 100%;
-}
-
-.item-info {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.item-name {
-	font-size: 30rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.item-code {
-	font-size: 24rpx;
-	color: #646a73;
-}
-
-.item-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>

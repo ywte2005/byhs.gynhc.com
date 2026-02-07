@@ -1,115 +1,108 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col bg-white h-screen">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">注册</text>
-			</view>
-		</view>
+		<cl-topbar title="注册" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
-				<view class="form-section">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[48rpx_32rpx]">
+				<view class="flex flex-col gap-[32rpx]">
 					<!-- Phone -->
-					<view class="input-group">
-						<text class="label">手机号</text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">手机号</text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input
 								v-model="form.mobile"
 								type="number"
 								placeholder="请输入手机号"
-								class="input"
-								placeholder-class="input-placeholder"
+								class="flex-1 text-[30rpx] text-[#1f2329] h-full"
+								placeholder-class="text-[#c0c4cc]"
 								maxlength="11"
 							/>
 						</view>
 					</view>
 
 					<!-- Code -->
-					<view class="input-group">
-						<text class="label">验证码</text>
-						<view class="input-wrapper code-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">验证码</text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx] pr-0">
 							<input
 								v-model="form.code"
 								type="number"
 								placeholder="请输入验证码"
-								class="input"
-								placeholder-class="input-placeholder"
+								class="flex-1 text-[30rpx] text-[#1f2329] h-full"
+								placeholder-class="text-[#c0c4cc]"
 								maxlength="6"
 							/>
 							<view 
-								class="code-btn" 
-								:class="{ disabled: countdown > 0 || form.mobile.length !== 11 }"
+								class="h-full px-[32rpx] flex items-center justify-center border-l-[2rpx] border-[#e5e6eb]" 
+								:class="{ 'opacity-50': countdown > 0 || form.mobile.length !== 11 }"
 								@tap="sendCode"
 							>
-								<text class="code-btn-text">{{ countdown > 0 ? `${countdown}s` : "获取验证码" }}</text>
+								<text class="text-[28rpx] text-[#0052d9]">{{ countdown > 0 ? `${countdown}s` : "获取验证码" }}</text>
 							</view>
 						</view>
 					</view>
 
 					<!-- Password -->
-					<view class="input-group">
-						<text class="label">设置密码</text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">设置密码</text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input
 								v-model="form.password"
 								:type="showPassword ? 'text' : 'password'"
 								placeholder="请设置6-20位密码"
-								class="input"
-								placeholder-class="input-placeholder"
+								class="flex-1 text-[30rpx] text-[#1f2329] h-full"
+								placeholder-class="text-[#c0c4cc]"
 							/>
-							<view class="eye-icon" @tap="showPassword = !showPassword">
-								<text>{{ showPassword ? '👁️' : '🔒' }}</text>
+							<view class="px-[16rpx]" @tap="showPassword = !showPassword">
+								<uni-icons :type="showPassword ? 'eye-filled' : 'eye-slash-filled'" size="20" color="#c0c4cc"></uni-icons>
 							</view>
 						</view>
 					</view>
 
 					<!-- Confirm Password -->
-					<view class="input-group">
-						<text class="label">确认密码</text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">确认密码</text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input
 								v-model="form.confirm_password"
 								:type="showConfirmPassword ? 'text' : 'password'"
 								placeholder="请再次输入密码"
-								class="input"
-								placeholder-class="input-placeholder"
+								class="flex-1 text-[30rpx] text-[#1f2329] h-full"
+								placeholder-class="text-[#c0c4cc]"
 							/>
-							<view class="eye-icon" @tap="showConfirmPassword = !showConfirmPassword">
-								<text>{{ showConfirmPassword ? '👁️' : '🔒' }}</text>
+							<view class="px-[16rpx]" @tap="showConfirmPassword = !showConfirmPassword">
+								<uni-icons :type="showConfirmPassword ? 'eye-filled' : 'eye-slash-filled'" size="20" color="#c0c4cc"></uni-icons>
 							</view>
 						</view>
 					</view>
 
 					<!-- Invite Code -->
-					<view class="input-group">
-						<text class="label">邀请码（选填）</text>
-						<view class="input-wrapper">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] font-medium text-[#1f2329]">邀请码（选填）</text>
+						<view class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-row items-center px-[24rpx]">
 							<input
 								v-model="form.invite_code"
 								placeholder="请输入邀请码"
-								class="input"
-								placeholder-class="input-placeholder"
+								class="flex-1 text-[30rpx] text-[#1f2329] h-full"
+								placeholder-class="text-[#c0c4cc]"
 							/>
 						</view>
 					</view>
 
 					<!-- Agreement -->
-					<view class="agreement" @tap="form.agree = !form.agree">
-						<view class="checkbox" :class="{ active: form.agree }">
-							<view v-if="form.agree" class="checkbox-inner"></view>
-						</view>
-						<text class="agreement-text">我已阅读并同意《用户协议》和《隐私政策》</text>
+					<view class="flex flex-row items-center gap-[16rpx] mt-[16rpx]" @tap="form.agree = !form.agree">
+						<uni-icons :type="form.agree ? 'checkbox-filled' : 'circle'" size="20" :color="form.agree ? '#0052d9' : '#c0c4cc'"></uni-icons>
+						<text class="text-[24rpx] text-[#86909c]">我已阅读并同意《用户协议》和《隐私政策》</text>
 					</view>
 
 					<!-- Register Button -->
 					<view 
-						class="btn-primary" 
-						:class="{ disabled: !canRegister }"
+						class="h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center mt-[32rpx]" 
+						:class="{ 'bg-[#bbd3fb]': !canRegister }"
 						@tap="handleRegister"
 					>
-						<text class="btn-text">注册</text>
+						<text class="text-[32rpx] text-white font-medium">注册</text>
 					</view>
 				</view>
 			</view>
@@ -194,7 +187,7 @@ async function handleRegister() {
 
 		const res = await register(form.value);
 
-		保存token
+		// 保存token
 		const { user } = useStore();
 		user.setToken(res.token);
 
@@ -218,177 +211,7 @@ async function handleRegister() {
 		loading.value = false;
 	}
 }
-
-function goBack() {
-	uni.navigateBack();
-}
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #ffffff;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx 48rpx;
-}
-
-.form-section {
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx;
-}
-
-.input-group {
-	display: flex;
-	flex-direction: column;
-	gap: 16rpx;
-}
-
-.label {
-	font-size: 28rpx;
-	font-weight: 500;
-	color: #1f2329;
-}
-
-.input-wrapper {
-	height: 96rpx;
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	padding: 0 24rpx;
-}
-
-.code-wrapper {
-	padding-right: 0;
-}
-
-.input {
-	flex: 1;
-	font-size: 30rpx;
-	color: #1f2329;
-	height: 100%;
-}
-
-.input-placeholder {
-	color: #c0c4cc;
-}
-
-.code-btn {
-	height: 100%;
-	padding: 0 32rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-left: 2rpx solid #e5e6eb;
-}
-
-.code-btn.disabled {
-	opacity: 0.5;
-}
-
-.code-btn-text {
-	font-size: 28rpx;
-	color: #0052d9;
-}
-
-.eye-icon {
-	padding: 0 16rpx;
-}
-
-/* Agreement */
-.agreement {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 16rpx;
-	margin-top: 16rpx;
-}
-
-.checkbox {
-	width: 32rpx;
-	height: 32rpx;
-	border: 2rpx solid #c0c4cc;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.checkbox.active {
-	border-color: #0052d9;
-	background-color: #0052d9;
-}
-
-.checkbox-inner {
-	width: 12rpx;
-	height: 24rpx;
-	border-bottom: 4rpx solid #ffffff;
-	border-right: 4rpx solid #ffffff;
-	transform: rotate(45deg) translate(-2rpx, -2rpx);
-}
-
-.agreement-text {
-	font-size: 24rpx;
-	color: #86909c;
-}
-
-/* Buttons */
-.btn-primary {
-	height: 96rpx;
-	background-color: #0052d9;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-top: 32rpx;
-}
-
-.btn-primary.disabled {
-	background-color: #bbd3fb;
-}
-
-.btn-text {
-	font-size: 32rpx;
-	color: #ffffff;
-	font-weight: 500;
-}
 </style>

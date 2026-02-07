@@ -1,34 +1,32 @@
 <template>
-	<view class="flex flex-col h-full bg-[#f5f5f5]">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<view class="flex items-center justify-between px-4 py-3 bg-white">
-			<view class="flex items-center" @click="goBack">
-				<text class="text-6">←</text>
-				<text class="text-4 ml-2">商户信息</text>
-			</view>
-			<view @click="toggleEdit">
-				<text class="text-4 text-[#0052d9]">{{ isEditing ? '保存' : '编辑' }}</text>
-			</view>
-		</view>
+		<cl-topbar title="商户信息" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
+			<template #append>
+				<view @click="toggleEdit" class="flex items-center px-[32rpx] h-full">
+					<text class="text-[28rpx] text-[#0052d9]">{{ isEditing ? '保存' : '编辑' }}</text>
+				</view>
+			</template>
+		</cl-topbar>
 
 		<!-- 内容区域 -->
-		<scroll-view class="flex-1" scroll-y>
-			<view class="px-4 py-4">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- 商户头像 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
 					<view class="flex items-center">
-						<view class="w-20 h-20 rounded-full bg-[#f5f5f5] flex items-center justify-center mr-4">
-							<text class="text-10">🏪</text>
+						<view class="w-[160rpx] h-[160rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center mr-[32rpx]">
+							<text class="text-[80rpx]">🏪</text>
 						</view>
 						<view class="flex-1">
-							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
-							<text class="text-3.5 text-[#999] mt-1">商户编号：{{ merchantInfo.merchantNo }}</text>
-							<view class="flex items-center mt-2">
-								<view class="bg-[#0052d9] rounded px-2 py-0.5 mr-2">
-									<text class="text-3 text-white">{{ merchantInfo.level }}</text>
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
+							<text class="text-[28rpx] text-[#999999] mt-[8rpx]">商户编号：{{ merchantInfo.merchantNo }}</text>
+							<view class="flex flex-row items-center mt-[16rpx]">
+								<view class="bg-[#0052d9] rounded-[8rpx] px-[16rpx] py-[4rpx] mr-[16rpx]">
+									<text class="text-[24rpx] text-white">{{ merchantInfo.level }}</text>
 								</view>
-								<view class="bg-[#ff9500] rounded px-2 py-0.5">
-									<text class="text-3 text-white">信用分：{{ merchantInfo.credit }}</text>
+								<view class="bg-[#ff9500] rounded-[8rpx] px-[16rpx] py-[4rpx]">
+									<text class="text-[24rpx] text-white">信用分：{{ merchantInfo.credit }}</text>
 								</view>
 							</view>
 						</view>
@@ -36,187 +34,187 @@
 				</view>
 
 				<!-- 基本信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">基本信息</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">基本信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">商户类型</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.type === 'personal' ? '个人商户' : '企业商户' }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">商户类型</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.type === 'personal' ? '个人商户' : '企业商户' }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">商户名称</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">商户名称</text>
 						<input 
 							v-if="isEditing"
 							v-model="merchantInfo.name"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="h-[80rpx] border-[2rpx] border-[#e5e5e5] rounded-[12rpx] px-[24rpx] text-[30rpx] text-[#1f2329]"
 							placeholder="请输入商户名称"
 						/>
-						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.name }}</text>
+						<text v-else class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.name }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">联系人</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">联系人</text>
 						<input 
 							v-if="isEditing"
 							v-model="merchantInfo.contact"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="h-[80rpx] border-[2rpx] border-[#e5e5e5] rounded-[12rpx] px-[24rpx] text-[30rpx] text-[#1f2329]"
 							placeholder="请输入联系人"
 						/>
-						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.contact }}</text>
+						<text v-else class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.contact }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">联系电话</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">联系电话</text>
 						<input 
 							v-if="isEditing"
 							v-model="merchantInfo.phone"
 							type="number"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="h-[80rpx] border-[2rpx] border-[#e5e5e5] rounded-[12rpx] px-[24rpx] text-[30rpx] text-[#1f2329]"
 							placeholder="请输入联系电话"
 						/>
-						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.phone }}</text>
+						<text v-else class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.phone }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">经营地址</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">经营地址</text>
 						<input 
 							v-if="isEditing"
 							v-model="merchantInfo.address"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="h-[80rpx] border-[2rpx] border-[#e5e5e5] rounded-[12rpx] px-[24rpx] text-[30rpx] text-[#1f2329]"
 							placeholder="请输入经营地址"
 						/>
-						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.address }}</text>
+						<text v-else class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.address }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">经营类目</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">经营类目</text>
 						<input 
 							v-if="isEditing"
 							v-model="merchantInfo.category"
-							class="border border-[#e5e5e5] rounded-2 px-3 py-2.5 text-4"
+							class="h-[80rpx] border-[2rpx] border-[#e5e5e5] rounded-[12rpx] px-[24rpx] text-[30rpx] text-[#1f2329]"
 							placeholder="请输入经营类目"
 						/>
-						<text v-else class="text-4 text-[#1f2329]">{{ merchantInfo.category }}</text>
+						<text v-else class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.category }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">入驻时间</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.joinTime }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">入驻时间</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.joinTime }}</text>
 					</view>
 				</view>
 
 				<!-- 企业信息（仅企业商户） -->
-				<view v-if="merchantInfo.type === 'enterprise'" class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">企业信息</text>
+				<view v-if="merchantInfo.type === 'enterprise'" class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">企业信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">统一社会信用代码</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.creditCode }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">统一社会信用代码</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.creditCode }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">法人姓名</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.legalPerson }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">法人姓名</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.legalPerson }}</text>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">法人身份证号</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.legalIdCard }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">法人身份证号</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.legalIdCard }}</text>
 					</view>
 				</view>
 
 				<!-- 认证信息 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">认证信息</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">认证信息</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">实名认证</text>
-						<view class="flex items-center">
-							<text class="text-4 text-[#0052d9] mr-2">✓ 已认证</text>
-							<text class="text-3.5 text-[#999]">{{ merchantInfo.realName }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">实名认证</text>
+						<view class="flex flex-row items-center">
+							<text class="text-[30rpx] text-[#0052d9] mr-[16rpx]">✓ 已认证</text>
+							<text class="text-[28rpx] text-[#999999]">{{ merchantInfo.realName }}</text>
 						</view>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">身份证号</text>
-						<text class="text-4 text-[#1f2329]">{{ merchantInfo.idCard }}</text>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[28rpx] text-[#999999]">身份证号</text>
+						<text class="text-[30rpx] text-[#1f2329]">{{ merchantInfo.idCard }}</text>
 					</view>
 				</view>
 
 				<!-- 证件照片 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">证件照片</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">证件照片</text>
 					
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">身份证正面</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">身份证正面</text>
 						<image 
 							:src="merchantInfo.idCardFront || '/static/images/placeholder.png'" 
-							class="w-full h-40 rounded-2 mt-2"
+							class="w-full h-[320rpx] rounded-[16rpx] bg-[#f5f5f5]"
 							mode="aspectFit"
 						/>
 					</view>
 
-					<view class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">身份证反面</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">身份证反面</text>
 						<image 
 							:src="merchantInfo.idCardBack || '/static/images/placeholder.png'" 
-							class="w-full h-40 rounded-2 mt-2"
+							class="w-full h-[320rpx] rounded-[16rpx] bg-[#f5f5f5]"
 							mode="aspectFit"
 						/>
 					</view>
 
-					<view v-if="merchantInfo.type === 'enterprise'" class="mb-4">
-						<text class="text-3.5 text-[#999] mb-2">营业执照</text>
+					<view v-if="merchantInfo.type === 'enterprise'" class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">营业执照</text>
 						<image 
 							:src="merchantInfo.businessLicense || '/static/images/placeholder.png'" 
-							class="w-full h-40 rounded-2 mt-2"
+							class="w-full h-[320rpx] rounded-[16rpx] bg-[#f5f5f5]"
 							mode="aspectFit"
 						/>
 					</view>
 				</view>
 
 				<!-- 账户统计 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
-					<text class="text-4 font-bold text-[#1f2329] mb-3">账户统计</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">账户统计</text>
 					
-					<view class="flex items-center justify-between mb-3">
-						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.totalOrders }}</text>
-							<text class="text-3.5 text-[#999] mt-1">总订单数</text>
+					<view class="flex items-center justify-between">
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.totalOrders }}</text>
+							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">总订单数</text>
 						</view>
-						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
-						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.completedOrders }}</text>
-							<text class="text-3.5 text-[#999] mt-1">完成订单</text>
+						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.completedOrders }}</text>
+							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">完成订单</text>
 						</view>
-						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
-						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#1f2329]">{{ merchantInfo.completionRate }}%</text>
-							<text class="text-3.5 text-[#999] mt-1">完成率</text>
+						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.completionRate }}%</text>
+							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">完成率</text>
 						</view>
 					</view>
 
-					<view class="flex items-center justify-between">
-						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#0052d9]">¥{{ merchantInfo.totalIncome }}</text>
-							<text class="text-3.5 text-[#999] mt-1">累计收入</text>
+					<view class="flex items-center justify-between border-t-[2rpx] border-[#e5e5e5] pt-[32rpx]">
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[40rpx] font-bold text-[#0052d9]">¥{{ merchantInfo.totalIncome }}</text>
+							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">累计收入</text>
 						</view>
-						<view class="w-0.5 h-10 bg-[#e5e5e5]"></view>
-						<view class="flex-1 text-center">
-							<text class="text-5 font-bold text-[#ff9500]">¥{{ merchantInfo.totalCommission }}</text>
-							<text class="text-3.5 text-[#999] mt-1">累计佣金</text>
+						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[40rpx] font-bold text-[#ff9500]">¥{{ merchantInfo.totalCommission }}</text>
+							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">累计佣金</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- 操作按钮 -->
-				<view class="bg-white rounded-2 p-4 mb-3">
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[64rpx]">
 					<button 
 						@click="logout"
-						class="w-full bg-white border border-[#ff3b30] text-[#ff3b30] rounded-full py-3"
+						class="w-full h-[88rpx] bg-white border-[2rpx] border-[#ff3b30] rounded-full flex items-center justify-center"
 					>
-						<text class="text-4">退出登录</text>
+						<text class="text-[32rpx] text-[#ff3b30]">退出登录</text>
 					</button>
 				</view>
 			</view>
@@ -338,17 +336,6 @@ const logout = () => {
 			}
 		}
 	})
-}
-
-// 返回
-const goBack = () => {
-	if (isEditing.value) {
-		// 如果在编辑模式，恢复原始数据
-		merchantInfo.value = JSON.parse(JSON.stringify(originalInfo.value))
-		isEditing.value = false
-	} else {
-		uni.navigateBack()
-	}
 }
 
 // 页面加载时获取商户信息

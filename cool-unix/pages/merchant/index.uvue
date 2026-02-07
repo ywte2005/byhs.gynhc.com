@@ -1,43 +1,38 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">商户中心</text>
-			</view>
-		</view>
+		<cl-topbar title="商户中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- Merchant Info -->
-		<view class="mch-info-card">
-			<view class="mch-avatar-wrapper">
-				<text class="mch-avatar-text">...</text>
+		<view class="bg-white p-[32rpx] flex flex-row items-center gap-[24rpx] m-[32rpx] rounded-[24rpx]">
+			<view class="w-[112rpx] h-[112rpx] bg-[#0052d9] rounded-[56rpx] flex items-center justify-center">
+				<text class="text-white text-[40rpx]">...</text>
 			</view>
-			<view class="mch-detail">
-				<text class="mch-name">{{ merchantInfo.name }}</text>
-				<text class="mch-id">商户编号: {{ merchantInfo.merchantNo }}</text>
+			<view class="flex flex-col gap-[8rpx]">
+				<text class="text-[36rpx] font-semibold text-[#1f2329]">{{ merchantInfo.name }}</text>
+				<text class="text-[24rpx] text-[#86909c]">商户编号: {{ merchantInfo.merchantNo }}</text>
 			</view>
 		</view>
 
 		<!-- Menu List -->
-		<view class="menu-list">
-			<view class="menu-item" @click="handleAction('info')">
-				<text class="menu-text">商户信息</text>
+		<view class="bg-white mx-[32rpx] rounded-[24rpx] px-[32rpx] flex flex-col">
+			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('info')">
+				<text class="text-[30rpx] text-[#1f2329]">商户信息</text>
 				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 			</view>
-			<view class="menu-divider"></view>
-			<view class="menu-item" @click="handleAction('audit')">
-				<text class="menu-text">审核状态</text>
+			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
+			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('audit')">
+				<text class="text-[30rpx] text-[#1f2329]">审核状态</text>
 				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 			</view>
-			<view class="menu-divider"></view>
-			<view class="menu-item" @click="handleAction('wallet')">
-				<text class="menu-text">我的钱包</text>
+			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
+			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('wallet')">
+				<text class="text-[30rpx] text-[#1f2329]">我的钱包</text>
 				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 			</view>
-			<view class="menu-divider"></view>
-			<view class="menu-item" @click="handleAction('tasks')">
-				<text class="menu-text">任务管理</text>
+			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
+			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('tasks')">
+				<text class="text-[30rpx] text-[#1f2329]">任务管理</text>
 				<uni-icons type="right" size="14" color="#c0c4cc"></uni-icons>
 			</view>
 		</view>
@@ -74,11 +69,6 @@ const handleAction = (action: string) => {
 	}
 }
 
-// 返回
-const goBack = () => {
-	uni.navigateBack()
-}
-
 // 页面加载
 onMounted(() => {
 	loadMerchantInfo()
@@ -86,114 +76,4 @@ onMounted(() => {
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	min-height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Info Card */
-.mch-info-card {
-	background-color: #ffffff;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-	margin: 32rpx 32rpx 0 32rpx;
-	border-radius: 24rpx; /* 12px */
-}
-
-.mch-avatar-wrapper {
-	width: 112rpx; /* 56px */
-	height: 112rpx; /* 56px */
-	background-color: #0052d9;
-	border-radius: 56rpx; /* 28px */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.mch-avatar-text {
-	color: #ffffff;
-	font-size: 40rpx;
-}
-
-.mch-detail {
-	display: flex;
-	flex-direction: column;
-	gap: 8rpx;
-}
-
-.mch-name {
-	font-size: 36rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.mch-id {
-	font-size: 24rpx;
-	color: #86909c;
-}
-
-/* Menu List */
-.menu-list {
-	background-color: #ffffff;
-	margin: 24rpx 32rpx;
-	border-radius: 24rpx; /* 12px */
-	padding: 16rpx 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-.menu-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 112rpx; /* 56px approx for touch target */
-	padding: 16rpx 0;
-}
-
-.menu-text {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-
-
-.menu-divider {
-	height: 2rpx;
-	background-color: #f0f0f0;
-	width: 100%;
-}
 </style>

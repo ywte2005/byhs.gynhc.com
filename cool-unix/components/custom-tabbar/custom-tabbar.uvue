@@ -1,0 +1,84 @@
+<template>
+	<view class="tabbar-placeholder"></view>
+	<view class="tabbar">
+		<view class="tab-item" :class="{ active: currentPath === 'pages/index/home' }" @tap="switchTab('/pages/index/home')">
+			<uni-icons :type="currentPath === 'pages/index/home' ? 'home-filled' : 'home'" size="24" :color="currentPath === 'pages/index/home' ? '#0052d9' : '#646a73'"></uni-icons>
+			<text class="tab-label">首页</text>
+		</view>
+		<view class="tab-item" :class="{ active: currentPath === 'pages/task/index' }" @tap="switchTab('/pages/task/index')">
+			<uni-icons :type="currentPath === 'pages/task/index' ? 'list' : 'list'" size="24" :color="currentPath === 'pages/task/index' ? '#0052d9' : '#646a73'"></uni-icons>
+			<text class="tab-label">任务</text>
+		</view>
+		<view class="tab-item" :class="{ active: currentPath === 'pages/wallet/index' }" @tap="switchTab('/pages/wallet/index')">
+			<uni-icons :type="currentPath === 'pages/wallet/index' ? 'wallet-filled' : 'wallet'" size="24" :color="currentPath === 'pages/wallet/index' ? '#0052d9' : '#646a73'"></uni-icons>
+			<text class="tab-label">资金</text>
+		</view>
+		<view class="tab-item" :class="{ active: currentPath === 'pages/promo/index' }" @tap="switchTab('/pages/promo/index')">
+			<uni-icons :type="currentPath === 'pages/promo/index' ? 'gift-filled' : 'gift'" size="24" :color="currentPath === 'pages/promo/index' ? '#0052d9' : '#646a73'"></uni-icons>
+			<text class="tab-label">推广</text>
+		</view>
+		<view class="tab-item" :class="{ active: currentPath === 'pages/index/my' }" @tap="switchTab('/pages/index/my')">
+			<uni-icons :type="currentPath === 'pages/index/my' ? 'person-filled' : 'person'" size="24" :color="currentPath === 'pages/index/my' ? '#0052d9' : '#646a73'"></uni-icons>
+			<text class="tab-label">我的</text>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from 'vue';
+
+const currentPath = ref('');
+
+onMounted(() => {
+	const pages = getCurrentPages();
+	const page = pages[pages.length - 1];
+	currentPath.value = page.route;
+	uni.hideTabBar();
+});
+
+function switchTab(path: string) {
+	uni.switchTab({
+		url: path
+	});
+}
+</script>
+
+<style scoped>
+.tabbar-placeholder {
+	height: 112rpx;
+	padding-bottom: env(safe-area-inset-bottom);
+}
+
+.tabbar {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 112rpx;
+	background-color: #ffffff;
+	border-top: 1px solid #e5e6eb;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	padding-bottom: env(safe-area-inset-bottom);
+	z-index: 999;
+}
+
+.tab-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+}
+
+.tab-label {
+	font-size: 20rpx;
+	color: #646a73;
+	margin-top: 4rpx;
+}
+
+.tab-item.active .tab-label {
+	color: #0052d9;
+}
+</style>

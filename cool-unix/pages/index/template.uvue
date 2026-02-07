@@ -1,59 +1,57 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<text class="header-title">功能模板</text>
-		</view>
+		<cl-topbar title="功能模板" :show-back="false" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] pb-[120rpx] flex flex-col gap-[24rpx]">
 				<!-- Shop Module -->
-				<view class="card menu-card">
-					<view class="card-header">
-						<text class="card-title">商城模板</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<view class="mb-[32rpx]">
+						<text class="text-[32rpx] font-semibold text-[#1f2329] border-l-[8rpx] border-[#0052d9] pl-[16rpx]">商城模板</text>
 					</view>
-					<view class="menu-grid">
-						<view class="menu-item" @tap="router.to('/pages/template/shop/goods-category')">
-							<view class="icon-box blue">
-								<text class="menu-icon">🛍️</text>
+					<view class="flex flex-row flex-wrap gap-[32rpx]">
+						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/goods-category')">
+							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#e8f3ff]">
+								<text class="text-[48rpx]">🛍️</text>
 							</view>
-							<text class="menu-label">商品分类</text>
+							<text class="text-[26rpx] text-[#646a73]">商品分类</text>
 						</view>
-						<view class="menu-item" @tap="router.to('/pages/template/shop/shopping-cart')">
-							<view class="icon-box orange">
-								<text class="menu-icon">🛒</text>
+						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/shopping-cart')">
+							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#fff7e6]">
+								<text class="text-[48rpx]">🛒</text>
 							</view>
-							<text class="menu-label">购物车</text>
+							<text class="text-[26rpx] text-[#646a73]">购物车</text>
 						</view>
-						<view class="menu-item" @tap="router.to('/pages/template/shop/address')">
-							<view class="icon-box green">
-								<text class="menu-icon">📍</text>
+						<view class="flex flex-col items-center gap-[16rpx] w-[140rpx]" @tap="router.to('/pages/template/shop/address')">
+							<view class="w-[96rpx] h-[96rpx] rounded-[32rpx] flex items-center justify-center bg-[#e8ffea]">
+								<text class="text-[48rpx]">📍</text>
 							</view>
-							<text class="menu-label">地址管理</text>
+							<text class="text-[26rpx] text-[#646a73]">地址管理</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- Other Modules -->
-				<view class="card menu-card">
-					<view class="card-header">
-						<text class="card-title">其他功能</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<view class="mb-[32rpx]">
+						<text class="text-[32rpx] font-semibold text-[#1f2329] border-l-[8rpx] border-[#0052d9] pl-[16rpx]">其他功能</text>
 					</view>
-					<view class="menu-list">
-						<view class="list-item" @tap="router.to('/pages/set/index')">
-							<view class="item-left">
-								<text class="item-icon">⚙️</text>
-								<text class="item-text">系统设置</text>
+					<view class="flex flex-col">
+						<view class="flex flex-row justify-between items-center h-[96rpx]" @tap="router.to('/pages/set/index')">
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<text class="text-[40rpx]">⚙️</text>
+								<text class="text-[30rpx] text-[#1f2329]">系统设置</text>
 							</view>
-							<text class="item-arrow">></text>
+							<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 						</view>
-						<view class="divider"></view>
-						<view class="list-item" @tap="router.to('/pages/user/feedback')">
-							<view class="item-left">
-								<text class="item-icon">📝</text>
-								<text class="item-text">意见反馈</text>
+						<view class="h-[2rpx] bg-[#f5f7fa]"></view>
+						<view class="flex flex-row justify-between items-center h-[96rpx]" @tap="router.to('/pages/user/feedback')">
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<text class="text-[40rpx]">📝</text>
+								<text class="text-[30rpx] text-[#1f2329]">意见反馈</text>
 							</view>
-							<text class="item-arrow">></text>
+							<text class="text-[30rpx] text-[#c0c4cc]">&gt;</text>
 						</view>
 					</view>
 				</view>
@@ -71,139 +69,4 @@ import CustomTabbar from "./components/tabbar.uvue";
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 88rpx;
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding-top: env(safe-area-inset-top);
-	border-bottom: 1rpx solid #f0f0f0;
-}
-
-.header-title {
-	font-size: 34rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	padding-bottom: 120rpx; /* Tabbar height */
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-.card-header {
-	margin-bottom: 32rpx;
-}
-
-.card-title {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-	border-left: 8rpx solid #0052d9;
-	padding-left: 16rpx;
-}
-
-/* Menu Grid */
-.menu-grid {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	gap: 32rpx;
-}
-
-.menu-item {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 16rpx;
-	width: 140rpx;
-}
-
-.icon-box {
-	width: 96rpx;
-	height: 96rpx;
-	border-radius: 32rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.icon-box.blue { background-color: #e8f3ff; }
-.icon-box.orange { background-color: #fff7e6; }
-.icon-box.green { background-color: #e8ffea; }
-
-.menu-icon {
-	font-size: 48rpx;
-}
-
-.menu-label {
-	font-size: 26rpx;
-	color: #646a73;
-}
-
-/* Menu List */
-.menu-list {
-	display: flex;
-	flex-direction: column;
-}
-
-.list-item {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	height: 96rpx;
-}
-
-.item-left {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 24rpx;
-}
-
-.item-icon {
-	font-size: 40rpx;
-}
-
-.item-text {
-	font-size: 30rpx;
-	color: #1f2329;
-}
-
-.item-arrow {
-	font-size: 30rpx;
-	color: #c0c4cc;
-}
-
-.divider {
-	height: 2rpx;
-	background-color: #f5f7fa;
-}
 </style>

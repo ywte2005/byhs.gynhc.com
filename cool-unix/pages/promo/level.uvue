@@ -1,55 +1,50 @@
 <template>
-	<view class="page-container">
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- Header -->
-		<view class="header">
-			<view class="header-left" @click="goBack">
-				<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-				<text class="header-title">等级中心</text>
-			</view>
-		</view>
+		<cl-topbar title="等级中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="content" scroll-y>
-			<view class="content-wrapper">
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<!-- 当前等级 -->
-				<view class="card current-card">
-					<view class="level-badge">
-						<text class="level-badge-text">当前等级</text>
+				<view class="bg-[#0052d9] items-center justify-center p-[48rpx_32rpx] gap-[16rpx] rounded-[24rpx] flex flex-col">
+					<view class="bg-white/20 px-[24rpx] py-[8rpx] rounded-[32rpx]">
+						<text class="text-white text-[24rpx]">当前等级</text>
 					</view>
-					<text class="current-level-name">{{ currentLevelName }}</text>
-					<text class="current-level-desc">享受更多权益，升级会员</text>
+					<text class="text-white text-[48rpx] font-bold">{{ currentLevelName }}</text>
+					<text class="text-white/80 text-[26rpx]">享受更多权益，升级会员</text>
 				</view>
 
 				<!-- 升级列表 -->
-				<view class="upgrade-list">
-					<view v-for="(item, index) in levels" :key="index" class="card level-item">
-						<view class="level-header">
-							<text class="level-name">{{ item.name }}</text>
-							<view v-if="canPurchase(item)" class="level-price-box">
-								<text class="price-symbol">¥</text>
-								<text class="price-value">{{ item.upgrade_price }}</text>
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in levels" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[32rpx] font-semibold text-[#1f2329]">{{ item.name }}</text>
+							<view v-if="canPurchase(item)" class="flex flex-row items-baseline">
+								<text class="text-[24rpx] text-[#ff9500] font-semibold">¥</text>
+								<text class="text-[36rpx] text-[#ff9500] font-bold">{{ item.upgrade_price }}</text>
 							</view>
 						</view>
 						
-						<view class="level-rights">
-							<view v-if="item.personal_performance_min != '0.00'" class="right-row">
-								<text class="right-dot">•</text>
-								<text class="right-text">个人业绩 ≥ {{ item.personal_performance_min }}</text>
+						<view class="flex flex-col gap-[12rpx] bg-[#f5f7fa] p-[24rpx] rounded-[16rpx]">
+							<view v-if="item.personal_performance_min != '0.00'" class="flex flex-row items-center gap-[12rpx]">
+								<text class="text-[24rpx] text-[#0052d9]">•</text>
+								<text class="text-[26rpx] text-[#646a73]">个人业绩 ≥ {{ item.personal_performance_min }}</text>
 							</view>
-							<view v-if="item.team_performance_min != '0.00'" class="right-row">
-								<text class="right-dot">•</text>
-								<text class="right-text">团队业绩 ≥ {{ item.team_performance_min }}</text>
+							<view v-if="item.team_performance_min != '0.00'" class="flex flex-row items-center gap-[12rpx]">
+								<text class="text-[24rpx] text-[#0052d9]">•</text>
+								<text class="text-[26rpx] text-[#646a73]">团队业绩 ≥ {{ item.team_performance_min }}</text>
 							</view>
-							<view v-if="item.direct_invite_min > 0" class="right-row">
-								<text class="right-dot">•</text>
-								<text class="right-text">直推人数 ≥ {{ item.direct_invite_min }}人</text>
+							<view v-if="item.direct_invite_min > 0" class="flex flex-row items-center gap-[12rpx]">
+								<text class="text-[24rpx] text-[#0052d9]">•</text>
+								<text class="text-[26rpx] text-[#646a73]">直推人数 ≥ {{ item.direct_invite_min }}人</text>
 							</view>
 						</view>
 
-						<view v-if="canPurchase(item)" class="btn-upgrade" @tap="purchaseLevel(item)">
-							<text class="btn-upgrade-text">立即升级</text>
+						<view v-if="canPurchase(item)" class="h-[88rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center" @tap="purchaseLevel(item)">
+							<text class="text-white text-[30rpx] font-medium">立即升级</text>
 						</view>
-						<view v-else-if="isCurrentLevel(item.id)" class="current-tag">
-							<text class="current-tag-text">当前等级</text>
+						<view v-else-if="isCurrentLevel(item.id)" class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] flex items-center justify-center">
+							<text class="text-[#9aa0a6] text-[28rpx]">当前等级</text>
 						</view>
 					</view>
 				</view>
@@ -86,9 +81,6 @@
 			this.loadData();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadData() {
 				this.loading = true;
 				// Mock data
@@ -160,190 +152,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx; /* 56px */
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	padding: 0 32rpx;
-	justify-content: center;
-	position: relative;
-}
-
-.header-left {
-	position: absolute;
-	left: 32rpx;
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx; /* 17px */
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 32rpx; /* 16px */
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx; /* 12px */
-	padding: 32rpx; /* 16px */
-	display: flex;
-	flex-direction: column;
-}
-
-/* Current Level Card */
-.current-card {
-	background-color: #0052d9;
-	align-items: center;
-	justify-content: center;
-	padding: 48rpx 32rpx;
-	gap: 16rpx;
-}
-
-.level-badge {
-	background-color: rgba(255, 255, 255, 0.2);
-	padding: 8rpx 24rpx;
-	border-radius: 32rpx;
-}
-
-.level-badge-text {
-	color: #ffffff;
-	font-size: 24rpx;
-}
-
-.current-level-name {
-	color: #ffffff;
-	font-size: 48rpx;
-	font-weight: 700;
-}
-
-.current-level-desc {
-	color: rgba(255, 255, 255, 0.8);
-	font-size: 26rpx;
-}
-
-/* Upgrade List */
-.upgrade-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.level-item {
-	gap: 24rpx;
-}
-
-.level-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.level-name {
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #1f2329;
-}
-
-.level-price-box {
-	display: flex;
-	flex-direction: row;
-	align-items: baseline;
-}
-
-.price-symbol {
-	font-size: 24rpx;
-	color: #ff9500;
-	font-weight: 600;
-}
-
-.price-value {
-	font-size: 36rpx;
-	color: #ff9500;
-	font-weight: 700;
-}
-
-.level-rights {
-	display: flex;
-	flex-direction: column;
-	gap: 12rpx;
-	background-color: #f5f7fa;
-	padding: 24rpx;
-	border-radius: 16rpx;
-}
-
-.right-row {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 12rpx;
-}
-
-.right-dot {
-	font-size: 24rpx;
-	color: #0052d9;
-}
-
-.right-text {
-	font-size: 26rpx;
-	color: #646a73;
-}
-
-.btn-upgrade {
-	height: 88rpx;
-	background-color: #0052d9;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-upgrade-text {
-	color: #ffffff;
-	font-size: 30rpx;
-	font-weight: 500;
-}
-
-.current-tag {
-	height: 88rpx;
-	background-color: #f5f7fa;
-	border-radius: 16rpx;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.current-tag-text {
-	color: #9aa0a6;
-	font-size: 28rpx;
-}
 </style>

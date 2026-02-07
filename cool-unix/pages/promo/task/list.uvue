@@ -1,72 +1,83 @@
 <template>
-	<cl-page>
-		<view class="page-container">
-			<!-- Header -->
-			<view class="header">
-				<view class="header-left" @click="goBack">
-					<uni-icons type="left" size="24" color="#1f2329"></uni-icons>
-					<text class="header-title">互助任务</text>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="互助任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
+			<template #append>
+				<view @click="goCreate" class="flex items-center px-[32rpx] h-full">
+					<text class="text-[28rpx] text-[#0052d9]">发起任务</text>
 				</view>
-				<view class="header-right" @click="goCreate">
-					<text class="header-action">发起任务</text>
+			</template>
+		</cl-topbar>
+
+		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<!-- Tabs -->
+				<view class="flex flex-row bg-white rounded-[16rpx] p-[8rpx] mb-[24rpx]">
+					<view class="flex-1 flex justify-center items-center py-[16rpx] rounded-[12rpx]" :class="{ 'bg-[#0052d9]': currentTab == '' }" @tap="switchTab('')">
+						<text class="text-[28rpx]" :class="currentTab == '' ? 'text-white font-medium' : 'text-[#646a73]'">全部</text>
+					</view>
+					<view class="flex-1 flex justify-center items-center py-[16rpx] rounded-[12rpx]" :class="{ 'bg-[#0052d9]': currentTab == 'pending' }" @tap="switchTab('pending')">
+						<text class="text-[28rpx]" :class="currentTab == 'pending' ? 'text-white font-medium' : 'text-[#646a73]'">待启动</text>
+					</view>
+					<view class="flex-1 flex justify-center items-center py-[16rpx] rounded-[12rpx]" :class="{ 'bg-[#0052d9]': currentTab == 'running' }" @tap="switchTab('running')">
+						<text class="text-[28rpx]" :class="currentTab == 'running' ? 'text-white font-medium' : 'text-[#646a73]'">进行中</text>
+					</view>
+					<view class="flex-1 flex justify-center items-center py-[16rpx] rounded-[12rpx]" :class="{ 'bg-[#0052d9]': currentTab == 'completed' }" @tap="switchTab('completed')">
+						<text class="text-[28rpx]" :class="currentTab == 'completed' ? 'text-white font-medium' : 'text-[#646a73]'">已完成</text>
+					</view>
+				</view>
+
+				<!-- Task List -->
+				<view class="flex flex-col gap-[24rpx]">
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]" @tap="goDetail(item.id)">
+						<view class="flex flex-row justify-between items-center pb-[24rpx] border-b-[2rpx] border-[#f5f7fa]">
+							<text class="text-[40rpx] font-bold text-[#1f2329]">¥{{ item.total_amount }}</text>
+							<view class="px-[16rpx] py-[4rpx] rounded-[8rpx]"
+								:class="{
+									'bg-[#fff7e6]': item.status === 'pending',
+									'bg-[#f0f9ff]': item.status === 'running',
+									'bg-[#e8fff3]': item.status === 'completed',
+									'bg-[#fff2f0]': item.status === 'paused',
+									'bg-[#f5f5f5]': item.status === 'cancelled'
+								}">
+								<text class="text-[24rpx]"
+									:class="{
+										'text-[#ff9500]': item.status === 'pending',
+										'text-[#0052d9]': item.status === 'running',
+										'text-[#00b578]': item.status === 'completed',
+										'text-[#ff3b30]': item.status === 'paused',
+										'text-[#999999]': item.status === 'cancelled'
+									}">{{ getStatusName(item.status) }}</text>
+							</view>
+						</view>
+						
+						<view class="flex flex-col gap-[12rpx]">
+							<view class="flex flex-row items-center">
+								<text class="text-[26rpx] text-[#999999] w-[140rpx]">保证金：</text>
+								<text class="text-[26rpx] text-[#1f2329]">¥{{ item.deposit_amount }}</text>
+							</view>
+							<view class="flex flex-row items-center">
+								<text class="text-[26rpx] text-[#999999] w-[140rpx]">已完成：</text>
+								<text class="text-[26rpx] text-[#1f2329]">¥{{ item.completed_amount }}</text>
+							</view>
+							<view class="flex flex-row items-center">
+								<text class="text-[26rpx] text-[#999999] w-[140rpx]">服务费：</text>
+								<text class="text-[26rpx] text-[#1f2329]">¥{{ item.service_fee }}</text>
+							</view>
+						</view>
+
+						<view class="flex flex-row justify-between items-center pt-[24rpx] border-t-[2rpx] border-[#f5f7fa]">
+							<text class="text-[24rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
+							<text class="text-[26rpx] text-[#0052d9]">查看详情 ></text>
+						</view>
+					</view>
+				</view>
+
+				<view v-if="list.length == 0 && !loading" class="flex items-center justify-center py-[64rpx]">
+					<text class="text-[28rpx] text-[#999999]">暂无互助任务</text>
 				</view>
 			</view>
-
-			<scroll-view class="content" scroll-y @scrolltolower="loadMore">
-				<view class="content-wrapper">
-					<!-- Tabs -->
-					<view class="tab-bar">
-						<view class="tab-item" :class="{ active: currentTab == '' }" @tap="switchTab('')">
-							<text class="tab-text" :class="{ active: currentTab == '' }">全部</text>
-						</view>
-						<view class="tab-item" :class="{ active: currentTab == 'pending' }" @tap="switchTab('pending')">
-							<text class="tab-text" :class="{ active: currentTab == 'pending' }">待启动</text>
-						</view>
-						<view class="tab-item" :class="{ active: currentTab == 'running' }" @tap="switchTab('running')">
-							<text class="tab-text" :class="{ active: currentTab == 'running' }">进行中</text>
-						</view>
-						<view class="tab-item" :class="{ active: currentTab == 'completed' }" @tap="switchTab('completed')">
-							<text class="tab-text" :class="{ active: currentTab == 'completed' }">已完成</text>
-						</view>
-					</view>
-
-					<!-- Task List -->
-					<view class="task-list">
-						<view v-for="(item, index) in list" :key="index" class="card task-item" @tap="goDetail(item.id)">
-							<view class="task-header">
-								<text class="task-amount">¥{{ item.total_amount }}</text>
-								<view :class="['status-tag', item.status]">
-									<text class="status-text" :class="item.status">{{ getStatusName(item.status) }}</text>
-								</view>
-							</view>
-							<view class="task-info">
-								<view class="info-row">
-									<text class="info-label">保证金：</text>
-									<text class="info-value">¥{{ item.deposit_amount }}</text>
-								</view>
-								<view class="info-row">
-									<text class="info-label">已完成：</text>
-									<text class="info-value">¥{{ item.completed_amount }}</text>
-								</view>
-								<view class="info-row">
-									<text class="info-label">服务费：</text>
-									<text class="info-value">¥{{ item.service_fee }}</text>
-								</view>
-							</view>
-							<view class="task-footer">
-								<text class="task-time">{{ formatTime(item.createtime) }}</text>
-								<text class="detail-link">查看详情 ></text>
-							</view>
-						</view>
-					</view>
-
-					<view v-if="list.length == 0 && !loading" class="empty-state">
-						<text class="empty-text">暂无互助任务</text>
-					</view>
-				</view>
-			</scroll-view>
-		</view>
-	</cl-page>
+		</scroll-view>
+	</view>
 </template>
 
 <script lang="uts">
@@ -85,9 +96,6 @@
 			this.loadData();
 		},
 		methods: {
-			goBack() {
-				uni.navigateBack();
-			},
 			loadData() {
 				this.loading = true;
 				
@@ -134,205 +142,4 @@
 </script>
 
 <style>
-.page-container {
-	display: flex;
-	flex-direction: column;
-	background-color: #f5f7fa;
-	height: 100vh;
-}
-
-/* Header */
-.header {
-	height: 112rpx;
-	background-color: #ffffff;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 0 32rpx;
-	position: relative;
-}
-
-.header-left {
-	display: flex;
-	align-items: center;
-	gap: 16rpx;
-}
-
-.back-icon {
-	font-size: 48rpx;
-	color: #1f2329;
-}
-
-.header-title {
-	font-size: 34rpx;
-	font-weight: 600;
-	color: #1f2329;
-	font-family: 'Inter', sans-serif;
-}
-
-.header-right {
-	display: flex;
-	align-items: center;
-}
-
-.header-action {
-	font-size: 28rpx;
-	color: #0052d9;
-}
-
-/* Content */
-.content {
-	flex: 1;
-	height: 0;
-}
-
-.content-wrapper {
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-/* Tabs */
-.tab-bar {
-	display: flex;
-	flex-direction: row;
-	background-color: #ffffff;
-	border-radius: 16rpx;
-	padding: 8rpx;
-	margin-bottom: 24rpx;
-}
-
-.tab-item {
-	flex: 1;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 16rpx 0;
-	border-radius: 12rpx;
-}
-
-.tab-item.active {
-	background-color: #0052d9;
-}
-
-.tab-text {
-	font-size: 28rpx;
-	color: #646a73;
-}
-
-.tab-text.active {
-	color: #ffffff;
-	font-weight: 500;
-}
-
-/* Task List */
-.task-list {
-	display: flex;
-	flex-direction: column;
-	gap: 24rpx;
-}
-
-.card {
-	background-color: #ffffff;
-	border-radius: 24rpx;
-	padding: 32rpx;
-	display: flex;
-	flex-direction: column;
-}
-
-.task-item {
-	gap: 24rpx;
-}
-
-.task-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding-bottom: 24rpx;
-	border-bottom: 2rpx solid #f5f7fa;
-}
-
-.task-amount {
-	font-size: 40rpx;
-	font-weight: 700;
-	color: #1f2329;
-}
-
-.status-tag {
-	padding: 4rpx 16rpx;
-	border-radius: 8rpx;
-}
-
-.status-tag.pending { background-color: #fff7e6; }
-.status-tag.running { background-color: #f0f9ff; }
-.status-tag.completed { background-color: #e8fff3; }
-.status-tag.paused { background-color: #fff2f0; }
-.status-tag.cancelled { background-color: #f5f5f5; }
-
-.status-text {
-	font-size: 24rpx;
-}
-
-.status-text.pending { color: #ff9500; }
-.status-text.running { color: #0052d9; }
-.status-text.completed { color: #00b578; }
-.status-text.paused { color: #ff3b30; }
-.status-text.cancelled { color: #999999; }
-
-.task-info {
-	display: flex;
-	flex-direction: column;
-	gap: 12rpx;
-}
-
-.info-row {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-}
-
-.info-label {
-	font-size: 26rpx;
-	color: #999999;
-	width: 140rpx;
-}
-
-.info-value {
-	font-size: 26rpx;
-	color: #1f2329;
-}
-
-.task-footer {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-	padding-top: 24rpx;
-	border-top: 2rpx solid #f5f7fa;
-}
-
-.task-time {
-	font-size: 24rpx;
-	color: #999999;
-}
-
-.detail-link {
-	font-size: 26rpx;
-	color: #0052d9;
-}
-
-/* Empty State */
-.empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 64rpx 0;
-}
-
-.empty-text {
-	font-size: 28rpx;
-	color: #999999;
-}
 </style>
