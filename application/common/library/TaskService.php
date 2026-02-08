@@ -102,7 +102,7 @@ class TaskService
             ->order('id', 'asc')
             ->select();
         
-        if ($pendingSubTasks->isEmpty()) {
+        if (empty($pendingSubTasks)) {
             return 0;
         }
         

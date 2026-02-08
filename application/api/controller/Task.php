@@ -119,12 +119,15 @@ class Task extends Api
         
         try {
             $task = TaskService::payDeposit($taskId, $userId, $amount);
-            $isFirstPayment = $task->status === 'deposit_paid';
-            $msg = $isFirstPayment ? '保证金缴纳成功，等待后台审核' : '保证金补缴成功';
-            $this->success($msg, ['task' => $task]);
+        } catch (\think\exception\HttpResponseException $e) {
+            throw $e;
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+        
+        $isFirstPayment = $task->status === 'deposit_paid';
+        $msg = $isFirstPayment ? '保证金缴纳成功，等待后台审核' : '保证金补缴成功';
+        $this->success($msg, ['task' => $task]);
     }
 
     /**
