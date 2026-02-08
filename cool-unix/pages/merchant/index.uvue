@@ -3,75 +3,133 @@
 		<!-- Header -->
 		<cl-topbar title="商户中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<!-- Merchant Info -->
-		<view class="bg-white p-[32rpx] flex flex-row items-center gap-[24rpx] m-[32rpx] rounded-[24rpx]">
-			<view class="w-[112rpx] h-[112rpx] bg-[#0052d9] rounded-[56rpx] flex items-center justify-center">
-				<uni-icons type="shop" size="32" color="#ffffff"></uni-icons>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<!-- Merchant Info -->
+			<view class="bg-white p-[32rpx] flex flex-row items-center gap-[24rpx] mb-[24rpx]" @tap="toMerchantInfo">
+				<view class="w-[112rpx] h-[112rpx] bg-[#0052d9] rounded-[56rpx] flex items-center justify-center text-white text-[48rpx] font-bold">
+					{{ merchantInfo.name.charAt(0) }}
+				</view>
+				<view class="flex-1 flex flex-col gap-[8rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
+					<view class="flex flex-row items-center gap-[12rpx]">
+						<view class="px-[12rpx] py-[4rpx] bg-[#e6f7f0] rounded-[4rpx]">
+							<text class="text-[20rpx] text-[#00b578]">已认证</text>
+						</view>
+						<view class="px-[12rpx] py-[4rpx] bg-[#fff7e6] rounded-[4rpx]">
+							<text class="text-[20rpx] text-[#faad14]">{{ merchantInfo.level || '普通商户' }}</text>
+						</view>
+					</view>
+				</view>
 			</view>
-			<view class="flex flex-col gap-[8rpx]">
-				<text class="text-[36rpx] font-semibold text-[#1f2329]">{{ merchantInfo.name }}</text>
-				<text class="text-[24rpx] text-[#86909c]">商户编号: {{ merchantInfo.merchantNo }}</text>
-			</view>
-		</view>
 
-		<!-- Menu List -->
-		<view class="bg-white mx-[32rpx] rounded-[24rpx] px-[32rpx] flex flex-col">
-			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('info')">
-				<text class="text-[30rpx] text-[#1f2329]">商户信息</text>
-				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
+			<!-- Menu List -->
+			<view class="px-[32rpx] flex flex-col gap-[24rpx] pb-[40rpx]">
+				<!-- Main Group -->
+				<view class="bg-white rounded-[24rpx] flex flex-col overflow-hidden">
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="handleAction('application-list')">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="list" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">进件列表</text>
+						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="handleAction('bankcard')">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="wallet" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">收款账户</text>
+						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="handleAction('wallet')">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="wallet-filled" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">资金管理</text>
+						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="handleAction('my-publish')">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="sound" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">我的发布</text>
+						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+				</view>
+
+				<!-- Separate Items -->
+				<view class="bg-white rounded-[24rpx] flex flex-row justify-between items-center p-[32rpx] active:bg-gray-50" @tap="handleAction('my-tasks')">
+					<view class="flex flex-row items-center gap-[24rpx]">
+						<uni-icons type="checkbox" size="22" color="#0052d9"></uni-icons>
+						<text class="text-[30rpx] text-[#1f2329]">我的任务</text>
+					</view>
+					<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+				</view>
+
+				<view class="bg-white rounded-[24rpx] flex flex-row justify-between items-center p-[32rpx] active:bg-gray-50" @tap="handleAction('settlement')">
+					<view class="flex flex-row items-center gap-[24rpx]">
+						<uni-icons type="calendar" size="22" color="#0052d9"></uni-icons>
+						<text class="text-[30rpx] text-[#1f2329]">结算记录</text>
+					</view>
+					<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+				</view>
+
+				<view class="bg-white rounded-[24rpx] flex flex-row justify-between items-center p-[32rpx] active:bg-gray-50" @tap="handleAction('settings')">
+					<view class="flex flex-row items-center gap-[24rpx]">
+						<uni-icons type="settings" size="22" color="#0052d9"></uni-icons>
+						<text class="text-[30rpx] text-[#1f2329]">商户设置</text>
+					</view>
+					<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+				</view>
 			</view>
-			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
-			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('audit')">
-				<text class="text-[30rpx] text-[#1f2329]">审核状态</text>
-				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-			</view>
-			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
-			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('wallet')">
-				<text class="text-[30rpx] text-[#1f2329]">我的钱包</text>
-				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-			</view>
-			<view class="h-[2rpx] bg-[#f0f0f0] w-full"></view>
-			<view class="flex flex-row justify-between items-center h-[112rpx]" @click="handleAction('tasks')">
-				<text class="text-[30rpx] text-[#1f2329]">任务管理</text>
-				<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-			</view>
-		</view>
+		</scroll-view>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-// import { getMerchantInfo } from '@/services/merchant'
 
-// 商户信息
 const merchantInfo = ref({
 	name: '示例商户',
 	merchantNo: 'M202501290001',
 	level: 'VIP',
 })
 
-// 加载商户信息
-const loadMerchantInfo = async () => {
-	// Mock implementation
+const showToast = (name: string) => {
+	uni.showToast({
+		title: `${name}功能开发中`,
+		icon: 'none'
+	})
 }
 
-// 处理操作
 const handleAction = (action: string) => {
 	const routes = {
-		info: '/pages/merchant/info',
-		audit: '/pages/merchant/audit-status',
-		wallet: '/pages/wallet/index',
-		tasks: '/pages/task/index'
+		'application-list': '/pages/merchant/application-list',
+		'bankcard': '/pages/wallet/bankcard',
+		'wallet': '/pages/wallet/index',
+		'my-publish': '/pages/task/my-publish',
+		'my-tasks': '/pages/task/my-tasks',
+		'settlement': '/pages/wallet/logs',
+		'settings': '/pages/merchant/settings'
 	}
 	const url = routes[action]
-	if (url) {
+	if (['wallet'].includes(action)) {
+		uni.switchTab({ url })
+	} else {
 		uni.navigateTo({ url })
 	}
 }
 
-// 页面加载
+const toMerchantInfo = () => {
+	uni.navigateTo({
+		url: '/pages/merchant/info'
+	})
+}
+
 onMounted(() => {
-	loadMerchantInfo()
+	// loadMerchantInfo()
 })
 </script>
 

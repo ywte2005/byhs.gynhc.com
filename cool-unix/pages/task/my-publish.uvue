@@ -5,50 +5,55 @@
 
 		<scroll-view class="flex-1 h-0" scroll-y @scrolltolower="loadMore">
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
-				<view class="flex flex-col gap-[24rpx]">
-					<view 
-						v-for="(item, index) in list" 
-						:key="index"
-						@click="goToDetail(item.id)"
-						class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]"
-					>
-						<view class="flex flex-row justify-between items-center pb-[24rpx] border-b-[2rpx] border-[#f5f7fa]">
-							<text class="text-[26rpx] text-[#999999]">任务编号：{{ item.taskNo }}</text>
-							<view :class="['px-[16rpx] py-[4rpx] rounded-[8rpx]', getStatusColor(item.status)]">
+				<view 
+					v-for="(item, index) in list" 
+					:key="index"
+					@click="goToDetail(item.id)"
+					class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]"
+				>
+					<!-- Title Row -->
+					<view class="card-header">
+						<text class="text-[30rpx] font-semibold text-[#1f2329] flex-1 mr-[16rpx]">{{ item.title }}</text>
+						<view class="tags">
+							<!-- Status Tag -->
+							<view 
+								class="px-[16rpx] py-[4rpx] rounded-[8rpx]"
+								:class="getStatusBgColor(item.status)"
+							>
 								<text class="text-[24rpx]" :class="getStatusTextColor(item.status)">{{ getStatusText(item.status) }}</text>
 							</view>
-						</view>
-						
-						<view class="flex flex-col gap-[12rpx]">
-							<text class="text-[32rpx] font-semibold text-[#1f2329]">{{ item.title }}</text>
-							<view class="flex flex-row items-center">
-								<text class="text-[26rpx] text-[#646a73]">单价：</text>
-								<text class="text-[26rpx] text-[#ff3b30] font-semibold">¥{{ item.unitPrice }}</text>
-								<text class="text-[24rpx] text-[#e5e5e5] mx-[16rpx]">|</text>
-								<text class="text-[26rpx] text-[#646a73]">剩余：</text>
-								<text class="text-[26rpx] text-[#1f2329]">{{ item.remainCount }}/{{ item.totalCount }}</text>
-							</view>
-							<view class="flex flex-row items-center">
-								<text class="text-[26rpx] text-[#646a73]">发布时间：</text>
-								<text class="text-[26rpx] text-[#1f2329]">{{ item.createTime }}</text>
-							</view>
-						</view>
-
-						<view class="flex flex-row justify-end gap-[16rpx] pt-[24rpx] border-t-[2rpx] border-[#f5f7fa]">
-							<view class="px-[32rpx] py-[12rpx] rounded-[32rpx] border-[2rpx] border-[#e5e5e5] bg-white" @click.stop="stopTask(item.id)">
-								<text class="text-[26rpx] text-[#646a73]">暂停</text>
-							</view>
-							<view class="px-[32rpx] py-[12rpx] rounded-[32rpx] border-[2rpx] border-[#0052d9] bg-[#0052d9]" @click.stop="goToDetail(item.id)">
-								<text class="text-[26rpx] text-white">查看详情</text>
+							<!-- Type Tag -->
+							<view 
+								class="px-[16rpx] py-[4rpx] rounded-[8rpx] bg-[#e8f4fd]"
+							>
+								<text class="text-[22rpx] text-[#1890ff]">{{ item.type === 'main' ? '主任务' : '子任务' }}</text>
 							</view>
 						</view>
 					</view>
+					
+					<!-- Info Row -->
+					<view class="card-info">
+						<!-- Stats -->
+						<view class="flex flex-col gap-[8rpx]">
+							<text class="text-[26rpx] text-[#646a73]">已完成：{{ item.completedCount }}/{{ item.totalCount }}</text>
+							<text class="text-[26rpx] text-[#646a73]">服务费：¥{{ item.unitPrice }}</text>
+							<text class="text-[26rpx] text-[#646a73]">总金额：¥{{ item.totalAmount }}</text>
+						</view>
 
-					<!-- Empty State -->
-					<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx] gap-[24rpx]">
-						<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
-						<text class="text-[28rpx] text-[#999999]">暂无发布记录</text>
+						<!-- Action Button -->
+						<view 
+							class="px-[32rpx] h-[64rpx] flex items-center justify-center rounded-[12rpx] bg-[#0052d9]"
+							@click.stop="goToDetail(item.id)"
+						>
+							<text class="text-[26rpx] text-white">查看</text>
+						</view>
 					</view>
+				</view>
+
+				<!-- Empty State -->
+				<view v-if="list.length == 0 && !loading" class="flex flex-col items-center justify-center py-[64rpx] gap-[24rpx]">
+					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
+					<text class="text-[28rpx] text-[#999999]">暂无发布记录</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -57,17 +62,18 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-// import { getMyPublishedTasks } from '@/services/task'
 
 type PublishedTask = {
-	id: number,
-	taskNo: string,
-	title: string,
-	unitPrice: string,
-	totalCount: number,
-	remainCount: number,
-	status: string,
+	id: number
+	taskNo: string
+	title: string
+	unitPrice: string
+	totalCount: number
+	completedCount: number // Changed from remainCount to completedCount logic
+	status: string
 	createTime: string
+	type: string // main or sub
+	totalAmount: string
 }
 
 const list = ref([] as PublishedTask[])
@@ -86,12 +92,14 @@ const loadMore = () => {
 			mockList.push({
 				id: 1,
 				taskNo: 'T202501300001',
-				title: '美团外卖订单互助',
-				unitPrice: '15.00',
-				totalCount: 100,
-				remainCount: 45,
+				title: '支付宝流水互刷',
+				unitPrice: '50.00',
+				totalCount: 50,
+				completedCount: 15,
 				status: 'ongoing',
-				createTime: '2025-01-30 10:00:00'
+				createTime: '2025-01-30 10:00:00',
+				type: 'main',
+				totalAmount: '2,500.00'
 			})
 			mockList.push({
 				id: 2,
@@ -99,9 +107,11 @@ const loadMore = () => {
 				title: '淘宝店铺刷单任务',
 				unitPrice: '20.00',
 				totalCount: 50,
-				remainCount: 0,
+				completedCount: 50,
 				status: 'completed',
-				createTime: '2025-01-29 15:30:00'
+				createTime: '2025-01-29 15:30:00',
+				type: 'main',
+				totalAmount: '1,000.00'
 			})
 		}
 		
@@ -125,9 +135,9 @@ const getStatusText = (status: string): string => {
 	return map[status] || '未知'
 }
 
-const getStatusColor = (status: string): string => {
+const getStatusBgColor = (status: string): string => {
 	const map = {
-		'ongoing': 'bg-[#e8fff3]',
+		'ongoing': 'bg-[#e6f7f0]',
 		'completed': 'bg-[#f5f5f5]',
 		'paused': 'bg-[#fff7e6]',
 		'cancelled': 'bg-[#fff2f0]'
@@ -137,7 +147,7 @@ const getStatusColor = (status: string): string => {
 
 const getStatusTextColor = (status: string): string => {
 	const map = {
-		'ongoing': 'text-[#07c160]',
+		'ongoing': 'text-[#00b578]',
 		'completed': 'text-[#999999]',
 		'paused': 'text-[#ff9500]',
 		'cancelled': 'text-[#ff3b30]'
@@ -151,22 +161,29 @@ const goToDetail = (id: number) => {
 	})
 }
 
-const stopTask = (id: number) => {
-	uni.showModal({
-		title: '提示',
-		content: '确定要暂停该任务吗？',
-		success: (res) => {
-			if (res.confirm) {
-				uni.showToast({ title: '操作成功', icon: 'success' })
-			}
-		}
-	})
-}
-
 onMounted(() => {
 	loadMore()
 })
 </script>
 
 <style>
+.card-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.tags {
+	display: flex;
+	flex-direction: row;
+	gap: 12rpx;
+}
+
+.card-info {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
 </style>

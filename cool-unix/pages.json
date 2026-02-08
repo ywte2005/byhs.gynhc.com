@@ -129,6 +129,26 @@
 					"meta": {
 						"isAuth": true
 					}
+				},
+				{
+					"path": "application-list",
+					"style": {
+						"navigationBarTitleText": "进件列表",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
+					"path": "settings",
+					"style": {
+						"navigationBarTitleText": "商户设置",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
 				}
 			]
 		},

@@ -87,6 +87,16 @@
 						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
 					</view>
 				</view>
+
+				<view class="bg-white rounded-[24rpx] flex flex-col overflow-hidden">
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toMerchant">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<uni-icons type="shop" size="22" color="#0052d9"></uni-icons>
+							<text class="text-[30rpx] text-[#1f2329]">商户中心</text>
+						</view>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+				</view>
 			</view>
 		</scroll-view>
 
@@ -118,6 +128,10 @@ function toQrCode() {
 
 function toCert() {
 	uni.navigateTo({ url: '/pages/auth/certification' });
+}
+
+function toMerchant() {
+	uni.navigateTo({ url: '/pages/merchant/index' });
 }
 
 function toFeedback() {

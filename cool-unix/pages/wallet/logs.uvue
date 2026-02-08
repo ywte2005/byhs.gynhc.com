@@ -3,14 +3,14 @@
 		<!-- 顶部导航 -->
 		<cl-topbar title="资金流水" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
 			<template #append>
-				<view class="flex items-center px-4 h-full" @click="showFilterDialog = true">
-					<text class="text-lg text-[#0052d9]">筛选</text>
+				<view class="flex flex-row items-center justify-center px-[32rpx] h-full" @click="showFilterDialog = true">
+					<text class="text-[28rpx] text-[#0052d9] font-medium">筛选</text>
 				</view>
 			</template>
 		</cl-topbar>
 
 		<!-- 标签栏 -->
-		<view class="bg-white px-8 py-6 border-b-2 border-[#f5f7fa]">
+		<view class="bg-white border-b-2 border-[#f5f7fa]">
 			<view class="flex flex-row gap-6">
 				<view 
 					v-for="(tab, index) in tabs" 
@@ -36,7 +36,10 @@
 				>
 					<view class="flex flex-row justify-between items-center">
 						<view class="flex flex-row items-center gap-[24rpx] flex-1">
-							<view class="w-[80rpx] h-[80rpx] bg-[#f5f7fa] rounded-[40rpx] flex items-center justify-center">
+							<view 
+								class="w-[80rpx] h-[80rpx] rounded-[40rpx] flex items-center justify-center"
+								:style="{ backgroundColor: item.iconBgColor }"
+							>
 								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
 							</view>
 							<view class="flex flex-col gap-[8rpx]">
@@ -134,6 +137,7 @@ const logList = ref([
 	{
 		iconType: 'wallet-filled',
 		iconColor: '#00b578',
+		iconBgColor: '#e6f7f0',
 		title: '任务佣金',
 		time: '2025-01-30 10:30:00',
 		type: 'in',
@@ -144,6 +148,7 @@ const logList = ref([
 	{
 		iconType: 'compose',
 		iconColor: '#faad14',
+		iconBgColor: '#fff7e6',
 		title: '发起任务',
 		time: '2025-01-30 09:00:00',
 		type: 'out',
@@ -154,6 +159,7 @@ const logList = ref([
 	{
 		iconType: 'wallet-filled',
 		iconColor: '#0052d9',
+		iconBgColor: '#eaf2ff',
 		title: '充值',
 		time: '2025-01-29 15:00:00',
 		type: 'in',
@@ -164,6 +170,7 @@ const logList = ref([
 	{
 		iconType: 'upload-filled',
 		iconColor: '#ff3b30',
+		iconBgColor: '#fef0f0',
 		title: '提现',
 		time: '2025-01-29 10:00:00',
 		type: 'out',

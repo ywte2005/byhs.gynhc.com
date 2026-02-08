@@ -3,8 +3,8 @@
 		<!-- 顶部导航 -->
 		<cl-topbar title="任务详情" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
 			<template #append>
-				<view @click="shareTask" class="flex items-center px-[32rpx] h-full">
-					<text class="text-[28rpx] text-[#0052d9]">分享</text>
+				<view @click="shareTask" class="flex items-center px-[32rpx] h-full"  style="flex-direction: row;">
+					<uni-icons type="paperplane" size="20" color="#0052d9"></uni-icons>
 				</view>
 			</template>
 		</cl-topbar>
@@ -12,151 +12,177 @@
 		<!-- 内容区域 -->
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
-				<!-- 任务状态卡片 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<view class="flex items-center justify-between mb-[24rpx]">
-						<view class="px-[24rpx] py-[8rpx] rounded-[8rpx]" :class="getStatusBgColor(taskInfo.status)">
-							<text class="text-[24rpx] font-bold" :class="getStatusTextColor(taskInfo.status)">
-								{{ getStatusText(taskInfo.status) }}
-							</text>
-						</view>
-						<text class="text-[24rpx] text-[#999999]">任务编号：{{ taskInfo.taskNo }}</text>
-					</view>
-
-					<text class="text-[36rpx] font-bold text-[#1f2329] mb-[16rpx] block">{{ taskInfo.title }}</text>
-					<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ taskInfo.description }}</text>
-				</view>
-
-				<!-- 商户信息 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">发布商户</text>
-					<view class="flex items-center">
-						<view class="w-[96rpx] h-[96rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center mr-[24rpx]">
-							<uni-icons type="shop" size="32" color="#0052d9"></uni-icons>
-						</view>
-						<view class="flex-1">
-							<text class="text-[32rpx] font-bold text-[#1f2329] block">{{ taskInfo.merchantName }}</text>
-							<view class="flex flex-row items-center mt-[8rpx]">
-								<view class="bg-[#07c160] px-[12rpx] py-[4rpx] rounded-[4rpx] mr-[16rpx]">
-									<text class="text-[20rpx] text-white">{{ taskInfo.merchantLevel }}</text>
-								</view>
-								<text class="text-[24rpx] text-[#999999]">信用分：{{ taskInfo.merchantCredit }}</text>
+				<!-- 基本信息卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[36rpx] font-bold text-[#1f2329] leading-tight">{{ taskInfo.title }}</text>
+						<view class="flex flex-row flex-wrap gap-[16rpx]">
+							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx]" :class="getStatusBgColor(taskInfo.status)">
+								<text class="text-[24rpx]" :class="getStatusTextColor(taskInfo.status)">{{ getStatusText(taskInfo.status) }}</text>
+							</view>
+							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#f0f9ff]">
+								<text class="text-[24rpx] text-[#0052d9]">{{ taskInfo.category }}</text>
+							</view>
+							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#f5f7fa]">
+								<text class="text-[24rpx] text-[#646a73]">No.{{ taskInfo.taskNo }}</text>
 							</view>
 						</view>
+					</view>
+
+					<view class="w-full h-[2rpx] bg-[#f5f7fa]"></view>
+
+					<view class="flex flex-row items-center justify-between">
+						<view class="flex flex-col gap-[4rpx]">
+							<text class="text-[24rpx] text-[#999999]">单价佣金</text>
+							<text class="text-[40rpx] font-bold text-[#ff3b30]">¥{{ taskInfo.unitPrice }}</text>
+						</view>
+						<view class="flex flex-col items-end gap-[4rpx]">
+							<text class="text-[24rpx] text-[#999999]">完成时限</text>
+							<text class="text-[32rpx] font-bold text-[#1f2329]">{{ taskInfo.timeLimit }}小时</text>
+						</view>
+					</view>
+
+					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ taskInfo.description }}</text>
 					</view>
 				</view>
 
 				<!-- 任务进度 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">任务进度</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<view class="flex flex-row items-center justify-between">
+						<text class="text-[30rpx] font-bold text-[#1f2329]">任务进度</text>
+						<text class="text-[24rpx] text-[#999999]">{{ taskInfo.createTime }} 发布</text>
+					</view>
 					
-					<view class="mb-[24rpx]">
-						<view class="flex items-center justify-between mb-[16rpx]">
-							<text class="text-[26rpx] text-[#999999]">完成进度</text>
-							<text class="text-[28rpx] font-bold text-[#07c160]">{{ taskInfo.completedCount }}/{{ taskInfo.totalCount }}</text>
-						</view>
-						<view class="w-full h-[16rpx] bg-[#f5f5f5] rounded-full overflow-hidden">
+					<view class="flex flex-col gap-[16rpx]">
+						<view class="w-full h-[16rpx] bg-[#f5f7fa] rounded-full overflow-hidden">
 							<view 
-								class="h-full bg-[#07c160] rounded-full" 
+								class="h-full bg-[#0052d9] rounded-full transition-all duration-300" 
 								:style="{ width: taskInfo.progress + '%' }"
 							></view>
 						</view>
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[24rpx] text-[#999999]">总体进度 {{ taskInfo.progress }}%</text>
+							<text class="text-[24rpx] text-[#0052d9] font-medium">{{ taskInfo.completedCount }}/{{ taskInfo.totalCount }}</text>
+						</view>
 					</view>
 
-					<view class="flex items-center justify-between">
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ taskInfo.totalCount }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[4rpx]">总数量</text>
+					<view class="flex flex-row gap-[24rpx]">
+						<view class="flex-1 bg-[#f8f9fb] rounded-[16rpx] p-[20rpx] flex flex-col items-center gap-[8rpx]">
+							<text class="text-[36rpx] font-bold text-[#1f2329]">{{ taskInfo.totalCount }}</text>
+							<text class="text-[22rpx] text-[#999999]">总数量</text>
 						</view>
-						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#07c160]">{{ taskInfo.completedCount }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[4rpx]">已完成</text>
+						<view class="flex-1 bg-[#f0f9ff] rounded-[16rpx] p-[20rpx] flex flex-col items-center gap-[8rpx]">
+							<text class="text-[36rpx] font-bold text-[#0052d9]">{{ taskInfo.completedCount }}</text>
+							<text class="text-[22rpx] text-[#6fa3f7]">已完成</text>
 						</view>
-						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#ff9500]">{{ taskInfo.remainCount }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[4rpx]">剩余</text>
+						<view class="flex-1 bg-[#fff7e6] rounded-[16rpx] p-[20rpx] flex flex-col items-center gap-[8rpx]">
+							<text class="text-[36rpx] font-bold text-[#faad14]">{{ taskInfo.remainCount }}</text>
+							<text class="text-[22rpx] text-[#ffd666]">剩余</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 任务信息 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">任务信息</text>
-					
+				<!-- 任务信息 & 要求 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<!-- 基本信息 -->
 					<view class="flex flex-col gap-[24rpx]">
-						<view class="flex justify-between">
-							<text class="text-[28rpx] text-[#999999]">任务类目</text>
-							<text class="text-[28rpx] text-[#1f2329]">{{ taskInfo.category }}</text>
-						</view>
-						<view class="flex justify-between">
-							<text class="text-[28rpx] text-[#999999]">平台名称</text>
-							<text class="text-[28rpx] text-[#1f2329]">{{ taskInfo.platform }}</text>
-						</view>
-						<view class="flex justify-between">
-							<text class="text-[28rpx] text-[#999999]">单价佣金</text>
-							<text class="text-[32rpx] font-bold text-[#ff3b30]">¥{{ taskInfo.unitPrice }}</text>
-						</view>
-						<view class="flex justify-between">
-							<text class="text-[28rpx] text-[#999999]">完成时限</text>
-							<text class="text-[28rpx] text-[#1f2329]">{{ taskInfo.timeLimit }}小时</text>
-						</view>
-						<view class="flex justify-between">
-							<text class="text-[28rpx] text-[#999999]">发布时间</text>
-							<text class="text-[28rpx] text-[#1f2329]">{{ taskInfo.createTime }}</text>
+						<text class="text-[30rpx] font-bold text-[#1f2329]">任务信息</text>
+						<view class="flex flex-col gap-[20rpx]">
+							<view class="flex justify-between items-center">
+								<text class="text-[28rpx] text-[#999999]">平台名称</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.platform }}</text>
+							</view>
+							<view class="flex justify-between items-center">
+								<text class="text-[28rpx] text-[#999999]">发布时间</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.createTime }}</text>
+							</view>
 						</view>
 					</view>
-				</view>
 
-				<!-- 任务要求 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">任务要求</text>
-					
-					<view class="mb-[24rpx]">
-						<text class="text-[28rpx] text-[#999999] mb-[16rpx] block">凭证要求</text>
+					<view class="w-full h-[2rpx] bg-[#f5f7fa]"></view>
+
+					<!-- 凭证要求 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[30rpx] font-bold text-[#1f2329]">凭证要求</text>
 						<view class="flex flex-row flex-wrap gap-[16rpx]">
 							<view 
 								v-for="(item, index) in taskInfo.proofTypes" 
 								:key="index"
-								class="bg-[#f0f9ff] px-[16rpx] py-[8rpx] rounded-[8rpx]"
+								class="bg-[#f0f9ff] px-[20rpx] py-[10rpx] rounded-[8rpx]"
 							>
 								<text class="text-[24rpx] text-[#0052d9]">{{ item }}</text>
 							</view>
 						</view>
 					</view>
 
-					<view v-if="taskInfo.specialRequirement">
-						<text class="text-[28rpx] text-[#999999] mb-[16rpx] block">特殊要求</text>
-						<view class="bg-[#fff9e6] rounded-[16rpx] p-[24rpx]">
-							<text class="text-[26rpx] text-[#646a73] leading-relaxed">{{ taskInfo.specialRequirement }}</text>
+					<!-- 特殊要求 -->
+					<view v-if="taskInfo.specialRequirement" class="flex flex-col gap-[16rpx]">
+						<text class="text-[30rpx] font-bold text-[#1f2329]">特殊要求</text>
+						<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx] border-[2rpx] border-[#ffe58f]">
+							<text class="text-[26rpx] text-[#faad14] leading-relaxed">{{ taskInfo.specialRequirement }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 发布商户 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-bold text-[#1f2329]">发布商户</text>
+					<view class="flex flex-row items-center gap-[24rpx]">
+						<view class="w-[96rpx] h-[96rpx] rounded-full bg-[#f5f7fa] flex items-center justify-center">
+							<uni-icons type="shop" size="36" color="#0052d9"></uni-icons>
+						</view>
+						<view class="flex-1 flex flex-col gap-[8rpx]">
+							<text class="text-[32rpx] font-bold text-[#1f2329]">{{ taskInfo.merchantName }}</text>
+							<view class="flex flex-row items-center gap-[16rpx]">
+								<view class="bg-[#e6f7f0] px-[12rpx] py-[4rpx] rounded-[6rpx]">
+									<text class="text-[22rpx] text-[#00b578]">{{ taskInfo.merchantLevel }}</text>
+								</view>
+								<text class="text-[24rpx] text-[#999999]">信用分：{{ taskInfo.merchantCredit }}</text>
+							</view>
+						</view>
+						<view class="px-[32rpx] py-[12rpx] rounded-full border-[2rpx] border-[#dcdfe6]">
+							<text class="text-[26rpx] text-[#646a73]">联系</text>
 						</view>
 					</view>
 				</view>
 
 				<!-- 子任务列表 -->
 				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[140rpx]">
-					<view class="flex items-center justify-between mb-[24rpx]">
+					<view class="flex flex-row items-center justify-between mb-[32rpx]">
 						<text class="text-[32rpx] font-bold text-[#1f2329]">子任务列表</text>
-						<view @click="goToSubtaskList" class="flex items-center gap-[4rpx]">
-							<text class="text-[26rpx] text-[#0052d9]">查看全部</text>
-							<uni-icons type="right" size="12" color="#0052d9"></uni-icons>
+						<view @click="goToSubtaskList" class="flex flex-row items-center gap-[4rpx]">
+							<text class="text-[26rpx] text-[#0052d9]">全部</text>
+							<uni-icons type="right" size="14" color="#0052d9"></uni-icons>
 						</view>
 					</view>
 
-					<view class="flex flex-col">
+					<view class="flex flex-col gap-[24rpx]">
 						<view 
 							v-for="(item, index) in subtaskList" 
 							:key="index"
 							@click="goToSubtaskDetail(item.id)"
-							class="flex items-center justify-between py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
+							class="flex flex-row items-center justify-between bg-[#f9fafb] rounded-[16rpx] p-[24rpx] border border-[#f0f0f0]"
 						>
-							<view class="flex-1 flex flex-col gap-[8rpx]">
-								<text class="text-[30rpx] text-[#1f2329]">子任务 #{{ item.no }}</text>
-								<text class="text-[24rpx] text-[#999999]">{{ item.receiverName || '待接单' }}</text>
+							<!-- Left: Info -->
+							<view class="flex flex-row items-center gap-[24rpx]">
+								<!-- Number Circle -->
+								<view class="w-[80rpx] h-[80rpx] rounded-full bg-white flex items-center justify-center border border-[#e5e6eb] shadow-sm">
+									<text class="text-[32rpx] font-bold text-[#1f2329]">{{ item.no }}</text>
+								</view>
+								
+								<view class="flex flex-col gap-[8rpx]">
+									<text class="text-[30rpx] font-bold text-[#1f2329]">子任务 #{{ item.no }}</text>
+									<view class="flex flex-row items-center gap-[8rpx]">
+										<uni-icons type="person" size="14" color="#999999"></uni-icons>
+										<text class="text-[26rpx] text-[#999999]">{{ item.receiverName ? `接单人: ${item.receiverName}` : '待接单' }}</text>
+									</view>
+								</view>
 							</view>
-							<view class="px-[16rpx] py-[8rpx] rounded-[8rpx]" :class="getSubtaskStatusColor(item.status)">
-								<text class="text-[22rpx] text-white">{{ getSubtaskStatusText(item.status) }}</text>
+
+							<!-- Right: Status -->
+							<view class="px-[20rpx] py-[8rpx] rounded-[8rpx]" :class="getSubtaskStatusBgColor(item.status)">
+								<text class="text-[24rpx] font-medium" :class="getSubtaskStatusTextColor(item.status)">{{ getSubtaskStatusText(item.status) }}</text>
 							</view>
 						</view>
 					</view>
@@ -165,21 +191,21 @@
 		</scroll-view>
 
 		<!-- 底部操作栏 -->
-		<view v-if="showActions" class="fixed bottom-0 left-0 right-0 bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e5e5] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+		<view v-if="showActions" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
 			<view class="flex flex-row gap-[24rpx]">
 				<button 
 					v-if="taskInfo.canCancel"
 					@click="cancelTask"
-					class="flex-1 h-[88rpx] bg-white border-[2rpx] border-[#ff3b30] rounded-full flex items-center justify-center"
+					class="flex-1 h-[88rpx] bg-[#fff0f0] border-[2rpx] border-[#ff3b30] rounded-full flex items-center justify-center"
 				>
-					<text class="text-[30rpx] text-[#ff3b30]">取消任务</text>
+					<text class="text-[30rpx] font-bold text-[#ff3b30]">取消任务</text>
 				</button>
 				<button 
 					v-if="taskInfo.canReceive"
 					@click="receiveTask"
-					class="flex-1 h-[88rpx] bg-[#0052d9] rounded-full flex items-center justify-center"
+					class="flex-1 h-[88rpx] bg-[#0052d9] rounded-full flex items-center justify-center shadow-lg shadow-blue-200"
 				>
-					<text class="text-[30rpx] text-white">立即接单</text>
+					<text class="text-[30rpx] font-bold text-white">立即接单</text>
 				</button>
 			</view>
 		</view>
@@ -222,7 +248,9 @@ const taskInfo = ref({
 const subtaskList = ref([
 	{ id: 1, no: '001', receiverName: '张三', status: 'completed' },
 	{ id: 2, no: '002', receiverName: '李四', status: 'ongoing' },
-	{ id: 3, no: '003', receiverName: '', status: 'pending' }
+	{ id: 3, no: '003', receiverName: '', status: 'pending' },
+	{ id: 4, no: '004', receiverName: '', status: 'pending' },
+	{ id: 5, no: '005', receiverName: '', status: 'pending' }
 ])
 
 // 是否显示操作按钮
@@ -293,15 +321,26 @@ const getSubtaskStatusText = (status: string): string => {
 	return statusMap[status] || '未知'
 }
 
-// 获取子任务状态颜色
-const getSubtaskStatusColor = (status: string): string => {
+// 获取子任务状态背景色
+const getSubtaskStatusBgColor = (status: string): string => {
 	const colorMap = {
-		pending: 'bg-[#999999]',
-		ongoing: 'bg-[#ff9500]',
-		completed: 'bg-[#00b578]',
-		cancelled: 'bg-[#ff3b30]'
+		pending: 'bg-[#f5f5f5]',
+		ongoing: 'bg-[#fff7e6]',
+		completed: 'bg-[#e6f7f0]',
+		cancelled: 'bg-[#fff0f0]'
 	}
-	return colorMap[status] || 'bg-[#999999]'
+	return colorMap[status] || 'bg-[#f5f5f5]'
+}
+
+// 获取子任务状态文字颜色
+const getSubtaskStatusTextColor = (status: string): string => {
+	const colorMap = {
+		pending: 'text-[#999999]',
+		ongoing: 'text-[#faad14]',
+		completed: 'text-[#00b578]',
+		cancelled: 'text-[#ff3b30]'
+	}
+	return colorMap[status] || 'text-[#999999]'
 }
 
 // 接单

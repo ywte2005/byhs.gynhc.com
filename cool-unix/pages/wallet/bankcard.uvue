@@ -3,26 +3,46 @@
 		<!-- Header -->
 		<cl-topbar title="收款账户" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
 			<template #append>
-				<view class="flex items-center px-[32rpx] h-full" @click="addCard">
+				<view class="flex items-center px-[32rpx] h-full" style="flex-direction: row;" @click="addCard">
 					<uni-icons type="plus" size="24" color="#0052d9"></uni-icons>
 				</view>
 			</template>
 		</cl-topbar>
 
 		<scroll-view class="flex-1 h-0" scroll-y>
-			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<view class="flex flex-col gap-[24rpx]">
-					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
-						<view class="w-[88rpx] h-[88rpx] bg-[#f5f5f5] rounded-[44rpx] flex items-center justify-center">
-							<uni-icons type="home" size="20" color="#0052d9"></uni-icons>
+					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+						<!-- Header: Tags -->
+						<view class="flex flex-row justify-between items-center">
+							<view class="flex flex-row gap-[16rpx]">
+								<view v-if="item.type === 1" class="px-[16rpx] h-[44rpx] bg-[#eaf2ff] rounded-[8rpx] flex items-center justify-center">
+									<text class="text-[22rpx] text-[#0052d9]">对公</text>
+								</view>
+								<view v-else class="px-[16rpx] h-[44rpx] bg-[#f5f5f5] rounded-[8rpx] flex items-center justify-center">
+									<text class="text-[22rpx] text-[#646a73]">个人</text>
+								</view>
+								
+								<view v-if="item.isDefault" class="px-[16rpx] h-[44rpx] bg-[#e6f7f0] rounded-[8rpx] flex items-center justify-center">
+									<text class="text-[22rpx] text-[#00b578]">默认</text>
+								</view>
+							</view>
 						</view>
-						<view class="flex-1 flex flex-col gap-[8rpx]">
-							<text class="text-[32rpx] font-semibold text-[#1f2329]">{{ item.bankName }}</text>
-							<text class="text-[24rpx] text-[#999999]">储蓄卡</text>
-							<text class="text-[32rpx] text-[#1f2329] font-mono mt-[8rpx]">{{ formatCardNo(item.cardNo) }}</text>
+
+						<!-- Info -->
+						<view class="flex flex-col gap-[12rpx]">
+							<text class="text-[28rpx] text-[#1f2329]">{{ item.bankName }} ({{ item.cardNo.slice(-4) }})</text>
+							<text class="text-[26rpx] text-[#646a73]">{{ item.accountName }}</text>
 						</view>
-						<view class="p-[16rpx] flex items-center justify-center" @click.stop="deleteCard(item.id)">
-							<uni-icons type="trash" size="16" color="#ff3b30"></uni-icons>
+
+						<!-- Actions -->
+						<view class="flex flex-row gap-[24rpx] mt-[12rpx]">
+							<view class="flex-1 h-[64rpx] bg-[#f5f7fa] rounded-[12rpx] flex items-center justify-center" @click.stop="editCard(item.id)">
+								<text class="text-[26rpx] text-[#1f2329]">编辑</text>
+							</view>
+							<view class="flex-1 h-[64rpx] bg-[#fef0f0] rounded-[12rpx] flex items-center justify-center" @click.stop="deleteCard(item.id)">
+								<text class="text-[26rpx] text-[#e34d59]">删除</text>
+							</view>
 						</view>
 					</view>
 					
@@ -45,9 +65,13 @@ import { onShow } from '@dcloudio/uni-app'
 // import { getBankCards, deleteBankCard } from '@/services/wallet'
 
 type BankCard = {
-	id: number,
-	bankName: string,
+	id: number
+	type: number // 1: Corporate (对公), 2: Personal (个人)
+	isDefault: boolean
+	bankName: string
 	cardNo: string
+	accountName: string
+	mobile?: string
 }
 
 const list = ref([] as BankCard[])
@@ -62,8 +86,24 @@ const loadData = () => {
 			list.value = cards
 		} else {
 			const defaultCards = [
-				{ id: 1, bankName: '中国工商银行', cardNo: '6222021001111888888', name: '张三', mobile: '13800138000' },
-				{ id: 2, bankName: '中国建设银行', cardNo: '6217001230006666666', name: '张三', mobile: '13800138000' }
+				{ 
+					id: 1, 
+					type: 1, 
+					isDefault: true, 
+					bankName: '中国工商银行', 
+					cardNo: '6222021001111888888', 
+					accountName: '北京科技有限公司',
+					mobile: '13800138000' 
+				},
+				{ 
+					id: 2, 
+					type: 2, 
+					isDefault: false, 
+					bankName: '中国建设银行', 
+					cardNo: '6217001230006666666', 
+					accountName: '张三',
+					mobile: '13800138000' 
+				}
 			]
 			uni.setStorageSync('mock_bank_cards', defaultCards)
 			// @ts-ignore
@@ -82,6 +122,12 @@ const formatCardNo = (no: string): string => {
 const addCard = () => {
 	uni.navigateTo({
 		url: '/pages/wallet/add-card'
+	})
+}
+
+const editCard = (id: number) => {
+	uni.navigateTo({
+		url: `/pages/wallet/add-card?id=${id}`
 	})
 }
 

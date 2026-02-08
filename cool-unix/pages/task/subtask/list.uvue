@@ -4,12 +4,15 @@
 		<cl-topbar title="可接子任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 筛选栏 -->
-		<view class="bg-white px-[32rpx] py-[24rpx] mb-[16rpx]">
-			<view class="flex items-center justify-between">
-				<text class="text-[32rpx] text-[#1f2329]">共 {{ totalCount }} 个可接任务</text>
-				<view @click="showFilterDialog = true" class="flex items-center">
-					<text class="text-[28rpx] text-[#0052d9]">筛选</text>
-					<uni-icons type="settings" size="16" color="#0052d9" class="ml-[8rpx]"></uni-icons>
+		<view class="bg-white px-[32rpx] py-[24rpx] mb-[20rpx] shadow-sm">
+			<view class="flex flex-row items-center justify-between">
+				<view class="flex flex-row items-baseline gap-[8rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">可接任务</text>
+					<text class="text-[24rpx] text-[#999999]">{{ totalCount }}个</text>
+				</view>
+				<view @click="showFilterDialog = true" class="flex flex-row items-center bg-[#f5f7fa] px-[20rpx] py-[10rpx] rounded-full">
+					<text class="text-[26rpx] text-[#1f2329]">筛选</text>
+					<uni-icons type="settings" size="14" color="#1f2329" class="ml-[4rpx]"></uni-icons>
 				</view>
 			</view>
 		</view>
@@ -21,50 +24,55 @@
 					v-for="(task, index) in subtaskList" 
 					:key="index"
 					@click="goToDetail(task.id)"
-					class="bg-white rounded-[24rpx] p-[32rpx]"
+					class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx] shadow-sm border border-[#e5e6eb]"
 				>
 					<!-- 任务头部 -->
-					<view class="flex items-center justify-between mb-[24rpx]">
-						<view class="flex items-center gap-[16rpx]">
-							<view class="bg-[#f0f9ff] px-[16rpx] py-[8rpx] rounded-[8rpx]">
-								<text class="text-[22rpx] text-[#0052d9]">{{ task.category }}</text>
+					<view class="flex flex-row items-center justify-between">
+						<view class="flex flex-row items-center gap-[12rpx]">
+							<view class="bg-[#f0f9ff] px-[16rpx] py-[6rpx] rounded-[8rpx]">
+								<text class="text-[22rpx] text-[#0052d9] font-medium">{{ task.category }}</text>
 							</view>
-							<view class="bg-[#fff9e6] px-[16rpx] py-[8rpx] rounded-[8rpx]">
-								<text class="text-[22rpx] text-[#ed6a0c]">{{ task.platform }}</text>
+							<view class="bg-[#fff7e6] px-[16rpx] py-[6rpx] rounded-[8rpx]">
+								<text class="text-[22rpx] text-[#faad14] font-medium">{{ task.platform }}</text>
 							</view>
 						</view>
 						<text class="text-[24rpx] text-[#999999]">{{ task.createTime }}</text>
 					</view>
 
 					<!-- 任务信息 -->
-					<view class="mb-[24rpx]">
-						<text class="text-[36rpx] font-bold text-[#1f2329] mb-[16rpx] block">{{ task.title }}</text>
-						<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ task.description }}</text>
+					<view class="flex flex-col gap-[12rpx]">
+						<text class="text-[34rpx] font-bold text-[#1f2329] leading-tight">{{ task.title }}</text>
+						<text class="text-[28rpx] text-[#646a73] leading-relaxed line-clamp-2">{{ task.description }}</text>
 					</view>
 
 					<!-- 任务要求 -->
-					<view class="flex flex-row flex-wrap gap-[24rpx] mb-[24rpx]">
-						<view class="flex items-center gap-[4rpx]">
-							<uni-icons type="time" size="14" color="#999999"></uni-icons>
-							<text class="text-[24rpx] text-[#999999]">{{ task.timeLimit }}小时</text>
+					<view class="flex flex-row flex-wrap gap-[16rpx]">
+						<view class="flex flex-row items-center gap-[8rpx] bg-[#f5f7fa] px-[16rpx] py-[8rpx] rounded-[8rpx]">
+							<uni-icons type="time" size="14" color="#646a73"></uni-icons>
+							<text class="text-[24rpx] text-[#646a73]">{{ task.timeLimit }}小时内完成</text>
 						</view>
-						<view class="flex items-center gap-[4rpx]">
-							<uni-icons type="camera" size="14" color="#999999"></uni-icons>
-							<text class="text-[24rpx] text-[#999999]">{{ task.proofCount }}张凭证</text>
+						<view class="flex flex-row items-center gap-[8rpx] bg-[#f5f7fa] px-[16rpx] py-[8rpx] rounded-[8rpx]">
+							<uni-icons type="camera" size="14" color="#646a73"></uni-icons>
+							<text class="text-[24rpx] text-[#646a73]">需要{{ task.proofCount }}张凭证</text>
 						</view>
 					</view>
 
+					<view class="w-full h-[2rpx] bg-[#f5f7fa]"></view>
+
 					<!-- 任务数据 -->
-					<view class="flex items-center justify-between border-t-[2rpx] border-[#e5e5e5] pt-[24rpx]">
-						<view>
-							<text class="text-[24rpx] text-[#999999]">佣金</text>
-							<text class="text-[40rpx] font-bold text-[#ff3b30] ml-[8rpx]">¥{{ task.commission }}</text>
+					<view class="flex flex-row items-center justify-between">
+						<view class="flex flex-col gap-[4rpx]">
+							<text class="text-[22rpx] text-[#999999]">任务佣金</text>
+							<view class="flex flex-row items-baseline gap-[4rpx]">
+								<text class="text-[28rpx] font-bold text-[#ff3b30]">¥</text>
+								<text class="text-[40rpx] font-bold text-[#ff3b30] leading-none">{{ task.commission }}</text>
+							</view>
 						</view>
 						<button 
 							@click.stop="receiveTask(task.id)"
-							class="bg-[#0052d9] text-white rounded-full px-[48rpx] py-[16rpx] h-[72rpx] flex items-center justify-center"
+							class="bg-[#0052d9] text-white rounded-full px-[40rpx] h-[72rpx] flex flex-row items-center justify-center shadow-md shadow-blue-100 m-0"
 						>
-							<text class="text-[28rpx]">立即接单</text>
+							<text class="text-[28rpx] font-bold">立即接单</text>
 						</button>
 					</view>
 				</view>
@@ -183,6 +191,90 @@ const loadSubtaskList = async () => {
 	try {
 		loading.value = true
 		
+		// 模拟真实数据
+		const mockData = [
+			{
+				id: 101,
+				category: '电商',
+				platform: '淘宝',
+				createTime: '10分钟前',
+				title: '淘宝店铺关注 + 商品收藏任务',
+				description: '搜索指定关键词找到店铺，关注并收藏前3个商品，无需浏览，截图上传即可。',
+				timeLimit: 1,
+				proofCount: 2,
+				commission: '1.50'
+			},
+			{
+				id: 102,
+				category: '外卖',
+				platform: '美团',
+				createTime: '25分钟前',
+				title: '美团外卖新店好评任务',
+				description: '在指定店铺下单（满20减10），收货后给5星好评+10字以上评语。',
+				timeLimit: 3,
+				proofCount: 1,
+				commission: '5.00'
+			},
+			{
+				id: 103,
+				category: '生活',
+				platform: '抖音',
+				createTime: '40分钟前',
+				title: '抖音短视频点赞评论任务',
+				description: '观看指定视频完播，点赞并发布一条正向评论，截图个人主页和评论区。',
+				timeLimit: 2,
+				proofCount: 2,
+				commission: '0.80'
+			},
+			{
+				id: 104,
+				category: '出行',
+				platform: '滴滴',
+				createTime: '1小时前',
+				title: '滴滴顺风车行程分享任务',
+				description: '模拟发布一条顺风车行程，并分享到微信群，保持10分钟后截图。',
+				timeLimit: 4,
+				proofCount: 1,
+				commission: '3.00'
+			},
+			{
+				id: 105,
+				category: '电商',
+				platform: '京东',
+				createTime: '2小时前',
+				title: '京东Plus会员问卷调查',
+				description: '填写关于京东Plus会员体验的问卷，需真实回答，约需3分钟。',
+				timeLimit: 12,
+				proofCount: 1,
+				commission: '8.00'
+			},
+			{
+				id: 106,
+				category: '其他',
+				platform: '小红书',
+				createTime: '3小时前',
+				title: '小红书笔记种草任务',
+				description: '发布一篇关于防晒霜的种草笔记，需带指定话题，图文并茂。',
+				timeLimit: 24,
+				proofCount: 1,
+				commission: '15.00'
+			}
+		]
+
+		// 模拟网络请求延迟
+		setTimeout(() => {
+			loading.value = false
+			
+			if (page.value === 1) {
+				subtaskList.value = mockData
+			} else {
+				// 模拟没有更多数据
+				hasMore.value = false
+			}
+			totalCount.value = 128
+		}, 500)
+		
+		/* 暂时注释掉真实接口调用，优先展示模拟数据
 		const res = await getAvailableSubTasks({
 			taskId: taskId.value,
 			category: filter.value.category === '全部' ? '' : filter.value.category,
@@ -202,6 +294,7 @@ const loadSubtaskList = async () => {
 			totalCount.value = res.data.total
 			hasMore.value = res.data.hasMore
 		}
+		*/
 	} catch (error) {
 		loading.value = false
 		console.log('加载子任务列表失败', error)

@@ -1,0 +1,71 @@
+<template>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="商户设置" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+		
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<view class="bg-white rounded-[24rpx] flex flex-col overflow-hidden">
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50">
+						<text class="text-[30rpx] text-[#1f2329]">接单通知</text>
+						<switch :checked="notification" @change="onNotificationChange" color="#0052d9" style="transform: scale(0.8)" />
+					</view>
+					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
+					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="toAutoReply">
+						<text class="text-[30rpx] text-[#1f2329]">自动回复</text>
+						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>
+					</view>
+				</view>
+				
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex items-center justify-center active:bg-gray-50" @tap="handleLogout">
+					<text class="text-[30rpx] text-[#ff3b30]">注销商户</text>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref } from 'vue'
+
+const notification = ref(true)
+
+const onNotificationChange = (e: UniSwitchChangeEvent) => {
+	notification.value = e.detail.value
+	uni.showToast({
+		title: notification.value ? '已开启通知' : '已关闭通知',
+		icon: 'none'
+	})
+}
+
+const toAutoReply = () => {
+	uni.showToast({
+		title: '自动回复功能开发中',
+		icon: 'none'
+	})
+}
+
+const handleLogout = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要注销当前商户账号吗？',
+		success: (res) => {
+			if (res.confirm) {
+				// Clear merchant token/info
+				uni.removeStorageSync('merchant_token')
+				
+				uni.showToast({
+					title: '注销成功',
+					icon: 'success'
+				})
+				
+				setTimeout(() => {
+					uni.navigateBack()
+				}, 1500)
+			}
+		}
+	})
+}
+</script>
+
+<style>
+</style>

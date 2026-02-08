@@ -3,86 +3,90 @@
 		<!-- 顶部导航 -->
 		<cl-topbar title="保证金管理" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<!-- 保证金余额卡片 -->
-		<view class="p-[32rpx] flex flex-col gap-[24rpx]">
-			<view class="bg-gradient-to-r from-[#5856d6] to-[#4845c7] rounded-[24rpx] p-[32rpx] flex flex-col">
-				<text class="text-[28rpx] text-white mb-[16rpx]">保证金余额（元）</text>
-				<text class="text-[64rpx] font-bold text-white mb-[32rpx]">{{ depositInfo.balance }}</text>
-				
-				<view class="flex flex-row items-center justify-between bg-white/20 rounded-[16rpx] p-[24rpx]">
-					<view class="flex-1 flex flex-col items-center">
-						<text class="text-[32rpx] font-bold text-white">{{ depositInfo.frozen }}</text>
-						<text class="text-[24rpx] text-white mt-[8rpx]">冻结中</text>
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<!-- 保证金余额卡片 -->
+				<view class="bg-[#0052d9] rounded-[24rpx] p-[40rpx_32rpx] flex flex-col shadow-lg shadow-blue-500/20">
+					<view class="flex flex-col items-center mb-[40rpx]">
+						<text class="text-[26rpx] text-white/70 mb-[12rpx]">保证金余额(元)</text>
+						<text class="text-[72rpx] font-bold text-white font-['DIN_Alternate']">{{ depositInfo.balance }}</text>
 					</view>
-					<view class="w-[2rpx] h-[40rpx] bg-white/30"></view>
-					<view class="flex-1 flex flex-col items-center">
-						<text class="text-[32rpx] font-bold text-white">{{ depositInfo.available }}</text>
-						<text class="text-[24rpx] text-white mt-[8rpx]">可用</text>
-					</view>
-					<view class="w-[2rpx] h-[40rpx] bg-white/30"></view>
-					<view class="flex-1 flex flex-col items-center">
-						<text class="text-[32rpx] font-bold text-white">{{ depositInfo.total }}</text>
-						<text class="text-[24rpx] text-white mt-[8rpx]">累计</text>
+					
+					<view class="flex flex-row items-center justify-between bg-white/10 rounded-[16rpx] p-[24rpx]">
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[32rpx] font-semibold text-white">{{ depositInfo.frozen }}</text>
+							<text class="text-[24rpx] text-white/70 mt-[8rpx]">冻结中</text>
+						</view>
+						<view class="w-[2rpx] h-[32rpx] bg-white/20"></view>
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[32rpx] font-semibold text-white">{{ depositInfo.available }}</text>
+							<text class="text-[24rpx] text-white/70 mt-[8rpx]">可用</text>
+						</view>
+						<view class="w-[2rpx] h-[32rpx] bg-white/20"></view>
+						<view class="flex-1 flex flex-col items-center">
+							<text class="text-[32rpx] font-semibold text-white">{{ depositInfo.total }}</text>
+							<text class="text-[24rpx] text-white/70 mt-[8rpx]">累计</text>
+						</view>
 					</view>
 				</view>
-			</view>
 
-			<!-- 操作按钮 -->
-			<view class="flex flex-row gap-[24rpx]">
-				<button 
-					@click="showRechargeDialog = true"
-					class="flex-1 h-[88rpx] bg-[#0052d9] text-white rounded-full flex items-center justify-center"
-				>
-					<text class="text-[30rpx] font-medium">充值保证金</text>
-				</button>
-				<button 
-					@click="showWithdrawDialog = true"
-					class="flex-1 h-[88rpx] bg-white border-[2rpx] border-[#0052d9] rounded-full flex items-center justify-center"
-				>
-					<text class="text-[30rpx] text-[#0052d9] font-medium">提取保证金</text>
-				</button>
-			</view>
-
-			<!-- 说明卡片 -->
-			<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[16rpx]">
-				<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">保证金说明</text>
-				<view class="flex flex-col gap-[8rpx]">
-					<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 发起任务需要缴纳任务总额10%的保证金</text>
-					<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 任务完成后保证金自动退还</text>
-					<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 可用保证金可随时提取到钱包</text>
-					<text class="text-[26rpx] text-[#646a73] leading-[1.5]">• 冻结保证金为进行中任务占用的金额</text>
-				</view>
-			</view>
-
-			<!-- 流水记录 -->
-			<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
-				<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx]">流水记录</text>
-				
-				<view class="flex flex-col">
+				<!-- 操作按钮 -->
+				<view class="flex flex-row gap-[24rpx]">
 					<view 
-						v-for="(item, index) in logList" 
-						:key="index"
-						class="flex justify-between items-center py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
+						@click="showRechargeDialog = true"
+						class="flex-1 h-[88rpx] bg-[#0052d9] rounded-[44rpx] flex items-center justify-center active:opacity-90"
 					>
-						<view class="flex-1 flex flex-col gap-[8rpx]">
-							<text class="text-[30rpx] text-[#1f2329]">{{ item.title }}</text>
-							<text class="text-[24rpx] text-[#999999]">{{ item.time }}</text>
-						</view>
-						<view class="flex flex-col items-end gap-[8rpx]">
-							<text class="text-[32rpx] font-bold" :class="item.type === 'in' ? 'text-[#0052d9]' : 'text-[#ff3b30]'">
-								{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
-							</text>
-							<text class="text-[24rpx] text-[#999999]">余额：{{ item.balance }}</text>
-						</view>
+						<text class="text-[30rpx] text-white font-medium">充值保证金</text>
+					</view>
+					<view 
+						@click="showWithdrawDialog = true"
+						class="flex-1 h-[88rpx] bg-white border-[2rpx] border-solid border-[#0052d9] rounded-[44rpx] flex items-center justify-center active:opacity-90"
+					>
+						<text class="text-[30rpx] text-[#0052d9] font-medium">提取保证金</text>
 					</view>
 				</view>
 
-				<view v-if="logList.length === 0" class="flex flex-col items-center justify-center py-[80rpx] gap-[16rpx]">
-					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
-					<text class="text-[28rpx] text-[#999999]">暂无流水记录</text>
+				<!-- 说明卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[20rpx]">
+					<text class="text-[30rpx] font-semibold text-[#1f2329]">保证金说明</text>
+					<view class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 发起任务需要缴纳任务总额10%的保证金</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 任务完成后保证金自动退还</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 可用保证金可随时提取到钱包</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 冻结保证金为进行中任务占用的金额</text>
+					</view>
+				</view>
+
+				<!-- 流水记录 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col">
+					<text class="text-[30rpx] font-semibold text-[#1f2329] mb-[24rpx]">流水记录</text>
+					
+					<view class="flex flex-col">
+						<view 
+							v-for="(item, index) in logList" 
+							:key="index"
+							class="flex justify-between items-center py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
+						>
+							<view class="flex-1 flex flex-col gap-[8rpx]">
+								<text class="text-[28rpx] text-[#1f2329]">{{ item.title }}</text>
+								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
+							</view>
+							<view class="flex flex-col items-end gap-[4rpx]">
+								<text class="text-[30rpx] font-semibold" :class="item.type === 'in' ? 'text-[#0052d9]' : 'text-[#ff3b30]'">
+									{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
+								</text>
+								<text class="text-[22rpx] text-[#9aa0a6]">余额：{{ item.balance }}</text>
+							</view>
+						</view>
+					</view>
+
+					<view v-if="logList.length === 0" class="flex flex-col items-center justify-center py-[80rpx] gap-[16rpx]">
+						<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
+						<text class="text-[28rpx] text-[#999999]">暂无流水记录</text>
+					</view>
 				</view>
 			</view>
-		</view>
+		</scroll-view>
 
 		<!-- 充值对话框 -->
 		<view v-if="showRechargeDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]" @click="showRechargeDialog = false">
@@ -105,7 +109,7 @@
 						v-for="(amount, index) in quickAmounts" 
 						:key="index"
 						@click="rechargeAmount = amount"
-						class="w-[160rpx] h-[64rpx] rounded-[8rpx] border-[2rpx] border-[#e5e5e5] flex items-center justify-center"
+						class="w-[160rpx] h-[64rpx] rounded-[8rpx] border-[2rpx] border-[#e5e5e5] flex items-center justify-center active:bg-[#f5f7fa]"
 					>
 						<text class="text-[28rpx] text-[#1f2329]">{{ amount }}元</text>
 					</view>
@@ -114,13 +118,13 @@
 				<view class="flex flex-row gap-[24rpx]">
 					<button 
 						@click="showRechargeDialog = false"
-						class="flex-1 h-[80rpx] bg-[#f5f5f5] text-[#646a73] rounded-[12rpx] flex items-center justify-center text-[28rpx]"
+						class="flex-1 h-[80rpx] bg-[#f5f5f5] text-[#646a73] rounded-[12rpx] flex items-center justify-center text-[28rpx] border-none"
 					>
 						取消
 					</button>
 					<button 
 						@click="confirmRecharge"
-						class="flex-1 h-[80rpx] bg-[#0052d9] text-white rounded-[12rpx] flex items-center justify-center text-[28rpx]"
+						class="flex-1 h-[80rpx] bg-[#0052d9] text-white rounded-[12rpx] flex items-center justify-center text-[28rpx] border-none"
 					>
 						确认充值
 					</button>
@@ -145,7 +149,7 @@
 						placeholder="请输入提取金额"
 						placeholder-class="text-[#c0c4cc]"
 					/>
-					<view @click="withdrawAmount = depositInfo.available" class="mt-[16rpx] flex justify-end">
+					<view @click="withdrawAmount = depositInfo.available.replace(/,/g, '')" class="mt-[16rpx] flex justify-end">
 						<text class="text-[26rpx] text-[#0052d9]">全部提取</text>
 					</view>
 				</view>
@@ -157,13 +161,13 @@
 				<view class="flex flex-row gap-[24rpx]">
 					<button 
 						@click="showWithdrawDialog = false"
-						class="flex-1 h-[80rpx] bg-[#f5f5f5] text-[#646a73] rounded-[12rpx] flex items-center justify-center text-[28rpx]"
+						class="flex-1 h-[80rpx] bg-[#f5f5f5] text-[#646a73] rounded-[12rpx] flex items-center justify-center text-[28rpx] border-none"
 					>
 						取消
 					</button>
 					<button 
 						@click="confirmWithdraw"
-						class="flex-1 h-[80rpx] bg-[#0052d9] text-white rounded-[12rpx] flex items-center justify-center text-[28rpx]"
+						class="flex-1 h-[80rpx] bg-[#0052d9] text-white rounded-[12rpx] flex items-center justify-center text-[28rpx] border-none"
 					>
 						确认提取
 					</button>

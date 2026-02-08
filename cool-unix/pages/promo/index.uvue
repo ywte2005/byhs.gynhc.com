@@ -25,25 +25,25 @@
 				<view class="flex flex-row justify-between">
 					<view class="flex flex-col items-center" @tap="goTo('/pages/wallet/withdraw')">
 						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
-							<uni-icons type="vip" size="22" color="#0052d9"></uni-icons>
+							<uni-icons type="vip" size="22" color="#ffffff"></uni-icons>
 						</view>
 						<text class="text-[24rpx] text-white">立即提现</text>
 					</view>
 					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/invite')">
 						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
-							<uni-icons type="contact" size="22" color="#00b578"></uni-icons>
+							<uni-icons type="contact" size="22" color="#ffffff"></uni-icons>
 						</view>
 						<text class="text-[24rpx] text-white">邀请好友</text>
 					</view>
 					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/commission')">
 						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
-							<uni-icons type="wallet" size="22" color="#faad14"></uni-icons>
+							<uni-icons type="wallet" size="22" color="#ffffff"></uni-icons>
 						</view>
 						<text class="text-[24rpx] text-white">佣金明细</text>
 					</view>
 					<view class="flex flex-col items-center" @tap="goTo('/pages/promo/team')">
 						<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-[44rpx] flex items-center justify-center mb-[16rpx]">
-							<uni-icons type="bars" size="22" color="#5856d6"></uni-icons>
+							<uni-icons type="bars" size="22" color="#ffffff"></uni-icons>
 						</view>
 						<text class="text-[24rpx] text-white">团队管理</text>
 					</view>

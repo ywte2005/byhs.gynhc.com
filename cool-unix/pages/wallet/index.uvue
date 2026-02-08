@@ -64,6 +64,7 @@
 					</view>
 				</view>
 
+
 				<!-- 最近交易 -->
 				<view class="mx-[32rpx] bg-white rounded-[24rpx] p-[32rpx] mb-[32rpx]">
 					<view class="flex flex-row justify-between items-center mb-[24rpx]">

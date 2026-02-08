@@ -6,131 +6,101 @@
 		<!-- 内容区域 -->
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
-				<!-- 任务状态卡片 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<view class="flex flex-row items-center justify-between mb-[24rpx]">
-						<view :class="['px-[24rpx] py-[12rpx] rounded-full', getStatusBgColor(subtaskInfo.status)]">
-							<text :class="['text-[32rpx] font-bold', getStatusTextColor(subtaskInfo.status)]">
-								{{ getStatusText(subtaskInfo.status) }}
-							</text>
+				<!-- 基本信息卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[36rpx] font-bold text-[#1f2329] leading-tight">{{ subtaskInfo.title }}</text>
+					
+					<view class="flex flex-row flex-wrap gap-[16rpx]">
+						<view class="px-[16rpx] py-[6rpx] rounded-[8rpx]" :class="getStatusBgColor(subtaskInfo.status)">
+							<text class="text-[24rpx]" :class="getStatusTextColor(subtaskInfo.status)">{{ getStatusText(subtaskInfo.status) }}</text>
 						</view>
-						<text class="text-[28rpx] text-[#999999]">编号：{{ subtaskInfo.subtaskNo }}</text>
+						<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#f0f9ff]">
+							<text class="text-[24rpx] text-[#0052d9]">{{ subtaskInfo.category }}</text>
+						</view>
 					</view>
 
-					<text class="text-[40rpx] font-bold text-[#1f2329] mb-[16rpx] block">{{ subtaskInfo.title }}</text>
-					<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ subtaskInfo.description }}</text>
-				</view>
-
-				<!-- 时间信息 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">时间信息</text>
-					
-					<view class="flex flex-col gap-[24rpx]">
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">接单时间</text>
-							<text class="text-[32rpx] text-[#1f2329]">{{ subtaskInfo.receiveTime }}</text>
-						</view>
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">完成时限</text>
-							<text class="text-[32rpx] text-[#1f2329]">{{ subtaskInfo.timeLimit }}小时</text>
-						</view>
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">剩余时间</text>
-							<text class="text-[32rpx] font-bold text-[#ff9500]">{{ subtaskInfo.remainTime }}</text>
-						</view>
-						<view v-if="subtaskInfo.completeTime" class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">完成时间</text>
-							<text class="text-[32rpx] text-[#1f2329]">{{ subtaskInfo.completeTime }}</text>
-						</view>
-					</view>
-				</view>
-
-				<!-- 任务信息 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">任务信息</text>
-					
-					<view class="flex flex-col gap-[24rpx]">
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">任务类目</text>
-							<text class="text-[32rpx] text-[#1f2329]">{{ subtaskInfo.category }}</text>
-						</view>
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">平台名称</text>
-							<text class="text-[32rpx] text-[#1f2329]">{{ subtaskInfo.platform }}</text>
-						</view>
-						<view class="flex flex-row items-center">
-							<text class="text-[28rpx] text-[#999999] w-[140rpx]">任务佣金</text>
+					<view class="flex flex-row items-center justify-between mt-[8rpx]">
+						<view class="flex flex-col gap-[4rpx]">
+							<text class="text-[24rpx] text-[#999999]">任务佣金</text>
 							<text class="text-[40rpx] font-bold text-[#ff3b30]">¥{{ subtaskInfo.commission }}</text>
 						</view>
+						<view class="flex flex-col items-end gap-[4rpx]">
+							<text class="text-[24rpx] text-[#999999]">剩余时间</text>
+							<text class="text-[32rpx] font-bold text-[#ff9500]">{{ subtaskInfo.remainTime }}</text>
+						</view>
 					</view>
+				</view>
+
+				<!-- 任务说明 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-bold text-[#1f2329]">任务说明</text>
+					<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ subtaskInfo.description }}</text>
 				</view>
 
 				<!-- 任务要求 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">任务要求</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-bold text-[#1f2329]">任务要求</text>
 					
-					<view class="flex flex-col gap-[24rpx]">
-						<view class="flex flex-col gap-[16rpx]">
-							<text class="text-[28rpx] text-[#999999]">操作步骤</text>
-							<view class="bg-[#f5f5f5] rounded-[16rpx] p-[24rpx]">
-								<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ subtaskInfo.steps }}</text>
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">操作步骤</text>
+						<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
+							<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ subtaskInfo.steps }}</text>
+						</view>
+					</view>
+
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">凭证要求</text>
+						<view class="flex flex-row flex-wrap gap-[16rpx]">
+							<view 
+								v-for="(item, index) in subtaskInfo.proofTypes" 
+								:key="index"
+								class="bg-[#f0f9ff] px-[16rpx] py-[8rpx] rounded-[8rpx]"
+							>
+								<text class="text-[24rpx] text-[#0052d9]">{{ item }}</text>
 							</view>
 						</view>
+					</view>
 
-						<view class="flex flex-col gap-[16rpx]">
-							<text class="text-[28rpx] text-[#999999]">凭证要求</text>
-							<view class="flex flex-row flex-wrap gap-[16rpx]">
-								<view 
-									v-for="(item, index) in subtaskInfo.proofTypes" 
-									:key="index"
-									class="bg-[#f0f9ff] px-[16rpx] py-[8rpx] rounded-[8rpx]"
-								>
-									<text class="text-[24rpx] text-[#07c160]">{{ item }}</text>
-								</view>
-							</view>
-						</view>
-
-						<view v-if="subtaskInfo.specialRequirement" class="flex flex-col gap-[16rpx]">
-							<text class="text-[28rpx] text-[#999999]">特殊要求</text>
-							<view class="bg-[#fff9e6] rounded-[16rpx] p-[24rpx]">
-								<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ subtaskInfo.specialRequirement }}</text>
-							</view>
+					<view v-if="subtaskInfo.specialRequirement" class="flex flex-col gap-[16rpx]">
+						<text class="text-[28rpx] text-[#999999]">特殊要求</text>
+						<view class="bg-[#fff7e6] rounded-[16rpx] p-[24rpx]">
+							<text class="text-[28rpx] text-[#faad14] leading-relaxed">{{ subtaskInfo.specialRequirement }}</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 上传的凭证 -->
-				<view v-if="subtaskInfo.proofImages && subtaskInfo.proofImages.length > 0" class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">上传的凭证</text>
+				<!-- 上传的凭证 (仅当有图片时显示) -->
+				<view v-if="subtaskInfo.proofImages && subtaskInfo.proofImages.length > 0" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-bold text-[#1f2329]">上传的凭证</text>
 					
 					<view class="flex flex-row flex-wrap gap-[16rpx]">
 						<view 
 							v-for="(img, index) in subtaskInfo.proofImages" 
 							:key="index"
 							@click="previewImage(index)"
-							class="w-[192rpx] h-[192rpx] rounded-[16rpx] overflow-hidden bg-[#f5f5f5]"
+							class="w-[192rpx] h-[192rpx] rounded-[16rpx] overflow-hidden bg-[#f5f7fa]"
 						>
 							<image :src="img" class="w-full h-full" mode="aspectFill" />
 						</view>
 					</view>
 
-					<view v-if="subtaskInfo.proofNote" class="bg-[#f5f5f5] rounded-[16rpx] p-[24rpx] mt-[24rpx]">
-						<text class="text-[28rpx] text-[#646a73] leading-relaxed block">{{ subtaskInfo.proofNote }}</text>
+					<view v-if="subtaskInfo.proofNote" class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
+						<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ subtaskInfo.proofNote }}</text>
 					</view>
 				</view>
 
 				<!-- 发布商户 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">发布商户</text>
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[30rpx] font-bold text-[#1f2329]">发布商户</text>
 					<view class="flex flex-row items-center gap-[24rpx]">
-						<view class="w-[96rpx] h-[96rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center">
+						<view class="w-[88rpx] h-[88rpx] rounded-full bg-[#f5f7fa] flex items-center justify-center">
 							<uni-icons type="shop" size="32" color="#0052d9"></uni-icons>
 						</view>
 						<view class="flex-1 flex flex-col gap-[8rpx]">
 							<text class="text-[32rpx] font-bold text-[#1f2329]">{{ subtaskInfo.merchantName }}</text>
 							<view class="flex flex-row items-center gap-[16rpx]">
-								<view class="bg-[#07c160] px-[16rpx] py-[4rpx] rounded-[8rpx]">
-									<text class="text-[22rpx] text-white">{{ subtaskInfo.merchantLevel }}</text>
+								<view class="bg-[#e6f7f0] px-[12rpx] py-[4rpx] rounded-[6rpx]">
+									<text class="text-[22rpx] text-[#00b578]">{{ subtaskInfo.merchantLevel }}</text>
 								</view>
 								<text class="text-[24rpx] text-[#999999]">信用分：{{ subtaskInfo.merchantCredit }}</text>
 							</view>
@@ -141,14 +111,21 @@
 		</scroll-view>
 
 		<!-- 底部操作栏 -->
-		<view v-if="showActions" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e5e5] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
-			<button 
-				v-if="subtaskInfo.canUpload"
-				@click="goToUpload"
-				class="w-full bg-[#07c160] text-white rounded-full h-[88rpx] flex items-center justify-center"
-			>
-				<text class="text-[32rpx] font-bold">上传凭证</text>
-			</button>
+		<view v-if="showActions" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+			<view class="flex flex-row gap-[24rpx]">
+				<view 
+					class="flex-1 h-[88rpx] rounded-[44rpx] border-[2rpx] border-[#ff3b30] flex items-center justify-center bg-[#fff0f0]"
+					@click="handleCancel"
+				>
+					<text class="text-[30rpx] font-bold text-[#ff3b30]">取消接单</text>
+				</view>
+				<view 
+					class="flex-[2] h-[88rpx] rounded-[44rpx] bg-[#0052d9] flex items-center justify-center"
+					@click="goToUpload"
+				>
+					<text class="text-[30rpx] font-bold text-white">上传凭证</text>
+				</view>
+			</view>
 		</view>
 	</view>
 </template>
@@ -187,7 +164,7 @@ const subtaskInfo = ref({
 
 // 是否显示操作按钮
 const showActions = computed(() => {
-	return subtaskInfo.value.canUpload
+	return subtaskInfo.value.canUpload && subtaskInfo.value.status === 'ongoing'
 })
 
 // 加载子任务详情
@@ -225,23 +202,23 @@ const getStatusText = (status: string): string => {
 // 获取状态背景色
 const getStatusBgColor = (status: string): string => {
 	const colorMap = {
-		ongoing: 'bg-[#fff9e6]',
-		completed: 'bg-[#f0f9ff]',
-		cancelled: 'bg-[#fff5f5]',
-		timeout: 'bg-[#f5f5f5]'
+		ongoing: 'bg-[#fff7e6]',
+		completed: 'bg-[#e6f7f0]',
+		cancelled: 'bg-[#fff0f0]',
+		timeout: 'bg-[#f5f7fa]'
 	}
-	return colorMap[status] || 'bg-[#f5f5f5]'
+	return colorMap[status] || 'bg-[#f5f7fa]'
 }
 
 // 获取状态文字颜色
 const getStatusTextColor = (status: string): string => {
 	const colorMap = {
-		ongoing: 'text-[#ff9500]',
-		completed: 'text-[#07c160]',
+		ongoing: 'text-[#faad14]',
+		completed: 'text-[#00b578]',
 		cancelled: 'text-[#ff3b30]',
-		timeout: 'text-[#999]'
+		timeout: 'text-[#999999]'
 	}
-	return colorMap[status] || 'text-[#999]'
+	return colorMap[status] || 'text-[#999999]'
 }
 
 // 预览图片
@@ -256,6 +233,32 @@ const previewImage = (index: number) => {
 const goToUpload = () => {
 	uni.navigateTo({
 		url: `/pages/task/subtask/upload?id=${subtaskId.value}`
+	})
+}
+
+// 取消接单
+const handleCancel = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要取消该子任务吗？取消后可能会影响您的信用分。',
+		success: async (res) => {
+			if (res.confirm) {
+				try {
+					uni.showLoading({ title: '处理中...' })
+					const result = await cancelSubTask(subtaskId.value)
+					uni.hideLoading()
+					
+					if (result.code === 0) {
+						uni.showToast({ title: '已取消', icon: 'success' })
+						// 刷新详情
+						loadSubtaskDetail()
+					}
+				} catch (e) {
+					uni.hideLoading()
+					uni.showToast({ title: '操作失败', icon: 'none' })
+				}
+			}
+		}
 	})
 }
 
