@@ -129,9 +129,10 @@ class Task extends Api
     {
         $page = $this->request->get('page', 1);
         $limit = $this->request->get('limit', 20);
+        $status = $this->request->get('status', '');
         
         $userId = $this->auth->id;
-        $list = TaskService::getUserAcceptedSubTasks($userId, $page, $limit);
+        $list = TaskService::getUserAcceptedSubTasks($userId, $status, $page, $limit);
         
         $this->success('获取成功', ['list' => $list->items(), 'total' => $list->total()]);
     }

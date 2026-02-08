@@ -76,11 +76,17 @@ class SubTask extends Model
             ->paginate(['page' => $page, 'list_rows' => $limit]);
     }
 
-    public static function getUserAccepted($userId, $page = 1, $limit = 20)
+    public static function getUserAccepted($userId, $status = '', $page = 1, $limit = 20)
     {
-        return self::where('to_user_id', $userId)
-            ->whereIn('status', ['accepted', 'paid', 'verified', 'completed', 'failed'])
-            ->order('id', 'desc')
+        $query = self::where('to_user_id', $userId);
+        
+        if (!empty($status)) {
+            $query->where('status', $status);
+        } else {
+            $query->whereIn('status', ['accepted', 'paid', 'verified', 'completed', 'failed']);
+        }
+        
+        return $query->order('id', 'desc')
             ->paginate(['page' => $page, 'list_rows' => $limit]);
     }
 

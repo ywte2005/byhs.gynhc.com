@@ -79,7 +79,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-import { getMyTasks } from '@/services/task'
+import { getMySubTasks } from '@/services/task'
 
 // 当前标签
 const currentTab = ref('all')
@@ -131,7 +131,7 @@ const loadTaskList = async () => {
 			'failed': 'failed'
 		}
 		
-		const res = await getMyTasks({
+		const res = await getMySubTasks({
 			status: statusMap[currentTab.value] || '',
 			page: page.value,
 			limit: 10

@@ -20,7 +20,7 @@
 								class="px-[16rpx] py-[4rpx] rounded-[8rpx]"
 								:class="getStatusBgColor(item.status)"
 							>
-								<text class="text-[24rpx]" :class="getStatusTextColor(item.status)">{{ getStatusText(item.status) }}</text>
+								<text class="text-[24rpx]" :class="getStatusTextColor(item.status)">{{ item.statusText }}</text>
 							</view>
 							<!-- Type Tag -->
 							<view 
@@ -110,6 +110,7 @@ const loadMore = async () => {
 			totalCount: Math.ceil(item.total_amount / 3000),
 			completedCount: Math.ceil(item.completed_amount / 3000),
 			status: item.status === 'running' ? 'ongoing' : item.status,
+			statusText: item.status_text,
 			createTime: formatTime(item.createtime),
 			type: 'main',
 			totalAmount: formatAmount(item.total_amount)
@@ -127,16 +128,6 @@ const loadMore = async () => {
 	} finally {
 		loading.value = false
 	}
-}
-
-const getStatusText = (status: string): string => {
-	const map = {
-		'ongoing': '进行中',
-		'completed': '已完成',
-		'paused': '已暂停',
-		'cancelled': '已取消'
-	}
-	return map[status] || '未知'
 }
 
 const getStatusBgColor = (status: string): string => {

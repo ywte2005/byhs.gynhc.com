@@ -342,9 +342,9 @@ class TaskService
         return SubTask::getAvailableForUser($userId, $category, $page, $limit);
     }
 
-    public static function getUserAcceptedSubTasks($userId, $page = 1, $limit = 20)
+    public static function getUserAcceptedSubTasks($userId, $status = '', $page = 1, $limit = 20)
     {
-        return SubTask::getUserAccepted($userId, $page, $limit);
+        return SubTask::getUserAccepted($userId, $status, $page, $limit);
     }
 
     public static function getUserTasks($userId, $status = null, $page = 1, $limit = 20)

@@ -18,10 +18,10 @@
 						<text class="text-[36rpx] font-bold text-[#1f2329] leading-tight">{{ taskInfo.title }}</text>
 						<view class="flex flex-row flex-wrap gap-[16rpx]">
 							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx]" :class="getStatusBgColor(taskInfo.status)">
-								<text class="text-[24rpx]" :class="getStatusTextColor(taskInfo.status)">{{ getStatusText(taskInfo.status) }}</text>
+								<text class="text-[24rpx]" :class="getStatusTextColor(taskInfo.status)">{{ taskInfo.statusText }}</text>
 							</view>
 							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#f0f9ff]">
-								<text class="text-[24rpx] text-[#0052d9]">{{ taskInfo.category }}</text>
+								<text class="text-[24rpx] text-[#0052d9]">{{ taskInfo.categoryText }}</text>
 							</view>
 							<view class="px-[16rpx] py-[6rpx] rounded-[8rpx] bg-[#f5f7fa]">
 								<text class="text-[24rpx] text-[#646a73]">No.{{ taskInfo.taskNo }}</text>
@@ -89,11 +89,27 @@
 					<view class="flex flex-col gap-[24rpx]">
 						<text class="text-[30rpx] font-bold text-[#1f2329]">任务信息</text>
 						<view class="flex flex-col gap-[20rpx]">
-							<view class="flex justify-between items-center">
-								<text class="text-[28rpx] text-[#999999]">平台名称</text>
-								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.platform }}</text>
+							<view class="info-row">
+								<text class="text-[28rpx] text-[#999999]">任务类型</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.categoryText }}</text>
 							</view>
-							<view class="flex justify-between items-center">
+							<view class="info-row">
+								<text class="text-[28rpx] text-[#999999]">目标金额</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">¥{{ taskInfo.totalAmount }}</text>
+							</view>
+							<view class="info-row">
+								<text class="text-[28rpx] text-[#999999]">收款方式</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.receiptTypeText }}</text>
+							</view>
+							<view class="info-row">
+								<text class="text-[28rpx] text-[#999999]">开始时间</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.startTime }}</text>
+							</view>
+							<view class="info-row">
+								<text class="text-[28rpx] text-[#999999]">结束时间</text>
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.endTime }}</text>
+							</view>
+							<view class="info-row">
 								<text class="text-[28rpx] text-[#999999]">发布时间</text>
 								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ taskInfo.createTime }}</text>
 							</view>
@@ -141,14 +157,11 @@
 								<text class="text-[24rpx] text-[#999999]">信用分：{{ taskInfo.merchantCredit }}</text>
 							</view>
 						</view>
-						<view class="px-[32rpx] py-[12rpx] rounded-full border-[2rpx] border-[#dcdfe6]">
-							<text class="text-[26rpx] text-[#646a73]">联系</text>
-						</view>
 					</view>
 				</view>
 
-				<!-- 子任务列表 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[140rpx]">
+				<!-- 子任务列表 (审核中不显示) -->
+				<view v-if="taskInfo.status !== 'pending' && taskInfo.status !== 'rejected'" class="bg-white rounded-[24rpx] p-[32rpx] mb-[140rpx]">
 					<view class="flex flex-row items-center justify-between mb-[32rpx]">
 						<text class="text-[32rpx] font-bold text-[#1f2329]">子任务列表</text>
 						<view @click="goToSubtaskList" class="flex flex-row items-center gap-[4rpx]">
@@ -182,7 +195,7 @@
 
 							<!-- Right: Status -->
 							<view class="px-[20rpx] py-[8rpx] rounded-[8rpx]" :class="getSubtaskStatusBgColor(item.status)">
-								<text class="text-[24rpx] font-medium" :class="getSubtaskStatusTextColor(item.status)">{{ getSubtaskStatusText(item.status) }}</text>
+								<text class="text-[24rpx] font-medium" :class="getSubtaskStatusTextColor(item.status)">{{ item.statusText }}</text>
 							</view>
 						</view>
 					</view>
@@ -221,37 +234,47 @@ const taskId = ref(0)
 
 // 任务信息
 const taskInfo = ref({
-	taskNo: 'T202501300001',
-	status: 'ongoing',
-	title: '美团外卖订单互助',
-	description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
+	taskNo: '',
+	status: '',
+	statusText: '',
+	title: '',
+	description: '',
 	merchantAvatar: '',
-	merchantName: '示例商户A',
-	merchantLevel: 'VIP',
-	merchantCredit: 98,
-	totalCount: 100,
-	completedCount: 55,
-	remainCount: 45,
-	progress: 55,
-	category: '外卖',
-	platform: '美团',
-	unitPrice: '15.00',
-	timeLimit: 24,
-	createTime: '2025-01-30 10:00:00',
-	proofTypes: ['订单截图', '聊天记录'],
-	specialRequirement: '请在下单后30分钟内上传截图',
+	merchantName: '',
+	merchantLevel: '',
+	merchantCredit: 0,
+	totalCount: 0,
+	completedCount: 0,
+	remainCount: 0,
+	progress: 0,
+	category: '',
+	categoryText: '',
+	platform: '',
+	unitPrice: '0.00',
+	timeLimit: 1,
+	createTime: '',
+	startTime: '',
+	endTime: '',
+	totalAmount: '0',
+	proofTypes: [] as string[],
+	specialRequirement: '',
 	canCancel: false,
-	canReceive: true
+	canReceive: false,
+	receiptType: '',
+	receiptTypeText: ''
 })
 
 // 子任务列表
-const subtaskList = ref([
-	{ id: 1, no: '001', receiverName: '张三', status: 'completed' },
-	{ id: 2, no: '002', receiverName: '李四', status: 'ongoing' },
-	{ id: 3, no: '003', receiverName: '', status: 'pending' },
-	{ id: 4, no: '004', receiverName: '', status: 'pending' },
-	{ id: 5, no: '005', receiverName: '', status: 'pending' }
-])
+type SubtaskItem = {
+	id: number
+	no: string
+	receiverName: string
+	amount: string
+	commission: string
+	status: string
+	statusText: string
+}
+const subtaskList = ref([] as SubtaskItem[])
 
 // 是否显示操作按钮
 const showActions = computed(() => {
@@ -269,38 +292,78 @@ const loadTaskDetail = async () => {
 		
 		if (res && res.task) {
 			const task = res.task
+			
+			// 计算子任务数量
+			const subTasks = task.sub_tasks || []
+			const totalCount = subTasks.length
+			const completedCount = subTasks.filter((s: any) => s.status === 'completed').length
+			const remainCount = totalCount - completedCount
+			const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
+			
+			// 计算单价佣金 (总金额 * 0.2% / 子任务数)
+			const totalAmount = parseFloat(task.total_amount) || 0
+			const avgCommission = totalCount > 0 ? (totalAmount * 0.002 / totalCount).toFixed(2) : '0.00'
+			
+			// 时间限制转换为小时
+			const timeLimitHours = Math.round((task.time_limit || 3600) / 3600)
+			
+			// 凭证类型
+			const proofTypeMap: Record<string, string> = {
+				'image': '订单截图',
+				'video': '视频凭证',
+				'text': '文字说明'
+			}
+			const proofTypes = [proofTypeMap[task.proof_type] || '订单截图']
+			
+			// 判断是否可以取消（只有发起人且状态为pending可取消）
+			const canCancel = task.status === 'pending' || task.status === 'approved'
+			// 判断是否可以接单（状态为running且有待接子任务）
+			const canReceive = task.status === 'running' && subTasks.some((s: any) => s.status === 'pending' || s.status === 'assigned')
+			
 			taskInfo.value = {
 				taskNo: task.task_no || `T${task.id}`,
-				status: mapTaskStatus(task.status),
+				status: task.status,
+				statusText: task.status_text || getStatusText(task.status),
 				title: task.title || `互助任务 #${task.task_no}`,
-				description: task.description || `金额：¥${task.amount}，佣金：¥${task.commission}`,
+				description: task.remark || task.content || `目标金额：¥${totalAmount.toLocaleString()}`,
 				merchantAvatar: '',
-				merchantName: task.merchant_name || `商户${task.from_user_id}`,
-				merchantLevel: task.merchant_level || 'VIP',
+				merchantName: task.merchant_name || `商户${task.user_id}`,
+				merchantLevel: task.merchant_level || '普通商户',
 				merchantCredit: task.merchant_credit || 100,
-				totalCount: task.total_count || 1,
-				completedCount: task.completed_count || 0,
-				remainCount: task.remain_count || (task.total_count - task.completed_count) || 0,
-				progress: task.total_count > 0 ? Math.round((task.completed_count / task.total_count) * 100) : 0,
+				totalCount: totalCount,
+				completedCount: completedCount,
+				remainCount: remainCount,
+				progress: progress,
 				category: task.category || '互助',
-				platform: task.platform || '平台',
-				unitPrice: task.commission || task.amount || '0.00',
-				timeLimit: task.time_limit || 24,
+				categoryText: task.category_text || task.category || '互助任务',
+				platform: task.platform || '通用',
+				unitPrice: avgCommission,
+				timeLimit: timeLimitHours,
 				createTime: formatDateTime(task.createtime),
-				proofTypes: task.proof_types || ['订单截图'],
-				specialRequirement: task.special_requirement || '',
-				canCancel: task.can_cancel || false,
-				canReceive: task.can_receive || true
+				startTime: formatDateTime(task.start_time),
+				endTime: formatDateTime(task.end_time),
+				totalAmount: totalAmount.toLocaleString(),
+				proofTypes: proofTypes,
+				specialRequirement: task.requirements || '',
+				canCancel: canCancel,
+				canReceive: canReceive,
+				receiptType: task.receipt_type,
+				receiptTypeText: task.receipt_type_text || (task.receipt_type === 'entry' ? '进件二维码' : '收款码')
 			}
 			
 			// 处理子任务列表
-			if (res.subtasks && res.subtasks.length > 0) {
-				subtaskList.value = res.subtasks.map((item: any, index: number) => ({
+			if (subTasks.length > 0) {
+				subtaskList.value = subTasks.slice(0, 5).map((item: any, index: number) => ({
 					id: item.id,
 					no: String(index + 1).padStart(3, '0'),
 					receiverName: item.receiver_name || '',
-					status: mapSubtaskStatus(item.status)
+					amount: parseFloat(item.amount || 0).toFixed(2),
+					commission: parseFloat(item.commission || 0).toFixed(2),
+					status: item.status,
+					statusText: item.status_text || getSubtaskStatusText(item.status)
 				}))
+			} else {
+				subtaskList.value = []
 			}
 		}
 	} catch (error) {
@@ -355,63 +418,87 @@ const formatDateTime = (timestamp: number): string => {
 
 // 获取状态文本
 const getStatusText = (status: string): string => {
-	const statusMap = {
-		ongoing: '进行中',
-		completed: '已完成',
-		cancelled: '已取消'
+	const statusMap: Record<string, string> = {
+		'pending': '待审核',
+		'approved': '已审核',
+		'rejected': '已拒绝',
+		'running': '进行中',
+		'paused': '已暂停',
+		'completed': '已完成',
+		'cancelled': '已取消'
 	}
 	return statusMap[status] || '未知'
 }
 
 // 获取状态背景色
 const getStatusBgColor = (status: string): string => {
-	const colorMap = {
-		ongoing: 'bg-[#f0f9ff]',
-		completed: 'bg-[#f5f5f5]',
-		cancelled: 'bg-[#fff5f5]'
+	const colorMap: Record<string, string> = {
+		'pending': 'bg-[#fff7e6]',
+		'approved': 'bg-[#e6f7f0]',
+		'rejected': 'bg-[#fff5f5]',
+		'running': 'bg-[#f0f9ff]',
+		'paused': 'bg-[#f5f5f5]',
+		'completed': 'bg-[#e6f7f0]',
+		'cancelled': 'bg-[#fff5f5]'
 	}
 	return colorMap[status] || 'bg-[#f5f5f5]'
 }
 
 // 获取状态文字颜色
 const getStatusTextColor = (status: string): string => {
-	const colorMap = {
-		ongoing: 'text-[#0052d9]',
-		completed: 'text-[#999999]',
-		cancelled: 'text-[#ff3b30]'
+	const colorMap: Record<string, string> = {
+		'pending': 'text-[#faad14]',
+		'approved': 'text-[#00b578]',
+		'rejected': 'text-[#ff3b30]',
+		'running': 'text-[#0052d9]',
+		'paused': 'text-[#999999]',
+		'completed': 'text-[#00b578]',
+		'cancelled': 'text-[#ff3b30]'
 	}
 	return colorMap[status] || 'text-[#999999]'
 }
 
 // 获取子任务状态文本
 const getSubtaskStatusText = (status: string): string => {
-	const statusMap = {
-		pending: '待接单',
-		ongoing: '进行中',
-		completed: '已完成',
-		cancelled: '已取消'
+	const statusMap: Record<string, string> = {
+		'pending': '待派发',
+		'assigned': '待接单',
+		'accepted': '已接单',
+		'paid': '已支付',
+		'verified': '审核中',
+		'completed': '已完成',
+		'failed': '已失败',
+		'cancelled': '已取消'
 	}
 	return statusMap[status] || '未知'
 }
 
 // 获取子任务状态背景色
 const getSubtaskStatusBgColor = (status: string): string => {
-	const colorMap = {
-		pending: 'bg-[#f5f5f5]',
-		ongoing: 'bg-[#fff7e6]',
-		completed: 'bg-[#e6f7f0]',
-		cancelled: 'bg-[#fff0f0]'
+	const colorMap: Record<string, string> = {
+		'pending': 'bg-[#f5f5f5]',
+		'assigned': 'bg-[#fff7e6]',
+		'accepted': 'bg-[#f0f9ff]',
+		'paid': 'bg-[#f0f9ff]',
+		'verified': 'bg-[#fff7e6]',
+		'completed': 'bg-[#e6f7f0]',
+		'failed': 'bg-[#fff0f0]',
+		'cancelled': 'bg-[#fff0f0]'
 	}
 	return colorMap[status] || 'bg-[#f5f5f5]'
 }
 
 // 获取子任务状态文字颜色
 const getSubtaskStatusTextColor = (status: string): string => {
-	const colorMap = {
-		pending: 'text-[#999999]',
-		ongoing: 'text-[#faad14]',
-		completed: 'text-[#00b578]',
-		cancelled: 'text-[#ff3b30]'
+	const colorMap: Record<string, string> = {
+		'pending': 'text-[#999999]',
+		'assigned': 'text-[#faad14]',
+		'accepted': 'text-[#0052d9]',
+		'paid': 'text-[#0052d9]',
+		'verified': 'text-[#faad14]',
+		'completed': 'text-[#00b578]',
+		'failed': 'text-[#ff3b30]',
+		'cancelled': 'text-[#ff3b30]'
 	}
 	return colorMap[status] || 'text-[#999999]'
 }
@@ -485,11 +572,12 @@ const goToSubtaskDetail = (id: number) => {
 
 // 页面加载时获取任务详情
 onMounted(() => {
-	// 获取任务ID
+	// 获取任务ID (支持 id 或 task_id 参数)
 	const pages = getCurrentPages()
 	const currentPage = pages[pages.length - 1]
 	// @ts-ignore
-	taskId.value = parseInt(currentPage.options?.id || '0')
+	const options = currentPage.options || {}
+	taskId.value = parseInt(options.task_id || options.id || '0')
 	
 	if (taskId.value > 0) {
 		loadTaskDetail()
@@ -498,4 +586,10 @@ onMounted(() => {
 </script>
 
 <style>
+.info-row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
 </style>
