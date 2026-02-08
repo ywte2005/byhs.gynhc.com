@@ -123,18 +123,7 @@ const withdrawAmount = ref('')
 const selectedBankCard = ref(1)
 
 // 银行卡列表
-const bankCards = ref([
-	{
-		id: 1,
-		bankName: '中国工商银行',
-		cardNo: '尾号 8888'
-	},
-	{
-		id: 2,
-		bankName: '中国建设银行',
-		cardNo: '尾号 6666'
-	}
-])
+const bankCards = ref([])
 
 // 计算手续费
 const serviceFee = computed(() => {

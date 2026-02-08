@@ -41,10 +41,10 @@
 
 					<view class="flex flex-col gap-[16rpx]">
 						<text class="text-[28rpx] font-medium text-[#1f2329]">开户银行</text>
-						<picker :range="banks" @change="onBankChange">
+						<picker :range="bankNames" @change="onBankChange" :disabled="loading">
 							<view class="bg-[#f5f7fa] h-[88rpx] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between">
 								<text class="text-[28rpx]" :class="form.bankName ? 'text-[#1f2329]' : 'text-[#9aa0a6]'">
-									{{ form.bankName || '请选择开户银行' }}
+									{{ loading ? '加载中...' : (form.bankName || '请选择开户银行') }}
 								</text>
 								<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 							</view>
@@ -80,50 +80,77 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { addBankcard, getBankList, type BankConfig } from '@/services/wallet'
 
 const form = ref({
 	name: '',
 	cardNo: '',
 	bankName: '',
+	bankCode: '',
 	mobile: ''
 })
 
-const banks = ['中国工商银行', '中国农业银行', '中国银行', '中国建设银行', '招商银行', '交通银行', '浦发银行', '民生银行', '平安银行', '兴业银行']
+const banks = ref<BankConfig[]>([])
+const bankNames = ref<string[]>([])
+const loading = ref(false)
+
+// 加载银行列表
+const loadBanks = async () => {
+	try {
+		loading.value = true
+		const res = await getBankList()
+		banks.value = res.list
+		bankNames.value = res.list.map(item => item.bank_name)
+	} catch (err: any) {
+		uni.showToast({
+			title: err.msg || err.message || '加载银行列表失败',
+			icon: 'none'
+		})
+	} finally {
+		loading.value = false
+	}
+}
+
+onMounted(() => {
+	loadBanks()
+})
 
 const onBankChange = (e: any) => {
 	const index = e.detail.value as number
-	form.value.bankName = banks[index]
+	const bank = banks.value[index]
+	form.value.bankName = bank.bank_name
+	form.value.bankCode = bank.bank_code
 }
 
 const canSubmit = computed(() => {
-	return form.value.name && form.value.cardNo.length >= 16 && form.value.bankName && form.value.mobile.length === 11
+	const name = form.value.name.trim()
+	const cardNo = form.value.cardNo.trim()
+	const bankName = form.value.bankName.trim()
+	const mobile = form.value.mobile.trim()
+	
+	return name.length > 0 && cardNo.length >= 16 && bankName.length > 0 && mobile.length === 11
 })
 
-const submit = () => {
-	if (!canSubmit.value) return
+const submit = async () => {
+	if (!canSubmit.value) {
+		uni.showToast({
+			title: '请完整填写信息',
+			icon: 'none'
+		})
+		return
+	}
 	
 	uni.showLoading({ title: '绑定中...' })
 	
-	// Mock submit
-	setTimeout(() => {
-		// Save to mock storage
-		try {
-			const cards = uni.getStorageSync('mock_bank_cards') || []
-			const newCard = {
-				id: Date.now(),
-				bankName: form.value.bankName,
-				cardNo: form.value.cardNo,
-				name: form.value.name,
-				mobile: form.value.mobile
-			}
-			// @ts-ignore
-			cards.unshift(newCard)
-			uni.setStorageSync('mock_bank_cards', cards)
-		} catch (e) {
-			console.error(e)
-		}
-
+	try {
+		await addBankcard({
+			bank_name: form.value.bankName,
+			bank_code: form.value.bankCode,
+			card_no: form.value.cardNo,
+			card_holder: form.value.name
+		})
+		
 		uni.hideLoading()
 		uni.showToast({
 			title: '绑定成功',
@@ -134,7 +161,13 @@ const submit = () => {
 		setTimeout(() => {
 			uni.navigateBack()
 		}, 1500)
-	}, 1500)
+	} catch (err: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: err.msg || err.message || '绑定失败',
+			icon: 'none'
+		})
+	}
 }
 </script>
 

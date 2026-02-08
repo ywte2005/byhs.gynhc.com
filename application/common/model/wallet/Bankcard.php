@@ -7,6 +7,8 @@ class Bankcard extends Model
 {
     protected $name = 'user_bankcard';
     protected $autoWriteTimestamp = true;
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     // 关联用户
     public function user()

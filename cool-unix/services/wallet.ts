@@ -100,6 +100,22 @@ export type Bankcard = {
 	is_default: number;
 };
 
+// 银行配置类型
+export type BankConfig = {
+	id: number;
+	bank_name: string;
+	bank_code: string;
+	bank_logo: string;
+};
+
+// 获取银行列表
+export function getBankList(): Promise<{ list: BankConfig[] }> {
+	return request({
+		url: "/wallet/bankList",
+		method: "GET"
+	});
+}
+
 // 获取银行卡列表
 export function getBankcards(): Promise<{ list: Bankcard[] }> {
 	return request({

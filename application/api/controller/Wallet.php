@@ -51,16 +51,13 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            if ($target === 'deposit') {
-                $recharge = WalletService::rechargeDeposit($userId, $amount, $payMethod);
-            } else {
-                $recharge = WalletService::rechargeBalance($userId, $amount, $payMethod);
-            }
-            $this->success('创建成功', ['recharge' => $recharge]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
+        if ($target === 'deposit') {
+            $recharge = WalletService::rechargeDeposit($userId, $amount, $payMethod);
+        } else {
+            $recharge = WalletService::rechargeBalance($userId, $amount, $payMethod);
         }
+        
+        $this->success('创建成功', ['recharge' => $recharge]);
     }
 
     public function withdraw()
@@ -82,12 +79,9 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $withdraw = WalletService::createWithdraw($userId, $amount, $bankInfo);
-            $this->success('提现申请已提交', ['withdraw' => $withdraw]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $withdraw = WalletService::createWithdraw($userId, $amount, $bankInfo);
+        
+        $this->success('提现申请已提交', ['withdraw' => $withdraw]);
     }
 
     public function withdrawRecords()
@@ -111,15 +105,11 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            WalletService::changeBalance($userId, '-' . $amount, 'deposit_pay', 0, '充值保证金');
-            WalletService::changeDeposit($userId, $amount, 'deposit_pay', 0, '充值保证金');
-            
-            $wallet = WalletService::getWallet($userId);
-            $this->success('充值成功', ['wallet' => $wallet]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        WalletService::changeBalance($userId, '-' . $amount, 'deposit_pay', 0, '充值保证金');
+        WalletService::changeDeposit($userId, $amount, 'deposit_pay', 0, '充值保证金');
+        
+        $wallet = WalletService::getWallet($userId);
+        $this->success('充值成功', ['wallet' => $wallet]);
     }
 
     public function depositWithdraw()
@@ -132,22 +122,18 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $wallet = WalletService::getWallet($userId);
-            $available = $wallet->getAvailableDeposit();
-            
-            if (bccomp($available, $amount, 2) < 0) {
-                $this->error('可用保证金不足');
-            }
-            
-            WalletService::changeDeposit($userId, '-' . $amount, 'deposit_withdraw', 0, '提取保证金');
-            WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
-            
-            $wallet = WalletService::getWallet($userId);
-            $this->success('提取成功', ['wallet' => $wallet]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
+        $wallet = WalletService::getWallet($userId);
+        $available = $wallet->getAvailableDeposit();
+        
+        if (bccomp($available, $amount, 2) < 0) {
+            $this->error('可用保证金不足');
         }
+        
+        WalletService::changeDeposit($userId, '-' . $amount, 'deposit_withdraw', 0, '提取保证金');
+        WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
+        
+        $wallet = WalletService::getWallet($userId);
+        $this->success('提取成功', ['wallet' => $wallet]);
     }
 
     public function withdrawConfig()
@@ -185,6 +171,23 @@ class Wallet extends Api
         $this->success('获取成功', ['list' => $result]);
     }
 
+    public function bankList()
+    {
+        $list = \app\common\model\BankConfig::getAvailableBanks();
+        
+        $result = [];
+        foreach ($list as $item) {
+            $result[] = [
+                'id' => $item->id,
+                'bank_name' => $item->bank_name,
+                'bank_code' => $item->bank_code,
+                'bank_logo' => $item->bank_logo
+            ];
+        }
+        
+        $this->success('获取成功', ['list' => $result]);
+    }
+
     public function addBankcard()
     {
         $data = [
@@ -201,17 +204,14 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $bankcard = \app\common\model\wallet\Bankcard::addBankcard($userId, $data);
-            $this->success('添加成功', ['bankcard' => [
-                'id' => $bankcard->id,
-                'bank_name' => $bankcard->bank_name,
-                'card_no' => $bankcard->masked_card_no,
-                'is_default' => $bankcard->is_default
-            ]]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $bankcard = \app\common\model\wallet\Bankcard::addBankcard($userId, $data);
+        
+        $this->success('添加成功', ['bankcard' => [
+            'id' => $bankcard->id,
+            'bank_name' => $bankcard->bank_name,
+            'card_no' => $bankcard->masked_card_no,
+            'is_default' => $bankcard->is_default
+        ]]);
     }
 
     public function deleteBankcard()
@@ -223,12 +223,9 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            \app\common\model\wallet\Bankcard::deleteBankcard($userId, $bankcardId);
-            $this->success('删除成功');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        \app\common\model\wallet\Bankcard::deleteBankcard($userId, $bankcardId);
+        
+        $this->success('删除成功');
     }
 
     public function setDefaultBankcard()
@@ -240,14 +237,11 @@ class Wallet extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $bankcard = \app\common\model\wallet\Bankcard::setDefault($userId, $bankcardId);
-            $this->success('设置成功', ['bankcard' => [
-                'id' => $bankcard->id,
-                'is_default' => $bankcard->is_default
-            ]]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $bankcard = \app\common\model\wallet\Bankcard::setDefault($userId, $bankcardId);
+        
+        $this->success('设置成功', ['bankcard' => [
+            'id' => $bankcard->id,
+            'is_default' => $bankcard->is_default
+        ]]);
     }
 }
