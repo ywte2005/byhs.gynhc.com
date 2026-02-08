@@ -6,7 +6,9 @@ use think\Model;
 class ProfitRule extends Model
 {
     protected $name = 'profit_rule';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     public static function getByLevelDiff($levelDiff)
     {

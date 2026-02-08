@@ -6,7 +6,9 @@ use think\Model;
 class MutualTask extends Model
 {
     protected $name = 'mutual_task';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected $append = ['status_text', 'receipt_type_text'];
 

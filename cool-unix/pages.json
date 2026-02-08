@@ -102,9 +102,20 @@
 					}
 				},
 				{
+					"path": "apply",
+					"style": {
+						"navigationBarTitleText": "商户入驻",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
 					"path": "register",
 					"style": {
-						"navigationBarTitleText": "新增进件"
+						"navigationBarTitleText": "新增进件",
+						"navigationStyle": "custom"
 					},
 					"meta": {
 						"isAuth": true

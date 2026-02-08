@@ -6,7 +6,7 @@ use think\Model;
 class MerchantCategory extends Model
 {
     protected $name = 'merchant_category';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
     protected $createTime = 'createtime';
     protected $updateTime = 'updatetime';
 

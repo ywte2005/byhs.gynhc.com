@@ -1,0 +1,169 @@
+<style>
+.detail-section { margin-bottom: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+.detail-section h4 { margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid #eee; color: #333; }
+.detail-row { display: flex; margin-bottom: 10px; }
+.detail-label { width: 120px; color: #666; }
+.detail-value { flex: 1; color: #333; font-weight: 500; }
+.image-preview { max-width: 200px; max-height: 150px; border-radius: 8px; border: 1px solid #ddd; cursor: pointer; }
+.image-group { display: flex; gap: 15px; flex-wrap: wrap; }
+.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
+.status-pending { background: #FFF3E0; color: #E65100; }
+.status-approved { background: #E8F5E9; color: #2E7D32; }
+.status-rejected { background: #FFEBEE; color: #C62828; }
+</style>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>进件详情</em> - 进件编号：{$row.application_no}</div>
+    </div>
+    <div class="panel-body">
+        <!-- 基本信息 -->
+        <div class="detail-section">
+            <h4><i class="fa fa-info-circle"></i> 基本信息</h4>
+            <div class="detail-row">
+                <div class="detail-label">进件编号</div>
+                <div class="detail-value">{$row.application_no}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">状态</div>
+                <div class="detail-value">
+                    {if $row.status == 'pending'}
+                    <span class="status-badge status-pending">待审核</span>
+                    {elseif $row.status == 'approved'}
+                    <span class="status-badge status-approved">已通过</span>
+                    {elseif $row.status == 'rejected'}
+                    <span class="status-badge status-rejected">已驳回</span>
+                    {/if}
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">主体类型</div>
+                <div class="detail-value">
+                    {if $row.type == 'personal'}个人{elseif $row.type == 'individual'}个体{else}企业{/if}
+                </div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">主体名称</div>
+                <div class="detail-value">{$row.name}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">证件号码</div>
+                <div class="detail-value">{$row.id_card}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">联系人</div>
+                <div class="detail-value">{$row.contact_name}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">联系电话</div>
+                <div class="detail-value">{$row.contact_phone}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">经营类目</div>
+                <div class="detail-value">{$row.category}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">经营地址</div>
+                <div class="detail-value">{$row.address}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">提交时间</div>
+                <div class="detail-value">{$row.createtime|date='Y-m-d H:i:s',###}</div>
+            </div>
+            {if $row.status == 'rejected'}
+            <div class="detail-row">
+                <div class="detail-label">驳回原因</div>
+                <div class="detail-value text-danger">{$row.reject_reason}</div>
+            </div>
+            {/if}
+        </div>
+
+        <!-- 附件信息 -->
+        <div class="detail-section">
+            <h4><i class="fa fa-image"></i> 附件信息</h4>
+            <div class="image-group">
+                {if $row.business_license}
+                <div>
+                    <p class="text-muted">营业执照</p>
+                    <img src="{$row.business_license}" class="image-preview" onclick="window.open(this.src)">
+                </div>
+                {/if}
+                {if $row.id_card_front}
+                <div>
+                    <p class="text-muted">身份证正面</p>
+                    <img src="{$row.id_card_front}" class="image-preview" onclick="window.open(this.src)">
+                </div>
+                {/if}
+                {if $row.id_card_back}
+                <div>
+                    <p class="text-muted">身份证反面</p>
+                    <img src="{$row.id_card_back}" class="image-preview" onclick="window.open(this.src)">
+                </div>
+                {/if}
+                {if $row.shop_front}
+                <div>
+                    <p class="text-muted">门头照</p>
+                    <img src="{$row.shop_front}" class="image-preview" onclick="window.open(this.src)">
+                </div>
+                {/if}
+                {if $row.other_files}
+                <div>
+                    <p class="text-muted">其他附件</p>
+                    <img src="{$row.other_files}" class="image-preview" onclick="window.open(this.src)">
+                </div>
+                {/if}
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        {if $row.status == 'pending'}
+        <div class="form-group">
+            <button type="button" class="btn btn-success btn-approve" data-id="{$row.id}">
+                <i class="fa fa-check"></i> 审核通过
+            </button>
+            <button type="button" class="btn btn-danger btn-reject" data-id="{$row.id}">
+                <i class="fa fa-times"></i> 驳回
+            </button>
+        </div>
+        {/if}
+    </div>
+</div>
+
+<script>
+$(function(){
+    // 审核通过
+    $('.btn-approve').click(function(){
+        var id = $(this).data('id');
+        Layer.confirm('确定要通过该进件申请吗？', function(){
+            $.post('merchant/application/approve', {ids: id}, function(res){
+                if(res.code === 1){
+                    Toastr.success(res.msg);
+                    setTimeout(function(){ location.reload(); }, 1000);
+                } else {
+                    Toastr.error(res.msg);
+                }
+            });
+        });
+    });
+
+    // 驳回
+    $('.btn-reject').click(function(){
+        var id = $(this).data('id');
+        Layer.prompt({title: '请输入驳回原因', formType: 2}, function(reason, index){
+            if(!reason){
+                Toastr.error('请输入驳回原因');
+                return;
+            }
+            $.post('merchant/application/reject', {ids: id, reason: reason}, function(res){
+                if(res.code === 1){
+                    Toastr.success(res.msg);
+                    Layer.close(index);
+                    setTimeout(function(){ location.reload(); }, 1000);
+                } else {
+                    Toastr.error(res.msg);
+                }
+            });
+        });
+    });
+});
+</script>

@@ -6,7 +6,9 @@ use think\Model;
 class RewardRule extends Model
 {
     protected $name = 'reward_rule';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected $append = ['scene_text', 'reward_type_text', 'amount_type_text'];
 

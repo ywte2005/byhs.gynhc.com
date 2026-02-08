@@ -1,0 +1,396 @@
+<template>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="商户入驻" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+		
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<!-- 主体类型 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">主体类型</text>
+					<view class="flex flex-row gap-[24rpx]">
+						<view 
+							class="flex-1 h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx] transition-all"
+							:class="form.type === 'personal' ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-white border-[#e5e6eb]'"
+							@tap="selectType('personal')"
+						>
+							<text class="text-[28rpx] font-medium" :class="form.type === 'personal' ? 'text-[#0052d9]' : 'text-[#646a73]'">个人</text>
+						</view>
+						<view 
+							class="flex-1 h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx] transition-all"
+							:class="form.type === 'individual' ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-white border-[#e5e6eb]'"
+							@tap="selectType('individual')"
+						>
+							<text class="text-[28rpx] font-medium" :class="form.type === 'individual' ? 'text-[#0052d9]' : 'text-[#646a73]'">个体</text>
+						</view>
+						<view 
+							class="flex-1 h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx] transition-all"
+							:class="form.type === 'enterprise' ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-white border-[#e5e6eb]'"
+							@tap="selectType('enterprise')"
+						>
+							<text class="text-[28rpx] font-medium" :class="form.type === 'enterprise' ? 'text-[#0052d9]' : 'text-[#646a73]'">企业</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 基本信息 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">基本信息</text>
+					
+					<!-- 商户名称 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">商户名称</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.name"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入商户名称"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+
+					<!-- 法人姓名 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">法人姓名</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.legalName"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入法人姓名"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+
+					<!-- 身份证号 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">身份证号</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.idCard"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入身份证号"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+
+					<!-- 联系电话 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">联系电话</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.phone"
+								type="number"
+								maxlength="11"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入联系电话"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+				</view>
+
+				<!-- 银行卡信息 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">结算信息</text>
+					
+					<!-- 开户银行 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">开户银行</text>
+						<view 
+							class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between"
+							@tap="showBankPicker = true"
+						>
+							<text class="text-[28rpx]" :class="form.bankName ? 'text-[#1f2329]' : 'text-[#9aa0a6]'">
+								{{ form.bankName || '请选择开户银行' }}
+							</text>
+							<uni-icons type="right" size="16" color="#9aa0a6"></uni-icons>
+						</view>
+					</view>
+
+					<!-- 银行账号 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">银行账号</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.bankAccount"
+								type="number"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入银行账号"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+
+					<!-- 开户支行 -->
+					<view class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">开户支行（选填）</text>
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
+							<input 
+								v-model="form.bankBranch"
+								class="flex-1 text-[28rpx] text-[#1f2329]"
+								placeholder="请输入开户支行"
+								placeholder-class="text-[#9aa0a6]"
+							/>
+						</view>
+					</view>
+				</view>
+
+				<!-- 证件上传 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">证件上传</text>
+					
+					<view class="flex flex-row gap-[24rpx]">
+						<!-- 身份证正面 -->
+						<view class="flex-1 flex flex-col gap-[16rpx]">
+							<text class="text-[26rpx] text-[#646a73]">身份证正面</text>
+							<view 
+								class="h-[180rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center border-[2rpx] border-dashed border-[#e5e6eb]"
+								@tap="uploadImage('idCardFront')"
+							>
+								<image v-if="form.idCardFront" :src="form.idCardFront" mode="aspectFill" class="w-full h-full rounded-[16rpx]"></image>
+								<template v-else>
+									<uni-icons type="plusempty" size="32" color="#9aa0a6"></uni-icons>
+									<text class="text-[24rpx] text-[#9aa0a6] mt-[8rpx]">上传正面</text>
+								</template>
+							</view>
+						</view>
+						
+						<!-- 身份证反面 -->
+						<view class="flex-1 flex flex-col gap-[16rpx]">
+							<text class="text-[26rpx] text-[#646a73]">身份证反面</text>
+							<view 
+								class="h-[180rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center border-[2rpx] border-dashed border-[#e5e6eb]"
+								@tap="uploadImage('idCardBack')"
+							>
+								<image v-if="form.idCardBack" :src="form.idCardBack" mode="aspectFill" class="w-full h-full rounded-[16rpx]"></image>
+								<template v-else>
+									<uni-icons type="plusempty" size="32" color="#9aa0a6"></uni-icons>
+									<text class="text-[24rpx] text-[#9aa0a6] mt-[8rpx]">上传反面</text>
+								</template>
+							</view>
+						</view>
+					</view>
+
+					<!-- 营业执照（非个人） -->
+					<view v-if="form.type !== 'personal'" class="flex flex-col gap-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73]">营业执照</text>
+						<view 
+							class="h-[180rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center border-[2rpx] border-dashed border-[#e5e6eb]"
+							@tap="uploadImage('businessLicense')"
+						>
+							<image v-if="form.businessLicense" :src="form.businessLicense" mode="aspectFill" class="w-full h-full rounded-[16rpx]"></image>
+							<template v-else>
+								<uni-icons type="plusempty" size="32" color="#9aa0a6"></uni-icons>
+								<text class="text-[24rpx] text-[#9aa0a6] mt-[8rpx]">上传营业执照</text>
+							</template>
+						</view>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部按钮 -->
+		<view class="p-[32rpx] bg-white safe-area-bottom">
+			<view 
+				class="h-[96rpx] rounded-[16rpx] flex items-center justify-center"
+				:class="canSubmit ? 'bg-[#0052d9]' : 'bg-[#c9cdd4]'"
+				@tap="handleSubmit"
+			>
+				<text class="text-[32rpx] font-medium text-white">提交申请</text>
+			</view>
+		</view>
+
+		<!-- 银行选择弹窗 -->
+		<cl-popup v-model="showBankPicker" direction="bottom">
+			<view class="bg-white rounded-t-[24rpx] max-h-[70vh]">
+				<view class="flex flex-row justify-between items-center p-[32rpx] border-b border-[#f0f0f0]">
+					<text class="text-[32rpx] font-medium text-[#1f2329]">选择开户银行</text>
+					<view @tap="showBankPicker = false">
+						<uni-icons type="closeempty" size="20" color="#999999"></uni-icons>
+					</view>
+				</view>
+				<scroll-view scroll-y class="max-h-[50vh]">
+					<view 
+						v-for="bank in bankList" 
+						:key="bank.code"
+						class="flex flex-row items-center justify-between p-[32rpx] border-b border-[#f5f7fa] active:bg-[#f5f7fa]"
+						@tap="selectBank(bank)"
+					>
+						<text class="text-[28rpx] text-[#1f2329]">{{ bank.name }}</text>
+						<uni-icons v-if="form.bankName === bank.name" type="checkmarkempty" size="18" color="#0052d9"></uni-icons>
+					</view>
+				</scroll-view>
+			</view>
+		</cl-popup>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+import { registerMerchant, getBanks, getMerchantInfo } from '@/services/merchant'
+import { uploadFile } from '@/services/upload'
+
+type BankItem = {
+	code: string
+	name: string
+}
+
+const form = ref({
+	type: 'personal',
+	name: '',
+	legalName: '',
+	idCard: '',
+	phone: '',
+	bankName: '',
+	bankAccount: '',
+	bankBranch: '',
+	idCardFront: '',
+	idCardBack: '',
+	businessLicense: ''
+})
+
+const submitting = ref(false)
+const showBankPicker = ref(false)
+const bankList = ref<BankItem[]>([])
+
+const loadBanks = async () => {
+	try {
+		const res = await getBanks()
+		if (res && res.list) {
+			bankList.value = res.list as BankItem[]
+		}
+	} catch (err: any) {
+		console.error('加载银行列表失败', err)
+	}
+}
+
+const selectType = (type: string) => {
+	form.value = { ...form.value, type }
+}
+
+const selectBank = (bank: BankItem) => {
+	form.value = { ...form.value, bankName: bank.name }
+	showBankPicker.value = false
+}
+
+const checkMerchantStatus = async () => {
+	try {
+		const res = await getMerchantInfo()
+		const merchant = res?.merchant
+		if (merchant && merchant.id) {
+			// 已有商户记录
+			if (merchant.status === 'approved') {
+				// 已通过审核，跳转商户中心
+				uni.redirectTo({ url: '/pages/merchant/index' })
+				return
+			} else if (merchant.status === 'pending') {
+				// 审核中，跳转审核状态页
+				uni.redirectTo({ url: '/pages/merchant/audit-status' })
+				return
+			}
+			// rejected 状态允许重新提交，不跳转
+		}
+	} catch (err: any) {
+		// 未注册商户，继续显示入驻页面
+	}
+}
+
+onMounted(() => {
+	checkMerchantStatus()
+	loadBanks()
+})
+
+const canSubmit = computed((): boolean => {
+	const f = form.value
+	if (!f.name || f.name.trim() == '') return false
+	if (!f.legalName || f.legalName.trim() == '') return false
+	if (!f.idCard || f.idCard.trim() == '') return false
+	if (!f.phone || f.phone.trim() == '') return false
+	if (!f.bankName || f.bankName.trim() == '') return false
+	if (!f.bankAccount || f.bankAccount.trim() == '') return false
+	if (!f.idCardFront) return false
+	if (!f.idCardBack) return false
+	if (f.type !== 'personal' && !f.businessLicense) return false
+	return true
+})
+
+const uploadImage = async (field: string) => {
+	try {
+		const res = await uni.chooseImage({
+			count: 1,
+			sizeType: ['compressed'],
+			sourceType: ['album', 'camera']
+		})
+		
+		if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+			uni.showLoading({ title: '上传中...' })
+			const uploadRes = await uploadFile(res.tempFilePaths[0])
+			uni.hideLoading()
+			
+			if (uploadRes && uploadRes.url) {
+				const newForm = { ...form.value }
+				if (field === 'idCardFront') newForm.idCardFront = uploadRes.url
+				else if (field === 'idCardBack') newForm.idCardBack = uploadRes.url
+				else if (field === 'businessLicense') newForm.businessLicense = uploadRes.url
+				form.value = newForm
+			}
+		}
+	} catch (err: any) {
+		uni.hideLoading()
+		if (err.errMsg && !err.errMsg.includes('cancel')) {
+			uni.showToast({ title: '上传失败', icon: 'none' })
+		}
+	}
+}
+
+const handleSubmit = async () => {
+	if (!canSubmit.value || submitting.value) return
+	
+	try {
+		submitting.value = true
+		uni.showLoading({ title: '提交中...' })
+		
+		const payload = {
+			type: form.value.type,
+			name: form.value.name,
+			contact: form.value.legalName,
+			id_card: form.value.idCard,
+			contact_phone: form.value.phone,
+			bank_name: form.value.bankName,
+			bank_account: form.value.bankAccount,
+			bank_branch: form.value.bankBranch,
+			id_card_front: form.value.idCardFront,
+			id_card_back: form.value.idCardBack,
+			business_license: form.value.businessLicense
+		}
+		
+		await registerMerchant(payload as any)
+		
+		uni.hideLoading()
+		uni.showToast({
+			title: '提交成功',
+			icon: 'success'
+		})
+		
+		setTimeout(() => {
+			uni.redirectTo({
+				url: '/pages/merchant/audit-status'
+			})
+		}, 1500)
+	} catch (err: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: err.msg || err.message || '提交失败',
+			icon: 'none'
+		})
+	} finally {
+		submitting.value = false
+	}
+}
+</script>
+
+<style>
+/* Tailwind handles all styling */
+</style>

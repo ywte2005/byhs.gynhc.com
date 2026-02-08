@@ -68,17 +68,20 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
+import { getApplicationList, type MerchantApplication } from '@/services/merchant'
 
 type Application = {
 	id: number
 	applicationNo: string
 	name: string
-	status: string // pending, approved, rejected
+	status: string
 	createTime: string
 }
 
 const currentTab = ref('all')
+const loading = ref(false)
+const allList = ref<Application[]>([])
 
 const tabs = [
 	{ label: '全部', value: 'all' },
@@ -87,34 +90,51 @@ const tabs = [
 	{ label: '已驳回', value: 'rejected' }
 ]
 
-// Mock Data
-const allList = ref<Application[]>([
-	{
-		id: 1,
-		applicationNo: 'JJ202401200001',
-		name: '北京某某科技有限公司',
-		status: 'pending',
-		createTime: '2024-01-20 14:30'
-	},
-	{
-		id: 2,
-		applicationNo: 'JJ202401180002',
-		name: '上海某某贸易有限公司',
-		status: 'approved',
-		createTime: '2024-01-18 10:15'
-	},
-	{
-		id: 3,
-		applicationNo: 'JJ202401150003',
-		name: '广州某某餐饮店',
-		status: 'rejected',
-		createTime: '2024-01-15 09:20'
+// 格式化时间戳
+const formatTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
+}
+
+// 加载数据
+const loadData = async () => {
+	try {
+		loading.value = true
+		const res = await getApplicationList(currentTab.value)
+		allList.value = res.list.map((item: MerchantApplication) => ({
+			id: item.id,
+			applicationNo: item.application_no,
+			name: item.name,
+			status: item.status,
+			createTime: formatTime(item.createtime)
+		}))
+	} catch (err: any) {
+		uni.showToast({
+			title: err.msg || err.message || '加载失败',
+			icon: 'none'
+		})
+	} finally {
+		loading.value = false
 	}
-])
+}
+
+// 监听 tab 切换
+watch(currentTab, () => {
+	loadData()
+})
+
+onMounted(() => {
+	loadData()
+})
 
 const list = computed(() => {
-	if (currentTab.value === 'all') return allList.value
-	return allList.value.filter(item => item.status === currentTab.value)
+	return allList.value
 })
 
 const getStatusText = (status: string): string => {

@@ -6,7 +6,9 @@ use think\Model;
 class Withdraw extends Model
 {
     protected $name = 'withdraw';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected $append = ['status_text'];
 

@@ -44,6 +44,14 @@ export function payEntryFee(payMethod: string = "balance"): Promise<{ order_no: 
 	});
 }
 
+// 获取银行列表
+export function getBanks(): Promise<{ list: Array<{ code: string; name: string }> }> {
+	return request({
+		url: "/merchant/banks",
+		method: "GET"
+	});
+}
+
 // 更新商户信息
 export function updateMerchantInfo(data: Partial<MerchantRegisterForm>): Promise<void> {
 	return request({
@@ -67,5 +75,90 @@ export function getMerchantCategories(): Promise<{ list: MerchantCategory[] }> {
 	return request({
 		url: "/merchant/categories",
 		method: "GET"
+	});
+}
+
+// ==================== 进件申请相关 ====================
+
+// 进件申请类型
+export type MerchantApplication = {
+	id: number;
+	application_no: string;
+	merchant_id: number;
+	channel: string;
+	type: string;
+	name: string;
+	id_card: string;
+	contact_name: string;
+	contact_phone: string;
+	category: string;
+	category_code: string;
+	address: string;
+	business_license: string;
+	id_card_front: string;
+	id_card_back: string;
+	shop_front: string;
+	other_files: string;
+	status: 'pending' | 'approved' | 'rejected';
+	status_text: string;
+	type_text: string;
+	reject_reason: string;
+	createtime: number;
+};
+
+// 进件申请表单类型
+export type ApplicationForm = {
+	type: 'personal' | 'individual' | 'enterprise';
+	name: string;
+	id_card: string;
+	contact_name: string;
+	contact_phone: string;
+	category: string;
+	category_code: string;
+	address: string;
+	business_license?: string;
+	id_card_front?: string;
+	id_card_back?: string;
+	shop_front?: string;
+	other_files?: string;
+	channel?: string;
+};
+
+// 获取进件列表
+export function getApplicationList(status: string = 'all', page: number = 1, pageSize: number = 10): Promise<{
+	list: MerchantApplication[];
+	total: number;
+}> {
+	return request({
+		url: "/merchantapp/list",
+		method: "GET",
+		data: { status, page, page_size: pageSize }
+	});
+}
+
+// 获取进件详情
+export function getApplicationDetail(id: number): Promise<{ application: MerchantApplication }> {
+	return request({
+		url: "/merchantapp/detail",
+		method: "GET",
+		data: { id }
+	});
+}
+
+// 提交进件申请
+export function submitApplication(form: ApplicationForm): Promise<{ application: MerchantApplication }> {
+	return request({
+		url: "/merchantapp/submit",
+		method: "POST",
+		data: form
+	});
+}
+
+// 重新提交进件申请
+export function resubmitApplication(id: number, form: ApplicationForm): Promise<{ application: MerchantApplication }> {
+	return request({
+		url: "/merchantapp/resubmit",
+		method: "POST",
+		data: { id, ...form }
 	});
 }

@@ -6,7 +6,9 @@ use think\Model;
 class BonusConfig extends Model
 {
     protected $name = 'promo_bonus_config';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     public static function getAll($status = 'normal')
     {

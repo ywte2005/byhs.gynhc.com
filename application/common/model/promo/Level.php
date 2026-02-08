@@ -6,7 +6,9 @@ use think\Model;
 class Level extends Model
 {
     protected $name = 'promo_level';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
     
     protected $append = [
         'status_text',

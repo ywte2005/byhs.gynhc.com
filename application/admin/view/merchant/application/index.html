@@ -1,0 +1,66 @@
+<style>
+.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+.status-pending { background: #FFF3E0; color: #E65100; }
+.status-approved { background: #E8F5E9; color: #2E7D32; }
+.status-rejected { background: #FFEBEE; color: #C62828; }
+.tab-stat { display: inline-block; background: #f44336; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px; }
+</style>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>进件管理</em> - 审核商户进件申请</div>
+        <ul class="nav nav-tabs" data-field="status">
+            <li class="active"><a href="#t-all" data-value="" data-toggle="tab">全部</a></li>
+            <li><a href="#t-pending" data-value="pending" data-toggle="tab">待审核 <span class="tab-stat" id="pending-count">0</span></a></li>
+            <li><a href="#t-approved" data-value="approved" data-toggle="tab">已通过</a></li>
+            <li><a href="#t-rejected" data-value="rejected" data-toggle="tab">已驳回</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        <a href="javascript:;" class="btn btn-primary btn-refresh" title="刷新"><i class="fa fa-refresh"></i></a>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="false"
+                           data-operate-del="false"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 驳回原因弹窗 -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-times-circle text-danger"></i> 驳回进件申请</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>驳回原因 <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="rejectReason" rows="4" placeholder="请输入驳回原因"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>快捷原因：</label>
+                    <div class="quick-reasons">
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">资料不完整</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">证件照片模糊</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">营业执照不清晰</a>
+                        <a href="javascript:;" class="btn btn-xs btn-default quick-reason">信息与证件不符</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmReject"><i class="fa fa-times"></i> 确认驳回</button>
+            </div>
+        </div>
+    </div>
+</div>

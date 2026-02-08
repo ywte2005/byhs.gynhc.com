@@ -6,7 +6,9 @@ use think\Model;
 class Recharge extends Model
 {
     protected $name = 'recharge';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected $append = ['status_text', 'target_text'];
 

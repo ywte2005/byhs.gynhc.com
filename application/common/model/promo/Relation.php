@@ -6,7 +6,9 @@ use think\Model;
 class Relation extends Model
 {
     protected $name = 'promo_relation';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected static function init()
     {

@@ -255,10 +255,10 @@ const goToMerchant = () => {
 	})
 }
 
-// 重新提交
+// 重新提交商户入驻申请
 const resubmit = () => {
 	uni.redirectTo({
-		url: '/pages/merchant/register'
+		url: '/pages/merchant/apply'
 	})
 }
 

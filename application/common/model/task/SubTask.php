@@ -6,7 +6,9 @@ use think\Model;
 class SubTask extends Model
 {
     protected $name = 'sub_task';
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     protected $append = ['status_text'];
 

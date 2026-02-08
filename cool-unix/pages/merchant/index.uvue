@@ -3,7 +3,43 @@
 		<!-- Header -->
 		<cl-topbar title="商户中心" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
-		<scroll-view class="flex-1 h-0" scroll-y>
+		<!-- Loading -->
+		<view v-if="loading" class="flex-1 flex items-center justify-center">
+			<text class="text-[28rpx] text-[#999999]">加载中...</text>
+		</view>
+
+		<!-- Not Merchant - Guide to Apply -->
+		<view v-else-if="!isMerchant" class="flex-1 flex flex-col items-center justify-center p-[64rpx]">
+			<uni-icons type="shop" size="80" color="#dcdfe6"></uni-icons>
+			<text class="text-[32rpx] font-medium text-[#1f2329] mt-[32rpx]">您还不是商户</text>
+			<text class="text-[28rpx] text-[#999999] mt-[16rpx] text-center">申请成为商户后，可发布任务、管理进件</text>
+			<view 
+				class="mt-[48rpx] px-[64rpx] h-[88rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center"
+				@tap="goToApply"
+			>
+				<text class="text-[32rpx] font-medium text-white">立即入驻</text>
+			</view>
+		</view>
+
+		<!-- Merchant Pending/Rejected -->
+		<view v-else-if="merchantStatus !== 'approved'" class="flex-1 flex flex-col items-center justify-center p-[64rpx]">
+			<uni-icons :type="merchantStatus === 'pending' ? 'clock' : 'closeempty'" size="80" :color="merchantStatus === 'pending' ? '#faad14' : '#ff3b30'"></uni-icons>
+			<text class="text-[32rpx] font-medium text-[#1f2329] mt-[32rpx]">
+				{{ merchantStatus === 'pending' ? '审核中' : '审核未通过' }}
+			</text>
+			<text class="text-[28rpx] text-[#999999] mt-[16rpx] text-center">
+				{{ merchantStatus === 'pending' ? '您的商户申请正在审核中，请耐心等待' : '您的商户申请未通过，请重新提交' }}
+			</text>
+			<view 
+				class="mt-[48rpx] px-[64rpx] h-[88rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center"
+				@tap="goToAuditStatus"
+			>
+				<text class="text-[32rpx] font-medium text-white">查看详情</text>
+			</view>
+		</view>
+
+		<!-- Merchant Approved -->
+		<scroll-view v-else class="flex-1 h-0" scroll-y>
 			<!-- Merchant Info -->
 			<view class="bg-white p-[32rpx] flex flex-row items-center gap-[24rpx] mb-[24rpx]" @tap="toMerchantInfo">
 				<view class="w-[112rpx] h-[112rpx] bg-[#0052d9] rounded-[56rpx] flex items-center justify-center text-white text-[48rpx] font-bold">
@@ -90,6 +126,11 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
+import { getMerchantInfo } from '@/services/merchant'
+
+const loading = ref(true)
+const isMerchant = ref(false)
+const merchantStatus = ref('')
 
 const merchantInfo = ref({
 	name: '示例商户',
@@ -97,14 +138,41 @@ const merchantInfo = ref({
 	level: 'VIP',
 })
 
-const showToast = (name: string) => {
-	uni.showToast({
-		title: `${name}功能开发中`,
-		icon: 'none'
-	})
+const loadMerchantInfo = async () => {
+	try {
+		loading.value = true
+		const res = await getMerchantInfo()
+		const merchant = res?.merchant
+		if (merchant && merchant.id) {
+			isMerchant.value = true
+			merchantStatus.value = merchant.status || ''
+			merchantInfo.value = {
+				name: merchant.name || '商户',
+				merchantNo: merchant.merchant_no || '',
+				level: merchant.level || '普通商户'
+			}
+		} else {
+			isMerchant.value = false
+		}
+	} catch (err: any) {
+		isMerchant.value = false
+	} finally {
+		loading.value = false
+	}
 }
 
 const handleAction = (action: string) => {
+	// 如果不是商户，引导去入驻
+	if (!isMerchant.value) {
+		uni.navigateTo({ url: '/pages/merchant/apply' })
+		return
+	}
+	// 如果商户未通过审核
+	if (merchantStatus.value !== 'approved') {
+		uni.navigateTo({ url: '/pages/merchant/audit-status' })
+		return
+	}
+	
 	const routes = {
 		'application-list': '/pages/merchant/application-list',
 		'bankcard': '/pages/wallet/bankcard',
@@ -123,13 +191,25 @@ const handleAction = (action: string) => {
 }
 
 const toMerchantInfo = () => {
+	if (!isMerchant.value) {
+		uni.navigateTo({ url: '/pages/merchant/apply' })
+		return
+	}
 	uni.navigateTo({
 		url: '/pages/merchant/info'
 	})
 }
 
+const goToApply = () => {
+	uni.navigateTo({ url: '/pages/merchant/apply' })
+}
+
+const goToAuditStatus = () => {
+	uni.navigateTo({ url: '/pages/merchant/audit-status' })
+}
+
 onMounted(() => {
-	// loadMerchantInfo()
+	loadMerchantInfo()
 })
 </script>
 

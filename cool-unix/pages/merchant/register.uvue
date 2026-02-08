@@ -1,5 +1,7 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="新增进件" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+		
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
 				<!-- 主体类型 -->
@@ -184,6 +186,7 @@
 			:ref="refs.set('category')"
 			:options="categoryOptions"
 			:show-trigger="false"
+			value-key="value"
 			@change="onCategoryChange"
 		></cl-cascader>
 	</view>
@@ -191,7 +194,7 @@
 
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
-import { registerMerchant, getMerchantCategories, type MerchantCategory } from '@/services/merchant'
+import { submitApplication, getMerchantCategories, getMerchantInfo, type MerchantCategory, type ApplicationForm } from '@/services/merchant'
 import { useRefs } from "@/.cool"
 import { useCascader } from "@/uni_modules/cool-ui"
 import pca from "@/.cool/data/pca.json"
@@ -250,7 +253,60 @@ const loadCategories = async () => {
 	}
 }
 
+const checkMerchantStatus = async () => {
+	try {
+		const res = await getMerchantInfo()
+		const merchant = res?.merchant
+		if (!merchant || !merchant.id) {
+			// 未入驻商户，提示并跳转入驻页面
+			uni.showModal({
+				title: '提示',
+				content: '您还未入驻商户，需要先完成商户入驻才能进件',
+				confirmText: '去入驻',
+				cancelText: '返回',
+				success: (result) => {
+					if (result.confirm) {
+						uni.redirectTo({ url: '/pages/merchant/apply' })
+					} else {
+						uni.navigateBack()
+					}
+				}
+			})
+			return
+		}
+		if (merchant.status !== 'approved') {
+			// 商户未通过审核
+			uni.showModal({
+				title: '提示',
+				content: merchant.status === 'pending' ? '您的商户申请正在审核中，审核通过后才能进件' : '您的商户申请未通过，请重新提交',
+				confirmText: '查看详情',
+				cancelText: '返回',
+				success: (result) => {
+					if (result.confirm) {
+						uni.redirectTo({ url: '/pages/merchant/audit-status' })
+					} else {
+						uni.navigateBack()
+					}
+				}
+			})
+			return
+		}
+		// 已通过审核，可以进件
+	} catch (err: any) {
+		// 未登录或其他错误
+		uni.showModal({
+			title: '提示',
+			content: '请先登录后再进行进件操作',
+			showCancel: false,
+			success: () => {
+				uni.navigateBack()
+			}
+		})
+	}
+}
+
 onMounted(() => {
+	checkMerchantStatus()
 	loadCategories()
 })
 
@@ -274,33 +330,51 @@ const selectCategory = () => {
 
 // 类目改变
 const onCategoryChange = (arr: string[]) => {
-	// arr 是选中的值数组，如 ['food', 'chinese_food']
-	form.value.categoryCode = arr[arr.length - 1] // 取最后一级的 code
-	form.value.category = arr.join(' / ') // 显示完整路径
+	console.log('Category changed:', arr)
 	
-	// 查找对应的名称
-	const findCategoryName = (list: MerchantCategory[], codes: string[], index: number): string => {
-		if (index >= codes.length) return ''
-		
-		const item = list.find(cat => cat.code === codes[index])
-		if (!item) return ''
-		
-		if (index === codes.length - 1) {
-			return item.name
-		}
-		
-		if (item.children && item.children.length > 0) {
-			const childName = findCategoryName(item.children, codes, index + 1)
-			return childName ? `${item.name} / ${childName}` : item.name
-		}
-		
-		return item.name
+	// arr 是选中的值数组（codes），如 ['food', 'chinese_food']
+	if (!arr || arr.length === 0) {
+		return
 	}
 	
-	const categoryName = findCategoryName(categories.value, arr, 0)
-	if (categoryName) {
-		form.value.category = categoryName
+	const code = arr[arr.length - 1] // 取最后一级的 code
+	
+	// 查找对应的名称路径
+	const findCategoryPath = (list: MerchantCategory[], codes: string[], index: number): string[] => {
+		if (index >= codes.length) return []
+		
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i]
+			if (item.code === codes[index]) {
+				if (index === codes.length - 1) {
+					return [item.name]
+				}
+				if (item.children && item.children.length > 0) {
+					const childPath = findCategoryPath(item.children, codes, index + 1)
+					if (childPath.length > 0) {
+						return [item.name, ...childPath]
+					}
+				}
+				return [item.name]
+			}
+		}
+		return []
 	}
+	
+	const namePath = findCategoryPath(categories.value, arr, 0)
+	const categoryName = namePath.join(' / ')
+	
+	console.log('Category name:', categoryName)
+	console.log('Category code:', code)
+	
+	// 更新表单 - 创建新对象触发响应式
+	form.value = {
+		...form.value,
+		category: categoryName,
+		categoryCode: code
+	}
+	
+	console.log('Form after update:', form.value)
 }
 
 // 选择地址
@@ -314,24 +388,29 @@ const onRegionChange = (arr: string[]) => {
 }
 
 // 校验是否可提交
-const canSubmit = computed(() => {
-	const name = form.value.name.trim()
-	const idCard = form.value.idCard.trim()
-	const contactName = form.value.contactName.trim()
-	const phone = form.value.phone.trim()
-	const category = form.value.category.trim()
-	const address = form.value.address.trim()
-	const license = form.value.license.trim()
-	const shopFront = form.value.shopFront.trim()
+const canSubmit = computed((): boolean => {
+	const f = form.value
+	const name = f.name != null ? f.name.trim() : ''
+	const idCard = f.idCard != null ? f.idCard.trim() : ''
+	const contactName = f.contactName != null ? f.contactName.trim() : ''
+	const phone = f.phone != null ? f.phone.trim() : ''
+	const category = f.category != null ? f.category : ''
+	const address = f.address != null ? f.address : ''
+	const license = f.license != null ? f.license : ''
+	const shopFront = f.shopFront != null ? f.shopFront : ''
 	
-	return name.length > 0 && 
-		   idCard.length > 0 && 
-		   contactName.length > 0 && 
-		   phone.length === 11 &&
-		   category.length > 0 &&
-		   address.length > 0 &&
-		   license.length > 0 &&
-		   shopFront.length > 0
+	const nameOk = name.length > 0
+	const idCardOk = idCard.length > 0
+	const contactNameOk = contactName.length > 0
+	const phoneOk = phone.length == 11
+	const categoryOk = category.length > 0
+	const addressOk = address.length > 0
+	const licenseOk = license.length > 0
+	const shopFrontOk = shopFront.length > 0
+	
+	console.log('canSubmit check:', nameOk, idCardOk, contactNameOk, phoneOk, categoryOk, addressOk, licenseOk, shopFrontOk)
+	
+	return nameOk && idCardOk && contactNameOk && phoneOk && categoryOk && addressOk && licenseOk && shopFrontOk
 })
 
 // 上传图片
@@ -342,8 +421,14 @@ const uploadImage = (field: string) => {
 		sourceType: ['album', 'camera'],
 		success: (res) => {
 			const tempFilePath = res.tempFilePaths[0]
-			// TODO: 调用上传接口
-			form.value[field] = tempFilePath
+			// 根据字段名分别赋值，确保响应式更新
+			if (field === 'license') {
+				form.value.license = tempFilePath
+			} else if (field === 'shopFront') {
+				form.value.shopFront = tempFilePath
+			} else if (field === 'other') {
+				form.value.other = tempFilePath
+			}
 		}
 	})
 }
@@ -359,6 +444,33 @@ const submit = async () => {
 	}
 
 	try {
+		uni.showLoading({ title: '上传图片中...' })
+		
+		// 先上传图片
+		const { uploadFile } = await import('@/services/upload')
+		
+		let licenseUrl = ''
+		let shopFrontUrl = ''
+		let otherUrl = ''
+		
+		// 上传营业执照/身份证正面
+		if (form.value.license) {
+			const result = await uploadFile(form.value.license)
+			licenseUrl = result.url
+		}
+		
+		// 上传门头照/身份证反面
+		if (form.value.shopFront) {
+			const result = await uploadFile(form.value.shopFront)
+			shopFrontUrl = result.url
+		}
+		
+		// 上传其他附件
+		if (form.value.other) {
+			const result = await uploadFile(form.value.other)
+			otherUrl = result.url
+		}
+		
 		uni.showLoading({ title: '提交中...' })
 		
 		// 构造提交数据
@@ -366,19 +478,19 @@ const submit = async () => {
 			type: form.value.type,
 			name: form.value.name,
 			id_card: form.value.idCard,
-			contact: form.value.contactName,
+			contact_name: form.value.contactName,
 			contact_phone: form.value.phone,
 			category: form.value.category,
 			category_code: form.value.categoryCode,
 			address: form.value.address,
-			business_license: form.value.type === 'personal' ? '' : form.value.license,
-			id_card_front: form.value.type === 'personal' ? form.value.license : '',
-			id_card_back: form.value.type === 'personal' ? form.value.shopFront : '',
-			shop_front: form.value.type === 'personal' ? '' : form.value.shopFront,
-			other_files: form.value.other
+			business_license: form.value.type === 'personal' ? '' : licenseUrl,
+			id_card_front: form.value.type === 'personal' ? licenseUrl : '',
+			id_card_back: form.value.type === 'personal' ? shopFrontUrl : '',
+			shop_front: form.value.type === 'personal' ? '' : shopFrontUrl,
+			other_files: otherUrl
 		}
 
-		await registerMerchant(payload as any)
+		await submitApplication(payload as ApplicationForm)
 		
 		uni.hideLoading()
 		uni.showToast({
@@ -387,9 +499,7 @@ const submit = async () => {
 		})
 		
 		setTimeout(() => {
-			uni.redirectTo({
-				url: '/pages/merchant/audit-status'
-			})
+			uni.navigateBack()
 		}, 1500)
 	} catch (err: any) {
 		uni.hideLoading()
