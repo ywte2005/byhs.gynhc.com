@@ -663,13 +663,8 @@ const handleCancelTask = () => {
 
 // 打开缴纳保证金弹窗
 const handlePayDeposit = async () => {
-	// 先获取用户余额
-	try {
-		const walletInfo = await getWalletInfo()
-		userBalance.value = parseFloat(walletInfo.balance || 0)
-	} catch (error) {
-		userBalance.value = 0
-	}
+	// 刷新用户余额（以防用户充值后返回）
+	await loadUserBalance()
 	
 	// 重置输入
 	depositInputAmount.value = ''
@@ -838,6 +833,18 @@ const goToSubtaskDetail = (id: number) => {
 	})
 }
 
+// 加载用户余额
+const loadUserBalance = async () => {
+	try {
+		const res = await getWalletInfo()
+		// API返回 { wallet: { balance: "1000.00" } }
+		const wallet = res.wallet || res
+		userBalance.value = parseFloat(wallet.balance || 0)
+	} catch (error) {
+		userBalance.value = 0
+	}
+}
+
 // 页面加载时获取任务详情
 onMounted(() => {
 	// 获取任务ID (支持 id 或 task_id 参数)
@@ -849,6 +856,7 @@ onMounted(() => {
 	
 	if (taskId.value > 0) {
 		loadTaskDetail()
+		loadUserBalance() // 同时加载用户余额
 	}
 })
 </script>
