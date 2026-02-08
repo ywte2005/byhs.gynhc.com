@@ -60,12 +60,28 @@ class Task extends Api
         
         $rule = [
             'total_amount' => 'require|float|gt:0',
-            'deposit_amount' => 'require|float|gt:0'
+            'start_time' => 'require',
+            'end_time' => 'require'
         ];
         
-        $validate = $this->validate($data, $rule);
+        $msg = [
+            'total_amount.require' => '请输入目标金额',
+            'total_amount.float' => '目标金额格式不正确',
+            'total_amount.gt' => '目标金额必须大于0',
+            'start_time.require' => '请选择开始时间',
+            'end_time.require' => '请选择结束时间'
+        ];
+        
+        $validate = $this->validate($data, $rule, $msg);
         if ($validate !== true) {
             $this->error($validate);
+        }
+        
+        // 验证时间逻辑
+        $startTime = strtotime($data['start_time']);
+        $endTime = strtotime($data['end_time']);
+        if ($endTime <= $startTime) {
+            $this->error('结束时间必须大于开始时间');
         }
         
         $task = TaskService::createTask($userId, $data);

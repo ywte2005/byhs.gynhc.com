@@ -95,42 +95,54 @@
 
 				<!-- Task Settings -->
 				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[32rpx]">
-					<view class="flex flex-col gap-[16rpx]">
-						<text class="text-[32rpx] font-bold text-[#1f2329]">任务设置</text>
-						<view class="w-full h-[80rpx] bg-[#eaf2ff] rounded-[16rpx] flex items-center justify-center">
-							<text class="text-[28rpx] text-[#0052d9]">总预算</text>
-						</view>
-					</view>
+					<text class="text-[32rpx] font-bold text-[#1f2329]">任务设置</text>
 					
 					<!-- Total Amount -->
 					<view class="flex flex-col gap-[16rpx]">
-						<text class="text-[28rpx] font-medium text-[#1f2329]">总金额</text>
+						<text class="text-[28rpx] font-medium text-[#1f2329]">目标金额（元）</text>
 						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center">
 							<input 
 								v-model="form.totalAmount"
 								type="digit"
 								class="flex-1 text-[28rpx] text-[#1f2329]"
-								placeholder="请输入总金额"
+								placeholder="请输入刷单目标总金额"
 								placeholder-class="text-[#9aa0a6]"
 							/>
+							<text class="text-[28rpx] text-[#9aa0a6]">元</text>
 						</view>
+						<text class="text-[24rpx] text-[#9aa0a6]">系统将自动拆分为2000-5000元/笔的子任务</text>
 					</view>
 
+					<!-- Time Range -->
 					<view class="flex flex-row gap-[24rpx]">
 						<!-- Start Time -->
 						<view class="flex-1 flex flex-col gap-[16rpx]">
 							<text class="text-[28rpx] font-medium text-[#1f2329]">开始时间</text>
-							<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-center" @tap="openDatePicker('start')">
-								<text :class="form.startTime ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx] whitespace-nowrap overflow-hidden">{{ form.startTime || '选择开始时间' }}</text>
-							</view>
+							<cl-select-date
+								v-model="form.startTime"
+								title="选择开始时间"
+								placeholder="请选择"
+								type="date"
+								:start="today"
+								value-format="YYYY-MM-DD"
+								label-format="YYYY-MM-DD"
+								:pt="datePickerPt"
+							></cl-select-date>
 						</view>
 
 						<!-- End Time -->
 						<view class="flex-1 flex flex-col gap-[16rpx]">
 							<text class="text-[28rpx] font-medium text-[#1f2329]">结束时间</text>
-							<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-center" @tap="openDatePicker('end')">
-								<text :class="form.endTime ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx] whitespace-nowrap overflow-hidden">{{ form.endTime || '选择结束时间' }}</text>
-							</view>
+							<cl-select-date
+								v-model="form.endTime"
+								title="选择结束时间"
+								placeholder="请选择"
+								type="date"
+								:start="form.startTime || today"
+								value-format="YYYY-MM-DD"
+								label-format="YYYY-MM-DD"
+								:pt="datePickerPt"
+							></cl-select-date>
 						</view>
 					</view>
 				</view>
@@ -179,18 +191,26 @@
 
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
-import { useRefs } from "@/.cool";
-import { getTaskTypes, type TaskType } from '@/services/task'
+import { dayUts } from "@/.cool";
+import { getTaskTypes, createTask, type TaskType } from '@/services/task'
 import { getApplicationList } from '@/services/merchant'
 
-// Refs
-const refs = useRefs()
-const datePicker = ref<any>(null)
+// 今天日期
+const today = dayUts().format('YYYY-MM-DD')
+
+// 日期选择器样式配置 - 主题色 #0052d9
+const datePickerPt = {
+	trigger: {
+		className: 'h-[88rpx] min-h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center'
+	},
+	popup: {
+		confirmButton: {
+			className: 'bg-[#0052d9]'
+		}
+	}
+}
 
 // State
-const showTypePicker = ref(false)
-const showMerchantPicker = ref(false)
-const datePickerType = ref<'start' | 'end'>('start')
 const loading = ref(false)
 
 // 表单数据
@@ -216,21 +236,6 @@ const taskTypeNames = computed(() => taskTypes.value.map(t => t.name))
 type MerchantItem = { id: number; name: string; applicationNo: string }
 const merchants = ref<MerchantItem[]>([])
 const merchantNames = computed(() => merchants.value.map(m => m.name))
-
-// 打开日期选择
-const openDatePicker = (type: 'start' | 'end') => {
-	datePickerType.value = type
-	refs.open("datePicker")
-}
-
-// 确认日期
-const onDateConfirm = (val: string) => {
-	if (datePickerType.value === 'start') {
-		form.value.startTime = val
-	} else {
-		form.value.endTime = val
-	}
-}
 
 // 选择类型
 const selectType = () => {
@@ -327,27 +332,39 @@ const canSubmit = computed(() => {
 
 // 提交任务
 const submitTask = async () => {
-	if (!canSubmit.value) return
+	if (!canSubmit.value) {
+		uni.showToast({ title: '请填写完整信息', icon: 'none' })
+		return
+	}
 	
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
-		// Mock API call
-		setTimeout(() => {
-			uni.hideLoading()
-			uni.showToast({
-				title: '提交成功',
-				icon: 'success'
-			})
-			setTimeout(() => {
-				uni.navigateBack()
-			}, 1500)
-		}, 1000)
-
-	} catch (error) {
+		const res = await createTask({
+			title: form.value.title,
+			type_code: form.value.typeCode,
+			total_amount: parseFloat(form.value.totalAmount),
+			channel_id: form.value.merchantId,
+			collection_type: form.value.collectionType,
+			qr_code: form.value.qrCode,
+			start_time: form.value.startTime,
+			end_time: form.value.endTime,
+			remark: form.value.description
+		})
+		
 		uni.hideLoading()
 		uni.showToast({
-			title: '提交失败，请重试',
+			title: '提交成功，等待审核',
+			icon: 'success'
+		})
+		setTimeout(() => {
+			uni.navigateBack()
+		}, 1500)
+
+	} catch (error: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: error.message || '提交失败，请重试',
 			icon: 'none'
 		})
 	}

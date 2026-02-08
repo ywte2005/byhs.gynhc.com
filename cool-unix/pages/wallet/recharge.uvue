@@ -69,7 +69,7 @@
 
 <script setup lang="uts">
 import { ref } from "vue";
-// import { recharge } from "@/services/wallet";
+import { recharge } from "@/services/wallet";
 
 const amount = ref("");
 const payType = ref("wechat");
@@ -91,19 +91,41 @@ async function handleSubmit() {
 		return;
 	}
 
-	uni.showLoading({ title: "支付中..." });
-
-	// Mock payment
-	setTimeout(() => {
-		uni.hideLoading();
+	const amountNum = parseFloat(amount.value);
+	if (isNaN(amountNum) || amountNum <= 0) {
 		uni.showToast({
-			title: "充值成功",
+			title: "请输入正确的金额",
+			icon: "none"
+		});
+		return;
+	}
+
+	try {
+		uni.showLoading({ title: "创建订单..." });
+		
+		const res = await recharge({
+			amount: amountNum,
+			pay_type: payType.value
+		});
+		
+		uni.hideLoading();
+		
+		// TODO: 根据支付类型调起对应支付
+		// 目前先显示成功提示
+		uni.showToast({
+			title: "订单创建成功",
 			icon: "success"
 		});
 		setTimeout(() => {
 			uni.navigateBack();
 		}, 1500);
-	}, 1500);
+	} catch (error: any) {
+		uni.hideLoading();
+		uni.showToast({
+			title: error.message || "充值失败",
+			icon: "none"
+		});
+	}
 }
 </script>
 

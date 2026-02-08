@@ -32,7 +32,7 @@
 </template>
 
 <script lang="uts">
-	// import { getInviteRecords } from "@/services/promo";
+	import { getMyTeam } from "@/services/promo";
 
 	type InviteRecord = {
 		id: number,
@@ -57,26 +57,32 @@
 			this.loadMore();
 		},
 		methods: {
-			loadMore() {
+			async loadMore() {
 				if (this.loading || !this.hasMore) return;
 				this.loading = true;
 
-				// Mock data
-				setTimeout(() => {
-					const mockList : InviteRecord[] = [];
-					if (this.page === 1) {
-						mockList.push({ id: 1, nickname: '张三', avatar: '', phone: '138****8888', createtime: 1678888888 });
-						mockList.push({ id: 2, nickname: '李四', avatar: '', phone: '139****9999', createtime: 1678889999 });
-					}
+				try {
+					const res = await getMyTeam(this.page, 10);
+					const records = (res.list || []).map((item: any) => ({
+						id: item.user_id,
+						nickname: item.nickname || '用户' + item.user_id,
+						avatar: item.avatar || '',
+						phone: item.mobile ? item.mobile.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : '',
+						createtime: item.createtime
+					}));
 					
-					if (mockList.length > 0) {
-						this.list = this.list.concat(mockList);
+					if (records.length > 0) {
+						this.list = this.list.concat(records);
 						this.page++;
 					} else {
 						this.hasMore = false;
 					}
+				} catch (err: any) {
+					console.error('加载邀请记录失败', err);
+					uni.showToast({ title: err.message || '加载失败', icon: 'none' });
+				} finally {
 					this.loading = false;
-				}, 500);
+				}
 			},
 			formatTime(timestamp : number) : string {
 				const date = new Date(timestamp * 1000);

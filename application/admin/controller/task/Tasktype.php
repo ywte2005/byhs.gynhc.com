@@ -2,7 +2,7 @@
 namespace app\admin\controller\task;
 
 use app\common\controller\Backend;
-use app\common\model\TaskType;
+use app\common\model\TaskType as TaskTypeModel;
 
 /**
  * 任务类型管理
@@ -15,7 +15,7 @@ class Tasktype extends Backend
     public function _initialize()
     {
         parent::_initialize();
-        $this->model = new TaskType();
+        $this->model = new TaskTypeModel();
         $this->view->assign('statusList', [
             'normal' => '正常',
             'hidden' => '隐藏'
@@ -56,7 +56,7 @@ class Tasktype extends Backend
             }
             
             // 检查编码是否重复
-            if (TaskType::getByCode($params['code'])) {
+            if (TaskTypeModel::getByCode($params['code'])) {
                 $this->error('类型编码已存在');
             }
             
@@ -87,7 +87,7 @@ class Tasktype extends Backend
             }
             
             // 检查编码是否重复（排除自己）
-            $existing = TaskType::getByCode($params['code']);
+            $existing = TaskTypeModel::getByCode($params['code']);
             if ($existing && $existing->id != $ids) {
                 $this->error('类型编码已存在');
             }

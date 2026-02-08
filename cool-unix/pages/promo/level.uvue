@@ -54,8 +54,7 @@
 </template>
 
 <script lang="uts">
-	// import { getLevels, purchaseLevel, getOverview } from "@/services/promo";
-	// import type { PromoLevel, PromoOverview } from "@/services/promo";
+	import { getLevels, purchaseLevel, getOverview } from "@/services/promo";
 
 	type PromoLevel = {
 		id: number,
@@ -81,44 +80,24 @@
 			this.loadData();
 		},
 		methods: {
-			loadData() {
+			async loadData() {
 				this.loading = true;
-				// Mock data
-				setTimeout(() => {
-					this.levels = [
-						{
-							id: 1,
-							name: '普通会员',
-							sort: 1,
-							upgrade_type: 'free',
-							upgrade_price: '0.00',
-							personal_performance_min: '0.00',
-							team_performance_min: '0.00',
-							direct_invite_min: 0
-						},
-						{
-							id: 2,
-							name: 'VIP会员',
-							sort: 2,
-							upgrade_type: 'buy',
-							upgrade_price: '199.00',
-							personal_performance_min: '0.00',
-							team_performance_min: '0.00',
-							direct_invite_min: 0
-						},
-						{
-							id: 3,
-							name: '钻石会员',
-							sort: 3,
-							upgrade_type: 'both',
-							upgrade_price: '599.00',
-							personal_performance_min: '10000.00',
-							team_performance_min: '50000.00',
-							direct_invite_min: 10
-						}
-					];
+				try {
+					const res = await getLevels();
+					this.levels = res || [];
+					
+					// 获取当前用户等级
+					const overview = await getOverview();
+					if (overview.level) {
+						this.currentLevelId = overview.level.id;
+						this.currentLevelName = overview.level.name;
+					}
+				} catch (err: any) {
+					console.error('加载等级列表失败', err);
+					uni.showToast({ title: err.message || '加载失败', icon: 'none' });
+				} finally {
 					this.loading = false;
-				}, 500);
+				}
 			},
 			isCurrentLevel(levelId : number) : boolean {
 				return levelId == this.currentLevelId;

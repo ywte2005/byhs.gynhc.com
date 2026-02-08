@@ -62,6 +62,8 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
+import { getMyTasks } from '@/services/task'
+import type { MutualTask } from '@/types/task'
 
 type PublishedTask = {
 	id: number
@@ -69,10 +71,10 @@ type PublishedTask = {
 	title: string
 	unitPrice: string
 	totalCount: number
-	completedCount: number // Changed from remainCount to completedCount logic
+	completedCount: number
 	status: string
 	createTime: string
-	type: string // main or sub
+	type: string
 	totalAmount: string
 }
 
@@ -81,48 +83,50 @@ const page = ref(1)
 const loading = ref(false)
 const hasMore = ref(true)
 
-const loadMore = () => {
+const formatAmount = (amount: number): string => {
+	return amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+const formatTime = (timestamp: number): string => {
+	const date = new Date(timestamp * 1000)
+	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+const loadMore = async () => {
 	if (loading.value || !hasMore.value) return
 	loading.value = true
 
-	// Mock data
-	setTimeout(() => {
-		const mockList : PublishedTask[] = []
-		if (page.value === 1) {
-			mockList.push({
-				id: 1,
-				taskNo: 'T202501300001',
-				title: '支付宝流水互刷',
-				unitPrice: '50.00',
-				totalCount: 50,
-				completedCount: 15,
-				status: 'ongoing',
-				createTime: '2025-01-30 10:00:00',
-				type: 'main',
-				totalAmount: '2,500.00'
-			})
-			mockList.push({
-				id: 2,
-				taskNo: 'T202501290002',
-				title: '淘宝店铺刷单任务',
-				unitPrice: '20.00',
-				totalCount: 50,
-				completedCount: 50,
-				status: 'completed',
-				createTime: '2025-01-29 15:30:00',
-				type: 'main',
-				totalAmount: '1,000.00'
-			})
-		}
+	try {
+		const res = await getMyTasks({
+			page: page.value,
+			limit: 10
+		})
 		
-		if (mockList.length > 0) {
-			list.value = list.value.concat(mockList)
+		const taskList = (res.list || []).map((item: MutualTask) => ({
+			id: item.id,
+			taskNo: item.task_no,
+			title: item.title || `任务${item.task_no}`,
+			unitPrice: formatAmount(item.total_amount / 100),
+			totalCount: Math.ceil(item.total_amount / 3000),
+			completedCount: Math.ceil(item.completed_amount / 3000),
+			status: item.status === 'running' ? 'ongoing' : item.status,
+			createTime: formatTime(item.createtime),
+			type: 'main',
+			totalAmount: formatAmount(item.total_amount)
+		}))
+		
+		if (taskList.length > 0) {
+			list.value = list.value.concat(taskList)
 			page.value++
 		} else {
 			hasMore.value = false
 		}
+	} catch (err: any) {
+		console.error('加载任务列表失败', err)
+		uni.showToast({ title: err.message || '加载失败', icon: 'none' })
+	} finally {
 		loading.value = false
-	}, 500)
+	}
 }
 
 const getStatusText = (status: string): string => {

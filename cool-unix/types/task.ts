@@ -52,13 +52,14 @@ export type SubTask = {
 
 // 创建任务表单
 export type CreateTaskForm = {
+	title: string
+	type_code: string
 	total_amount: number
-	sub_task_min: number
-	sub_task_max: number
 	channel_id: number
-	start_time: number
-	end_time: number
-	deposit_amount: number
+	collection_type: 'merchant' | 'qrcode'
+	qr_code?: string
+	start_time: string
+	end_time: string
 	remark: string
 }
 

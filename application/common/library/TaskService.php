@@ -15,31 +15,33 @@ class TaskService
         Db::startTrans();
         try {
             $totalAmount = $data['total_amount'];
-            $depositAmount = $data['deposit_amount'];
             $serviceFeeRate = $data['service_fee_rate'] ?? 0.01;
             
-            $wallet = WalletService::getWallet($userId);
-            if (bccomp($wallet->balance, $depositAmount, 2) < 0) {
-                throw new \Exception('余额不足以支付保证金');
-            }
+            // 处理时间格式
+            $startTime = is_numeric($data['start_time']) ? $data['start_time'] : strtotime($data['start_time']);
+            $endTime = is_numeric($data['end_time']) ? $data['end_time'] : strtotime($data['end_time']);
             
-            WalletService::changeBalance($userId, '-' . $depositAmount, 'task_deposit', 0, '任务保证金');
-            WalletService::changeDeposit($userId, $depositAmount, 'task_deposit', 0, '任务保证金');
+            // 处理收款类型
+            $receiptType = ($data['collection_type'] ?? 'merchant') === 'merchant' ? 'entry' : 'collection';
             
             $task = MutualTask::create([
                 'user_id' => $userId,
                 'task_no' => MutualTask::generateTaskNo(),
+                'title' => $data['title'] ?? '',
+                'category' => $data['type_code'] ?? '',
                 'total_amount' => $totalAmount,
                 'completed_amount' => 0,
                 'pending_amount' => 0,
-                'deposit_amount' => $depositAmount,
+                'deposit_amount' => 0,
                 'frozen_amount' => 0,
                 'service_fee_rate' => $serviceFeeRate,
                 'sub_task_min' => $data['sub_task_min'] ?? 2000,
                 'sub_task_max' => $data['sub_task_max'] ?? 5000,
                 'channel_id' => $data['channel_id'] ?? 0,
-                'start_time' => $data['start_time'] ?? null,
-                'end_time' => $data['end_time'] ?? null,
+                'receipt_type' => $receiptType,
+                'collection_qrcode' => $data['qr_code'] ?? '',
+                'start_time' => $startTime,
+                'end_time' => $endTime,
                 'status' => 'pending',
                 'remark' => $data['remark'] ?? ''
             ]);
