@@ -92,6 +92,14 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
         },
         add: function () {
             Controller.api.bindevent();
+            // 发送对象切换
+            $('input[name="send_all"]').change(function(){
+                if($(this).val() == '0'){
+                    $('#user-select-group').show();
+                } else {
+                    $('#user-select-group').hide();
+                }
+            });
         },
         detail: function () {
             // 详情页无需特殊处理

@@ -11,6 +11,7 @@ class Message extends Backend
     protected $model = null;
     protected $searchFields = 'id,user_id,title,content';
     protected $relationSearch = true;
+    protected $noNeedRight = ['searchuser', 'index', 'add', 'detail', 'del', 'markread'];
 
     public function _initialize()
     {
@@ -54,50 +55,54 @@ class Message extends Backend
      */
     public function add()
     {
-        if ($this->request->isPost()) {
-            $params = $this->request->post('row/a');
-            if (!$params) {
-                $this->error(__('Parameter %s can not be empty', ''));
-            }
-            
-            $userIds = $this->request->post('user_ids', '');
-            $sendAll = $this->request->post('send_all', 0);
-            
-            \think\Db::startTrans();
-            try {
-                if ($sendAll) {
-                    // 群发给所有用户
-                    $users = \app\common\model\User::where('status', 'normal')->column('id');
-                } else {
-                    $users = array_filter(explode(',', $userIds));
-                }
-                
-                if (empty($users)) {
-                    throw new \Exception('请选择接收用户');
-                }
-                
-                $data = [];
-                $time = time();
-                foreach ($users as $userId) {
-                    $data[] = [
-                        'user_id' => $userId,
-                        'type' => $params['type'],
-                        'title' => $params['title'],
-                        'content' => $params['content'],
-                        'is_read' => 0,
-                        'createtime' => $time
-                    ];
-                }
-                
-                $this->model->insertAll($data);
-                \think\Db::commit();
-                $this->success('发送成功，共发送 ' . count($users) . ' 条消息');
-            } catch (\Exception $e) {
-                \think\Db::rollback();
-                $this->error($e->getMessage());
-            }
+        if (false === $this->request->isPost()) {
+            return $this->view->fetch();
         }
-        return $this->view->fetch();
+        $params = $this->request->post('row/a');
+        if (empty($params)) {
+            $this->error(__('Parameter %s can not be empty', ''));
+        }
+        
+        $userIds = $this->request->post('user_ids', '');
+        $sendAll = $this->request->post('send_all', 0);
+        
+        \think\Db::startTrans();
+        try {
+            if ($sendAll == 1) {
+                // 群发给所有用户
+                $users = \app\common\model\User::where('status', 'normal')->column('id');
+            } else {
+                // 指定用户
+                if (empty($userIds)) {
+                    $this->error('请选择接收用户');
+                }
+                $users = array_filter(explode(',', $userIds));
+            }
+            
+            if (empty($users)) {
+                $this->error('请选择接收用户');
+            }
+            
+            $data = [];
+            $time = time();
+            foreach ($users as $userId) {
+                $data[] = [
+                    'user_id' => intval($userId),
+                    'type' => $params['type'],
+                    'title' => $params['title'],
+                    'content' => $params['content'],
+                    'is_read' => 0,
+                    'createtime' => $time
+                ];
+            }
+            
+            \think\Db::name('message')->insertAll($data);
+            \think\Db::commit();
+        } catch (\Exception $e) {
+            \think\Db::rollback();
+            $this->error($e->getMessage());
+        }
+        $this->success();
     }
 
     /**
@@ -155,5 +160,61 @@ class Message extends Backend
             $count = $this->model->where('id', 'in', $ids)->update(['is_read' => 1]);
             $this->success('已标记 ' . $count . ' 条为已读');
         }
+    }
+
+    /**
+     * 用户搜索（支持手机号模糊搜索）
+     * 返回格式：手机号（用户名：ID）
+     */
+    public function searchuser()
+    {
+        $q_word = $this->request->request('q_word/a', []);
+        $page = $this->request->request('pageNumber', 1);
+        $pagesize = $this->request->request('pageSize', 10);
+        
+        // 支持手机号或用户名模糊搜索
+        $keyword = '';
+        if (!empty($q_word[0])) {
+            $keyword = trim($q_word[0]);
+        }
+        
+        // 构建查询 - ThinkPHP 5.0 语法
+        $query = \app\common\model\User::where('status', 'normal');
+        if ($keyword) {
+            $query->where(function($q) use ($keyword) {
+                $q->where('mobile', 'like', '%' . $keyword . '%')
+                  ->whereOr('nickname', 'like', '%' . $keyword . '%')
+                  ->whereOr('username', 'like', '%' . $keyword . '%');
+            });
+        }
+        $total = $query->count();
+        
+        // 重新构建查询获取列表
+        $query2 = \app\common\model\User::where('status', 'normal');
+        if ($keyword) {
+            $query2->where(function($q) use ($keyword) {
+                $q->where('mobile', 'like', '%' . $keyword . '%')
+                  ->whereOr('nickname', 'like', '%' . $keyword . '%')
+                  ->whereOr('username', 'like', '%' . $keyword . '%');
+            });
+        }
+        $list = $query2->order('id', 'desc')
+            ->page($page, $pagesize)
+            ->select();
+        
+        $result = [];
+        foreach ($list as $item) {
+            $mobile = $item->mobile ?: '无手机号';
+            $nickname = $item->nickname ?: $item->username;
+            $result[] = [
+                'id' => $item->id,
+                'name' => $mobile . '（' . $nickname . '：' . $item->id . '）'
+            ];
+        }
+        
+        return json([
+            'list' => $result,
+            'total' => $total
+        ]);
     }
 }
