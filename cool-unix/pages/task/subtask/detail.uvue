@@ -110,8 +110,18 @@
 			</view>
 		</scroll-view>
 
-		<!-- 底部操作栏 -->
-		<view v-if="showActions" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+		<!-- 底部操作栏 - 未接单状态 -->
+		<view v-if="canAccept" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+			<view 
+				class="h-[88rpx] rounded-[44rpx] bg-[#0052d9] flex items-center justify-center shadow-[0_4rpx_16rpx_rgba(0,82,217,0.3)]"
+				@click="handleAccept"
+			>
+				<text class="text-[32rpx] font-bold text-white">立即接单</text>
+			</view>
+		</view>
+
+		<!-- 底部操作栏 - 已接单状态（接单者） -->
+		<view v-else-if="canUpload" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
 			<view class="flex flex-row gap-[24rpx]">
 				<view 
 					class="flex-1 h-[88rpx] rounded-[44rpx] border-[2rpx] border-[#ff3b30] flex items-center justify-center bg-[#fff0f0]"
@@ -127,44 +137,62 @@
 				</view>
 			</view>
 		</view>
+
+		<!-- 底部操作栏 - 待确认状态（发布者） -->
+		<view v-else-if="canConfirm" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
+			<view class="flex flex-row gap-[24rpx]">
+				<view 
+					class="flex-1 h-[88rpx] rounded-[44rpx] border-[2rpx] border-[#ff3b30] flex items-center justify-center bg-[#fff0f0]"
+					@click="handleReject"
+				>
+					<text class="text-[30rpx] font-bold text-[#ff3b30]">拒绝</text>
+				</view>
+				<view 
+					class="flex-[2] h-[88rpx] rounded-[44rpx] bg-[#00b578] flex items-center justify-center"
+					@click="handleConfirm"
+				>
+					<text class="text-[30rpx] font-bold text-white">确认完成</text>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { getSubTaskDetail, cancelSubTask } from '@/services/task'
+import { getSubTaskDetail, cancelSubTask, acceptSubTask, confirmSubTask, rejectSubTask } from '@/services/task'
+import { userInfo } from '@/.cool/store/user'
 
 // 子任务ID
 const subtaskId = ref(0)
 
+// 当前用户ID
+const currentUserId = ref(0)
+
 // 子任务信息
-const subtaskInfo = ref({
-	subtaskNo: 'ST202501300001',
-	status: 'ongoing',
-	title: '美团外卖订单互助',
-	description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
-	receiveTime: '2025-01-30 10:00:00',
-	timeLimit: 24,
-	remainTime: '23小时30分',
-	completeTime: '',
-	category: '外卖',
-	platform: '美团',
-	commission: '15.00',
-	steps: '1. 打开美团APP\n2. 搜索指定商家\n3. 下单指定商品\n4. 完成支付\n5. 上传订单截图',
-	proofTypes: ['订单截图', '聊天记录'],
-	specialRequirement: '请在下单后30分钟内上传截图',
-	proofImages: [],
-	proofNote: '',
-	merchantAvatar: '',
-	merchantName: '示例商户A',
-	merchantLevel: 'VIP',
-	merchantCredit: 98,
-	canUpload: true
+const subtaskInfo = ref({} as any)
+
+// 是否为任务发布者
+const isPublisher = computed(() => {
+	return subtaskInfo.value.fromUserId === currentUserId.value
 })
 
-// 是否显示操作按钮
-const showActions = computed(() => {
-	return subtaskInfo.value.canUpload && subtaskInfo.value.status === 'ongoing'
+// 是否可以接单（未接单状态，且不是发布者）
+const canAccept = computed(() => {
+	if (isPublisher.value) return false
+	return subtaskInfo.value.rawStatus === 'pending' || subtaskInfo.value.rawStatus === 'assigned'
+})
+
+// 是否可以上传凭证（已接单状态，且不是发布者）
+const canUpload = computed(() => {
+	if (isPublisher.value) return false
+	return subtaskInfo.value.rawStatus === 'accepted' || subtaskInfo.value.rawStatus === 'paid'
+})
+
+// 是否可以确认/拒绝（发布者且状态为 paid 或 verified）
+const canConfirm = computed(() => {
+	if (!isPublisher.value) return false
+	return subtaskInfo.value.rawStatus === 'paid' || subtaskInfo.value.rawStatus === 'verified'
 })
 
 // 加载子任务详情
@@ -181,8 +209,12 @@ const loadSubtaskDetail = async () => {
 			subtaskInfo.value = {
 				subtaskNo: data.subtask_no || `ST${data.id}`,
 				status: mapSubtaskStatus(data.status),
-				title: data.title || `互助任务 #${data.subtask_no || data.id}`,
+				rawStatus: data.status,  // 保存原始状态
+				fromUserId: data.from_user_id,  // 发布者ID
+				toUserId: data.to_user_id,  // 接单者ID
+				title: data.title || `互助任务 #${data.task_no || data.id}`,
 				description: data.description || `金额：¥${data.amount}，佣金：¥${data.commission}`,
+				amount: data.amount,
 				receiveTime: formatDateTime(data.accepted_time || data.createtime),
 				timeLimit: data.time_limit || 24,
 				remainTime: calculateRemainTime(data.accepted_time, data.time_limit || 24),
@@ -193,8 +225,8 @@ const loadSubtaskDetail = async () => {
 				steps: data.steps || data.description || '',
 				proofTypes: data.proof_types || ['订单截图'],
 				specialRequirement: data.special_requirement || '',
-				proofImages: data.proof_images || [],
-				proofNote: data.proof_note || '',
+				proofImages: data.proof_image ? data.proof_image.split(',') : [],
+				proofNote: data.proof_desc || '',
 				merchantAvatar: '',
 				merchantName: data.merchant_name || `商户${data.from_user_id}`,
 				merchantLevel: data.merchant_level || 'VIP',
@@ -304,6 +336,29 @@ const goToUpload = () => {
 	})
 }
 
+// 立即接单
+const handleAccept = () => {
+	uni.showModal({
+		title: '确认接单',
+		content: `确定接受该任务吗？接单后需在规定时间内完成并上传凭证。`,
+		success: async (res) => {
+			if (res.confirm) {
+				try {
+					uni.showLoading({ title: '接单中...' })
+					await acceptSubTask(subtaskId.value)
+					uni.hideLoading()
+					uni.showToast({ title: '接单成功', icon: 'success' })
+					// 刷新详情
+					loadSubtaskDetail()
+				} catch (e: any) {
+					uni.hideLoading()
+					uni.showToast({ title: e.msg || e.message || '接单失败', icon: 'none' })
+				}
+			}
+		}
+	})
+}
+
 // 取消接单
 const handleCancel = () => {
 	uni.showModal({
@@ -327,6 +382,59 @@ const handleCancel = () => {
 	})
 }
 
+// 发布者确认完成
+const handleConfirm = () => {
+	uni.showModal({
+		title: '确认完成',
+		content: `确认该子任务已完成？确认后将支付佣金¥${subtaskInfo.value.commission}给接单者。`,
+		success: async (res) => {
+			if (res.confirm) {
+				try {
+					uni.showLoading({ title: '处理中...' })
+					await confirmSubTask(subtaskId.value)
+					uni.hideLoading()
+					uni.showToast({ title: '已确认完成', icon: 'success' })
+					// 刷新详情
+					loadSubtaskDetail()
+				} catch (e: any) {
+					uni.hideLoading()
+					uni.showToast({ title: e.msg || e.message || '操作失败', icon: 'none' })
+				}
+			}
+		}
+	})
+}
+
+// 发布者拒绝
+const handleReject = () => {
+	uni.showModal({
+		title: '拒绝任务',
+		content: '确定拒绝该子任务吗？拒绝后任务将重新进入待接单状态。',
+		success: async (res) => {
+			if (res.confirm) {
+				try {
+					uni.showLoading({ title: '处理中...' })
+					await rejectSubTask(subtaskId.value, '凭证不符合要求')
+					uni.hideLoading()
+					uni.showToast({ title: '已拒绝', icon: 'success' })
+					// 刷新详情
+					loadSubtaskDetail()
+				} catch (e: any) {
+					uni.hideLoading()
+					uni.showToast({ title: e.msg || e.message || '操作失败', icon: 'none' })
+				}
+			}
+		}
+	})
+}
+
+// 加载当前用户信息
+const loadCurrentUser = () => {
+	if (userInfo.value && userInfo.value.id) {
+		currentUserId.value = userInfo.value.id
+	}
+}
+
 // 页面加载时获取子任务详情
 onMounted(() => {
 	// 获取子任务ID
@@ -334,6 +442,9 @@ onMounted(() => {
 	const currentPage = pages[pages.length - 1]
 	// @ts-ignore
 	subtaskId.value = parseInt(currentPage.options?.id || '0')
+	
+	// 加载用户信息
+	loadCurrentUser()
 	
 	if (subtaskId.value > 0) {
 		loadSubtaskDetail()

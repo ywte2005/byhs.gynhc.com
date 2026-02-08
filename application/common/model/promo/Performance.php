@@ -6,8 +6,7 @@ use think\Model;
 class Performance extends Model
 {
     protected $name = 'promo_performance';
-    protected $autoWriteTimestamp = 'updatetime';
-    protected $createTime = false;
+    protected $autoWriteTimestamp = false;
 
     public function user()
     {
@@ -22,6 +21,7 @@ class Performance extends Model
     public static function updatePerformance($userId, $period, $personalAmount = 0, $teamAmount = 0)
     {
         $record = self::getByUserMonth($userId, $period);
+        $now = time();
         if (!$record) {
             return self::create([
                 'user_id' => $userId,
@@ -30,11 +30,14 @@ class Performance extends Model
                 'team_performance' => $teamAmount,
                 'growth' => 0,
                 'direct_invite_count' => 0,
-                'team_member_count' => 0
+                'team_member_count' => 0,
+                'createtime' => $now,
+                'updatetime' => $now
             ]);
         }
         $record->personal_performance = bcadd($record->personal_performance, $personalAmount, 2);
         $record->team_performance = bcadd($record->team_performance, $teamAmount, 2);
+        $record->updatetime = $now;
         $record->save();
         return $record;
     }

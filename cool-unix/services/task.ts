@@ -52,8 +52,8 @@ export function cancelTask(taskId: number, reason: string): Promise<void> {
 	});
 }
 
-// 获取保证金信息
-export function getDepositInfo(taskId: number): Promise<{
+// 获取任务保证金信息
+export function getTaskDepositInfo(taskId: number): Promise<{
 	task_id: number;
 	total_amount: string;
 	paid_amount: string;
@@ -67,6 +67,19 @@ export function getDepositInfo(taskId: number): Promise<{
 		url: "/task/getDepositInfo",
 		method: "GET",
 		data: { task_id: taskId }
+	});
+}
+
+// 获取用户保证金账户信息
+export function getDepositInfo(): Promise<{
+	deposit: number;
+	frozen_deposit: number;
+	total_deposit: number;
+	logs: any[];
+}> {
+	return request({
+		url: "/wallet/depositInfo",
+		method: "GET"
 	});
 }
 
@@ -138,7 +151,7 @@ export function acceptSubTask(subtaskId: number): Promise<void> {
 	});
 }
 
-// 上传支付凭证
+// 上传支付凭证（旧接口，保留兼容）
 export function uploadProof(form: UploadProofForm): Promise<void> {
 	return request({
 		url: "/task/subtaskUploadProof",
@@ -147,8 +160,21 @@ export function uploadProof(form: UploadProofForm): Promise<void> {
 	});
 }
 
+// 上传子任务凭证
+export function uploadSubTaskProof(subtaskId: number, proofImage: string, proofDesc: string = ''): Promise<{ subtask: SubTask }> {
+	return request({
+		url: "/task/subtaskUploadProof",
+		method: "POST",
+		data: {
+			subtask_id: subtaskId,
+			proof_image: proofImage,
+			proof_desc: proofDesc
+		}
+	});
+}
+
 // 取消接单
-export function cancelSubTask(subtaskId: number, reason: string): Promise<void> {
+export function cancelSubTask(subtaskId: number, reason: string = ''): Promise<void> {
 	return request({
 		url: "/task/subtaskCancel",
 		method: "POST",
@@ -159,11 +185,41 @@ export function cancelSubTask(subtaskId: number, reason: string): Promise<void> 
 	});
 }
 
+// 发布者确认子任务完成
+export function confirmSubTask(subtaskId: number): Promise<{ count: number }> {
+	return request({
+		url: "/task/subtaskConfirm",
+		method: "POST",
+		data: { subtask_id: subtaskId }
+	});
+}
 
-// 提取保证金
+// 发布者拒绝子任务
+export function rejectSubTask(subtaskId: number, reason: string = '凭证不符合要求'): Promise<{ count: number }> {
+	return request({
+		url: "/task/subtaskReject",
+		method: "POST",
+		data: {
+			subtask_id: subtaskId,
+			reason
+		}
+	});
+}
+
+
+// 充值保证金（从余额转入保证金账户）
+export function rechargeDeposit(amount: number): Promise<void> {
+	return request({
+		url: "/wallet/depositPay",
+		method: "POST",
+		data: { amount }
+	});
+}
+
+// 提取保证金（从保证金账户转回余额）
 export function withdrawDeposit(amount: number): Promise<void> {
 	return request({
-		url: "/task/depositWithdraw",
+		url: "/wallet/depositWithdraw",
 		method: "POST",
 		data: { amount }
 	});

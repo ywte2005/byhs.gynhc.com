@@ -155,7 +155,7 @@ class PromoService
         $performance = Performance::getByUserMonth($userId, $period);
         $personalAmount = $performance ? $performance->personal_performance : 0;
         $teamAmount = $performance ? $performance->team_performance : 0;
-        $directCount = Relation::getDirectChildren($userId)->count();
+        $directCount = count(Relation::getDirectChildren($userId));
         
         $levels = Level::where('status', 'normal')
             ->where('sort', '>', $currentSort)
@@ -185,7 +185,7 @@ class PromoService
         $period = date('Y-m');
         $performance = Performance::getByUserMonth($userId, $period);
         $growth = Performance::calculateGrowth($userId, $period);
-        $directCount = $relation ? Relation::getDirectChildren($userId)->count() : 0;
+        $directCount = $relation ? count(Relation::getDirectChildren($userId)) : 0;
         
         $totalBonus = Commission::getUserTotalCommission($userId, 'settled');
         $monthBonus = Commission::where('user_id', $userId)

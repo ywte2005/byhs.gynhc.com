@@ -43,7 +43,7 @@
 								<uni-icons :type="item.iconType" size="20" :color="item.iconColor"></uni-icons>
 							</view>
 							<view class="flex flex-col gap-[8rpx]">
-								<text class="text-[30rpx] text-[#1f2329] font-semibold">{{ item.title }}</text>
+								<text class="text-[30rpx] text-[#1f2329] font-semibold">{{ item.bizTypeText }}</text>
 								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
 							</view>
 						</view>
@@ -199,7 +199,7 @@ const loadLogList = async () => {
 					iconType: isIncome ? 'wallet-filled' : 'upload-filled',
 					iconColor: isIncome ? '#00b578' : '#ff3b30',
 					iconBgColor: isIncome ? '#e6f7f0' : '#fef0f0',
-					title: item.memo || item.change_type,
+					bizTypeText: item.biz_type_text,
 					time: formatTime(item.createtime),
 					type: isIncome ? 'in' : 'out',
 					amount: Math.abs(amount).toFixed(2),

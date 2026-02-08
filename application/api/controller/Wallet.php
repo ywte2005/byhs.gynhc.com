@@ -6,7 +6,7 @@ use app\common\library\WalletService;
 
 class Wallet extends Api
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['transactionTypes'];
     protected $noNeedRight = ['*'];
 
     public function info()
@@ -243,5 +243,37 @@ class Wallet extends Api
             'id' => $bankcard->id,
             'is_default' => $bankcard->is_default
         ]]);
+    }
+
+    /**
+     * 获取交易类型配置（供前端使用）
+     */
+    public function transactionTypes()
+    {
+        $types = \app\common\model\wallet\WalletLog::getTypeConfigs();
+        $this->success('获取成功', $types);
+    }
+
+    /**
+     * 获取保证金账户信息
+     */
+    public function depositInfo()
+    {
+        $userId = $this->auth->id;
+        $wallet = WalletService::getWallet($userId);
+        
+        // 获取保证金流水
+        $logs = \app\common\model\wallet\WalletLog::where('user_id', $userId)
+            ->where('wallet_type', 'deposit')
+            ->order('id', 'desc')
+            ->limit(20)
+            ->select();
+        
+        $this->success('获取成功', [
+            'deposit' => $wallet->deposit,
+            'frozen_deposit' => $wallet->frozen,
+            'total_deposit' => $wallet->deposit,
+            'logs' => $logs
+        ]);
     }
 }

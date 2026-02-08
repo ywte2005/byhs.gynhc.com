@@ -61,7 +61,7 @@ class SubTask extends Model
     public static function getAvailableForUser($userId, $category = null, $page = 1, $limit = 20)
     {
         $query = self::with(['task' => function($query) {
-                $query->field('id,title,category,category_text,platform,createtime,status');
+                $query->field('id,title,category,platform,createtime,status');
             }])
             ->whereIn('status', ['pending', 'assigned'])  // 待派发和已派发的都可以接单
             ->where('to_user_id', 0)

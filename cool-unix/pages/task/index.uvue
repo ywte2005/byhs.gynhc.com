@@ -10,20 +10,17 @@
 		</cl-topbar>
 
 		<!-- 筛选栏 -->
-		<view class="bg-white py-[24rpx] border-b-[2rpx] border-[#f0f0f0]">
-			<scroll-view class="w-full" scroll-x :show-scrollbar="false">
-				<view class="flex flex-row px-[32rpx] gap-[16rpx]">
-					<view 
-						v-for="(item, index) in categories" 
-						:key="index"
-						@click="selectCategory(item.value)"
-						class="px-[32rpx] py-[12rpx] rounded-[32rpx] flex-shrink-0"
-						:class="[currentCategory === item.value ? 'bg-[#0052d9]' : 'bg-[#f5f7fa]']"
-					>
-						<text class="text-[28rpx]" :class="[currentCategory === item.value ? 'text-white' : 'text-[#646a73]']">{{ item.label }}</text>
-					</view>
-				</view>
-			</scroll-view>
+		<view class="bg-white border-b-[2rpx] border-[#f0f0f0]">
+			<cl-tabs 
+				v-model="currentCategory" 
+				:list="categories" 
+				:show-line="true"
+				:show-slider="false"
+				:gutter="16"
+				color="#0052d9"
+				un-color="#646a73"
+				@change="onCategoryChange"
+			/>
 		</view>
 
 		<!-- 任务列表 -->
@@ -118,22 +115,33 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getTaskList } from '@/services/task'
+import { getTaskList, getTaskTypes } from '@/services/task'
 import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 当前分类
 const currentCategory = ref('all')
 
-// 分类列表（与后端保持一致）
-const categories = [
-	{ label: '全部', value: 'all' },
-	{ label: '电商平台', value: 'ecommerce' },
-	{ label: '外卖配送', value: 'food' },
-	{ label: '出行服务', value: 'travel' },
-	{ label: '生活服务', value: 'life' },
-	{ label: '金融支付', value: 'finance' },
-	{ label: '其他', value: 'other' }
-]
+// 分类列表（从后端加载）
+const categories = ref([{ label: '全部', value: 'all' }] as { label: string; value: string }[])
+
+// 加载分类列表
+const loadCategories = async () => {
+	try {
+		const data = await getTaskTypes()
+		if (data && data.list) {
+			// 添加"全部"选项 + 后端返回的分类
+			categories.value = [
+				{ label: '全部', value: 'all' },
+				...data.list.map((item: any) => ({
+					label: item.name,
+					value: item.code
+				}))
+			]
+		}
+	} catch (error) {
+		console.log('加载分类失败', error)
+	}
+}
 
 // 任务列表（初始为空，从后端加载）
 const taskList = ref([] as any[])
@@ -143,9 +151,8 @@ const loading = ref(false)
 const hasMore = ref(true)
 const page = ref(1)
 
-// 选择分类
-const selectCategory = (value: string) => {
-	currentCategory.value = value
+// 分类变更事件
+const onCategoryChange = (item: { label: string; value: string }) => {
 	page.value = 1
 	taskList.value = []
 	loadTaskList()
@@ -270,10 +277,10 @@ const getStatusTextClass = (status: string): string => {
 	return classMap[status] || 'text-[#909399]'
 }
 
-// 进入任务详情
+// 进入子任务详情（任务大厅显示的是子任务）
 const goToDetail = (id: number) => {
 	uni.navigateTo({
-		url: `/pages/task/detail?id=${id}`
+		url: `/pages/task/subtask/detail?id=${id}`
 	})
 }
 
@@ -292,6 +299,7 @@ const goToCreate = () => {
 }
 
 onMounted(() => {
+	loadCategories()
 	loadTaskList()
 })
 </script>

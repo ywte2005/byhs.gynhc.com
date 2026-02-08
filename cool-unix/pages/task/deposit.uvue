@@ -65,15 +65,36 @@
 						<view 
 							v-for="(item, index) in logList" 
 							:key="index"
-							class="flex justify-between items-center py-[24rpx] border-b-[2rpx] border-[#f5f7fa]"
+							class="log-item"
 						>
-							<view class="flex-1 flex flex-col gap-[8rpx]">
-								<text class="text-[28rpx] text-[#1f2329]">{{ item.title }}</text>
-								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
+							<!-- 左侧图标 -->
+							<view 
+								class="w-[80rpx] h-[80rpx] rounded-[16rpx] flex items-center justify-center mr-[24rpx]"
+								:class="item.type === 'income' ? 'bg-[#e6f7f0]' : 'bg-[#fff0f0]'"
+							>
+								<uni-icons 
+									:type="item.type === 'income' ? 'arrow-down' : 'arrow-up'" 
+									size="24" 
+									:color="item.type === 'income' ? '#00b578' : '#ff3b30'"
+								></uni-icons>
 							</view>
-							<view class="flex flex-col items-end gap-[4rpx]">
-								<text class="text-[30rpx] font-semibold" :class="item.type === 'in' ? 'text-[#0052d9]' : 'text-[#ff3b30]'">
-									{{ item.type === 'in' ? '+' : '-' }}{{ item.amount }}
+							
+							<!-- 中间信息 -->
+							<view class="flex-1 flex flex-col gap-[8rpx]">
+								<view class="log-title-row">
+									<text class="text-[28rpx] font-medium text-[#1f2329]">{{ item.bizTypeText }}</text>
+								</view>
+								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.remark }}</text>
+								<text class="text-[22rpx] text-[#c0c4cc]">{{ item.time }}</text>
+							</view>
+							
+							<!-- 右侧金额 -->
+							<view class="flex flex-col items-end gap-[8rpx] ml-[16rpx]">
+								<text 
+									class="text-[32rpx] font-semibold font-['DIN_Alternate']" 
+									:class="item.type === 'income' ? 'text-[#00b578]' : 'text-[#ff3b30]'"
+								>
+									{{ item.type === 'income' ? '+' : '-' }}{{ item.amount }}
 								</text>
 								<text class="text-[22rpx] text-[#9aa0a6]">余额：{{ item.balance }}</text>
 							</view>
@@ -222,11 +243,13 @@ const loadDepositInfo = async () => {
 				logList.value = res.logs.map((item: any) => {
 					const amount = parseFloat(item.amount)
 					return {
-						title: item.memo || item.change_type,
+						bizTypeText: item.biz_type_text || item.biz_type || '未知类型',
+						changeTypeText: item.change_type_text || (item.change_type === 'income' ? '收入' : '支出'),
+						remark: item.remark || '',
 						time: formatDateTime(item.createtime),
-						type: amount >= 0 ? 'in' : 'out',
+						type: item.change_type || (amount >= 0 ? 'income' : 'expense'),
 						amount: Math.abs(amount).toFixed(2),
-						balance: parseFloat(item.after_balance || 0).toFixed(2)
+						balance: parseFloat(item.after_amount || 0).toFixed(2)
 					}
 				})
 			}
@@ -359,4 +382,21 @@ onMounted(() => {
 </script>
 
 <style>
+.log-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 24rpx 0;
+	border-bottom: 2rpx solid #f5f7fa;
+}
+
+.log-item:last-child {
+	border-bottom: none;
+}
+
+.log-title-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
 </style>

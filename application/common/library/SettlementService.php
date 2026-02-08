@@ -24,18 +24,25 @@ class SettlementService
             $commission = $subTask->commission;
             $serviceFee = $subTask->service_fee;
             
-            $totalToUser = bcadd($amount, $commission, 2);
-            WalletService::changeBalance($toUserId, $totalToUser, 'subtask_complete', $subTask->id, '刷单收入+佣金');
+            // 分开记录刷单金额和佣金
+            WalletService::changeBalance($toUserId, $amount, 'subtask_amount', $subTask->id, "刷单收入（本次刷单¥{$amount}，佣金¥{$commission}）");
+            WalletService::changeBalance($toUserId, $commission, 'subtask_commission', $subTask->id, "佣金收入（本次刷单¥{$amount}，佣金¥{$commission}）");
             
             WalletService::changeMutualBalance($toUserId, $amount, 'subtask_complete', $subTask->id, '帮刷增加互助余额');
             
-            WalletService::unfreezeDeposit($fromUserId, $amount, 'subtask_complete', $subTask->id, '子任务完成解冻');
+            // 只有在金额被冻结时才解冻（检查任务的冻结金额）
+            if (bccomp($task->frozen_amount, $amount, 2) >= 0) {
+                WalletService::unfreezeDeposit($fromUserId, $amount, 'subtask_complete', $subTask->id, '子任务完成解冻');
+            }
+            
             WalletService::changeDeposit($fromUserId, '-' . $amount, 'subtask_complete', $subTask->id, '子任务完成扣除');
             WalletService::changeDeposit($fromUserId, '-' . $serviceFee, 'service_fee', $subTask->id, '服务费');
             
             WalletService::changeMutualBalance($fromUserId, '-' . $amount, 'subtask_complete', $subTask->id, '被刷减少互助余额');
             
-            $task->frozen_amount = bcsub($task->frozen_amount, $amount, 2);
+            if (bccomp($task->frozen_amount, $amount, 2) >= 0) {
+                $task->frozen_amount = bcsub($task->frozen_amount, $amount, 2);
+            }
             $task->save();
             
             RewardService::updatePerformance($toUserId, $amount);
@@ -116,7 +123,7 @@ class SettlementService
                 continue;
             }
             
-            $directCount = Relation::getDirectChildren($perf->user_id)->count();
+            $directCount = count(Relation::getDirectChildren($perf->user_id));
             if ($directCount < $config->qualified_count_min) {
                 continue;
             }

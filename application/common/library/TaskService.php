@@ -509,7 +509,42 @@ class TaskService
 
     public static function getSubTaskDetail($subTaskId)
     {
-        return SubTask::find($subTaskId);
+        $subTask = SubTask::with(['task'])->find($subTaskId);
+        if (!$subTask) {
+            return null;
+        }
+        
+        // 生成操作步骤
+        $subTask->steps = self::generateSubTaskSteps($subTask);
+        
+        // 添加商户信息
+        $merchant = \app\common\model\merchant\Merchant::where('user_id', $subTask->from_user_id)->find();
+        $subTask->merchant_name = $merchant ? $merchant->name : '商户' . $subTask->from_user_id;
+        $subTask->merchant_level = 'VIP';  // 暂无等级字段，使用默认值
+        $subTask->merchant_credit = 100;   // 暂无信用分字段，使用默认值
+        
+        return $subTask;
+    }
+    
+    /**
+     * 生成子任务操作步骤
+     */
+    protected static function generateSubTaskSteps($subTask)
+    {
+        $task = $subTask->task;
+        $amount = $subTask->amount;
+        
+        // 根据任务类型生成步骤
+        $steps = [
+            "1. 打开商户指定的支付平台或APP",
+            "2. 按照商户要求完成消费/下单操作",
+            "3. 支付金额：¥{$amount}",
+            "4. 保存支付成功截图（需包含订单号、金额、时间）",
+            "5. 返回本页面上传支付凭证",
+            "6. 等待系统自动验证完成"
+        ];
+        
+        return implode("\n", $steps);
     }
 
     public static function cancelSubTask($subTaskId, $userId)

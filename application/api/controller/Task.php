@@ -30,7 +30,7 @@ class Task extends Api
         $this->success('获取成功', [
             'list' => $list->items(), 
             'total' => $list->total(),
-            'hasMore' => $list->hasMore()
+            'hasMore' => $list->currentPage() < $list->lastPage()
         ]);
     }
 
@@ -46,11 +46,15 @@ class Task extends Api
             $this->error('任务不存在');
         }
         
-        if ($task->user_id !== $this->auth->id) {
-            $this->error('无权查看');
+        // 判断当前用户是否为任务发布者
+        $isOwner = ($task->user_id === $this->auth->id);
+        
+        // 非发布者只能查看运行中的任务
+        if (!$isOwner && $task->status !== 'running') {
+            $this->error('任务不可查看');
         }
         
-        $this->success('获取成功', ['task' => $task]);
+        $this->success('获取成功', ['task' => $task, 'isOwner' => $isOwner]);
     }
 
     public function create()
@@ -273,6 +277,68 @@ class Task extends Api
         
         $subTask = TaskService::cancelSubTask($subTaskId, $userId);
         $this->success('取消成功', ['subtask' => $subTask]);
+    }
+
+    /**
+     * 发布者确认子任务完成
+     */
+    public function subtaskConfirm()
+    {
+        $subTaskId = $this->request->post('subtask_id');
+        if (!$subTaskId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        // 验证是否为任务发布者
+        $subTask = \app\common\model\task\SubTask::find($subTaskId);
+        if (!$subTask) {
+            $this->error('子任务不存在');
+        }
+        
+        if ($subTask->from_user_id !== $userId) {
+            $this->error('无权操作');
+        }
+        
+        if (!in_array($subTask->status, ['paid', 'verified'])) {
+            $this->error('当前状态不允许确认');
+        }
+        
+        $count = TaskService::completeSubTask($subTaskId);
+        $this->success('确认成功', ['count' => $count]);
+    }
+
+    /**
+     * 发布者拒绝子任务
+     */
+    public function subtaskReject()
+    {
+        $subTaskId = $this->request->post('subtask_id');
+        $reason = $this->request->post('reason', '凭证不符合要求');
+        
+        if (!$subTaskId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        // 验证是否为任务发布者
+        $subTask = \app\common\model\task\SubTask::find($subTaskId);
+        if (!$subTask) {
+            $this->error('子任务不存在');
+        }
+        
+        if ($subTask->from_user_id !== $userId) {
+            $this->error('无权操作');
+        }
+        
+        if (!in_array($subTask->status, ['paid', 'verified'])) {
+            $this->error('当前状态不允许拒绝');
+        }
+        
+        $count = TaskService::failSubTask($subTaskId, $reason);
+        $this->success('已拒绝', ['count' => $count]);
     }
 
     public function depositInfo()

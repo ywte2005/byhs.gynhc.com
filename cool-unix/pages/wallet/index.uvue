@@ -82,7 +82,7 @@
 							class="flex flex-row items-center justify-between"
 						>
 							<view class="flex flex-col gap-[8rpx]">
-								<text class="text-[30rpx] text-[#1f2329]">{{ item.title }}</text>
+								<text class="text-[30rpx] text-[#1f2329]">{{ item.bizTypeText }}</text>
 								<text class="text-[24rpx] text-[#9aa0a6]">{{ item.time }}</text>
 							</view>
 							<text class="text-[30rpx] font-semibold" :class="[item.type === 'in' ? 'text-[#00b578]' : 'text-[#e34d59]']">
@@ -139,7 +139,7 @@ const loadRecentLogs = async () => {
 		const res = await getWalletLogs({ page: 1, limit: 5 })
 		if (res && res.list) {
 			recentLogs.value = res.list.map((item: any) => ({
-				title: item.memo || item.change_type,
+				bizTypeText: item.biz_type_text,
 				time: formatTime(item.createtime),
 				type: parseFloat(item.amount) >= 0 ? 'in' : 'out',
 				amount: Math.abs(parseFloat(item.amount)).toFixed(2)

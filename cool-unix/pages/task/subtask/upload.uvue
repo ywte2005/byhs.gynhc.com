@@ -128,19 +128,20 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { getSubTaskDetail, uploadProof } from '@/services/task'
+import { getSubTaskDetail, uploadSubTaskProof } from '@/services/task'
+import { uploadFiles } from '@/services/upload'
 
 // 子任务ID
 const subtaskId = ref(0)
 
 // 任务信息
 const taskInfo = ref({
-	title: '美团外卖订单互助',
-	description: '需要帮忙完成美团外卖订单，要求真实下单并上传截图',
-	commission: '15.00',
-	remainTime: '23小时30分',
-	proofTypes: ['订单截图', '聊天记录'],
-	specialRequirement: '请在下单后30分钟内上传截图'
+	title: '',
+	description: '',
+	commission: '0.00',
+	remainTime: '',
+	proofTypes: [] as string[],
+	specialRequirement: ''
 })
 
 // 已上传的图片
@@ -157,13 +158,43 @@ const canSubmit = computed(() => {
 // 加载任务信息
 const loadTaskInfo = async () => {
 	try {
+		uni.showLoading({ title: '加载中...' })
 		const res = await getSubTaskDetail(subtaskId.value)
-		if (res.code === 0) {
-			taskInfo.value = res.data
+		uni.hideLoading()
+		
+		if (res && res.subtask) {
+			const data = res.subtask
+			taskInfo.value = {
+				title: data.title || `互助任务 #${data.task_no || data.id}`,
+				description: data.steps || `金额：¥${data.amount}，佣金：¥${data.commission}`,
+				commission: parseFloat(data.commission || 0).toFixed(2),
+				remainTime: calculateRemainTime(data.accepted_time, 24),
+				proofTypes: ['订单截图'],
+				specialRequirement: '请确保截图包含订单号、金额、时间等关键信息'
+			}
 		}
 	} catch (error) {
+		uni.hideLoading()
 		console.log('加载任务信息失败', error)
 	}
+}
+
+// 计算剩余时间
+const calculateRemainTime = (acceptedTime: number, timeLimit: number): string => {
+	if (!acceptedTime) return `${timeLimit}小时`
+	const deadline = acceptedTime + timeLimit * 3600
+	const now = Date.now() / 1000
+	const remain = deadline - now
+	
+	if (remain <= 0) return '已超时'
+	
+	const hours = Math.floor(remain / 3600)
+	const minutes = Math.floor((remain % 3600) / 60)
+	
+	if (hours > 0) {
+		return `${hours}小时${minutes}分`
+	}
+	return `${minutes}分钟`
 }
 
 // 选择图片
@@ -174,16 +205,19 @@ const chooseImage = () => {
 		count: remainCount,
 		sizeType: ['compressed'],
 		sourceType: ['album', 'camera'],
-		success: (res) => {
+		success: async (res) => {
 			const tempFilePaths = res.tempFilePaths
 			
-			// 这里应该上传到服务器，暂时直接使用本地路径
-			uploadedImages.value = uploadedImages.value.concat(tempFilePaths)
-			
-			// TODO: 实际项目中应该上传到服务器
-			// uploadFiles(tempFilePaths).then(urls => {
-			//   uploadedImages.value = uploadedImages.value.concat(urls)
-			// })
+			try {
+				uni.showLoading({ title: '上传中...' })
+				// 上传到服务器
+				const urls = await uploadFiles(tempFilePaths)
+				uploadedImages.value = uploadedImages.value.concat(urls)
+				uni.hideLoading()
+			} catch (error) {
+				uni.hideLoading()
+				uni.showToast({ title: '图片上传失败', icon: 'none' })
+			}
 		}
 	})
 }
@@ -200,34 +234,23 @@ const submitProof = async () => {
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
-		const res = await uploadProof({
-			subtaskId: subtaskId.value,
-			images: uploadedImages.value,
-			note: proofNote.value
-		})
+		// 调用后端接口，参数为 subtask_id 和 proof_image
+		await uploadSubTaskProof(subtaskId.value, uploadedImages.value.join(','), proofNote.value)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
-			uni.showToast({
-				title: '提交成功',
-				icon: 'success'
-			})
-			
-			// 返回上一页
-			setTimeout(() => {
-				uni.navigateBack()
-			}, 1500)
-		} else {
-			uni.showToast({
-				title: res.msg || '提交失败',
-				icon: 'none'
-			})
-		}
-	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '提交失败，请重试',
+			title: '提交成功',
+			icon: 'success'
+		})
+		
+		// 返回上一页
+		setTimeout(() => {
+			uni.navigateBack()
+		}, 1500)
+	} catch (error: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: error.msg || '提交失败，请重试',
 			icon: 'none'
 		})
 	}
