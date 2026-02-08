@@ -65,4 +65,17 @@ class Merchant extends Api
             $this->error($e->getMessage());
         }
     }
+
+    public function update()
+    {
+        $userId = $this->auth->id;
+        $data = $this->request->post();
+        
+        try {
+            $merchant = MerchantService::updateMerchant($userId, $data);
+            $this->success('更新成功', ['merchant' => $merchant]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
 }

@@ -149,4 +149,105 @@ class Wallet extends Api
             $this->error($e->getMessage());
         }
     }
+
+    public function withdrawConfig()
+    {
+        $config = \think\Db::name('system_config_ext')
+            ->where('group', 'wallet')
+            ->column('value', 'key');
+        
+        $this->success('获取成功', [
+            'min_amount' => floatval($config['withdraw_min_amount'] ?? 100),
+            'max_amount' => floatval($config['withdraw_max_amount'] ?? 50000),
+            'fee_rate' => floatval($config['withdraw_fee_rate'] ?? 0.006),
+            'fee_min' => floatval($config['withdraw_fee_min'] ?? 2)
+        ]);
+    }
+
+    public function bankcards()
+    {
+        $userId = $this->auth->id;
+        $list = \app\common\model\wallet\Bankcard::getUserBankcards($userId);
+        
+        $result = [];
+        foreach ($list as $item) {
+            $result[] = [
+                'id' => $item->id,
+                'bank_name' => $item->bank_name,
+                'bank_code' => $item->bank_code,
+                'card_no' => $item->masked_card_no,
+                'card_holder' => $item->card_holder,
+                'bank_branch' => $item->bank_branch,
+                'is_default' => $item->is_default
+            ];
+        }
+        
+        $this->success('获取成功', ['list' => $result]);
+    }
+
+    public function addBankcard()
+    {
+        $data = [
+            'bank_name' => $this->request->post('bank_name'),
+            'bank_code' => $this->request->post('bank_code', ''),
+            'card_no' => $this->request->post('card_no'),
+            'card_holder' => $this->request->post('card_holder'),
+            'bank_branch' => $this->request->post('bank_branch', '')
+        ];
+        
+        if (!$data['bank_name'] || !$data['card_no'] || !$data['card_holder']) {
+            $this->error('参数不完整');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            $bankcard = \app\common\model\wallet\Bankcard::addBankcard($userId, $data);
+            $this->success('添加成功', ['bankcard' => [
+                'id' => $bankcard->id,
+                'bank_name' => $bankcard->bank_name,
+                'card_no' => $bankcard->masked_card_no,
+                'is_default' => $bankcard->is_default
+            ]]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    public function deleteBankcard()
+    {
+        $bankcardId = $this->request->post('bankcard_id');
+        if (!$bankcardId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            \app\common\model\wallet\Bankcard::deleteBankcard($userId, $bankcardId);
+            $this->success('删除成功');
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    public function setDefaultBankcard()
+    {
+        $bankcardId = $this->request->post('bankcard_id');
+        if (!$bankcardId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            $bankcard = \app\common\model\wallet\Bankcard::setDefault($userId, $bankcardId);
+            $this->success('设置成功', ['bankcard' => [
+                'id' => $bankcard->id,
+                'is_default' => $bankcard->is_default
+            ]]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
 }

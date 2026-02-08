@@ -78,11 +78,20 @@ class Task extends Api
     public function cancel()
     {
         $taskId = $this->request->post('task_id');
+        $reason = $this->request->post('reason', '');
+        
         if (!$taskId) {
             $this->error('参数缺失');
         }
         
-        $this->error('暂不支持取消');
+        $userId = $this->auth->id;
+        
+        try {
+            $task = TaskService::cancelTask($taskId, $userId, $reason);
+            $this->success('取消成功', ['task' => $task]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 
     public function myTasks()
@@ -188,6 +197,82 @@ class Task extends Api
 
     public function subtaskCancel()
     {
-        $this->error('暂不支持取消');
+        $subTaskId = $this->request->post('subtask_id');
+        if (!$subTaskId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            $subTask = TaskService::cancelSubTask($subTaskId, $userId);
+            $this->success('取消成功', ['subtask' => $subTask]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    public function depositInfo()
+    {
+        $userId = $this->auth->id;
+        $wallet = \app\common\library\WalletService::getWallet($userId);
+        
+        $this->success('获取成功', [
+            'deposit' => $wallet->deposit,
+            'frozen' => $wallet->frozen,
+            'available' => $wallet->getAvailableDeposit()
+        ]);
+    }
+
+    public function depositRecharge()
+    {
+        $amount = $this->request->post('amount');
+        $payMethod = $this->request->post('pay_method', 'balance');
+        
+        if (!$amount || $amount <= 0) {
+            $this->error('金额必须大于0');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            if ($payMethod === 'balance') {
+                \app\common\library\WalletService::changeBalance($userId, '-' . $amount, 'deposit_recharge', 0, '充值保证金');
+                \app\common\library\WalletService::changeDeposit($userId, $amount, 'deposit_recharge', 0, '充值保证金');
+                $this->success('充值成功');
+            } else {
+                $recharge = \app\common\library\WalletService::rechargeDeposit($userId, $amount, $payMethod);
+                $this->success('创建成功', ['recharge' => $recharge]);
+            }
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    public function depositWithdraw()
+    {
+        $amount = $this->request->post('amount');
+        
+        if (!$amount || $amount <= 0) {
+            $this->error('金额必须大于0');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            $wallet = \app\common\library\WalletService::getWallet($userId);
+            $available = $wallet->getAvailableDeposit();
+            
+            if (bccomp($available, $amount, 2) < 0) {
+                $this->error('可用保证金不足');
+            }
+            
+            \app\common\library\WalletService::changeDeposit($userId, '-' . $amount, 'deposit_withdraw', 0, '提取保证金');
+            \app\common\library\WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
+            
+            $this->success('提取成功');
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 }

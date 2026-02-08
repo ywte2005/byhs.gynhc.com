@@ -363,4 +363,96 @@ class TaskService
     {
         return SubTask::find($subTaskId);
     }
+
+    public static function cancelSubTask($subTaskId, $userId)
+    {
+        Db::startTrans();
+        try {
+            $subTask = SubTask::lock(true)->find($subTaskId);
+            if (!$subTask) {
+                throw new \Exception('子任务不存在');
+            }
+            if ($subTask->to_user_id !== $userId) {
+                throw new \Exception('无权操作');
+            }
+            if (!in_array($subTask->status, ['assigned', 'accepted'])) {
+                throw new \Exception('当前状态不允许取消');
+            }
+            
+            $task = MutualTask::lock(true)->find($subTask->task_id);
+            
+            WalletService::unfreezeDeposit($task->user_id, $subTask->amount, 'subtask_cancel', $subTask->id, '子任务取消解冻');
+            
+            $task->frozen_amount = bcsub($task->frozen_amount, $subTask->amount, 2);
+            $task->save();
+            
+            $subTask->status = 'pending';
+            $subTask->to_user_id = 0;
+            $subTask->accepted_time = null;
+            $subTask->assigned_time = null;
+            $subTask->save();
+            
+            Db::commit();
+            return $subTask;
+        } catch (\Exception $e) {
+            Db::rollback();
+            throw $e;
+        }
+    }
+
+    public static function cancelTask($taskId, $userId, $reason = '')
+    {
+        Db::startTrans();
+        try {
+            $task = MutualTask::lock(true)->find($taskId);
+            if (!$task) {
+                throw new \Exception('任务不存在');
+            }
+            if ($task->user_id !== $userId) {
+                throw new \Exception('无权操作');
+            }
+            
+            $allowedStatus = ['pending', 'approved', 'running', 'paused'];
+            if (!in_array($task->status, $allowedStatus)) {
+                throw new \Exception('当前状态不允许取消');
+            }
+            
+            $hasActiveSubTasks = SubTask::where('task_id', $taskId)
+                ->whereIn('status', ['accepted', 'paid', 'verified'])
+                ->count();
+            
+            if ($hasActiveSubTasks > 0) {
+                throw new \Exception('存在进行中的子任务，无法取消');
+            }
+            
+            $pendingSubTasks = SubTask::where('task_id', $taskId)
+                ->whereIn('status', ['pending', 'assigned'])
+                ->select();
+            
+            foreach ($pendingSubTasks as $subTask) {
+                if ($subTask->status === 'assigned' && bccomp($task->frozen_amount, $subTask->amount, 2) >= 0) {
+                    WalletService::unfreezeDeposit($task->user_id, $subTask->amount, 'task_cancel', $subTask->id, '任务取消解冻');
+                    $task->frozen_amount = bcsub($task->frozen_amount, $subTask->amount, 2);
+                }
+                $subTask->status = 'cancelled';
+                $subTask->save();
+            }
+            
+            $refundDeposit = bcsub($task->deposit_amount, $task->frozen_amount, 2);
+            if (bccomp($refundDeposit, '0', 2) > 0) {
+                WalletService::changeDeposit($task->user_id, '-' . $refundDeposit, 'task_cancel', $taskId, '任务取消退回保证金');
+                WalletService::changeBalance($task->user_id, $refundDeposit, 'task_cancel', $taskId, '任务取消退回保证金');
+            }
+            
+            $task->status = 'cancelled';
+            $task->remark = $reason ?: '用户主动取消';
+            $task->save();
+            
+            Db::commit();
+            return $task;
+        } catch (\Exception $e) {
+            Db::rollback();
+            throw $e;
+        }
+    }
 }

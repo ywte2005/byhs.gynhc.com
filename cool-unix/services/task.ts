@@ -27,7 +27,7 @@ export function getTaskDetail(taskId: number): Promise<MutualTask & { sub_tasks:
 	return request({
 		url: "/task/detail",
 		method: "GET",
-		data: { id: taskId }
+		data: { task_id: taskId }
 	});
 }
 
@@ -71,7 +71,7 @@ export function getAvailableSubTasks(params: {
 	limit?: number;
 }): Promise<{ list: SubTask[]; total: number }> {
 	return request({
-		url: "/task/subtask/available",
+		url: "/task/subtaskAvailable",
 		method: "GET",
 		data: params
 	});
@@ -84,7 +84,7 @@ export function getMySubTasks(params: {
 	limit?: number;
 }): Promise<{ list: SubTask[]; total: number }> {
 	return request({
-		url: "/task/subtask/my",
+		url: "/task/subtaskMy",
 		method: "GET",
 		data: params
 	});
@@ -93,16 +93,16 @@ export function getMySubTasks(params: {
 // 获取子任务详情
 export function getSubTaskDetail(subtaskId: number): Promise<SubTask> {
 	return request({
-		url: "/task/subtask/detail",
+		url: "/task/subtaskDetail",
 		method: "GET",
-		data: { id: subtaskId }
+		data: { subtask_id: subtaskId }
 	});
 }
 
 // 接受子任务
 export function acceptSubTask(subtaskId: number): Promise<void> {
 	return request({
-		url: "/task/subtask/accept",
+		url: "/task/subtaskAccept",
 		method: "POST",
 		data: { subtask_id: subtaskId }
 	});
@@ -111,7 +111,7 @@ export function acceptSubTask(subtaskId: number): Promise<void> {
 // 上传支付凭证
 export function uploadProof(form: UploadProofForm): Promise<void> {
 	return request({
-		url: "/task/subtask/uploadProof",
+		url: "/task/subtaskUploadProof",
 		method: "POST",
 		data: form
 	});
@@ -120,7 +120,7 @@ export function uploadProof(form: UploadProofForm): Promise<void> {
 // 取消接单
 export function cancelSubTask(subtaskId: number, reason: string): Promise<void> {
 	return request({
-		url: "/task/subtask/cancel",
+		url: "/task/subtaskCancel",
 		method: "POST",
 		data: {
 			subtask_id: subtaskId,
@@ -136,7 +136,7 @@ export function getDepositInfo(): Promise<{
 	available: number;
 }> {
 	return request({
-		url: "/task/deposit/info",
+		url: "/task/depositInfo",
 		method: "GET"
 	});
 }
@@ -144,7 +144,7 @@ export function getDepositInfo(): Promise<{
 // 充值保证金
 export function rechargeDeposit(amount: number, payMethod: string = "balance"): Promise<{ order_no: string }> {
 	return request({
-		url: "/task/deposit/recharge",
+		url: "/task/depositRecharge",
 		method: "POST",
 		data: {
 			amount,
@@ -156,8 +156,16 @@ export function rechargeDeposit(amount: number, payMethod: string = "balance"): 
 // 提取保证金
 export function withdrawDeposit(amount: number): Promise<void> {
 	return request({
-		url: "/task/deposit/withdraw",
+		url: "/task/depositWithdraw",
 		method: "POST",
 		data: { amount }
+	});
+}
+
+// 检查是否可以接单
+export function canReceiveTask(): Promise<{ can: boolean; reason: string }> {
+	return request({
+		url: "/task/canReceive",
+		method: "GET"
 	});
 }

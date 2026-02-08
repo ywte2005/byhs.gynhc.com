@@ -63,10 +63,80 @@ export function getWithdrawConfig(): Promise<{
 	min_amount: number;
 	max_amount: number;
 	fee_rate: number;
-	daily_limit: number;
+	fee_min: number;
 }> {
 	return request({
 		url: "/wallet/withdrawConfig",
 		method: "GET"
+	});
+}
+
+// 余额转保证金
+export function depositPay(amount: number): Promise<void> {
+	return request({
+		url: "/wallet/depositPay",
+		method: "POST",
+		data: { amount }
+	});
+}
+
+// 保证金转余额
+export function depositWithdraw(amount: number): Promise<void> {
+	return request({
+		url: "/wallet/depositWithdraw",
+		method: "POST",
+		data: { amount }
+	});
+}
+
+// 银行卡相关接口
+export type Bankcard = {
+	id: number;
+	bank_name: string;
+	bank_code: string;
+	card_no: string;
+	card_holder: string;
+	bank_branch: string;
+	is_default: number;
+};
+
+// 获取银行卡列表
+export function getBankcards(): Promise<{ list: Bankcard[] }> {
+	return request({
+		url: "/wallet/bankcards",
+		method: "GET"
+	});
+}
+
+// 添加银行卡
+export function addBankcard(data: {
+	bank_name: string;
+	bank_code?: string;
+	card_no: string;
+	card_holder: string;
+	bank_branch?: string;
+}): Promise<{ bankcard: Bankcard }> {
+	return request({
+		url: "/wallet/addBankcard",
+		method: "POST",
+		data
+	});
+}
+
+// 删除银行卡
+export function deleteBankcard(bankcardId: number): Promise<void> {
+	return request({
+		url: "/wallet/deleteBankcard",
+		method: "POST",
+		data: { bankcard_id: bankcardId }
+	});
+}
+
+// 设置默认银行卡
+export function setDefaultBankcard(bankcardId: number): Promise<void> {
+	return request({
+		url: "/wallet/setDefaultBankcard",
+		method: "POST",
+		data: { bankcard_id: bankcardId }
 	});
 }

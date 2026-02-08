@@ -19,16 +19,16 @@ export function getMessageDetail(messageId: number): Promise<MessageInfo> {
 	return request({
 		url: "/message/detail",
 		method: "GET",
-		data: { id: messageId }
+		data: { message_id: messageId }
 	});
 }
 
 // 标记已读
-export function markAsRead(messageIds: number[]): Promise<void> {
+export function markAsRead(messageId?: number): Promise<void> {
 	return request({
 		url: "/message/markRead",
 		method: "POST",
-		data: { ids: messageIds }
+		data: { message_id: messageId }
 	});
 }
 
@@ -42,11 +42,11 @@ export function markAllAsRead(type?: string): Promise<void> {
 }
 
 // 删除消息
-export function deleteMessage(messageIds: number[]): Promise<void> {
+export function deleteMessage(messageId: number): Promise<void> {
 	return request({
 		url: "/message/delete",
 		method: "POST",
-		data: { ids: messageIds }
+		data: { message_id: messageId }
 	});
 }
 

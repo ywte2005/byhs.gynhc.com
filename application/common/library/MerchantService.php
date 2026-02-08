@@ -116,4 +116,24 @@ class MerchantService
             'entry_fee_paid' => $merchant->entry_fee_paid
         ];
     }
+
+    public static function updateMerchant($userId, $data)
+    {
+        $merchant = Merchant::where('user_id', $userId)->find();
+        if (!$merchant) {
+            throw new \Exception('商户不存在');
+        }
+        
+        $allowFields = ['name', 'legal_name', 'contact_phone', 'contact_address', 'category', 
+                        'bank_name', 'bank_account', 'bank_branch'];
+        
+        foreach ($allowFields as $field) {
+            if (isset($data[$field])) {
+                $merchant->$field = $data[$field];
+            }
+        }
+        
+        $merchant->save();
+        return $merchant;
+    }
 }

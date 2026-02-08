@@ -110,7 +110,7 @@ class Promo extends Api
         $growth = \app\common\model\promo\Performance::calculateGrowth($userId, $month);
         
         $this->success('获取成功', [
-            'period' => $period,
+            'period' => $month,
             'personal_performance' => $performance ? $performance->personal_performance : '0.00',
             'team_performance' => $performance ? $performance->team_performance : '0.00',
             'growth' => $growth
