@@ -3,6 +3,7 @@ namespace app\common\library;
 
 use app\common\model\task\MutualTask;
 use app\common\model\task\SubTask;
+use app\common\model\task\TaskDepositLog;
 use app\common\model\promo\Level;
 use app\common\model\promo\Relation;
 use app\common\model\wallet\Wallet;
@@ -62,19 +63,145 @@ class TaskService
         try {
             foreach ($ids as $taskId) {
                 $task = MutualTask::lock(true)->find($taskId);
+                // 待审核状态的任务才能审核通过
                 if ($task && $task->status === 'pending') {
-                    $task->status = 'approved';
-                    $task->save();
+                    // 根据目标总金额拆分生成所有子任务（状态为pending，不可接单）
+                    self::splitTaskByDeposit($task, $task->total_amount, 'pending');
                     
-                    self::splitTask($task);
-                    
+                    // 审核通过，任务开始运行
                     $task->status = 'running';
                     $task->save();
+                    
+                    // 如果已有保证金，释放对应数量的子任务
+                    if (bccomp($task->deposit_amount, '0', 2) > 0) {
+                        self::releaseSubTasksByDeposit($task, $task->deposit_amount);
+                    }
+                    
                     $count++;
                 }
             }
             Db::commit();
             return $count;
+        } catch (\Exception $e) {
+            Db::rollback();
+            throw $e;
+        }
+    }
+    
+    /**
+     * 根据保证金金额释放子任务（从pending改为assigned）
+     * @param MutualTask $task 主任务
+     * @param string $depositAmount 保证金金额
+     * @return int 释放的子任务数量
+     */
+    public static function releaseSubTasksByDeposit($task, $depositAmount)
+    {
+        // 获取待释放的子任务（状态为pending）
+        $pendingSubTasks = SubTask::where('task_id', $task->id)
+            ->where('status', 'pending')
+            ->order('id', 'asc')
+            ->select();
+        
+        if ($pendingSubTasks->isEmpty()) {
+            return 0;
+        }
+        
+        $releasedCount = 0;
+        $remainingDeposit = $depositAmount;
+        
+        foreach ($pendingSubTasks as $subTask) {
+            // 检查保证金是否足够覆盖这个子任务
+            if (bccomp($remainingDeposit, $subTask->amount, 2) >= 0) {
+                // 释放子任务
+                $subTask->status = 'assigned';
+                $subTask->assigned_time = time();
+                $subTask->save();
+                
+                $remainingDeposit = bcsub($remainingDeposit, $subTask->amount, 2);
+                $releasedCount++;
+            } else {
+                // 保证金不足，停止释放
+                break;
+            }
+        }
+        
+        return $releasedCount;
+    }
+
+    /**
+     * 缴纳/补缴保证金
+     * 支持部分缴纳，可多次补缴
+     * @param int $taskId 任务ID
+     * @param int $userId 用户ID
+     * @param float $amount 缴纳金额（为空则缴纳全部剩余金额）
+     */
+    public static function payDeposit($taskId, $userId, $amount = null)
+    {
+        Db::startTrans();
+        try {
+            $task = MutualTask::lock(true)->find($taskId);
+            if (!$task) {
+                throw new \Exception('任务不存在');
+            }
+            if ($task->user_id !== $userId) {
+                throw new \Exception('无权操作');
+            }
+            // 只有 running 状态才能缴纳保证金（审核通过后）
+            if ($task->status !== 'running') {
+                throw new \Exception('任务需要审核通过后才能缴纳保证金');
+            }
+            
+            // 计算还需要缴纳的金额
+            $remainingDeposit = bcsub($task->total_amount, $task->deposit_amount, 2);
+            if (bccomp($remainingDeposit, '0', 2) <= 0) {
+                throw new \Exception('保证金已缴满');
+            }
+            
+            // 如果未指定金额，则缴纳全部剩余
+            $payAmount = $amount ? min($amount, $remainingDeposit) : $remainingDeposit;
+            if (bccomp($payAmount, '0', 2) <= 0) {
+                throw new \Exception('缴纳金额必须大于0');
+            }
+            
+            // 检查余额
+            $wallet = Wallet::getByUserId($userId);
+            if (bccomp($wallet->balance, $payAmount, 2) < 0) {
+                throw new \Exception('余额不足，当前余额：¥' . $wallet->balance);
+            }
+            
+            // 判断是首次缴费还是补缴
+            $isFirstPayment = bccomp($task->deposit_amount, '0', 2) === 0;
+            $changeType = $isFirstPayment ? 'task_deposit' : 'task_deposit_topup';
+            $remark = $isFirstPayment ? '任务保证金' : '任务保证金补缴';
+            
+            // 扣除保证金（从余额转入保证金账户）
+            WalletService::changeBalance($userId, '-' . $payAmount, $changeType, $taskId, $remark);
+            WalletService::changeDeposit($userId, $payAmount, $changeType, $taskId, $remark);
+            
+            // 记录保证金缴纳日志
+            TaskDepositLog::create([
+                'task_id' => $taskId,
+                'user_id' => $userId,
+                'amount' => $payAmount,
+                'type' => $isFirstPayment ? 'pay' : 'topup',
+                'before_deposit' => $task->deposit_amount,
+                'after_deposit' => bcadd($task->deposit_amount, $payAmount, 2),
+                'remark' => $remark
+            ]);
+            
+            // 更新任务保证金金额
+            $task->deposit_amount = bcadd($task->deposit_amount, $payAmount, 2);
+            $task->save();
+            
+            // 如果任务已经在运行中，根据本次缴纳金额释放对应数量的子任务
+            if ($task->status === 'running') {
+                $releasedCount = self::releaseSubTasksByDeposit($task, $payAmount);
+                // 记录释放的子任务数量
+                $task->setAttr('released_subtasks_count', $releasedCount);
+            }
+            
+            Db::commit();
+            return $task;
         } catch (\Exception $e) {
             Db::rollback();
             throw $e;
@@ -107,14 +234,22 @@ class TaskService
         }
     }
 
-    protected static function splitTask($task)
+    /**
+     * 根据指定金额拆分生成子任务
+     * @param MutualTask $task 主任务
+     * @param string $depositAmount 本次缴纳的保证金金额
+     * @param string $status 子任务初始状态
+     */
+    protected static function splitTaskByDeposit($task, $depositAmount, $status = 'pending')
     {
-        $remaining = $task->total_amount;
+        $remaining = $depositAmount;
         $min = $task->sub_task_min;
         $max = $task->sub_task_max;
         
+        $createdCount = 0;
         while (bccomp($remaining, '0', 2) > 0) {
             if (bccomp($remaining, $min, 2) < 0) {
+                // 剩余金额不足最小子任务金额，合并到最后一个子任务或单独创建
                 $amount = $remaining;
             } elseif (bccomp($remaining, $max, 2) <= 0) {
                 $amount = $remaining;
@@ -134,11 +269,22 @@ class TaskService
                 'amount' => $amount,
                 'commission' => $commission,
                 'service_fee' => $serviceFee,
-                'status' => 'pending'
+                'status' => $status
             ]);
             
             $remaining = bcsub($remaining, $amount, 2);
+            $createdCount++;
         }
+        
+        return $createdCount;
+    }
+    
+    /**
+     * 根据总金额拆分生成子任务（兼容旧方法）
+     */
+    protected static function splitTask($task)
+    {
+        return self::splitTaskByDeposit($task, $task->total_amount, 'pending');
     }
 
     public static function dispatchSubTasks($taskIds)

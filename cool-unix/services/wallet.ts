@@ -156,3 +156,21 @@ export function setDefaultBankcard(bankcardId: number): Promise<void> {
 		data: { bankcard_id: bankcardId }
 	});
 }
+
+// 发起微信支付
+export function wechatPay(orderNo: string, payMethod?: string): Promise<any> {
+	return request({
+		url: "/payment/wechat",
+		method: "POST",
+		data: { order_no: orderNo, method: payMethod }
+	});
+}
+
+// 查询支付状态
+export function queryPayStatus(orderNo: string): Promise<{ status: string; paid: boolean }> {
+	return request({
+		url: "/payment/query",
+		method: "GET",
+		data: { order_no: orderNo }
+	});
+}

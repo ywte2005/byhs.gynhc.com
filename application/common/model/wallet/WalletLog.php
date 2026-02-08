@@ -6,7 +6,8 @@ use think\Model;
 class WalletLog extends Model
 {
     protected $name = 'wallet_log';
-    protected $autoWriteTimestamp = 'createtime';
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
     protected $updateTime = false;
 
     protected $append = ['wallet_type_text', 'change_type_text'];

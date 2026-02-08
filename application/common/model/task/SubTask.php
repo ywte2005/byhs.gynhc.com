@@ -53,23 +53,40 @@ class SubTask extends Model
 
     public static function generateTaskNo()
     {
-        return 'ST' . date('YmdHis') . str_pad(mt_rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        // 使用微秒 + 更大随机数范围避免重复
+        $microtime = substr(str_replace('.', '', microtime(true)), -6);
+        return 'ST' . date('YmdHis') . $microtime . str_pad(mt_rand(1, 99), 2, '0', STR_PAD_LEFT);
     }
 
     public static function getAvailableForUser($userId, $category = null, $page = 1, $limit = 20)
     {
         $query = self::with(['task' => function($query) {
-                $query->field('id,title,category,platform,createtime');
+                $query->field('id,title,category,category_text,platform,createtime,status');
             }])
-            ->where('status', 'assigned')
+            ->whereIn('status', ['pending', 'assigned'])  // 待派发和已派发的都可以接单
             ->where('to_user_id', 0)
             ->where('from_user_id', '<>', $userId);
         
-        // 如果指定了分类，则关联主任务表进行筛选
+        // 只查询主任务状态为 running 的子任务
+        $runningTaskIds = \app\common\model\task\MutualTask::where('status', 'running')
+            ->column('id');
+        if (empty($runningTaskIds)) {
+            $query->where('id', 0); // 没有运行中的任务，返回空结果
+        } else {
+            $query->whereIn('task_id', $runningTaskIds);
+        }
+        
+        // 如果指定了分类，进一步筛选 (兼容 ThinkPHP 5.0)
         if ($category && $category !== 'all') {
-            $query->hasWhere('task', function($query) use ($category) {
-                $query->where('category', $category);
-            });
+            $categoryTaskIds = \app\common\model\task\MutualTask::where('category', $category)
+                ->where('status', 'running')
+                ->column('id');
+            if (!empty($categoryTaskIds)) {
+                $query->whereIn('task_id', $categoryTaskIds);
+            } else {
+                // 没有匹配的任务，返回空结果
+                $query->where('id', 0);
+            }
         }
         
         return $query->order('id', 'asc')

@@ -1,0 +1,246 @@
+<template>
+	<view class="flex flex-col bg-[#f5f7fa] h-screen">
+		<!-- Header -->
+		<cl-topbar title="支付订单" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<!-- Content -->
+		<scroll-view class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
+				<!-- 订单信息卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center gap-[24rpx]">
+					<view class="w-[120rpx] h-[120rpx] rounded-full bg-[#fff7e6] flex items-center justify-center">
+						<uni-icons type="wallet" size="48" color="#ff9500"></uni-icons>
+					</view>
+					<text class="text-[28rpx] text-[#646a73]">待支付金额</text>
+					<text class="text-[64rpx] font-bold text-[#1f2329]">¥{{ amount }}</text>
+					<view class="flex flex-row items-center gap-[8rpx]">
+						<text class="text-[24rpx] text-[#999999]">订单号：{{ orderNo }}</text>
+						<view @click="copyOrderNo" class="px-[12rpx] py-[4rpx] bg-[#f5f7fa] rounded-[8rpx]">
+							<text class="text-[22rpx] text-[#0052d9]">复制</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 支付方式说明 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-semibold text-[#1f2329]">微信支付</text>
+					
+					<view class="flex flex-col gap-[16rpx]">
+						<view class="flex flex-row items-center gap-[16rpx]">
+							<uni-icons type="weixin" size="24" color="#07C160"></uni-icons>
+							<text class="text-[28rpx] text-[#1f2329]">请使用微信扫码支付</text>
+						</view>
+						<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx] flex flex-col items-center gap-[16rpx]">
+							<text class="text-[26rpx] text-[#646a73]">正在调起微信支付...</text>
+							<text class="text-[24rpx] text-[#999999]">如未自动跳转，请点击下方按钮</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- 注意事项 -->
+				<view class="bg-[#fff7e6] rounded-[24rpx] p-[32rpx] flex flex-col gap-[16rpx]">
+					<view class="flex flex-row items-center gap-[8rpx]">
+						<uni-icons type="info" size="18" color="#ff9500"></uni-icons>
+						<text class="text-[28rpx] font-semibold text-[#ff9500]">温馨提示</text>
+					</view>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[24rpx] text-[#996600] leading-relaxed">1. 请在微信支付页面完成付款</text>
+						<text class="text-[24rpx] text-[#996600] leading-relaxed">2. 支付成功后余额将自动到账</text>
+						<text class="text-[24rpx] text-[#996600] leading-relaxed">3. 如有问题请联系在线客服</text>
+					</view>
+				</view>
+
+				<!-- 操作按钮 -->
+				<view class="flex flex-col gap-[24rpx] mt-[16rpx]">
+					<view class="h-[96rpx] bg-[#07C160] rounded-[24rpx] flex items-center justify-center" @tap="handlePay">
+						<text class="text-[32rpx] text-white font-semibold">立即支付</text>
+					</view>
+					<view class="h-[96rpx] bg-white border-[2rpx] border-[#e5e6eb] rounded-[24rpx] flex items-center justify-center" @tap="handleCancel">
+						<text class="text-[32rpx] text-[#646a73] font-semibold">取消订单</text>
+					</view>
+				</view>
+			</view>
+		</scroll-view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, onMounted } from "vue";
+import { wechatPay } from "@/services/wallet";
+
+const orderNo = ref("");
+const amount = ref("");
+const paying = ref(false);
+const platform = ref("");
+const payStatus = ref("waiting"); // waiting, paying, success, fail
+
+onMounted(() => {
+	const pages = getCurrentPages();
+	const currentPage = pages[pages.length - 1];
+	const options = currentPage.$page?.options || {};
+	
+	orderNo.value = options.order_no || "";
+	amount.value = options.amount || "0";
+	
+	// 获取当前平台
+	const systemInfo = uni.getSystemInfoSync();
+	platform.value = systemInfo.uniPlatform || "";
+	
+	// 自动发起支付
+	handlePay();
+});
+
+const copyOrderNo = () => {
+	uni.setClipboardData({
+		data: orderNo.value,
+		success: () => {
+			uni.showToast({ title: "订单号已复制", icon: "success" });
+		}
+	});
+};
+
+// 获取支付方式
+const getPayMethod = (): string => {
+	const sysInfo = uni.getSystemInfoSync();
+	const uniPlatform = sysInfo.uniPlatform || "";
+	
+	if (uniPlatform === "app") {
+		return "app";
+	} else if (uniPlatform === "mp-weixin") {
+		return "miniapp";
+	} else if (uniPlatform === "web" || uniPlatform === "h5") {
+		// H5环境下判断是否在微信内
+		const ua = navigator?.userAgent?.toLowerCase() || "";
+		if (ua.indexOf("micromessenger") > -1) {
+			return "mp"; // 微信公众号H5
+		}
+		return "wap"; // 普通H5
+	}
+	return "wap";
+};
+
+// 发起微信支付
+const handlePay = async () => {
+	if (paying.value || !orderNo.value) return;
+	
+	paying.value = true;
+	payStatus.value = "paying";
+	
+	try {
+		uni.showLoading({ title: "正在发起支付..." });
+		
+		const method = getPayMethod();
+		
+		// 调用后端获取微信支付参数
+		const payParams = await wechatPay(orderNo.value, method);
+		
+		uni.hideLoading();
+		
+		// 根据平台调起支付
+		if (method === "app") {
+			// APP支付
+			uni.requestPayment({
+				provider: "wxpay",
+				orderInfo: payParams,
+				success: () => {
+					payStatus.value = "success";
+					uni.showToast({ title: "支付成功", icon: "success" });
+					setTimeout(() => {
+						uni.navigateBack({ delta: 2 });
+					}, 1500);
+				},
+				fail: (err: any) => {
+					payStatus.value = "fail";
+					if (err.errMsg && err.errMsg.indexOf("cancel") > -1) {
+						uni.showToast({ title: "已取消支付", icon: "none" });
+					} else {
+						uni.showToast({ title: "支付失败", icon: "none" });
+					}
+				}
+			});
+		} else if (method === "miniapp") {
+			// 微信小程序支付
+			uni.requestPayment({
+				timeStamp: payParams.timeStamp,
+				nonceStr: payParams.nonceStr,
+				package: payParams.package,
+				signType: payParams.signType || "RSA",
+				paySign: payParams.paySign,
+				success: () => {
+					payStatus.value = "success";
+					uni.showToast({ title: "支付成功", icon: "success" });
+					setTimeout(() => {
+						uni.navigateBack({ delta: 2 });
+					}, 1500);
+				},
+				fail: (err: any) => {
+					payStatus.value = "fail";
+					if (err.errMsg && err.errMsg.indexOf("cancel") > -1) {
+						uni.showToast({ title: "已取消支付", icon: "none" });
+					} else {
+						uni.showToast({ title: "支付失败", icon: "none" });
+					}
+				}
+			});
+		} else if (method === "mp") {
+			// 微信公众号H5 (JSAPI)
+			if (typeof WeixinJSBridge !== "undefined") {
+				WeixinJSBridge.invoke("getBrandWCPayRequest", {
+					appId: payParams.appId,
+					timeStamp: payParams.timeStamp,
+					nonceStr: payParams.nonceStr,
+					package: payParams.package,
+					signType: payParams.signType || "RSA",
+					paySign: payParams.paySign
+				}, (res: any) => {
+					if (res.err_msg === "get_brand_wcpay_request:ok") {
+						payStatus.value = "success";
+						uni.showToast({ title: "支付成功", icon: "success" });
+						setTimeout(() => {
+							uni.navigateBack({ delta: 2 });
+						}, 1500);
+					} else {
+						payStatus.value = "fail";
+						uni.showToast({ title: "支付失败", icon: "none" });
+					}
+				});
+			} else {
+				uni.showToast({ title: "请在微信中打开", icon: "none" });
+			}
+		} else {
+			// 普通H5 (WAP支付，跳转到微信支付页面)
+			if (payParams.mweb_url) {
+				window.location.href = payParams.mweb_url;
+			} else if (payParams.h5_url) {
+				window.location.href = payParams.h5_url;
+			} else {
+				uni.showToast({ title: "获取支付链接失败", icon: "none" });
+			}
+		}
+		
+	} catch (error: any) {
+		uni.hideLoading();
+		payStatus.value = "fail";
+		uni.showToast({ title: error.message || "支付失败", icon: "none" });
+	} finally {
+		paying.value = false;
+	}
+};
+
+const handleCancel = () => {
+	uni.showModal({
+		title: "取消订单",
+		content: "确定要取消此充值订单吗？",
+		confirmText: "确定取消",
+		cancelText: "继续支付",
+		success: (res) => {
+			if (res.confirm) {
+				uni.navigateBack({ delta: 2 });
+			}
+		}
+	});
+};
+</script>
+
+<style>
+</style>

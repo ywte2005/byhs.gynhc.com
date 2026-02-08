@@ -160,6 +160,36 @@
 					</view>
 				</view>
 
+				<!-- 保证金信息卡片 -->
+				<view v-if="taskInfo.canPayDeposit" class="bg-[#ff9500] rounded-[24rpx] p-[32rpx] mb-[24rpx]">
+					<view class="flex flex-col gap-[20rpx]">
+						<view class="flex flex-row items-center justify-between">
+							<text class="text-[30rpx] text-white font-bold">保证金进度</text>
+							<text class="text-[30rpx] text-white font-bold">{{ taskInfo.depositProgress }}%</text>
+						</view>
+						<!-- 进度条 -->
+						<view class="w-full h-[16rpx] bg-[rgba(255,255,255,0.3)] rounded-full overflow-hidden">
+							<view class="h-full bg-white rounded-full" :style="{ width: taskInfo.depositProgress + '%' }"></view>
+						</view>
+						<view class="flex flex-row items-center justify-between mt-[8rpx]">
+							<view class="flex flex-col gap-[8rpx]">
+								<text class="text-[26rpx] text-[rgba(255,255,255,0.85)]">已缴纳</text>
+								<text class="text-[36rpx] text-white font-bold">¥{{ taskInfo.paidDeposit }}</text>
+							</view>
+							<view class="flex flex-col gap-[8rpx] items-end">
+								<text class="text-[26rpx] text-[rgba(255,255,255,0.85)]">待缴纳</text>
+								<text class="text-[36rpx] text-white font-bold">¥{{ taskInfo.remainingDeposit }}</text>
+							</view>
+						</view>
+						<button 
+							@click="handlePayDeposit"
+							class="w-full h-[88rpx] bg-white rounded-full flex items-center justify-center mt-[16rpx]"
+						>
+							<text class="text-[30rpx] font-bold text-[#ff9500]">{{ taskInfo.paidDeposit === '0.00' ? '缴纳保证金' : '补缴保证金' }}</text>
+						</button>
+					</view>
+				</view>
+
 				<!-- 子任务列表 (审核中不显示) -->
 				<view v-if="taskInfo.status !== 'pending' && taskInfo.status !== 'rejected'" class="bg-white rounded-[24rpx] p-[32rpx] mb-[140rpx]">
 					<view class="flex flex-row items-center justify-between mb-[32rpx]">
@@ -208,12 +238,12 @@
 			<view class="flex flex-row gap-[24rpx]">
 				<button 
 					v-if="taskInfo.canCancel"
-					@click="cancelTask"
+					@click="handleCancelTask"
 					class="flex-1 h-[88rpx] bg-[#fff0f0] border-[2rpx] border-[#ff3b30] rounded-full flex items-center justify-center"
 				>
 					<text class="text-[30rpx] font-bold text-[#ff3b30]">取消任务</text>
 				</button>
-				<button 
+					<button 
 					v-if="taskInfo.canReceive"
 					@click="receiveTask"
 					class="flex-1 h-[88rpx] bg-[#0052d9] rounded-full flex items-center justify-center shadow-lg shadow-blue-200"
@@ -222,12 +252,76 @@
 				</button>
 			</view>
 		</view>
+
+		<!-- 缴纳保证金弹窗 -->
+		<view v-if="showDepositDialog" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]" @click="showDepositDialog = false">
+			<view class="bg-white rounded-[24rpx] w-[600rpx] overflow-hidden" @click.stop>
+				<!-- 弹窗头部 -->
+				<view class="flex flex-row items-center justify-between p-[32rpx] border-b border-[#f0f0f0]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">{{ depositDialogTitle }}</text>
+					<view @click="showDepositDialog = false" class="w-[48rpx] h-[48rpx] flex items-center justify-center">
+						<uni-icons type="close" size="20" color="#999999"></uni-icons>
+					</view>
+				</view>
+				
+				<!-- 弹窗内容 -->
+				<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+					<!-- 金额信息 -->
+					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx]">
+						<view class="flex flex-row justify-between mb-[16rpx]">
+							<text class="text-[26rpx] text-[#646a73]">目标总额</text>
+							<text class="text-[26rpx] text-[#1f2329] font-medium">¥{{ taskInfo.depositAmount }}</text>
+						</view>
+						<view class="flex flex-row justify-between mb-[16rpx]">
+							<text class="text-[26rpx] text-[#646a73]">已缴纳</text>
+							<text class="text-[26rpx] text-[#00b578] font-medium">¥{{ taskInfo.paidDeposit }}</text>
+						</view>
+						<view class="flex flex-row justify-between">
+							<text class="text-[26rpx] text-[#646a73]">待缴纳</text>
+							<text class="text-[26rpx] text-[#ff9500] font-bold">¥{{ taskInfo.remainingDeposit }}</text>
+						</view>
+					</view>
+					
+					<!-- 输入金额 -->
+					<view class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">缴纳金额</text>
+						<view class="flex flex-row items-center bg-[#f5f7fa] rounded-[12rpx] px-[24rpx] h-[88rpx]">
+							<text class="text-[32rpx] text-[#1f2329] font-bold mr-[8rpx]">¥</text>
+							<input 
+								type="digit"
+								v-model="depositInputAmount"
+								:placeholder="'最多可缴纳 ' + taskInfo.remainingDeposit"
+								class="flex-1 text-[32rpx] text-[#1f2329] font-bold"
+							/>
+						</view>
+						<text v-if="depositWarning" class="text-[24rpx] text-[#ff9500]">{{ depositWarning }}</text>
+					</view>
+				</view>
+				
+				<!-- 弹窗按钮 -->
+				<view class="flex flex-row gap-[24rpx] p-[32rpx] pt-0">
+					<button 
+						@click="handlePartialDeposit"
+						class="flex-1 h-[88rpx] bg-[#f5f7fa] rounded-full flex items-center justify-center"
+					>
+						<text class="text-[28rpx] font-bold text-[#646a73]">部分缴纳</text>
+					</button>
+					<button 
+						@click="handleFullDeposit"
+						class="flex-1 h-[88rpx] bg-[#ff9500] rounded-full flex items-center justify-center"
+					>
+						<text class="text-[28rpx] font-bold text-white">全额缴纳</text>
+					</button>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
-import { getTaskDetail, cancelTask } from '@/services/task'
+import { getTaskDetail, cancelTask, payDeposit } from '@/services/task'
+import { getWalletInfo } from '@/services/wallet'
 
 // 任务ID
 const taskId = ref(0)
@@ -260,6 +354,11 @@ const taskInfo = ref({
 	specialRequirement: '',
 	canCancel: false,
 	canReceive: false,
+	canPayDeposit: false,
+	depositAmount: '0.00',
+	paidDeposit: '0.00',
+	remainingDeposit: '0.00',
+	depositProgress: 0,
 	receiptType: '',
 	receiptTypeText: ''
 })
@@ -275,6 +374,17 @@ type SubtaskItem = {
 	statusText: string
 }
 const subtaskList = ref([] as SubtaskItem[])
+
+// 保证金弹窗相关
+const showDepositDialog = ref(false)
+const depositInputAmount = ref('')
+const depositWarning = ref('')
+const userBalance = ref(0)
+const minSubTaskAmount = ref(2000)  // 最小子任务金额
+
+const depositDialogTitle = computed(() => {
+	return taskInfo.value.paidDeposit === '0.00' ? '缴纳保证金' : '补缴保证金'
+})
 
 // 是否显示操作按钮
 const showActions = computed(() => {
@@ -316,9 +426,15 @@ const loadTaskDetail = async () => {
 			const proofTypes = [proofTypeMap[task.proof_type] || '订单截图']
 			
 			// 判断是否可以取消（只有发起人且状态为pending可取消）
-			const canCancel = task.status === 'pending' || task.status === 'approved'
+			const canCancel = task.status === 'pending'
 			// 判断是否可以接单（状态为running且有待接子任务）
 			const canReceive = task.status === 'running' && subTasks.some((s: any) => s.status === 'pending' || s.status === 'assigned')
+			// 判断是否可以缴纳保证金（running状态且未缴满时）
+			const paidDeposit = parseFloat(task.deposit_amount || 0)
+			const remainingDeposit = totalAmount - paidDeposit
+			const canPayDeposit = task.status === 'running' && remainingDeposit > 0
+			// 保证金进度
+			const depositProgress = totalAmount > 0 ? Math.round((paidDeposit / totalAmount) * 100) : 0
 			
 			taskInfo.value = {
 				taskNo: task.task_no || `T${task.id}`,
@@ -347,6 +463,11 @@ const loadTaskDetail = async () => {
 				specialRequirement: task.requirements || '',
 				canCancel: canCancel,
 				canReceive: canReceive,
+				canPayDeposit: canPayDeposit,
+				depositAmount: totalAmount.toFixed(2),
+				paidDeposit: paidDeposit.toFixed(2),
+				remainingDeposit: remainingDeposit.toFixed(2),
+				depositProgress: depositProgress,
 				receiptType: task.receipt_type,
 				receiptTypeText: task.receipt_type_text || (task.receipt_type === 'entry' ? '进件二维码' : '收款码')
 			}
@@ -511,7 +632,7 @@ const receiveTask = () => {
 }
 
 // 取消任务
-const cancelTask = () => {
+const handleCancelTask = () => {
 	uni.showModal({
 		title: '提示',
 		content: '确定要取消该任务吗？',
@@ -520,32 +641,179 @@ const cancelTask = () => {
 				try {
 					uni.showLoading({ title: '处理中...' })
 					
-					const result = await cancelTask(taskId.value, '用户取消')
+					await cancelTask(taskId.value, '用户取消')
 					
-					uni.hideLoading()
-					
-					if (result.code === 0) {
-						uni.showToast({
-							title: '取消成功',
-							icon: 'success'
-						})
-						loadTaskDetail()
-					} else {
-						uni.showToast({
-							title: result.msg || '取消失败',
-							icon: 'none'
-						})
-					}
-				} catch (error) {
 					uni.hideLoading()
 					uni.showToast({
-						title: '取消失败',
+						title: '取消成功',
+						icon: 'success'
+					})
+					loadTaskDetail()
+				} catch (error: any) {
+					uni.hideLoading()
+					uni.showToast({
+						title: error.message || '取消失败',
 						icon: 'none'
 					})
 				}
 			}
 		}
 	})
+}
+
+// 打开缴纳保证金弹窗
+const handlePayDeposit = async () => {
+	// 先获取用户余额
+	try {
+		const walletInfo = await getWalletInfo()
+		userBalance.value = parseFloat(walletInfo.balance || 0)
+	} catch (error) {
+		userBalance.value = 0
+	}
+	
+	// 重置输入
+	depositInputAmount.value = ''
+	depositWarning.value = ''
+	showDepositDialog.value = true
+}
+
+// 检查缴纳金额是否有效
+const validateDepositAmount = (amount: number): string => {
+	const remaining = parseFloat(taskInfo.value.remainingDeposit)
+	
+	if (amount <= 0) {
+		return '请输入有效金额'
+	}
+	if (amount > remaining) {
+		return `最多可缴纳 ¥${remaining}`
+	}
+	if (amount > userBalance.value) {
+		return `余额不足，当前余额 ¥${userBalance.value.toFixed(2)}`
+	}
+	if (amount < minSubTaskAmount.value && amount < remaining) {
+		return `金额不足以释放子任务（最小 ¥${minSubTaskAmount.value}），建议缴纳更多`
+	}
+	return ''
+}
+
+// 部分缴纳
+const handlePartialDeposit = async () => {
+	const amount = parseFloat(depositInputAmount.value)
+	
+	if (!depositInputAmount.value || isNaN(amount)) {
+		depositWarning.value = '请输入缴纳金额'
+		return
+	}
+	
+	const warning = validateDepositAmount(amount)
+	if (warning.includes('余额不足')) {
+		// 余额不足，询问是否充值
+		uni.showModal({
+			title: '余额不足',
+			content: `当前余额 ¥${userBalance.value.toFixed(2)}，不足以缴纳 ¥${amount.toFixed(2)}。是否前往充值？`,
+			confirmText: '去充值',
+			cancelText: '取消',
+			success: (res) => {
+				if (res.confirm) {
+					showDepositDialog.value = false
+					uni.navigateTo({
+						url: '/pages/wallet/recharge'
+					})
+				}
+			}
+		})
+		return
+	}
+	
+	if (warning && !warning.includes('不足以释放')) {
+		depositWarning.value = warning
+		return
+	}
+	
+	// 如果金额不足以释放子任务，给出提示但允许继续
+	if (warning.includes('不足以释放')) {
+		uni.showModal({
+			title: '提示',
+			content: warning + '，确定继续缴纳吗？',
+			success: async (res) => {
+				if (res.confirm) {
+					await doPayDeposit(amount)
+				}
+			}
+		})
+		return
+	}
+	
+	await doPayDeposit(amount)
+}
+
+// 全额缴纳
+const handleFullDeposit = async () => {
+	const remaining = parseFloat(taskInfo.value.remainingDeposit)
+	
+	if (remaining > userBalance.value) {
+		// 余额不足，询问是否充值
+		uni.showModal({
+			title: '余额不足',
+			content: `当前余额 ¥${userBalance.value.toFixed(2)}，不足以缴纳 ¥${remaining.toFixed(2)}。是否前往充值？`,
+			confirmText: '去充值',
+			cancelText: '取消',
+			success: (res) => {
+				if (res.confirm) {
+					showDepositDialog.value = false
+					uni.navigateTo({
+						url: '/pages/wallet/recharge'
+					})
+				}
+			}
+		})
+		return
+	}
+	
+	await doPayDeposit(remaining)
+}
+
+// 执行缴纳
+const doPayDeposit = async (amount: number) => {
+	try {
+		uni.showLoading({ title: '处理中...' })
+		
+		await payDeposit(taskId.value, amount)
+		
+		uni.hideLoading()
+		showDepositDialog.value = false
+		
+		uni.showToast({
+			title: '缴纳成功',
+			icon: 'success'
+		})
+		loadTaskDetail()
+	} catch (error: any) {
+		uni.hideLoading()
+		
+		// 检查是否是余额不足错误
+		if (error.message && error.message.includes('余额不足')) {
+			uni.showModal({
+				title: '余额不足',
+				content: error.message + '。是否前往充值？',
+				confirmText: '去充值',
+				cancelText: '取消',
+				success: (res) => {
+					if (res.confirm) {
+						showDepositDialog.value = false
+						uni.navigateTo({
+							url: '/pages/wallet/recharge'
+						})
+					}
+				}
+			})
+		} else {
+			uni.showToast({
+				title: error.message || '缴纳失败',
+				icon: 'none'
+			})
+		}
+	}
 }
 
 // 分享任务

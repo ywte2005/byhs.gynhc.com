@@ -280,6 +280,16 @@
 					}
 				},
 				{
+					"path": "pay",
+					"style": {
+						"navigationBarTitleText": "支付订单",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
 					"path": "withdraw",
 					"style": {
 						"navigationBarTitleText": "提现",

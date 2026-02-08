@@ -102,11 +102,11 @@
 						<view 
 							v-for="(item, index) in categories" 
 							:key="index"
-							@click="filter.category = item"
+							@click="filter.category = item.code"
 							class="px-[32rpx] py-[16rpx] rounded-[32rpx] border-[2rpx]"
-							:class="filter.category === item ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e5e5] bg-white'"
+							:class="filter.category === item.code ? 'border-[#0052d9] bg-[#f0f9ff]' : 'border-[#e5e5e5] bg-white'"
 						>
-							<text class="text-[28rpx]" :class="filter.category === item ? 'text-[#0052d9]' : 'text-[#646a73]'">{{ item }}</text>
+							<text class="text-[28rpx]" :class="filter.category === item.code ? 'text-[#0052d9]' : 'text-[#646a73]'">{{ item.name }}</text>
 						</view>
 					</view>
 				</view>
@@ -147,7 +147,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-import { getAvailableSubTasks, acceptSubTask } from '@/services/task'
+import { getAvailableSubTasks, acceptSubTask, getTaskTypes } from '@/services/task'
 
 // 任务ID（可选）
 const taskId = ref(0)
@@ -168,12 +168,16 @@ const showFilterDialog = ref(false)
 
 // 筛选条件
 const filter = ref({
-	category: '全部',
+	category: '',  // 空字符串表示全部
 	commissionRange: 'all'
 })
 
 // 分类列表
-const categories = ['全部', '电商', '外卖', '出行', '生活', '其他']
+type CategoryItem = {
+	code: string
+	name: string
+}
+const categories = ref([{ code: '', name: '全部' }] as CategoryItem[])
 
 // 佣金范围
 const commissionRanges = [
@@ -193,7 +197,7 @@ const loadSubtaskList = async () => {
 		
 		const res = await getAvailableSubTasks({
 			task_id: taskId.value || undefined,
-			category: filter.value.category === '全部' ? '' : filter.value.category,
+			category: filter.value.category || '',
 			page: page.value,
 			limit: 10
 		})
@@ -288,7 +292,7 @@ const receiveTask = async (id: number) => {
 // 重置筛选
 const resetFilter = () => {
 	filter.value = {
-		category: '全部',
+		category: '',  // 空字符串表示全部
 		commissionRange: 'all'
 	}
 }
@@ -308,6 +312,25 @@ const goToDetail = (id: number) => {
 	})
 }
 
+// 加载分类列表
+const loadCategories = async () => {
+	try {
+		const res = await getTaskTypes()
+		// API 返回 { list: [...] } 结构
+		const list = res?.list || res || []
+		if (list.length > 0) {
+			categories.value = [{ code: '', name: '全部' }].concat(
+				list.map((item: any) => ({
+					code: item.code,
+					name: item.name
+				}))
+			)
+		}
+	} catch (error) {
+		console.log('加载分类列表失败', error)
+	}
+}
+
 // 页面加载时获取子任务列表
 onMounted(() => {
 	// 获取任务ID（可选）
@@ -316,6 +339,7 @@ onMounted(() => {
 	// @ts-ignore
 	taskId.value = parseInt(currentPage.options?.taskId || '0')
 	
+	loadCategories()
 	loadSubtaskList()
 })
 </script>

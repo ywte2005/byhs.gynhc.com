@@ -52,6 +52,36 @@ export function cancelTask(taskId: number, reason: string): Promise<void> {
 	});
 }
 
+// 获取保证金信息
+export function getDepositInfo(taskId: number): Promise<{
+	task_id: number;
+	total_amount: string;
+	paid_amount: string;
+	remaining_amount: string;
+	progress: number;
+	status: string;
+	status_text: string;
+	logs: any[];
+}> {
+	return request({
+		url: "/task/getDepositInfo",
+		method: "GET",
+		data: { task_id: taskId }
+	});
+}
+
+// 缴纳/补缴保证金
+export function payDeposit(taskId: number, amount?: number): Promise<{ task: any }> {
+	return request({
+		url: "/task/payDeposit",
+		method: "POST",
+		data: { 
+			task_id: taskId,
+			amount: amount  // 可选，不传则缴纳全部剩余
+		}
+	});
+}
+
 // 我发起的任务
 export function getMyTasks(params: {
 	status?: string;
@@ -129,29 +159,6 @@ export function cancelSubTask(subtaskId: number, reason: string): Promise<void> 
 	});
 }
 
-// 获取保证金信息
-export function getDepositInfo(): Promise<{
-	deposit: number;
-	frozen: number;
-	available: number;
-}> {
-	return request({
-		url: "/task/depositInfo",
-		method: "GET"
-	});
-}
-
-// 充值保证金
-export function rechargeDeposit(amount: number, payMethod: string = "balance"): Promise<{ order_no: string }> {
-	return request({
-		url: "/task/depositRecharge",
-		method: "POST",
-		data: {
-			amount,
-			pay_method: payMethod
-		}
-	});
-}
 
 // 提取保证金
 export function withdrawDeposit(amount: number): Promise<void> {

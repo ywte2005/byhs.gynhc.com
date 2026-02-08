@@ -103,6 +103,68 @@ class Task extends Api
         $this->success('取消成功', ['task' => $task]);
     }
 
+    /**
+     * 缴纳/补缴保证金
+     */
+    public function payDeposit()
+    {
+        $taskId = $this->request->post('task_id');
+        $amount = $this->request->post('amount');  // 可选，不传则缴纳全部剩余
+        
+        if (!$taskId) {
+            $this->error('参数缺失');
+        }
+        
+        $userId = $this->auth->id;
+        
+        try {
+            $task = TaskService::payDeposit($taskId, $userId, $amount);
+            $isFirstPayment = $task->status === 'deposit_paid';
+            $msg = $isFirstPayment ? '保证金缴纳成功，等待后台审核' : '保证金补缴成功';
+            $this->success($msg, ['task' => $task]);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+    }
+
+    /**
+     * 获取任务保证金信息
+     */
+    public function getDepositInfo()
+    {
+        $taskId = $this->request->get('task_id');
+        
+        if (!$taskId) {
+            $this->error('参数缺失');
+        }
+        
+        $task = TaskService::getTaskDetail($taskId);
+        if (!$task) {
+            $this->error('任务不存在');
+        }
+        
+        // 计算已缴纳和待缴纳金额
+        $paidAmount = $task->deposit_amount ?: '0.00';
+        $remainingAmount = bcsub($task->total_amount, $paidAmount, 2);
+        $progress = bccomp($task->total_amount, '0', 2) > 0 
+            ? round(($paidAmount / $task->total_amount) * 100, 2) 
+            : 0;
+        
+        // 获取缴纳记录
+        $logs = \app\common\model\task\TaskDepositLog::getByTaskId($taskId);
+        
+        $this->success('获取成功', [
+            'task_id' => $task->id,
+            'total_amount' => $task->total_amount,
+            'paid_amount' => $paidAmount,
+            'remaining_amount' => $remainingAmount,
+            'progress' => $progress,
+            'status' => $task->status,
+            'status_text' => $task->status_text,
+            'logs' => $logs
+        ]);
+    }
+
     public function myTasks()
     {
         $page = $this->request->get('page', 1);
