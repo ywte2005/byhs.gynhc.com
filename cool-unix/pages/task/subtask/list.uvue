@@ -191,113 +191,61 @@ const loadSubtaskList = async () => {
 	try {
 		loading.value = true
 		
-		// 模拟真实数据
-		const mockData = [
-			{
-				id: 101,
-				category: '电商',
-				platform: '淘宝',
-				createTime: '10分钟前',
-				title: '淘宝店铺关注 + 商品收藏任务',
-				description: '搜索指定关键词找到店铺，关注并收藏前3个商品，无需浏览，截图上传即可。',
-				timeLimit: 1,
-				proofCount: 2,
-				commission: '1.50'
-			},
-			{
-				id: 102,
-				category: '外卖',
-				platform: '美团',
-				createTime: '25分钟前',
-				title: '美团外卖新店好评任务',
-				description: '在指定店铺下单（满20减10），收货后给5星好评+10字以上评语。',
-				timeLimit: 3,
-				proofCount: 1,
-				commission: '5.00'
-			},
-			{
-				id: 103,
-				category: '生活',
-				platform: '抖音',
-				createTime: '40分钟前',
-				title: '抖音短视频点赞评论任务',
-				description: '观看指定视频完播，点赞并发布一条正向评论，截图个人主页和评论区。',
-				timeLimit: 2,
-				proofCount: 2,
-				commission: '0.80'
-			},
-			{
-				id: 104,
-				category: '出行',
-				platform: '滴滴',
-				createTime: '1小时前',
-				title: '滴滴顺风车行程分享任务',
-				description: '模拟发布一条顺风车行程，并分享到微信群，保持10分钟后截图。',
-				timeLimit: 4,
-				proofCount: 1,
-				commission: '3.00'
-			},
-			{
-				id: 105,
-				category: '电商',
-				platform: '京东',
-				createTime: '2小时前',
-				title: '京东Plus会员问卷调查',
-				description: '填写关于京东Plus会员体验的问卷，需真实回答，约需3分钟。',
-				timeLimit: 12,
-				proofCount: 1,
-				commission: '8.00'
-			},
-			{
-				id: 106,
-				category: '其他',
-				platform: '小红书',
-				createTime: '3小时前',
-				title: '小红书笔记种草任务',
-				description: '发布一篇关于防晒霜的种草笔记，需带指定话题，图文并茂。',
-				timeLimit: 24,
-				proofCount: 1,
-				commission: '15.00'
-			}
-		]
-
-		// 模拟网络请求延迟
-		setTimeout(() => {
-			loading.value = false
-			
-			if (page.value === 1) {
-				subtaskList.value = mockData
-			} else {
-				// 模拟没有更多数据
-				hasMore.value = false
-			}
-			totalCount.value = 128
-		}, 500)
-		
-		/* 暂时注释掉真实接口调用，优先展示模拟数据
 		const res = await getAvailableSubTasks({
-			taskId: taskId.value,
+			task_id: taskId.value || undefined,
 			category: filter.value.category === '全部' ? '' : filter.value.category,
-			commissionRange: filter.value.commissionRange,
 			page: page.value,
-			pageSize: 10
+			limit: 10
 		})
 		
 		loading.value = false
 		
-		if (res.code === 0) {
+		if (res && res.list) {
+			const formattedList = res.list.map((item: any) => ({
+				id: item.id,
+				category: item.category || '互助',
+				platform: item.platform || '平台',
+				createTime: formatRelativeTime(item.createtime),
+				title: item.title || `互助任务 #${item.subtask_no || item.id}`,
+				description: item.description || `金额：¥${item.amount}，佣金：¥${item.commission}`,
+				timeLimit: item.time_limit || 24,
+				proofCount: item.proof_count || 1,
+				commission: parseFloat(item.commission || 0).toFixed(2)
+			}))
+			
 			if (page.value === 1) {
-				subtaskList.value = res.data.list
+				subtaskList.value = formattedList
 			} else {
-				subtaskList.value = subtaskList.value.concat(res.data.list)
+				subtaskList.value = subtaskList.value.concat(formattedList)
 			}
-			totalCount.value = res.data.total
-			hasMore.value = res.data.hasMore
+			totalCount.value = res.total || formattedList.length
+			hasMore.value = res.list.length >= 10
 		}
-		*/
 	} catch (error) {
 		loading.value = false
 		console.log('加载子任务列表失败', error)
+	}
+}
+
+// 格式化相对时间
+const formatRelativeTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const now = Date.now() / 1000
+	const diff = now - timestamp
+	
+	if (diff < 60) {
+		return '刚刚'
+	} else if (diff < 3600) {
+		return `${Math.floor(diff / 60)}分钟前`
+	} else if (diff < 86400) {
+		return `${Math.floor(diff / 3600)}小时前`
+	} else if (diff < 86400 * 2) {
+		return '昨天'
+	} else {
+		const date = new Date(timestamp * 1000)
+		const m = String(date.getMonth() + 1).padStart(2, '0')
+		const d = String(date.getDate()).padStart(2, '0')
+		return `${m}-${d}`
 	}
 }
 
@@ -314,32 +262,24 @@ const receiveTask = async (id: number) => {
 	try {
 		uni.showLoading({ title: '接单中...' })
 		
-		const res = await acceptSubTask(id)
+		await acceptSubTask(id)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
-			uni.showToast({
-				title: '接单成功',
-				icon: 'success'
-			})
-			
-			// 跳转到子任务详情
-			setTimeout(() => {
-				uni.navigateTo({
-					url: `/pages/task/subtask/detail?id=${id}`
-				})
-			}, 1500)
-		} else {
-			uni.showToast({
-				title: res.msg || '接单失败',
-				icon: 'none'
-			})
-		}
-	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '接单失败',
+			title: '接单成功',
+			icon: 'success'
+		})
+		
+		// 跳转到子任务详情
+		setTimeout(() => {
+			uni.navigateTo({
+				url: `/pages/task/subtask/detail?id=${id}`
+			})
+		}, 1500)
+	} catch (error: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: error.message || '接单失败',
 			icon: 'none'
 		})
 	}

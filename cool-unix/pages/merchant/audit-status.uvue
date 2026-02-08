@@ -211,8 +211,21 @@ const loadAuditStatus = async () => {
 		
 		uni.hideLoading()
 		
-		if (res.code === 0) {
-			auditInfo.value = res.data
+		if (res) {
+			auditInfo.value = {
+				status: res.status || 'pending',
+				submitTime: formatDateTime(res.createtime),
+				auditTime: res.audit_time ? formatDateTime(res.audit_time) : '',
+				auditNo: res.audit_no || `A${res.id}`,
+				merchantNo: res.merchant_no || '',
+				rejectReason: res.reject_reason || '',
+				type: res.type || 'personal',
+				name: res.name || '',
+				contact: res.contact || '',
+				phone: res.contact_phone || '',
+				address: res.address || '',
+				category: res.category || ''
+			}
 		}
 	} catch (error) {
 		uni.hideLoading()
@@ -221,6 +234,18 @@ const loadAuditStatus = async () => {
 			icon: 'none'
 		})
 	}
+}
+
+// 格式化日期时间
+const formatDateTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
 }
 
 // 进入商户中心

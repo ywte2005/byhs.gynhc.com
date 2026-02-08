@@ -176,8 +176,31 @@ const loadSubtaskDetail = async () => {
 		
 		uni.hideLoading()
 		
-		if (res.code === 0) {
-			subtaskInfo.value = res.data
+		if (res && res.subtask) {
+			const data = res.subtask
+			subtaskInfo.value = {
+				subtaskNo: data.subtask_no || `ST${data.id}`,
+				status: mapSubtaskStatus(data.status),
+				title: data.title || `互助任务 #${data.subtask_no || data.id}`,
+				description: data.description || `金额：¥${data.amount}，佣金：¥${data.commission}`,
+				receiveTime: formatDateTime(data.accepted_time || data.createtime),
+				timeLimit: data.time_limit || 24,
+				remainTime: calculateRemainTime(data.accepted_time, data.time_limit || 24),
+				completeTime: data.completed_time ? formatDateTime(data.completed_time) : '',
+				category: data.category || '互助',
+				platform: data.platform || '平台',
+				commission: parseFloat(data.commission || 0).toFixed(2),
+				steps: data.steps || data.description || '',
+				proofTypes: data.proof_types || ['订单截图'],
+				specialRequirement: data.special_requirement || '',
+				proofImages: data.proof_images || [],
+				proofNote: data.proof_note || '',
+				merchantAvatar: '',
+				merchantName: data.merchant_name || `商户${data.from_user_id}`,
+				merchantLevel: data.merchant_level || 'VIP',
+				merchantCredit: data.merchant_credit || 100,
+				canUpload: data.status === 'accepted' || data.status === 'paid'
+			}
 		}
 	} catch (error) {
 		uni.hideLoading()
@@ -186,6 +209,51 @@ const loadSubtaskDetail = async () => {
 			icon: 'none'
 		})
 	}
+}
+
+// 映射子任务状态
+const mapSubtaskStatus = (status: string): string => {
+	const statusMap: Record<string, string> = {
+		'pending': 'ongoing',
+		'assigned': 'ongoing',
+		'accepted': 'ongoing',
+		'paid': 'ongoing',
+		'verified': 'ongoing',
+		'completed': 'completed',
+		'failed': 'cancelled',
+		'cancelled': 'cancelled'
+	}
+	return statusMap[status] || 'ongoing'
+}
+
+// 格式化日期时间
+const formatDateTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
+}
+
+// 计算剩余时间
+const calculateRemainTime = (acceptedTime: number, timeLimit: number): string => {
+	if (!acceptedTime) return `${timeLimit}小时`
+	const deadline = acceptedTime + timeLimit * 3600
+	const now = Date.now() / 1000
+	const remain = deadline - now
+	
+	if (remain <= 0) return '已超时'
+	
+	const hours = Math.floor(remain / 3600)
+	const minutes = Math.floor((remain % 3600) / 60)
+	
+	if (hours > 0) {
+		return `${hours}小时${minutes}分`
+	}
+	return `${minutes}分钟`
 }
 
 // 获取状态文本
@@ -245,17 +313,14 @@ const handleCancel = () => {
 			if (res.confirm) {
 				try {
 					uni.showLoading({ title: '处理中...' })
-					const result = await cancelSubTask(subtaskId.value)
+					await cancelSubTask(subtaskId.value)
 					uni.hideLoading()
-					
-					if (result.code === 0) {
-						uni.showToast({ title: '已取消', icon: 'success' })
-						// 刷新详情
-						loadSubtaskDetail()
-					}
-				} catch (e) {
+					uni.showToast({ title: '已取消', icon: 'success' })
+					// 刷新详情
+					loadSubtaskDetail()
+				} catch (e: any) {
 					uni.hideLoading()
-					uni.showToast({ title: '操作失败', icon: 'none' })
+					uni.showToast({ title: e.message || '操作失败', icon: 'none' })
 				}
 			}
 		}

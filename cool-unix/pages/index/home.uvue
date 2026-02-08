@@ -167,13 +167,28 @@ const statistics = ref({
 async function loadStatistics() {
 	try {
 		const data = await getStatistics();
-		statistics.value = data;
+		if (data) {
+			statistics.value = {
+				wallet: {
+					balance: parseFloat(data.wallet?.balance || 0),
+					frozen: parseFloat(data.wallet?.frozen || 0),
+					pending: parseFloat(data.wallet?.pending || data.wallet?.deposit || 0)
+				},
+				todo: {
+					pending_merchant: data.todo?.pending_merchant || 0,
+					pending_task: data.todo?.pending_task || 0,
+					pending_withdraw: data.todo?.pending_withdraw || 0
+				},
+				today: {
+					accepted: data.today?.accepted || 0,
+					completed: data.today?.completed || 0,
+					income: parseFloat(data.today?.income || 0)
+				},
+				news: data.news || []
+			};
+		}
 	} catch (err: any) {
 		console.error('加载统计数据失败', err);
-		uni.showToast({
-			title: err.message || '加载失败',
-			icon: 'none'
-		});
 	}
 }
 

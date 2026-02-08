@@ -133,52 +133,7 @@ const tabs = [
 ]
 
 // 账单列表
-const logList = ref([
-	{
-		iconType: 'wallet-filled',
-		iconColor: '#00b578',
-		iconBgColor: '#e6f7f0',
-		title: '任务佣金',
-		time: '2025-01-30 10:30:00',
-		type: 'in',
-		amount: '15.00',
-		balance: '12,580.00',
-		remark: '完成子任务 #ST202501300001'
-	},
-	{
-		iconType: 'compose',
-		iconColor: '#faad14',
-		iconBgColor: '#fff7e6',
-		title: '发起任务',
-		time: '2025-01-30 09:00:00',
-		type: 'out',
-		amount: '1,500.00',
-		balance: '12,565.00',
-		remark: '任务编号：T202501300001'
-	},
-	{
-		iconType: 'wallet-filled',
-		iconColor: '#0052d9',
-		iconBgColor: '#eaf2ff',
-		title: '充值',
-		time: '2025-01-29 15:00:00',
-		type: 'in',
-		amount: '3,000.00',
-		balance: '14,065.00',
-		remark: '微信支付'
-	},
-	{
-		iconType: 'upload-filled',
-		iconColor: '#ff3b30',
-		iconBgColor: '#fef0f0',
-		title: '提现',
-		time: '2025-01-29 10:00:00',
-		type: 'out',
-		amount: '5,000.00',
-		balance: '11,065.00',
-		remark: '提现到工商银行 尾号8888'
-	}
-])
+const logList = ref([] as any[])
 
 // 加载状态
 const loading = ref(false)
@@ -229,31 +184,60 @@ const loadLogList = async () => {
 		loading.value = true
 		
 		const res = await getWalletLogs({
-			type: currentTab.value,
-			filterType: filter.value.type,
-			timeRange: filter.value.timeRange,
+			wallet_type: 'balance',
 			page: page.value,
-			pageSize: 10
+			limit: 10
 		})
 		
 		loading.value = false
 		
-		if (res.code === 0) {
-			if (page.value === 1) {
-				logList.value = res.data.list
-			} else {
-				logList.value = logList.value.concat(res.data.list)
+		if (res && res.list) {
+			const formattedList = res.list.map((item: any) => {
+				const amount = parseFloat(item.amount)
+				const isIncome = amount >= 0
+				return {
+					iconType: isIncome ? 'wallet-filled' : 'upload-filled',
+					iconColor: isIncome ? '#00b578' : '#ff3b30',
+					iconBgColor: isIncome ? '#e6f7f0' : '#fef0f0',
+					title: item.memo || item.change_type,
+					time: formatTime(item.createtime),
+					type: isIncome ? 'in' : 'out',
+					amount: Math.abs(amount).toFixed(2),
+					balance: parseFloat(item.after_balance || 0).toFixed(2),
+					remark: item.remark || ''
+				}
+			})
+			
+			// 根据当前tab过滤
+			let filtered = formattedList
+			if (currentTab.value === 'in') {
+				filtered = formattedList.filter((item: any) => item.type === 'in')
+			} else if (currentTab.value === 'out') {
+				filtered = formattedList.filter((item: any) => item.type === 'out')
 			}
-			hasMore.value = res.data.hasMore
+			
+			if (page.value === 1) {
+				logList.value = filtered
+			} else {
+				logList.value = logList.value.concat(filtered)
+			}
+			hasMore.value = res.list.length >= 10
 		}
 	} catch (error) {
 		loading.value = false
 		console.log('加载账单列表失败', error)
-		uni.showToast({
-			title: '加载账单列表失败',
-			icon: 'error'
-		})
 	}
+}
+
+// 格式化时间
+const formatTime = (timestamp: number): string => {
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
 }
 
 // 加载更多

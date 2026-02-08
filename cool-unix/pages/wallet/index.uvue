@@ -104,45 +104,67 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
+import { getWalletInfo, getWalletLogs } from '@/services/wallet'
 import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 钱包信息
 const walletInfo = ref({
-	balance: '12,580.00',
-	frozen: '2,500.00',
-	pending: '5,320.00'
+	balance: '0.00',
+	frozen: '0.00',
+	pending: '0.00'
 })
 
 // 最近交易
-const recentLogs = ref([
-	{
-		title: '任务佣金',
-		time: '2025-01-30 10:30:00',
-		type: 'in',
-		amount: '15.00'
-	},
-	{
-		title: '发起任务',
-		time: '2025-01-30 09:00:00',
-		type: 'out',
-		amount: '1,500.00'
-	},
-	{
-		title: '充值',
-		time: '2025-01-29 15:00:00',
-		type: 'in',
-		amount: '3,000.00'
-	}
-])
+const recentLogs = ref([] as any[])
 
 // 加载钱包信息
 const loadWalletInfo = async () => {
-	// Mock implementation
+	try {
+		const res = await getWalletInfo()
+		if (res && res.wallet) {
+			walletInfo.value = {
+				balance: formatMoney(res.wallet.balance),
+				frozen: formatMoney(res.wallet.frozen),
+				pending: formatMoney(res.wallet.deposit || 0)
+			}
+		}
+	} catch (err: any) {
+		console.error('加载钱包信息失败', err)
+	}
 }
 
 // 加载最近交易
 const loadRecentLogs = async () => {
-	// Mock implementation
+	try {
+		const res = await getWalletLogs({ page: 1, limit: 5 })
+		if (res && res.list) {
+			recentLogs.value = res.list.map((item: any) => ({
+				title: item.memo || item.change_type,
+				time: formatTime(item.createtime),
+				type: parseFloat(item.amount) >= 0 ? 'in' : 'out',
+				amount: Math.abs(parseFloat(item.amount)).toFixed(2)
+			}))
+		}
+	} catch (err: any) {
+		console.error('加载交易记录失败', err)
+	}
+}
+
+// 格式化金额
+const formatMoney = (amount: number | string): string => {
+	const num = typeof amount === 'string' ? parseFloat(amount) : amount
+	return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// 格式化时间
+const formatTime = (timestamp: number): string => {
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
 }
 
 // Navigation

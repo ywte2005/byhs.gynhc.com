@@ -348,9 +348,67 @@ CREATE TABLE `fa_message` (
 | `cool-unix/services/wallet.ts` | 新增 depositPay/Withdraw(), 银行卡管理方法 |
 | `cool-unix/services/message.ts` | 修复API参数匹配 |
 
+### 前端页面API集成更新
+| 文件路径 | 修改内容 |
+|----------|----------|
+| `cool-unix/pages/index/home.uvue` | 首页统计数据API集成，数据格式化 |
+| `cool-unix/pages/wallet/index.uvue` | 钱包首页API集成，余额和流水加载 |
+| `cool-unix/pages/wallet/logs.uvue` | 钱包流水API集成，分页和筛选 |
+| `cool-unix/pages/wallet/withdraw.uvue` | 提现页面API集成，银行卡加载 |
+| `cool-unix/pages/wallet/bankcard.uvue` | 银行卡管理API集成，增删改查 |
+| `cool-unix/pages/message/index.uvue` | 消息列表API集成，标记已读 |
+| `cool-unix/pages/promo/index.uvue` | 推广中心API集成，数据展示 |
+| `cool-unix/pages/task/detail.uvue` | 任务详情API集成，状态映射 |
+| `cool-unix/pages/task/deposit.uvue` | 保证金管理API集成，充值提取 |
+| `cool-unix/pages/task/my-tasks.uvue` | 我的任务API集成，分页筛选 |
+| `cool-unix/pages/task/subtask/list.uvue` | 可接子任务API集成，接单功能 |
+| `cool-unix/pages/task/subtask/detail.uvue` | 子任务详情API集成，取消接单 |
+| `cool-unix/pages/merchant/audit-status.uvue` | 审核状态API集成，数据格式化 |
+
+---
+
+## 九、前端页面API集成详情
+
+### 9.1 首页模块 (pages/index)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| home.uvue | getStatistics() | ✅ 已集成 |
+
+### 9.2 钱包模块 (pages/wallet)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| index.uvue | getWalletInfo(), getWalletLogs() | ✅ 已集成 |
+| logs.uvue | getWalletLogs() | ✅ 已集成 |
+| withdraw.uvue | getWalletInfo(), getBankcards(), withdraw() | ✅ 已集成 |
+| bankcard.uvue | getBankcards(), deleteBankcard() | ✅ 已集成 |
+
+### 9.3 消息模块 (pages/message)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| index.uvue | getMessageList(), markAsRead(), markAllAsRead() | ✅ 已集成 |
+
+### 9.4 推广模块 (pages/promo)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| index.uvue | getOverview() | ✅ 已集成 |
+
+### 9.5 任务模块 (pages/task)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| detail.uvue | getTaskDetail(), cancelTask() | ✅ 已集成 |
+| deposit.uvue | getDepositInfo(), rechargeDeposit(), withdrawDeposit() | ✅ 已集成 |
+| my-tasks.uvue | getMyTasks() | ✅ 已集成 |
+| subtask/list.uvue | getAvailableSubTasks(), acceptSubTask() | ✅ 已集成 |
+| subtask/detail.uvue | getSubTaskDetail(), cancelSubTask() | ✅ 已集成 |
+
+### 9.6 商户模块 (pages/merchant)
+| 页面 | API调用 | 状态 |
+|------|---------|------|
+| audit-status.uvue | getAuditStatus() | ✅ 已集成 |
+
 ---
 
 *文档生成时间: 2025-01-22*
 *最后更新: 2025-02-08*
-*版本: 2.0*
-*状态: 所有任务已完成 ✅*
+*版本: 3.0*
+*状态: 所有任务已完成 ✅ (包括前端页面API集成)*

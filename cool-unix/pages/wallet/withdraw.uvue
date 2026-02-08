@@ -111,10 +111,10 @@
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-// import { getWalletInfo, withdraw, getWithdrawConfig } from '@/services/wallet'
+import { getWalletInfo, withdraw, getWithdrawConfig, getBankcards } from '@/services/wallet'
 
 // 可提现余额
-const availableBalance = ref('12,580.00')
+const availableBalance = ref('0.00')
 
 // 提现金额
 const withdrawAmount = ref('')
@@ -160,53 +160,44 @@ const canSubmit = computed(() => {
 
 // 加载钱包信息
 const loadWalletInfo = async () => {
-	// Mock implementation
+	try {
+		const res = await getWalletInfo()
+		if (res && res.wallet) {
+			availableBalance.value = parseFloat(res.wallet.balance).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+		}
+	} catch (err: any) {
+		console.error('加载钱包信息失败', err)
+	}
 }
 
 // 加载银行卡列表
 const loadBankCards = async () => {
 	try {
-		const cards = uni.getStorageSync('mock_bank_cards')
-		if (cards) {
-			// @ts-ignore
-			bankCards.value = cards.map((item: any) => ({
+		const res = await getBankcards()
+		if (res && res.list) {
+			bankCards.value = res.list.map((item: any) => ({
 				id: item.id,
-				bankName: item.bankName,
-				cardNo: `尾号 ${item.cardNo.slice(-4)}`
+				bankName: item.bank_name,
+				cardNo: `尾号 ${item.card_no.slice(-4)}`
 			}))
 			
-			// 如果当前选中的卡不在列表中（比如被删除了），默认选中第一张
+			// 如果当前选中的卡不在列表中，默认选中第一张或默认卡
 			if (bankCards.value.length > 0) {
-				const exists = bankCards.value.find(item => item.id === selectedBankCard.value)
-				if (!exists) {
-					selectedBankCard.value = bankCards.value[0].id
+				const defaultCard = res.list.find((item: any) => item.is_default === 1)
+				if (defaultCard) {
+					selectedBankCard.value = defaultCard.id
+				} else {
+					const exists = bankCards.value.find((item: any) => item.id === selectedBankCard.value)
+					if (!exists) {
+						selectedBankCard.value = bankCards.value[0].id
+					}
 				}
 			} else {
 				selectedBankCard.value = 0
 			}
-		} else {
-			// Initialize default data if storage is empty
-			const defaultCards = [
-				{
-					id: 1,
-					bankName: '中国工商银行',
-					cardNo: '6222021001111888888',
-					name: '张三',
-					mobile: '13800138000'
-				},
-				{
-					id: 2,
-					bankName: '中国建设银行',
-					cardNo: '6217001230006666666',
-					name: '张三',
-					mobile: '13800138000'
-				}
-			]
-			uni.setStorageSync('mock_bank_cards', defaultCards)
-			loadBankCards() // Reload from storage
 		}
-	} catch (e) {
-		console.error(e)
+	} catch (err: any) {
+		console.error('加载银行卡失败', err)
 	}
 }
 
@@ -258,6 +249,16 @@ const confirmWithdraw = async () => {
 		return
 	}
 
+	// 获取选中的银行卡信息
+	const selectedCard = bankCards.value.find((item: any) => item.id === selectedBankCard.value)
+	if (!selectedCard) {
+		uni.showToast({
+			title: '请选择提现账户',
+			icon: 'none'
+		})
+		return
+	}
+
 	uni.showModal({
 		title: '确认提现',
 		content: `提现金额：¥${amount}\n手续费：¥${serviceFee.value}\n实际到账：¥${actualAmount.value}`,
@@ -266,22 +267,26 @@ const confirmWithdraw = async () => {
 				try {
 					uni.showLoading({ title: '处理中...' })
 					
-					// Mock withdraw
-					setTimeout(() => {
-						uni.hideLoading()
-						uni.showToast({
-							title: '提现申请已提交',
-							icon: 'success'
-						})
-						setTimeout(() => {
-							uni.navigateBack()
-						}, 1500)
-					}, 1000)
+					await withdraw({
+						amount: amount,
+						bank_name: selectedCard.bankName,
+						bank_account: selectedCard.cardNo,
+						account_name: ''
+					})
 					
-				} catch (error) {
 					uni.hideLoading()
 					uni.showToast({
-						title: '提现失败，请重试',
+						title: '提现申请已提交',
+						icon: 'success'
+					})
+					setTimeout(() => {
+						uni.navigateBack()
+					}, 1500)
+					
+				} catch (error: any) {
+					uni.hideLoading()
+					uni.showToast({
+						title: error.message || '提现失败，请重试',
 						icon: 'none'
 					})
 				}

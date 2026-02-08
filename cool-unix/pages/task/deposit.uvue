@@ -183,36 +183,14 @@ import { getDepositInfo, rechargeDeposit, withdrawDeposit } from '@/services/tas
 
 // 保证金信息
 const depositInfo = ref({
-	balance: '5,000.00',
-	frozen: '2,500.00',
-	available: '2,500.00',
-	total: '15,000.00'
+	balance: '0.00',
+	frozen: '0.00',
+	available: '0.00',
+	total: '0.00'
 })
 
 // 流水记录
-const logList = ref([
-	{
-		title: '任务完成退还',
-		time: '2025-01-30 10:30:00',
-		type: 'in',
-		amount: '500.00',
-		balance: '5,000.00'
-	},
-	{
-		title: '发起任务冻结',
-		time: '2025-01-30 09:00:00',
-		type: 'out',
-		amount: '1,500.00',
-		balance: '4,500.00'
-	},
-	{
-		title: '充值保证金',
-		time: '2025-01-29 15:00:00',
-		type: 'in',
-		amount: '3,000.00',
-		balance: '6,000.00'
-	}
-])
+const logList = ref([] as any[])
 
 // 显示充值对话框
 const showRechargeDialog = ref(false)
@@ -231,25 +209,54 @@ const quickAmounts = ['500', '1000', '2000', '3000', '5000', '10000']
 const loadDepositInfo = async () => {
 	try {
 		const res = await getDepositInfo()
-		if (res.code === 0) {
-			depositInfo.value = res.data
+		if (res) {
+			depositInfo.value = {
+				balance: formatMoney(res.deposit || 0),
+				frozen: formatMoney(res.frozen_deposit || 0),
+				available: formatMoney((res.deposit || 0) - (res.frozen_deposit || 0)),
+				total: formatMoney(res.total_deposit || res.deposit || 0)
+			}
+			
+			// 处理流水记录
+			if (res.logs && res.logs.length > 0) {
+				logList.value = res.logs.map((item: any) => {
+					const amount = parseFloat(item.amount)
+					return {
+						title: item.memo || item.change_type,
+						time: formatDateTime(item.createtime),
+						type: amount >= 0 ? 'in' : 'out',
+						amount: Math.abs(amount).toFixed(2),
+						balance: parseFloat(item.after_balance || 0).toFixed(2)
+					}
+				})
+			}
 		}
 	} catch (error) {
 		console.log('加载保证金信息失败', error)
 	}
 }
 
-// 加载流水记录
+// 格式化金额
+const formatMoney = (amount: number | string): string => {
+	const num = typeof amount === 'string' ? parseFloat(amount) : amount
+	return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
+// 格式化日期时间
+const formatDateTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
+}
+
+// 加载流水记录（已整合到loadDepositInfo中）
 const loadLogList = async () => {
-	try {
-		// TODO: 实现获取保证金流水接口
-		const res = { code: 0, data: { list: [] } } as any
-		if (res.code === 0) {
-			logList.value = res.data.list
-		}
-	} catch (error) {
-		console.log('加载流水记录失败', error)
-	}
+	// 流水记录已在loadDepositInfo中加载
 }
 
 // 确认充值
@@ -274,29 +281,20 @@ const confirmRecharge = async () => {
 	try {
 		uni.showLoading({ title: '处理中...' })
 		
-		const res = await rechargeDeposit(rechargeAmount.value)
+		await rechargeDeposit(amount)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
-			uni.showToast({
-				title: '充值成功',
-				icon: 'success'
-			})
-			showRechargeDialog.value = false
-			rechargeAmount.value = ''
-			loadDepositInfo()
-			loadLogList()
-		} else {
-			uni.showToast({
-				title: res.msg || '充值失败',
-				icon: 'none'
-			})
-		}
-	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '充值失败',
+			title: '充值成功',
+			icon: 'success'
+		})
+		showRechargeDialog.value = false
+		rechargeAmount.value = ''
+		loadDepositInfo()
+	} catch (error: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: error.message || '充值失败',
 			icon: 'none'
 		})
 	}
@@ -334,29 +332,20 @@ const confirmWithdraw = async () => {
 	try {
 		uni.showLoading({ title: '处理中...' })
 		
-		const res = await withdrawDeposit(withdrawAmount.value)
+		await withdrawDeposit(amount)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
-			uni.showToast({
-				title: '提取成功',
-				icon: 'success'
-			})
-			showWithdrawDialog.value = false
-			withdrawAmount.value = ''
-			loadDepositInfo()
-			loadLogList()
-		} else {
-			uni.showToast({
-				title: res.msg || '提取失败',
-				icon: 'none'
-			})
-		}
-	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '提取失败',
+			title: '提取成功',
+			icon: 'success'
+		})
+		showWithdrawDialog.value = false
+		withdrawAmount.value = ''
+		loadDepositInfo()
+	} catch (error: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: error.message || '提取失败',
 			icon: 'none'
 		})
 	}

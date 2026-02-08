@@ -63,7 +63,7 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-// import { getMessageList, markAllAsRead } from '@/services/message' // Commented out as services might not exist yet
+import { getMessageList, markAsRead, markAllAsRead } from '@/services/message'
 
 // 当前标签
 const currentTab = ref('all')
@@ -73,48 +73,11 @@ const tabs = [
 	{ label: '全部', value: 'all' },
 	{ label: '系统', value: 'system' },
 	{ label: '任务', value: 'task' },
-	{ label: '交易', value: 'transaction' }
+	{ label: '交易', value: 'wallet' }
 ]
 
 // 消息列表
-const messageList = ref([
-	{
-		id: 1,
-		icon: 'wallet-filled',
-		iconColor: '#ff9500',
-		title: '任务佣金到账',
-		content: '您完成的子任务已结算，佣金15.00元已到账',
-		time: '10分钟前',
-		isRead: false
-	},
-	{
-		id: 2,
-		icon: 'checkbox-filled',
-		iconColor: '#0052d9',
-		title: '任务审核通过',
-		content: '您发起的任务"美团外卖订单互助"已通过审核',
-		time: '1小时前',
-		isRead: false
-	},
-	{
-		id: 3,
-		icon: 'notification-filled',
-		iconColor: '#00b578',
-		title: '系统通知',
-		content: '平台将于今晚22:00-24:00进行系统维护',
-		time: '2小时前',
-		isRead: true
-	},
-	{
-		id: 4,
-		icon: 'vip-filled',
-		iconColor: '#ff3b30',
-		title: '提现成功',
-		content: '您的提现申请已处理，金额5000.00元已到账',
-		time: '昨天',
-		isRead: true
-	}
-])
+const messageList = ref([] as any[])
 
 // 加载状态
 const loading = ref(false)
@@ -125,28 +88,135 @@ const page = ref(1)
 const selectTab = (value: string) => {
 	currentTab.value = value
 	page.value = 1
-	// messageList.value = [] // Keep mock data for now
-	// loadMessageList()
+	messageList.value = []
+	loadMessageList()
 }
 
 // 加载消息列表
 const loadMessageList = async () => {
-	// Mock implementation
+	if (loading.value) return
+	
+	try {
+		loading.value = true
+		
+		const params: any = {
+			page: page.value,
+			limit: 10
+		}
+		if (currentTab.value !== 'all') {
+			params.type = currentTab.value
+		}
+		
+		const res = await getMessageList(params)
+		
+		loading.value = false
+		
+		if (res && res.list) {
+			const formattedList = res.list.map((item: any) => ({
+				id: item.id,
+				icon: getIconByType(item.type),
+				iconColor: getIconColorByType(item.type),
+				title: item.title,
+				content: item.content,
+				time: formatTime(item.createtime),
+				isRead: item.is_read === 1
+			}))
+			
+			if (page.value === 1) {
+				messageList.value = formattedList
+			} else {
+				messageList.value = messageList.value.concat(formattedList)
+			}
+			hasMore.value = res.list.length >= 10
+		}
+	} catch (error) {
+		loading.value = false
+		console.log('加载消息列表失败', error)
+	}
+}
+
+// 获取图标类型
+const getIconByType = (type: string): string => {
+	const iconMap: Record<string, string> = {
+		'system': 'notification-filled',
+		'task': 'checkbox-filled',
+		'wallet': 'wallet-filled',
+		'promo': 'vip-filled'
+	}
+	return iconMap[type] || 'notification-filled'
+}
+
+// 获取图标颜色
+const getIconColorByType = (type: string): string => {
+	const colorMap: Record<string, string> = {
+		'system': '#00b578',
+		'task': '#0052d9',
+		'wallet': '#ff9500',
+		'promo': '#ff3b30'
+	}
+	return colorMap[type] || '#0052d9'
+}
+
+// 格式化时间
+const formatTime = (timestamp: number): string => {
+	const now = Date.now() / 1000
+	const diff = now - timestamp
+	
+	if (diff < 60) {
+		return '刚刚'
+	} else if (diff < 3600) {
+		return `${Math.floor(diff / 60)}分钟前`
+	} else if (diff < 86400) {
+		return `${Math.floor(diff / 3600)}小时前`
+	} else if (diff < 86400 * 2) {
+		return '昨天'
+	} else {
+		const date = new Date(timestamp * 1000)
+		const m = String(date.getMonth() + 1).padStart(2, '0')
+		const d = String(date.getDate()).padStart(2, '0')
+		return `${m}-${d}`
+	}
 }
 
 // 加载更多
 const loadMore = () => {
-	// Mock implementation
+	if (!loading.value && hasMore.value) {
+		page.value++
+		loadMessageList()
+	}
 }
 
 // 全部已读
-const markAllRead = async () => {
-	// Mock implementation
+const handleMarkAllRead = async () => {
+	try {
+		await markAllAsRead(currentTab.value === 'all' ? undefined : currentTab.value)
+		// 更新列表中的已读状态
+		messageList.value = messageList.value.map((item: any) => ({
+			...item,
+			isRead: true
+		}))
+		uni.showToast({
+			title: '已全部标记为已读',
+			icon: 'success'
+		})
+	} catch (error) {
+		console.log('标记已读失败', error)
+	}
 }
 
 // 进入消息详情
 const goToDetail = async (id: number) => {
-	// Mock implementation
+	// 标记为已读
+	try {
+		await markAsRead(id)
+		// 更新本地状态
+		const item = messageList.value.find((m: any) => m.id === id)
+		if (item) {
+			item.isRead = true
+		}
+	} catch (error) {
+		console.log('标记已读失败', error)
+	}
 }
 
 // 页面加载时获取消息列表

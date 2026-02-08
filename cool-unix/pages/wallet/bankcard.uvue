@@ -62,7 +62,7 @@
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-// import { getBankCards, deleteBankCard } from '@/services/wallet'
+import { getBankcards, deleteBankcard, setDefaultBankcard } from '@/services/wallet'
 
 type BankCard = {
 	id: number
@@ -77,40 +77,23 @@ type BankCard = {
 const list = ref([] as BankCard[])
 const loading = ref(false)
 
-const loadData = () => {
+const loadData = async () => {
 	loading.value = true
 	try {
-		const cards = uni.getStorageSync('mock_bank_cards')
-		if (cards) {
-			// @ts-ignore
-			list.value = cards
-		} else {
-			const defaultCards = [
-				{ 
-					id: 1, 
-					type: 1, 
-					isDefault: true, 
-					bankName: '中国工商银行', 
-					cardNo: '6222021001111888888', 
-					accountName: '北京科技有限公司',
-					mobile: '13800138000' 
-				},
-				{ 
-					id: 2, 
-					type: 2, 
-					isDefault: false, 
-					bankName: '中国建设银行', 
-					cardNo: '6217001230006666666', 
-					accountName: '张三',
-					mobile: '13800138000' 
-				}
-			]
-			uni.setStorageSync('mock_bank_cards', defaultCards)
-			// @ts-ignore
-			list.value = defaultCards
+		const res = await getBankcards()
+		if (res && res.list) {
+			list.value = res.list.map((item: any) => ({
+				id: item.id,
+				type: item.bank_code?.startsWith('C') ? 1 : 2, // 简单判断对公/个人
+				isDefault: item.is_default === 1,
+				bankName: item.bank_name,
+				cardNo: item.card_no,
+				accountName: item.card_holder,
+				mobile: ''
+			}))
 		}
-	} catch (e) {
-		console.error(e)
+	} catch (err: any) {
+		console.error('加载银行卡失败', err)
 	}
 	loading.value = false
 }
@@ -135,19 +118,19 @@ const deleteCard = (id: number) => {
 	uni.showModal({
 		title: '提示',
 		content: '确定要解绑该银行卡吗？',
-		success: (res) => {
+		success: async (res) => {
 			if (res.confirm) {
-				// Mock delete
-				list.value = list.value.filter(item => item.id !== id)
-				
-				// Update storage
 				try {
-					uni.setStorageSync('mock_bank_cards', list.value)
-				} catch (e) {
-					console.error(e)
+					await deleteBankcard(id)
+					// 从列表中移除
+					list.value = list.value.filter(item => item.id !== id)
+					uni.showToast({ title: '解绑成功', icon: 'success' })
+				} catch (err: any) {
+					uni.showToast({ 
+						title: err.message || '解绑失败', 
+						icon: 'none' 
+					})
 				}
-
-				uni.showToast({ title: '解绑成功', icon: 'success' })
 			}
 		}
 	})

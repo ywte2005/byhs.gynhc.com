@@ -267,9 +267,41 @@ const loadTaskDetail = async () => {
 		
 		uni.hideLoading()
 		
-		if (res.code === 0) {
-			taskInfo.value = res.data.task
-			subtaskList.value = res.data.subtasks
+		if (res && res.task) {
+			const task = res.task
+			taskInfo.value = {
+				taskNo: task.task_no || `T${task.id}`,
+				status: mapTaskStatus(task.status),
+				title: task.title || `互助任务 #${task.task_no}`,
+				description: task.description || `金额：¥${task.amount}，佣金：¥${task.commission}`,
+				merchantAvatar: '',
+				merchantName: task.merchant_name || `商户${task.from_user_id}`,
+				merchantLevel: task.merchant_level || 'VIP',
+				merchantCredit: task.merchant_credit || 100,
+				totalCount: task.total_count || 1,
+				completedCount: task.completed_count || 0,
+				remainCount: task.remain_count || (task.total_count - task.completed_count) || 0,
+				progress: task.total_count > 0 ? Math.round((task.completed_count / task.total_count) * 100) : 0,
+				category: task.category || '互助',
+				platform: task.platform || '平台',
+				unitPrice: task.commission || task.amount || '0.00',
+				timeLimit: task.time_limit || 24,
+				createTime: formatDateTime(task.createtime),
+				proofTypes: task.proof_types || ['订单截图'],
+				specialRequirement: task.special_requirement || '',
+				canCancel: task.can_cancel || false,
+				canReceive: task.can_receive || true
+			}
+			
+			// 处理子任务列表
+			if (res.subtasks && res.subtasks.length > 0) {
+				subtaskList.value = res.subtasks.map((item: any, index: number) => ({
+					id: item.id,
+					no: String(index + 1).padStart(3, '0'),
+					receiverName: item.receiver_name || '',
+					status: mapSubtaskStatus(item.status)
+				}))
+			}
 		}
 	} catch (error) {
 		uni.hideLoading()
@@ -278,6 +310,47 @@ const loadTaskDetail = async () => {
 			icon: 'none'
 		})
 	}
+}
+
+// 映射任务状态
+const mapTaskStatus = (status: string): string => {
+	const statusMap: Record<string, string> = {
+		'pending': 'ongoing',
+		'approved': 'ongoing',
+		'running': 'ongoing',
+		'paused': 'ongoing',
+		'completed': 'completed',
+		'cancelled': 'cancelled',
+		'failed': 'cancelled'
+	}
+	return statusMap[status] || 'ongoing'
+}
+
+// 映射子任务状态
+const mapSubtaskStatus = (status: string): string => {
+	const statusMap: Record<string, string> = {
+		'pending': 'pending',
+		'assigned': 'pending',
+		'accepted': 'ongoing',
+		'paid': 'ongoing',
+		'verified': 'ongoing',
+		'completed': 'completed',
+		'failed': 'cancelled',
+		'cancelled': 'cancelled'
+	}
+	return statusMap[status] || 'pending'
+}
+
+// 格式化日期时间
+const formatDateTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
 }
 
 // 获取状态文本

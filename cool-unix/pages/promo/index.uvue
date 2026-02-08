@@ -88,8 +88,7 @@
 </template>
 
 <script lang="uts">
-	// import { getOverview } from "@/services/promo";
-	// import type { PromoOverview } from "@/services/promo";
+	import { getOverview } from "@/services/promo";
 	import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 	type PromoOverview = {
@@ -117,39 +116,42 @@
 			return {
 				overview: null as PromoOverview | null,
 				loading: false,
-				recentList: [
-					{ content: '用户***加入团队', time: '10分钟前' },
-					{ content: '获得直推奖励 10.00元', time: '30分钟前' },
-					{ content: '团队成员完成任务', time: '1小时前' }
-				]
+				recentList: [] as any[]
 			};
 		},
 		onShow() {
 			this.loadData();
 		},
 		methods: {
-			loadData() {
+			async loadData() {
 				this.loading = true;
-				// Mock data
-				setTimeout(() => {
-					this.overview = {
-						wallet: {
-							balance: '12580.00',
-							total_income: '56800.00',
-							deposit: '5000.00'
-						},
-						level: {
-							name: 'VIP会员'
-						},
-						team_count: 156,
-						performance: {
-							personal_total: '5000.00',
-							team_total: '120000.00',
-							growth: '15%'
-						}
-					};
+				try {
+					const res = await getOverview();
+					if (res) {
+						this.overview = {
+							wallet: {
+								balance: res.wallet?.balance || '0.00',
+								total_income: res.wallet?.total_income || '0.00',
+								deposit: res.wallet?.deposit || '0.00'
+							},
+							level: {
+								name: res.level?.name || '普通会员'
+							},
+							team_count: res.team_count || 0,
+							performance: {
+								personal_total: res.performance?.personal_total || '0.00',
+								team_total: res.performance?.team_total || '0.00',
+								growth: res.performance?.growth || '0%'
+							}
+						};
+						// 最近动态可以从API获取，暂时使用空数组
+						this.recentList = res.recent_list || [];
+					}
+				} catch (err) {
+					console.error('加载推广数据失败', err);
+				} finally {
 					this.loading = false;
-				}, 500);
+				}
 			},
 			goTo(path : string) {
 				uni.navigateTo({ url: path });
