@@ -7,8 +7,9 @@
 					<!-- Task Type -->
 					<view class="flex flex-col gap-[16rpx]">
 						<text class="text-[28rpx] font-medium text-[#1f2329]">任务类型</text>
-						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="showTypePicker = true">
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="onTypeTap">
 							<text :class="form.type ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx]">{{ form.type || '请选择任务类型' }}</text>
+							<uni-icons type="down" size="16" color="#9aa0a6"></uni-icons>
 						</view>
 					</view>
 
@@ -67,7 +68,7 @@
 					<!-- Merchant Select -->
 					<view v-if="form.collectionType === 'merchant'" class="flex flex-col gap-[16rpx]">
 						<text class="text-[28rpx] font-medium text-[#1f2329]">选择进件商户</text>
-						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="showMerchantPicker = true">
+						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="onMerchantTap">
 							<text :class="form.merchant ? 'text-[#1f2329]' : 'text-[#9aa0a6]'" class="text-[28rpx]">{{ form.merchant || '请选择进件商户' }}</text>
 							<uni-icons type="down" size="16" color="#9aa0a6"></uni-icons>
 						</view>
@@ -177,8 +178,10 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRefs } from "@/.cool";
+import { getTaskTypes, type TaskType } from '@/services/task'
+import { getApplicationList } from '@/services/merchant'
 
 // Refs
 const refs = useRefs()
@@ -188,25 +191,31 @@ const datePicker = ref<any>(null)
 const showTypePicker = ref(false)
 const showMerchantPicker = ref(false)
 const datePickerType = ref<'start' | 'end'>('start')
+const loading = ref(false)
 
 // 表单数据
 const form = ref({
 	type: '',
+	typeCode: '',
 	title: '',
 	description: '',
 	collectionType: 'merchant' as 'merchant' | 'qrcode',
 	merchant: '',
+	merchantId: 0,
 	qrCode: '',
 	totalAmount: '',
 	startTime: '',
 	endTime: ''
 })
 
-// 分类列表
-const taskTypes = ['电商推广', '应用下载', '实名认证', '问卷调查', '其他']
+// 任务类型列表
+const taskTypes = ref<TaskType[]>([])
+const taskTypeNames = computed(() => taskTypes.value.map(t => t.name))
 
 // 商户列表
-const merchants = ['商家A', '商家B', '商家C']
+type MerchantItem = { id: number; name: string; applicationNo: string }
+const merchants = ref<MerchantItem[]>([])
+const merchantNames = computed(() => merchants.value.map(m => m.name))
 
 // 打开日期选择
 const openDatePicker = (type: 'start' | 'end') => {
@@ -225,36 +234,73 @@ const onDateConfirm = (val: string) => {
 
 // 选择类型
 const selectType = () => {
+	if (taskTypeNames.value.length === 0) {
+		uni.showToast({ title: '暂无任务类型', icon: 'none' })
+		return
+	}
 	uni.showActionSheet({
-		itemList: taskTypes,
+		itemList: taskTypeNames.value,
 		success: (res) => {
-			form.value.type = taskTypes[res.tapIndex]
+			const selected = taskTypes.value[res.tapIndex]
+			form.value.type = selected.name
+			form.value.typeCode = selected.code
 		}
 	})
 }
 
 // 选择商户
 const selectMerchant = () => {
+	if (merchantNames.value.length === 0) {
+		uni.showToast({ title: '暂无可用进件商户', icon: 'none' })
+		return
+	}
 	uni.showActionSheet({
-		itemList: merchants,
+		itemList: merchantNames.value,
 		success: (res) => {
-			form.value.merchant = merchants[res.tapIndex]
+			const selected = merchants.value[res.tapIndex]
+			form.value.merchant = selected.name
+			form.value.merchantId = selected.id
 		}
 	})
 }
 
-// 监听点击
-watch(showTypePicker, (val) => {
-	if(val) {
-		selectType()
-		showTypePicker.value = false
+// 点击选择类型
+const onTypeTap = () => {
+	selectType()
+}
+
+// 点击选择商户
+const onMerchantTap = () => {
+	selectMerchant()
+}
+
+// 加载任务类型
+const loadTaskTypes = async () => {
+	try {
+		const res = await getTaskTypes()
+		taskTypes.value = res.list || []
+	} catch (err: any) {
+		console.error('加载任务类型失败', err)
 	}
-})
-watch(showMerchantPicker, (val) => {
-	if(val) {
-		selectMerchant()
-		showMerchantPicker.value = false
+}
+
+// 加载商户列表
+const loadMerchants = async () => {
+	try {
+		const res = await getApplicationList('approved')
+		merchants.value = (res.list || []).map((item: any) => ({
+			id: item.id,
+			name: item.name,
+			applicationNo: item.application_no
+		}))
+	} catch (err: any) {
+		console.error('加载商户列表失败', err)
 	}
+}
+
+onMounted(() => {
+	loadTaskTypes()
+	loadMerchants()
 })
 
 // 上传二维码

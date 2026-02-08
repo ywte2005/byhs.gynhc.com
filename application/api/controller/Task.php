@@ -3,10 +3,11 @@ namespace app\api\controller;
 
 use app\common\controller\Api;
 use app\common\library\TaskService;
+use app\common\model\TaskType;
 
 class Task extends Api
 {
-    protected $noNeedLogin = [];
+    protected $noNeedLogin = ['types'];
     protected $noNeedRight = ['*'];
 
     /**
@@ -246,5 +247,14 @@ class Task extends Api
         \app\common\library\WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
         
         $this->success('提取成功');
+    }
+
+    /**
+     * 获取任务类型列表
+     */
+    public function types()
+    {
+        $list = TaskType::getAvailableTypes();
+        $this->success('获取成功', ['list' => $list]);
     }
 }

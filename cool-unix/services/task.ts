@@ -169,3 +169,22 @@ export function canReceiveTask(): Promise<{ can: boolean; reason: string }> {
 		method: "GET"
 	});
 }
+
+// 任务类型
+export type TaskType = {
+	id: number;
+	name: string;
+	code: string;
+	icon: string;
+	description: string;
+	sort: number;
+	status: string;
+}
+
+// 获取任务类型列表
+export function getTaskTypes(): Promise<{ list: TaskType[] }> {
+	return request({
+		url: "/task/types",
+		method: "GET"
+	});
+}
