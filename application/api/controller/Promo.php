@@ -34,12 +34,8 @@ class Promo extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $relation = PromoService::purchaseLevel($userId, $levelId, $payMethod);
-            $this->success('购买成功', ['relation' => $relation]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $relation = PromoService::purchaseLevel($userId, $levelId, $payMethod);
+        $this->success('购买成功', ['relation' => $relation]);
     }
 
     public function myInviteCode()
@@ -59,12 +55,8 @@ class Promo extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $relation = PromoService::bindParent($userId, $inviteCode);
-            $this->success('绑定成功', ['relation' => $relation]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $relation = PromoService::bindParent($userId, $inviteCode);
+        $this->success('绑定成功', ['relation' => $relation]);
     }
 
     public function myTeam()

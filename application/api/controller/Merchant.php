@@ -103,12 +103,8 @@ class Merchant extends Api
             $this->error($validate);
         }
         
-        try {
-            $merchant = MerchantService::register($userId, $data);
-            $this->success('提交成功，等待审核', ['merchant' => $merchant]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $merchant = MerchantService::register($userId, $data);
+        $this->success('提交成功，等待审核', ['merchant' => $merchant]);
     }
 
     public function auditStatus()
@@ -123,12 +119,8 @@ class Merchant extends Api
         $userId = $this->auth->id;
         $payMethod = $this->request->post('pay_method', 'balance');
         
-        try {
-            $merchant = MerchantService::payEntryFee($userId, $payMethod);
-            $this->success('支付成功', ['merchant' => $merchant]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $merchant = MerchantService::payEntryFee($userId, $payMethod);
+        $this->success('支付成功', ['merchant' => $merchant]);
     }
 
     public function update()
@@ -136,11 +128,7 @@ class Merchant extends Api
         $userId = $this->auth->id;
         $data = $this->request->post();
         
-        try {
-            $merchant = MerchantService::updateMerchant($userId, $data);
-            $this->success('更新成功', ['merchant' => $merchant]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $merchant = MerchantService::updateMerchant($userId, $data);
+        $this->success('更新成功', ['merchant' => $merchant]);
     }
 }

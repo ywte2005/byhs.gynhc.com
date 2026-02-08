@@ -15,7 +15,7 @@
 				:key="index"
 				class="px-[24rpx] py-[12rpx] rounded-[32rpx] text-[26rpx] transition-all"
 				:class="currentTab === tab.value ? 'bg-[#0052d9] text-white' : 'bg-[#f5f7fa] text-[#646a73]'"
-				@click="currentTab = tab.value"
+				@click="switchTab(tab.value)"
 			>
 				{{ tab.label }}
 			</view>
@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getApplicationList, type MerchantApplication } from '@/services/merchant'
 
 type Application = {
@@ -124,10 +124,12 @@ const loadData = async () => {
 	}
 }
 
-// 监听 tab 切换
-watch(currentTab, () => {
+// 切换 tab
+const switchTab = (value: string) => {
+	if (currentTab.value === value) return
+	currentTab.value = value
 	loadData()
-})
+}
 
 onMounted(() => {
 	loadData()
@@ -170,7 +172,7 @@ const toRegister = () => {
 
 const toDetail = (item: Application) => {
 	uni.navigateTo({ 
-		url: `/pages/merchant/audit-status?id=${item.id}` 
+		url: `/pages/merchant/application-detail?id=${item.id}` 
 	})
 }
 </script>

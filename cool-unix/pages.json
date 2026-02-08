@@ -132,6 +132,16 @@
 					}
 				},
 				{
+					"path": "application-detail",
+					"style": {
+						"navigationBarTitleText": "进件详情",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
+				},
+				{
 					"path": "info",
 					"style": {
 						"navigationBarTitleText": "商户信息",

@@ -85,13 +85,9 @@ class Application extends Backend
             $this->error('只能审核待审核状态的进件');
         }
         
-        try {
-            $adminId = $this->auth->id;
-            $row->approve($adminId);
-            $this->success('审核通过');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $adminId = $this->auth->id;
+        $row->approve($adminId);
+        $this->success('审核通过');
     }
 
     /**
@@ -113,12 +109,8 @@ class Application extends Backend
             $this->error('请填写驳回原因');
         }
         
-        try {
-            $adminId = $this->auth->id;
-            $row->reject($reason, $adminId);
-            $this->success('已驳回');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $adminId = $this->auth->id;
+        $row->reject($reason, $adminId);
+        $this->success('已驳回');
     }
 }

@@ -42,12 +42,8 @@ class Merchant extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                MerchantService::approve($ids, $this->auth->id);
-                $this->success('审核通过');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            MerchantService::approve($ids, $this->auth->id);
+            $this->success('审核通过');
         }
     }
 
@@ -60,12 +56,8 @@ class Merchant extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                MerchantService::reject($ids, $reason, $this->auth->id);
-                $this->success('已拒绝');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            MerchantService::reject($ids, $reason, $this->auth->id);
+            $this->success('已拒绝');
         }
         return $this->view->fetch();
     }

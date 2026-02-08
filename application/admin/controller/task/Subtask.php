@@ -50,12 +50,8 @@ class Subtask extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                TaskService::completeSubTask($ids);
-                $this->success('已完成');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            TaskService::completeSubTask($ids);
+            $this->success('已完成');
         }
     }
 
@@ -68,12 +64,8 @@ class Subtask extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                TaskService::failSubTask($ids, $reason);
-                $this->success('已标记失败');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            TaskService::failSubTask($ids, $reason);
+            $this->success('已标记失败');
         }
         return $this->view->fetch();
     }

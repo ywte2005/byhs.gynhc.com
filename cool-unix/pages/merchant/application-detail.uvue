@@ -1,0 +1,265 @@
+<template>
+	<view class="flex flex-col h-screen bg-[#f5f7fa]">
+		<cl-topbar title="进件详情" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<!-- Loading -->
+		<view v-if="loading" class="flex-1 flex items-center justify-center">
+			<text class="text-[28rpx] text-[#999999]">加载中...</text>
+		</view>
+
+		<scroll-view v-else class="flex-1 h-0" scroll-y>
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<!-- 状态卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col items-center gap-[16rpx]">
+					<uni-icons 
+						:type="statusIcon" 
+						size="48" 
+						:color="statusColor"
+					></uni-icons>
+					<text class="text-[32rpx] font-medium" :class="statusTextClass">{{ statusText }}</text>
+					<text v-if="application.reject_reason" class="text-[26rpx] text-[#ff3b30] text-center">
+						驳回原因：{{ application.reject_reason }}
+					</text>
+					<text class="text-[24rpx] text-[#999999]">进件编号：{{ application.application_no }}</text>
+				</view>
+
+				<!-- 基本信息 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">基本信息</text>
+					
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">主体类型</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ typeText }}</text>
+					</view>
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">主体名称</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.name }}</text>
+					</view>
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">证件号码</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.id_card }}</text>
+					</view>
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">联系人</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.contact_name }}</text>
+					</view>
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">联系电话</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.contact_phone }}</text>
+					</view>
+				</view>
+
+				<!-- 经营信息 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">经营信息</text>
+					
+					<view class="flex flex-row justify-between">
+						<text class="text-[26rpx] text-[#646a73]">经营类目</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.category }}</text>
+					</view>
+					<view class="flex flex-col gap-[8rpx]">
+						<text class="text-[26rpx] text-[#646a73]">经营地址</text>
+						<text class="text-[26rpx] text-[#1f2329]">{{ application.address }}</text>
+					</view>
+				</view>
+
+				<!-- 证件照片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[28rpx] font-medium text-[#1f2329]">证件照片</text>
+					
+					<view v-if="application.business_license" class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">营业执照</text>
+						<image 
+							:src="getFullUrl(application.business_license)" 
+							mode="aspectFit" 
+							class="w-full h-[300rpx] rounded-[12rpx] bg-[#f5f7fa]"
+							@tap="previewImage(application.business_license)"
+						></image>
+					</view>
+					
+					<view v-if="application.shop_front" class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">门头照</text>
+						<image 
+							:src="getFullUrl(application.shop_front)" 
+							mode="aspectFit" 
+							class="w-full h-[300rpx] rounded-[12rpx] bg-[#f5f7fa]"
+							@tap="previewImage(application.shop_front)"
+						></image>
+					</view>
+
+					<view v-if="application.id_card_front" class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">身份证正面</text>
+						<image 
+							:src="getFullUrl(application.id_card_front)" 
+							mode="aspectFit" 
+							class="w-full h-[300rpx] rounded-[12rpx] bg-[#f5f7fa]"
+							@tap="previewImage(application.id_card_front)"
+						></image>
+					</view>
+
+					<view v-if="application.id_card_back" class="flex flex-col gap-[12rpx]">
+						<text class="text-[26rpx] text-[#646a73]">身份证反面</text>
+						<image 
+							:src="getFullUrl(application.id_card_back)" 
+							mode="aspectFit" 
+							class="w-full h-[300rpx] rounded-[12rpx] bg-[#f5f7fa]"
+							@tap="previewImage(application.id_card_back)"
+						></image>
+					</view>
+				</view>
+
+				<!-- 提交时间 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row justify-between">
+					<text class="text-[26rpx] text-[#646a73]">提交时间</text>
+					<text class="text-[26rpx] text-[#1f2329]">{{ formatTime(application.createtime) }}</text>
+				</view>
+			</view>
+		</scroll-view>
+
+		<!-- 底部按钮 - 仅驳回状态显示 -->
+		<view v-if="application.status === 'rejected'" class="p-[32rpx] bg-white safe-area-bottom">
+			<view 
+				class="h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center"
+				@tap="resubmit"
+			>
+				<text class="text-[32rpx] font-medium text-white">重新提交</text>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+import { getApplicationDetail, type MerchantApplication } from '@/services/merchant'
+import { config } from '@/config'
+
+const loading = ref(true)
+const application = ref<MerchantApplication>({
+	id: 0,
+	merchant_id: 0,
+	user_id: 0,
+	application_no: '',
+	type: 'individual',
+	name: '',
+	contact_name: '',
+	contact_phone: '',
+	id_card: '',
+	category: '',
+	category_code: '',
+	address: '',
+	business_license: '',
+	id_card_front: '',
+	id_card_back: '',
+	shop_front: '',
+	other_files: '',
+	status: 'pending',
+	status_text: '',
+	type_text: '',
+	reject_reason: '',
+	createtime: 0
+})
+
+const statusIcon = computed(() => {
+	const map: Record<string, string> = {
+		pending: 'clock',
+		approved: 'checkmarkempty',
+		rejected: 'closeempty'
+	}
+	return map[application.value.status] || 'info'
+})
+
+const statusColor = computed(() => {
+	const map: Record<string, string> = {
+		pending: '#faad14',
+		approved: '#00b578',
+		rejected: '#ff3b30'
+	}
+	return map[application.value.status] || '#999999'
+})
+
+const statusText = computed(() => {
+	const map: Record<string, string> = {
+		pending: '审核中',
+		approved: '已通过',
+		rejected: '已驳回'
+	}
+	return map[application.value.status] || '未知'
+})
+
+const statusTextClass = computed(() => {
+	const map: Record<string, string> = {
+		pending: 'text-[#faad14]',
+		approved: 'text-[#00b578]',
+		rejected: 'text-[#ff3b30]'
+	}
+	return map[application.value.status] || 'text-[#999999]'
+})
+
+const typeText = computed(() => {
+	const map: Record<string, string> = {
+		personal: '个人',
+		individual: '个体工商户',
+		enterprise: '企业'
+	}
+	return map[application.value.type] || '未知'
+})
+
+const formatTime = (timestamp: number): string => {
+	if (!timestamp) return ''
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = String(date.getMonth() + 1).padStart(2, '0')
+	const d = String(date.getDate()).padStart(2, '0')
+	const h = String(date.getHours()).padStart(2, '0')
+	const min = String(date.getMinutes()).padStart(2, '0')
+	return `${y}-${m}-${d} ${h}:${min}`
+}
+
+const getFullUrl = (path: string): string => {
+	if (!path) return ''
+	if (path.startsWith('http')) return path
+	return config.baseUrl + path
+}
+
+const previewImage = (url: string) => {
+	uni.previewImage({
+		urls: [getFullUrl(url)]
+	})
+}
+
+const loadData = async () => {
+	const pages = getCurrentPages()
+	const currentPage = pages[pages.length - 1]
+	const id = (currentPage as any).options?.id
+	
+	if (!id) {
+		uni.showToast({ title: '参数错误', icon: 'none' })
+		return
+	}
+	
+	try {
+		loading.value = true
+		const res = await getApplicationDetail(parseInt(id))
+		if (res && res.application) {
+			application.value = res.application
+		}
+	} catch (err: any) {
+		uni.showToast({
+			title: err.msg || err.message || '加载失败',
+			icon: 'none'
+		})
+	} finally {
+		loading.value = false
+	}
+}
+
+const resubmit = () => {
+	uni.navigateTo({
+		url: `/pages/merchant/register?id=${application.value.id}&resubmit=1`
+	})
+}
+
+onMounted(() => {
+	loadData()
+})
+</script>

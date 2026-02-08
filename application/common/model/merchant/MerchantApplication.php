@@ -75,14 +75,16 @@ class MerchantApplication extends Model
      */
     public static function getListByUser($userId, $status = null, $page = 1, $pageSize = 10)
     {
-        $query = self::where('user_id', $userId);
-        
+        // 构建基础条件
+        $where = ['user_id' => $userId];
         if ($status && $status !== 'all') {
-            $query->where('status', $status);
+            $where['status'] = $status;
         }
         
-        $total = $query->count();
-        $list = $query->order('id', 'desc')
+        // 分别查询总数和列表
+        $total = self::where($where)->count();
+        $list = self::where($where)
+            ->order('id', 'desc')
             ->page($page, $pageSize)
             ->select();
         

@@ -51,12 +51,8 @@ class Mutualtask extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                TaskService::approveTask($ids, $this->auth->id);
-                $this->success('审核通过，任务已开始');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            TaskService::approveTask($ids, $this->auth->id);
+            $this->success('审核通过，任务已开始');
         }
     }
 
@@ -69,12 +65,8 @@ class Mutualtask extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                TaskService::rejectTask($ids, $reason, $this->auth->id);
-                $this->success('已拒绝');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            TaskService::rejectTask($ids, $reason, $this->auth->id);
+            $this->success('已拒绝');
         }
         return $this->view->fetch();
     }
@@ -87,12 +79,8 @@ class Mutualtask extends Backend
                 $this->error('参数缺失');
             }
             
-            try {
-                TaskService::dispatchSubTasks($ids);
-                $this->success('派发成功');
-            } catch (\Exception $e) {
-                $this->error($e->getMessage());
-            }
+            TaskService::dispatchSubTasks($ids);
+            $this->success('派发成功');
         }
     }
 

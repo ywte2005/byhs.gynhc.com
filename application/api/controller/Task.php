@@ -67,12 +67,8 @@ class Task extends Api
             $this->error($validate);
         }
         
-        try {
-            $task = TaskService::createTask($userId, $data);
-            $this->success('创建成功，等待审核', ['task' => $task]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $task = TaskService::createTask($userId, $data);
+        $this->success('创建成功，等待审核', ['task' => $task]);
     }
 
     public function cancel()
@@ -86,12 +82,8 @@ class Task extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $task = TaskService::cancelTask($taskId, $userId, $reason);
-            $this->success('取消成功', ['task' => $task]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $task = TaskService::cancelTask($taskId, $userId, $reason);
+        $this->success('取消成功', ['task' => $task]);
     }
 
     public function myTasks()
@@ -157,12 +149,8 @@ class Task extends Api
             $this->error($canReceive['reason']);
         }
         
-        try {
-            $subTask = TaskService::acceptSubTask($subTaskId, $userId);
-            $this->success('接单成功', ['subtask' => $subTask]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $subTask = TaskService::acceptSubTask($subTaskId, $userId);
+        $this->success('接单成功', ['subtask' => $subTask]);
     }
 
     /**
@@ -187,12 +175,8 @@ class Task extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $subTask = TaskService::uploadProof($subTaskId, $userId, $proofImage, $thirdOrderNo);
-            $this->success('上传成功', ['subtask' => $subTask]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $subTask = TaskService::uploadProof($subTaskId, $userId, $proofImage, $thirdOrderNo);
+        $this->success('上传成功', ['subtask' => $subTask]);
     }
 
     public function subtaskCancel()
@@ -204,12 +188,8 @@ class Task extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $subTask = TaskService::cancelSubTask($subTaskId, $userId);
-            $this->success('取消成功', ['subtask' => $subTask]);
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+        $subTask = TaskService::cancelSubTask($subTaskId, $userId);
+        $this->success('取消成功', ['subtask' => $subTask]);
     }
 
     public function depositInfo()
@@ -235,17 +215,13 @@ class Task extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            if ($payMethod === 'balance') {
-                \app\common\library\WalletService::changeBalance($userId, '-' . $amount, 'deposit_recharge', 0, '充值保证金');
-                \app\common\library\WalletService::changeDeposit($userId, $amount, 'deposit_recharge', 0, '充值保证金');
-                $this->success('充值成功');
-            } else {
-                $recharge = \app\common\library\WalletService::rechargeDeposit($userId, $amount, $payMethod);
-                $this->success('创建成功', ['recharge' => $recharge]);
-            }
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
+        if ($payMethod === 'balance') {
+            \app\common\library\WalletService::changeBalance($userId, '-' . $amount, 'deposit_recharge', 0, '充值保证金');
+            \app\common\library\WalletService::changeDeposit($userId, $amount, 'deposit_recharge', 0, '充值保证金');
+            $this->success('充值成功');
+        } else {
+            $recharge = \app\common\library\WalletService::rechargeDeposit($userId, $amount, $payMethod);
+            $this->success('创建成功', ['recharge' => $recharge]);
         }
     }
 
@@ -259,20 +235,16 @@ class Task extends Api
         
         $userId = $this->auth->id;
         
-        try {
-            $wallet = \app\common\library\WalletService::getWallet($userId);
-            $available = $wallet->getAvailableDeposit();
-            
-            if (bccomp($available, $amount, 2) < 0) {
-                $this->error('可用保证金不足');
-            }
-            
-            \app\common\library\WalletService::changeDeposit($userId, '-' . $amount, 'deposit_withdraw', 0, '提取保证金');
-            \app\common\library\WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
-            
-            $this->success('提取成功');
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
+        $wallet = \app\common\library\WalletService::getWallet($userId);
+        $available = $wallet->getAvailableDeposit();
+        
+        if (bccomp($available, $amount, 2) < 0) {
+            $this->error('可用保证金不足');
         }
+        
+        \app\common\library\WalletService::changeDeposit($userId, '-' . $amount, 'deposit_withdraw', 0, '提取保证金');
+        \app\common\library\WalletService::changeBalance($userId, $amount, 'deposit_withdraw', 0, '提取保证金');
+        
+        $this->success('提取成功');
     }
 }
