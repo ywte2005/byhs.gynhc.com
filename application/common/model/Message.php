@@ -10,6 +10,12 @@ class Message extends Model
     protected $createTime = 'createtime';
     protected $updateTime = false;
 
+    // 关联用户
+    public function user()
+    {
+        return $this->belongsTo('app\common\model\User', 'user_id', 'id', [], 'LEFT')->setEagerlyType(0);
+    }
+
     const TYPE_SYSTEM = 'system';
     const TYPE_TASK = 'task';
     const TYPE_WALLET = 'wallet';

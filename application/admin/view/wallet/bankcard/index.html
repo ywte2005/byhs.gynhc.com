@@ -1,0 +1,37 @@
+<style>
+.status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; display: inline-block; }
+.status-normal { background: #E8F5E9; color: #2E7D32; }
+.status-disabled { background: #FFEBEE; color: #C62828; }
+.card-no { font-family: monospace; font-size: 14px; letter-spacing: 1px; }
+.bank-icon { width: 24px; height: 24px; margin-right: 8px; vertical-align: middle; }
+</style>
+
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>银行卡管理</em> - 管理用户绑定的银行卡信息</div>
+        <ul class="nav nav-tabs" data-field="status">
+            <li class="active"><a href="#t-all" data-value="" data-toggle="tab">全部</a></li>
+            <li><a href="#t-normal" data-value="normal" data-toggle="tab">正常</a></li>
+            <li><a href="#t-disabled" data-value="disabled" data-toggle="tab">已禁用</a></li>
+        </ul>
+    </div>
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        <a href="javascript:;" class="btn btn-primary btn-refresh" title="刷新"><i class="fa fa-refresh"></i></a>
+                        <a href="javascript:;" class="btn btn-success btn-multi btn-multi-enable {:$auth->check('wallet/bankcard/enable')?'':'hide'}" title="批量启用"><i class="fa fa-check"></i> 启用</a>
+                        <a href="javascript:;" class="btn btn-warning btn-multi btn-multi-disable {:$auth->check('wallet/bankcard/disable')?'':'hide'}" title="批量禁用"><i class="fa fa-ban"></i> 禁用</a>
+                        <a href="javascript:;" class="btn btn-danger btn-multi btn-multi-del {:$auth->check('wallet/bankcard/del')?'':'hide'}" title="批量删除"><i class="fa fa-trash"></i> 删除</a>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-edit="{:$auth->check('wallet/bankcard/edit')}"
+                           data-operate-del="{:$auth->check('wallet/bankcard/del')}"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,56 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">消息详情</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered">
+            <tr>
+                <th width="120">消息ID</th>
+                <td>{$row.id}</td>
+            </tr>
+            <tr>
+                <th>用户</th>
+                <td>
+                    {if $row.user}
+                    <a href="javascript:;" data-url="user/user/detail?ids={$row.user_id}" class="btn-dialog">{$row.user.nickname}</a> (ID: {$row.user_id})
+                    {else}
+                    用户ID: {$row.user_id}
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <th>消息类型</th>
+                <td>
+                    {switch $row.type}
+                    {case 'system'}<span class="label label-primary">系统消息</span>{/case}
+                    {case 'task'}<span class="label label-info">任务消息</span>{/case}
+                    {case 'wallet'}<span class="label label-success">钱包消息</span>{/case}
+                    {case 'promo'}<span class="label label-warning">推广消息</span>{/case}
+                    {default}<span class="label label-default">{$row.type}</span>{/switch}
+                </td>
+            </tr>
+            <tr>
+                <th>消息标题</th>
+                <td>{$row.title}</td>
+            </tr>
+            <tr>
+                <th>消息内容</th>
+                <td style="white-space: pre-wrap;">{$row.content}</td>
+            </tr>
+            <tr>
+                <th>阅读状态</th>
+                <td>
+                    {if $row.is_read}
+                    <span class="label label-success">已读</span>
+                    {else}
+                    <span class="label label-warning">未读</span>
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <th>创建时间</th>
+                <td>{$row.createtime|date='Y-m-d H:i:s',###}</td>
+            </tr>
+        </table>
+    </div>
+</div>

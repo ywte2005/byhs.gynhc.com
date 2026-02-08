@@ -1,0 +1,71 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">银行卡详情</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered">
+            <tr>
+                <th width="120">ID</th>
+                <td>{$row.id}</td>
+            </tr>
+            <tr>
+                <th>用户</th>
+                <td>
+                    {if $row.user}
+                    <a href="javascript:;" data-url="user/user/detail?ids={$row.user_id}" class="btn-dialog">{$row.user.nickname}</a> (ID: {$row.user_id})
+                    {else}
+                    用户ID: {$row.user_id}
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <th>银行名称</th>
+                <td>{$row.bank_name}</td>
+            </tr>
+            <tr>
+                <th>银行代码</th>
+                <td>{$row.bank_code}</td>
+            </tr>
+            <tr>
+                <th>卡号</th>
+                <td style="font-family: monospace; font-size: 16px; letter-spacing: 2px;">{$row.card_no}</td>
+            </tr>
+            <tr>
+                <th>持卡人</th>
+                <td>{$row.card_holder}</td>
+            </tr>
+            <tr>
+                <th>开户支行</th>
+                <td>{$row.bank_branch ?: '-'}</td>
+            </tr>
+            <tr>
+                <th>是否默认</th>
+                <td>
+                    {if $row.is_default}
+                    <span class="label label-success">默认卡</span>
+                    {else}
+                    <span class="label label-default">否</span>
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <th>状态</th>
+                <td>
+                    {if $row.status == 'normal'}
+                    <span class="label label-success">正常</span>
+                    {else}
+                    <span class="label label-danger">已禁用</span>
+                    {/if}
+                </td>
+            </tr>
+            <tr>
+                <th>创建时间</th>
+                <td>{$row.createtime|date='Y-m-d H:i:s',###}</td>
+            </tr>
+            <tr>
+                <th>更新时间</th>
+                <td>{$row.updatetime|date='Y-m-d H:i:s',###}</td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -408,7 +408,62 @@ CREATE TABLE `fa_message` (
 
 ---
 
+---
+
+## 十、后台管理模块补充
+
+### 10.1 新增后台管理控制器
+
+| 控制器 | 文件路径 | 功能说明 |
+|--------|----------|----------|
+| Message | `application/admin/controller/Message.php` | 消息管理（列表、发送、详情、删除、标记已读） |
+| Bankcard | `application/admin/controller/wallet/Bankcard.php` | 银行卡管理（列表、详情、启用、禁用、删除） |
+
+### 10.2 新增后台视图模板
+
+| 模块 | 文件路径 | 说明 |
+|------|----------|------|
+| 消息管理 | `application/admin/view/message/index.html` | 消息列表页 |
+| 消息管理 | `application/admin/view/message/add.html` | 发送消息页 |
+| 消息管理 | `application/admin/view/message/detail.html` | 消息详情页 |
+| 银行卡管理 | `application/admin/view/wallet/bankcard/index.html` | 银行卡列表页 |
+| 银行卡管理 | `application/admin/view/wallet/bankcard/detail.html` | 银行卡详情页 |
+
+### 10.3 新增后台JavaScript
+
+| 文件路径 | 说明 |
+|----------|------|
+| `public/assets/js/backend/message.js` | 消息管理前端逻辑 |
+| `public/assets/js/backend/wallet/bankcard.js` | 银行卡管理前端逻辑 |
+
+### 10.4 模型关联更新
+
+| 模型 | 文件路径 | 新增关联 |
+|------|----------|----------|
+| Message | `application/common/model/Message.php` | 添加 `user()` 关联 |
+| Bankcard | `application/common/model/wallet/Bankcard.php` | 添加 `user()` 关联 |
+
+### 10.5 后台菜单SQL
+
+- **文件**: `backend/database/13_admin_menu.sql`
+- **内容**: 消息管理和银行卡管理的菜单权限配置
+- **使用**: 执行SQL后需在后台【权限管理】-【角色组】中分配权限
+
+### 10.6 现有后台管理模块对照
+
+| 模块 | 控制器 | 状态 |
+|------|--------|------|
+| 用户管理 | `user/User`, `user/Group`, `user/Rule` | ✅ 已有 |
+| 商户管理 | `merchant/Merchant`, `merchant/Audit` | ✅ 已有 |
+| 任务管理 | `task/Mutualtask`, `task/Subtask` | ✅ 已有 |
+| 钱包管理 | `wallet/Wallet`, `wallet/Log`, `wallet/Recharge`, `wallet/Withdraw` | ✅ 已有 |
+| 银行卡管理 | `wallet/Bankcard` | ✅ 新增 |
+| 推广管理 | `promo/Level`, `promo/Relation`, `promo/Commission`, `promo/Performance`, `promo/Bonus` | ✅ 已有 |
+| 消息管理 | `Message` | ✅ 新增 |
+
+---
+
 *文档生成时间: 2025-01-22*
 *最后更新: 2025-02-08*
-*版本: 3.0*
-*状态: 所有任务已完成 ✅ (包括前端页面API集成)*
+*版本: 4.0*
+*状态: 所有任务已完成 ✅ (包括前端页面API集成和后台管理模块)*

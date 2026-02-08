@@ -8,6 +8,12 @@ class Bankcard extends Model
     protected $name = 'user_bankcard';
     protected $autoWriteTimestamp = true;
 
+    // 关联用户
+    public function user()
+    {
+        return $this->belongsTo('app\common\model\User', 'user_id', 'id', [], 'LEFT')->setEagerlyType(0);
+    }
+
     public static function getUserBankcards($userId)
     {
         return self::where('user_id', $userId)
