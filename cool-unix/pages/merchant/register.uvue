@@ -92,7 +92,9 @@
 					<view class="flex flex-col gap-[16rpx]">
 						<text class="text-[26rpx] text-[#646a73]">经营类目</text>
 						<view class="h-[88rpx] bg-[#f5f7fa] rounded-[16rpx] px-[24rpx] flex flex-row items-center justify-between" @tap="selectCategory">
-							<text class="text-[28rpx]" :class="form.category ? 'text-[#1f2329]' : 'text-[#9aa0a6]'">{{ form.category || '请选择经营类目' }}</text>
+							<text class="text-[28rpx]" :class="form.category ? 'text-[#1f2329]' : 'text-[#9aa0a6]'">
+								{{ loading ? '加载中...' : (form.category || '请选择经营类目') }}
+							</text>
 							<uni-icons type="right" size="16" color="#9aa0a6"></uni-icons>
 						</view>
 					</view>
@@ -176,12 +178,20 @@
 			:show-trigger="false"
 			@change="onRegionChange"
 		></cl-cascader>
+
+		<cl-cascader
+			title="选择经营类目"
+			:ref="refs.set('category')"
+			:options="categoryOptions"
+			:show-trigger="false"
+			@change="onCategoryChange"
+		></cl-cascader>
 	</view>
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
-import { registerMerchant } from '@/services/merchant'
+import { ref, computed, onMounted } from 'vue'
+import { registerMerchant, getMerchantCategories, type MerchantCategory } from '@/services/merchant'
 import { useRefs } from "@/.cool"
 import { useCascader } from "@/uni_modules/cool-ui"
 import pca from "@/.cool/data/pca.json"
@@ -197,10 +207,51 @@ const form = ref({
 	contactName: '',    // 联系人姓名
 	phone: '',          // 联系电话
 	category: '',       // 经营类目
+	categoryCode: '',   // 经营类目代码
 	address: '',        // 经营地址
 	license: '',        // 营业执照/身份证正面
 	shopFront: '',      // 门头照/身份证反面
 	other: ''           // 其他
+})
+
+const categories = ref<MerchantCategory[]>([])
+const categoryOptions = ref<any[]>([])
+const loading = ref(false)
+
+// 转换类目数据为 cascader 格式
+const convertCategoriesToCascader = (list: MerchantCategory[]) => {
+	return list.map(item => {
+		const option: any = {
+			label: item.name,
+			value: item.code
+		}
+		if (item.children && item.children.length > 0) {
+			option.children = convertCategoriesToCascader(item.children)
+		}
+		return option
+	})
+}
+
+// 加载经营类目
+const loadCategories = async () => {
+	try {
+		loading.value = true
+		const res = await getMerchantCategories()
+		categories.value = res.list
+		// 转换为 cascader 格式
+		categoryOptions.value = convertCategoriesToCascader(res.list)
+	} catch (err: any) {
+		uni.showToast({
+			title: err.msg || err.message || '加载类目失败',
+			icon: 'none'
+		})
+	} finally {
+		loading.value = false
+	}
+}
+
+onMounted(() => {
+	loadCategories()
 })
 
 // 切换类型
@@ -210,13 +261,46 @@ const selectType = (type: string) => {
 
 // 选择类目
 const selectCategory = () => {
-	uni.showActionSheet({
-		itemList: ['餐饮美食', '服装零售', '生活服务', '其他'],
-		success: (res) => {
-			const categories = ['餐饮美食', '服装零售', '生活服务', '其他']
-			form.value.category = categories[res.tapIndex]
+	if (loading.value || categoryOptions.value.length === 0) {
+		uni.showToast({
+			title: '类目加载中，请稍候',
+			icon: 'none'
+		})
+		return
+	}
+	
+	refs.open('category')
+}
+
+// 类目改变
+const onCategoryChange = (arr: string[]) => {
+	// arr 是选中的值数组，如 ['food', 'chinese_food']
+	form.value.categoryCode = arr[arr.length - 1] // 取最后一级的 code
+	form.value.category = arr.join(' / ') // 显示完整路径
+	
+	// 查找对应的名称
+	const findCategoryName = (list: MerchantCategory[], codes: string[], index: number): string => {
+		if (index >= codes.length) return ''
+		
+		const item = list.find(cat => cat.code === codes[index])
+		if (!item) return ''
+		
+		if (index === codes.length - 1) {
+			return item.name
 		}
-	})
+		
+		if (item.children && item.children.length > 0) {
+			const childName = findCategoryName(item.children, codes, index + 1)
+			return childName ? `${item.name} / ${childName}` : item.name
+		}
+		
+		return item.name
+	}
+	
+	const categoryName = findCategoryName(categories.value, arr, 0)
+	if (categoryName) {
+		form.value.category = categoryName
+	}
 }
 
 // 选择地址
@@ -231,14 +315,23 @@ const onRegionChange = (arr: string[]) => {
 
 // 校验是否可提交
 const canSubmit = computed(() => {
-	return form.value.name && 
-		   form.value.idCard && 
-		   form.value.contactName && 
-		   form.value.phone &&
-		   form.value.category &&
-		   form.value.address &&
-		   form.value.license &&
-		   form.value.shopFront
+	const name = form.value.name.trim()
+	const idCard = form.value.idCard.trim()
+	const contactName = form.value.contactName.trim()
+	const phone = form.value.phone.trim()
+	const category = form.value.category.trim()
+	const address = form.value.address.trim()
+	const license = form.value.license.trim()
+	const shopFront = form.value.shopFront.trim()
+	
+	return name.length > 0 && 
+		   idCard.length > 0 && 
+		   contactName.length > 0 && 
+		   phone.length === 11 &&
+		   category.length > 0 &&
+		   address.length > 0 &&
+		   license.length > 0 &&
+		   shopFront.length > 0
 })
 
 // 上传图片
@@ -257,7 +350,13 @@ const uploadImage = (field: string) => {
 
 // 提交
 const submit = async () => {
-	if (!canSubmit.value) return
+	if (!canSubmit.value) {
+		uni.showToast({
+			title: '请完整填写信息',
+			icon: 'none'
+		})
+		return
+	}
 
 	try {
 		uni.showLoading({ title: '提交中...' })
@@ -266,12 +365,12 @@ const submit = async () => {
 		const payload = {
 			type: form.value.type,
 			name: form.value.name,
-			id_card: form.value.idCard, // ID or Credit Code
+			id_card: form.value.idCard,
 			contact: form.value.contactName,
 			contact_phone: form.value.phone,
 			category: form.value.category,
+			category_code: form.value.categoryCode,
 			address: form.value.address,
-			// Map images based on type
 			business_license: form.value.type === 'personal' ? '' : form.value.license,
 			id_card_front: form.value.type === 'personal' ? form.value.license : '',
 			id_card_back: form.value.type === 'personal' ? form.value.shopFront : '',
@@ -279,30 +378,23 @@ const submit = async () => {
 			other_files: form.value.other
 		}
 
-		const res = await registerMerchant(payload as any)
+		await registerMerchant(payload as any)
 		
-		uni.hideLoading()
-		
-		if (res.code === 0) {
-			uni.showToast({
-				title: '提交成功',
-				icon: 'success'
-			})
-			setTimeout(() => {
-				uni.redirectTo({
-					url: '/pages/merchant/audit-status'
-				})
-			}, 1500)
-		} else {
-			uni.showToast({
-				title: res.msg || '提交失败',
-				icon: 'none'
-			})
-		}
-	} catch (error) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '提交失败，请重试',
+			title: '提交成功',
+			icon: 'success'
+		})
+		
+		setTimeout(() => {
+			uni.redirectTo({
+				url: '/pages/merchant/audit-status'
+			})
+		}, 1500)
+	} catch (err: any) {
+		uni.hideLoading()
+		uni.showToast({
+			title: err.msg || err.message || '提交失败',
 			icon: 'none'
 		})
 	}

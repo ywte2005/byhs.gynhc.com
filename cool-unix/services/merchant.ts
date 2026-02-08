@@ -52,3 +52,20 @@ export function updateMerchantInfo(data: Partial<MerchantRegisterForm>): Promise
 		data
 	});
 }
+
+// 经营类目类型
+export type MerchantCategory = {
+	id: number;
+	name: string;
+	code: string;
+	level: number;
+	children?: MerchantCategory[];
+};
+
+// 获取经营类目列表
+export function getMerchantCategories(): Promise<{ list: MerchantCategory[] }> {
+	return request({
+		url: "/merchant/categories",
+		method: "GET"
+	});
+}

@@ -21,6 +21,12 @@ class Merchant extends Api
         $this->success('获取成功', ['merchant' => $merchant]);
     }
 
+    public function categories()
+    {
+        $tree = \app\common\model\MerchantCategory::getCategoryTree();
+        $this->success('获取成功', ['list' => $tree]);
+    }
+
     public function register()
     {
         $userId = $this->auth->id;
