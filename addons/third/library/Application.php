@@ -16,9 +16,12 @@ class Application
      * @var array
      */
     private $providers = [
-        'qq'      => 'Qq',
-        'weibo'   => 'Weibo',
-        'wechat'  => 'Wechat',
+        'qq'          => 'Qq',
+        'weibo'       => 'Weibo',
+        'wechat'      => 'Wechat',
+        'wechatmini'  => 'Wechatmini',
+        'wechatweb'   => 'Wechat',
+        'wechatapp'   => 'Wechat',
     ];
 
     /**
