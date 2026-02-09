@@ -1,13 +1,13 @@
 <template>
 	<view class="flex flex-col h-screen bg-[#f5f7fa]">
 		<!-- 顶部导航 -->
-		<cl-topbar title="可接子任务" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+		<cl-topbar title="子任务列表" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
 
 		<!-- 筛选栏 -->
-		<view class="bg-white px-[32rpx] py-[24rpx] mb-[20rpx] shadow-sm">
+		<view class="bg-white px-[32rpx] py-[24rpx] shadow-sm">
 			<view class="flex flex-row items-center justify-between">
 				<view class="flex flex-row items-baseline gap-[8rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329]">可接任务</text>
+					<text class="text-[32rpx] font-bold text-[#1f2329]">子任务</text>
 					<text class="text-[24rpx] text-[#999999]">{{ totalCount }}个</text>
 				</view>
 				<view @click="showFilterDialog = true" class="flex flex-row items-center bg-[#f5f7fa] px-[20rpx] py-[10rpx] rounded-full">
@@ -15,6 +15,20 @@
 					<uni-icons type="settings" size="14" color="#1f2329" class="ml-[4rpx]"></uni-icons>
 				</view>
 			</view>
+		</view>
+
+		<!-- 状态Tabs -->
+		<view class="bg-white border-b-[2rpx] border-[#f0f0f0]">
+			<cl-tabs 
+				v-model="currentStatus" 
+				:list="statusTabs" 
+				:show-line="true"
+				:show-slider="false"
+				:gutter="16"
+				color="#0052d9"
+				un-color="#646a73"
+				@change="onStatusChange"
+			/>
 		</view>
 
 		<!-- 子任务列表 -->
@@ -62,18 +76,18 @@
 					<!-- 任务数据 -->
 					<view class="flex flex-row items-center justify-between">
 						<view class="flex flex-col gap-[4rpx]">
-							<text class="text-[22rpx] text-[#999999]">任务佣金</text>
+							<text class="text-[22rpx] text-[#999999]">任务金额</text>
 							<view class="flex flex-row items-baseline gap-[4rpx]">
 								<text class="text-[28rpx] font-bold text-[#ff3b30]">¥</text>
-								<text class="text-[40rpx] font-bold text-[#ff3b30] leading-none">{{ task.commission }}</text>
+								<text class="text-[40rpx] font-bold text-[#ff3b30] leading-none">{{ task.amount }}</text>
 							</view>
 						</view>
-						<button 
-							@click.stop="receiveTask(task.id)"
-							class="bg-[#0052d9] text-white rounded-full px-[40rpx] h-[72rpx] flex flex-row items-center justify-center shadow-md shadow-blue-100 m-0"
+						<view 
+							class="px-[24rpx] py-[12rpx] rounded-[8rpx]"
+							:class="getStatusBgClass(task.status)"
 						>
-							<text class="text-[28rpx] font-bold">立即接单</text>
-						</button>
+							<text class="text-[26rpx] font-medium" :class="getStatusTextClass(task.status)">{{ getStatusText(task.status) }}</text>
+						</view>
 					</view>
 				</view>
 
@@ -86,7 +100,7 @@
 				</view>
 				<view v-if="subtaskList.length === 0 && !loading" class="flex flex-col items-center justify-center py-[160rpx] gap-[24rpx]">
 					<uni-icons type="compose" size="48" color="#dcdfe6"></uni-icons>
-					<text class="text-[32rpx] text-[#999999]">暂无可接任务</text>
+					<text class="text-[32rpx] text-[#999999]">暂无子任务</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -147,9 +161,9 @@
 
 <script setup lang="uts">
 import { ref, onMounted } from 'vue'
-import { getAvailableSubTasks, acceptSubTask, getTaskTypes } from '@/services/task'
+import { getTaskSubTasks, getTaskTypes } from '@/services/task'
 
-// 任务ID（可选）
+// 任务ID（必须）
 const taskId = ref(0)
 
 // 总数量
@@ -165,6 +179,28 @@ const page = ref(1)
 
 // 显示筛选对话框
 const showFilterDialog = ref(false)
+
+// 当前状态Tab
+const currentStatus = ref('')
+
+// 状态Tabs（cl-tabs 使用 label/value 格式）
+// 后端状态: pending=待分配, assigned=已分配, accepted=已接单, paid=已支付, verified=已验证, completed=已完成, failed=失败, cancelled=已取消
+const statusTabs = [
+	{ label: '全部', value: '' },
+	{ label: '待分配', value: 'pending' },
+	{ label: '已分配', value: 'assigned' },
+	{ label: '已接单', value: 'accepted' },
+	{ label: '已支付', value: 'paid' },
+	{ label: '已完成', value: 'completed' },
+	{ label: '失败', value: 'failed' }
+]
+
+// 状态Tab变化
+const onStatusChange = (value: string) => {
+	page.value = 1
+	subtaskList.value = []
+	loadSubtaskList()
+}
 
 // 筛选条件
 const filter = ref({
@@ -188,16 +224,63 @@ const commissionRanges = [
 	{ label: '50元以上', value: '50-' }
 ]
 
+// 获取状态文本
+const getStatusText = (status: string): string => {
+	const statusMap: Record<string, string> = {
+		'pending': '待分配',
+		'assigned': '已分配',
+		'accepted': '已接单',
+		'paid': '已支付',
+		'verified': '已验证',
+		'completed': '已完成',
+		'failed': '失败',
+		'cancelled': '已取消'
+	}
+	return statusMap[status] || status
+}
+
+// 获取状态背景样式
+const getStatusBgClass = (status: string): string => {
+	const classMap: Record<string, string> = {
+		'pending': 'bg-[#fff7e6]',
+		'assigned': 'bg-[#e6f7ff]',
+		'accepted': 'bg-[#f0f9ff]',
+		'paid': 'bg-[#e6f7ff]',
+		'verified': 'bg-[#e6f7f0]',
+		'completed': 'bg-[#e6f7f0]',
+		'failed': 'bg-[#fff2f0]',
+		'cancelled': 'bg-[#f5f5f5]'
+	}
+	return classMap[status] || 'bg-[#f5f5f5]'
+}
+
+// 获取状态文字样式
+const getStatusTextClass = (status: string): string => {
+	const classMap: Record<string, string> = {
+		'pending': 'text-[#faad14]',
+		'assigned': 'text-[#1890ff]',
+		'accepted': 'text-[#0052d9]',
+		'paid': 'text-[#1890ff]',
+		'verified': 'text-[#00b578]',
+		'completed': 'text-[#00b578]',
+		'failed': 'text-[#ff4d4f]',
+		'cancelled': 'text-[#999999]'
+	}
+	return classMap[status] || 'text-[#999999]'
+}
+
 // 加载子任务列表
 const loadSubtaskList = async () => {
-	if (loading.value) return
+	if (loading.value || !taskId.value) return
 	
 	try {
 		loading.value = true
 		
-		const res = await getAvailableSubTasks({
-			task_id: taskId.value || undefined,
+		const res = await getTaskSubTasks({
+			task_id: taskId.value,
+			status: currentStatus.value || '',
 			category: filter.value.category || '',
+			commission_range: filter.value.commissionRange || 'all',
 			page: page.value,
 			limit: 10
 		})
@@ -207,14 +290,15 @@ const loadSubtaskList = async () => {
 		if (res && res.list) {
 			const formattedList = res.list.map((item: any) => ({
 				id: item.id,
-				category: item.category || '互助',
-				platform: item.platform || '平台',
+				category: item.task?.category_text || item.task?.category || '互助',
+				platform: item.task?.platform || '平台',
 				createTime: formatRelativeTime(item.createtime),
-				title: item.title || `互助任务 #${item.subtask_no || item.id}`,
-				description: item.description || `金额：¥${item.amount}，佣金：¥${item.commission}`,
+				title: item.task?.title || `子任务 #${item.task_no || item.id}`,
+				description: `金额：¥${item.amount}，佣金：¥${item.commission}`,
 				timeLimit: item.time_limit || 24,
 				proofCount: item.proof_count || 1,
-				commission: parseFloat(item.commission || 0).toFixed(2)
+				amount: parseFloat(item.amount || 0).toFixed(2),
+				status: item.status
 			}))
 			
 			if (page.value === 1) {
@@ -258,34 +342,6 @@ const loadMore = () => {
 	if (!loading.value && hasMore.value) {
 		page.value++
 		loadSubtaskList()
-	}
-}
-
-// 接单
-const receiveTask = async (id: number) => {
-	try {
-		uni.showLoading({ title: '接单中...' })
-		
-		await acceptSubTask(id)
-		
-		uni.hideLoading()
-		uni.showToast({
-			title: '接单成功',
-			icon: 'success'
-		})
-		
-		// 跳转到子任务详情
-		setTimeout(() => {
-			uni.navigateTo({
-				url: `/pages/task/subtask/detail?id=${id}`
-			})
-		}, 1500)
-	} catch (error: any) {
-		uni.hideLoading()
-		uni.showToast({
-			title: error.message || '接单失败',
-			icon: 'none'
-		})
 	}
 }
 
@@ -333,11 +389,19 @@ const loadCategories = async () => {
 
 // 页面加载时获取子任务列表
 onMounted(() => {
-	// 获取任务ID（可选）
+	// 获取任务ID（必须）
 	const pages = getCurrentPages()
 	const currentPage = pages[pages.length - 1]
 	// @ts-ignore
-	taskId.value = parseInt(currentPage.options?.taskId || '0')
+	taskId.value = parseInt(currentPage.options?.taskId || currentPage.options?.task_id || '0')
+	
+	if (!taskId.value) {
+		uni.showToast({
+			title: '缺少任务ID',
+			icon: 'none'
+		})
+		return
+	}
 	
 	loadCategories()
 	loadSubtaskList()

@@ -161,8 +161,10 @@ class Wallet extends Api
                 'id' => $item->id,
                 'bank_name' => $item->bank_name,
                 'bank_code' => $item->bank_code,
-                'card_no' => $item->masked_card_no,
+                'card_no' => $item->card_no,
+                'card_no_display' => $item->masked_card_no,
                 'card_holder' => $item->card_holder,
+                'account_name' => $item->card_holder,
                 'bank_branch' => $item->bank_branch,
                 'is_default' => $item->is_default
             ];

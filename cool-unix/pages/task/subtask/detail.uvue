@@ -225,7 +225,7 @@ const loadSubtaskDetail = async () => {
 				steps: data.steps || data.description || '',
 				proofTypes: data.proof_types || ['订单截图'],
 				specialRequirement: data.special_requirement || '',
-				proofImages: data.proof_image ? data.proof_image.split(',') : [],
+				proofImages: data.proof_image_full ? data.proof_image_full.split(',') : [],
 				proofNote: data.proof_desc || '',
 				merchantAvatar: '',
 				merchantName: data.merchant_name || `商户${data.from_user_id}`,

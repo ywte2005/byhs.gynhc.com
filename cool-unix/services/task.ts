@@ -120,6 +120,20 @@ export function getAvailableSubTasks(params: {
 	});
 }
 
+// 获取任务的子任务列表（发布者视角）
+export function getTaskSubTasks(params: {
+	task_id: number;
+	status?: string;
+	page?: number;
+	limit?: number;
+}): Promise<{ list: SubTask[]; total: number }> {
+	return request({
+		url: "/task/subtaskList",
+		method: "GET",
+		data: params
+	});
+}
+
 // 我接的子任务
 export function getMySubTasks(params: {
 	status?: string;

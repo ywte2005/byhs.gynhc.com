@@ -69,6 +69,16 @@ class RewardService
             return null;
         }
         
+        // 检查等级要求
+        if (!self::checkLevelRequire($rule, $directParent)) {
+            return null;
+        }
+        
+        // 检查增量门槛
+        if (!self::checkGrowthRequire($rule, $directParent->user_id)) {
+            return null;
+        }
+        
         $amount = self::calculateAmount($rule, $baseAmount);
         if (bccomp($amount, '0', 2) <= 0) {
             return null;
@@ -101,6 +111,16 @@ class RewardService
             return null;
         }
         
+        // 检查等级要求
+        if (!self::checkLevelRequire($rule, $indirectParent)) {
+            return null;
+        }
+        
+        // 检查增量门槛
+        if (!self::checkGrowthRequire($rule, $indirectParent->user_id)) {
+            return null;
+        }
+        
         $amount = self::calculateAmount($rule, $baseAmount);
         if (bccomp($amount, '0', 2) <= 0) {
             return null;
@@ -128,6 +148,7 @@ class RewardService
         $sourceLevel = $sourceRelation && $sourceRelation->level_id ? Level::getById($sourceRelation->level_id) : null;
         $sourceLevelSort = $sourceLevel ? $sourceLevel->sort : 0;
         
+        $month = date('Y-m');
         $results = [];
         foreach ($parentChain as $parent) {
             $parentLevel = $parent->level_id ? Level::getById($parent->level_id) : null;
@@ -141,6 +162,14 @@ class RewardService
             $profitRule = ProfitRule::getByLevelDiff($levelDiff);
             if (!$profitRule) {
                 continue;
+            }
+            
+            // 检查增量条件
+            if (isset($profitRule->growth_min) && bccomp($profitRule->growth_min, '0', 2) > 0) {
+                $growth = Performance::calculateGrowth($parent->user_id, $month);
+                if (bccomp($growth, $profitRule->growth_min, 2) < 0) {
+                    continue;
+                }
             }
             
             $amount = bcmul($baseAmount, $profitRule->profit_rate, 2);
@@ -174,6 +203,37 @@ class RewardService
             return $rule->amount_value;
         }
         return bcmul($baseAmount, $rule->amount_value, 2);
+    }
+
+    /**
+     * 检查等级要求
+     */
+    protected static function checkLevelRequire($rule, $parent)
+    {
+        if (empty($rule->level_require)) {
+            return true;
+        }
+        
+        $levelRequire = json_decode($rule->level_require, true);
+        if (empty($levelRequire)) {
+            return true;
+        }
+        
+        return in_array($parent->level_id, $levelRequire);
+    }
+
+    /**
+     * 检查增量门槛
+     */
+    protected static function checkGrowthRequire($rule, $userId)
+    {
+        if (!isset($rule->growth_min) || bccomp($rule->growth_min, '0', 2) <= 0) {
+            return true;
+        }
+        
+        $month = date('Y-m');
+        $growth = Performance::calculateGrowth($userId, $month);
+        return bccomp($growth, $rule->growth_min, 2) >= 0;
     }
 
     public static function settleCommission($commission)

@@ -42,7 +42,20 @@ class Promo extends Api
     {
         $userId = $this->auth->id;
         $inviteCode = PromoService::getInviteCode($userId);
-        $this->success('获取成功', ['invite_code' => $inviteCode]);
+        
+        // 生成邀请二维码URL（包含邀请码的注册链接）
+        $site = \think\Config::get('site');
+        $baseUrl = $site['url'] ?? request()->domain();
+        $inviteUrl = $baseUrl . '/pages/user/login?invite_code=' . $inviteCode;
+        
+        // 使用第三方二维码API生成二维码图片
+        $qrcodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($inviteUrl);
+        
+        $this->success('获取成功', [
+            'invite_code' => $inviteCode,
+            'invite_url' => $inviteUrl,
+            'qrcode_url' => $qrcodeUrl
+        ]);
     }
 
     public function bindRelation()
@@ -55,7 +68,12 @@ class Promo extends Api
         
         $userId = $this->auth->id;
         
-        $relation = PromoService::bindParent($userId, $inviteCode);
+        try {
+            $relation = PromoService::bindParent($userId, $inviteCode);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
+        
         $this->success('绑定成功', ['relation' => $relation]);
     }
 

@@ -38,6 +38,16 @@ class WalletService
         return $wallet->unfreezeDeposit($amount, $bizType, $bizId, $remark);
     }
 
+    /**
+     * 解冻并扣除保证金（用于子任务完成结算）
+     * 将冻结的保证金直接扣除，不经过可用余额
+     */
+    public static function unfreezeAndDeduct($userId, $amount, $bizType, $bizId, $remark = '')
+    {
+        $wallet = self::getWallet($userId);
+        return $wallet->unfreezeAndDeduct($amount, $bizType, $bizId, $remark);
+    }
+
     public static function changeMutualBalance($userId, $amount, $bizType, $bizId, $remark = '')
     {
         $wallet = self::getWallet($userId);

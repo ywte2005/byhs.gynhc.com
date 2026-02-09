@@ -96,7 +96,7 @@ class Relation extends Backend
         $active_count = \app\common\model\promo\Performance::alias('p')
             ->join('promo_relation r', 'p.user_id = r.user_id')
             ->where('r.path', 'like', "%{$row->user_id}%")
-            ->where('p.period', $period)
+            ->where('p.period', $month)
             ->where('(p.personal_performance + p.team_performance) > 0')
             ->count();
 
@@ -105,7 +105,7 @@ class Relation extends Backend
             ->join('promo_relation r', 'p.user_id = r.user_id')
             ->join('user u', 'p.user_id = u.id')
             ->where('r.path', 'like', "%{$row->user_id}%")
-            ->where('p.period', $period)
+            ->where('p.period', $month)
             ->field('u.nickname, p.personal_performance, p.team_performance, p.user_id')
             ->order('p.personal_performance', 'desc')
             ->limit(5)

@@ -30,12 +30,10 @@ class SettlementService
             
             WalletService::changeMutualBalance($toUserId, $amount, 'subtask_complete', $subTask->id, '帮刷增加互助余额');
             
-            // 只有在金额被冻结时才解冻（检查任务的冻结金额）
-            if (bccomp($task->frozen_amount, $amount, 2) >= 0) {
-                WalletService::unfreezeDeposit($fromUserId, $amount, 'subtask_complete', $subTask->id, '子任务完成解冻');
-            }
+            // 解冻并扣除保证金（使用专门的方法处理冻结转扣除）
+            WalletService::unfreezeAndDeduct($fromUserId, $amount, 'subtask_complete', $subTask->id, '子任务完成结算');
             
-            WalletService::changeDeposit($fromUserId, '-' . $amount, 'subtask_complete', $subTask->id, '子任务完成扣除');
+            // 扣除服务费（从可用保证金扣除）
             WalletService::changeDeposit($fromUserId, '-' . $serviceFee, 'service_fee', $subTask->id, '服务费');
             
             WalletService::changeMutualBalance($fromUserId, '-' . $amount, 'subtask_complete', $subTask->id, '被刷减少互助余额');
@@ -166,6 +164,56 @@ class SettlementService
             } catch (\Exception $e) {
                 continue;
             }
+        }
+    }
+
+    /**
+     * 获取分红统计日（每月几号）
+     */
+    public static function getBonusCalculateDay()
+    {
+        return config('site.bonus_calculate_day') ?: 1;
+    }
+
+    /**
+     * 获取分红发放日（每月几号）
+     */
+    public static function getBonusSettleDay()
+    {
+        return config('site.bonus_settle_day') ?: 3;
+    }
+
+    /**
+     * 检查是否为分红统计日
+     */
+    public static function isBonusCalculateDay()
+    {
+        return date('j') == self::getBonusCalculateDay();
+    }
+
+    /**
+     * 检查是否为分红发放日
+     */
+    public static function isBonusSettleDay()
+    {
+        return date('j') == self::getBonusSettleDay();
+    }
+
+    /**
+     * 自动执行分红任务（由定时任务调用）
+     */
+    public static function autoBonusTask()
+    {
+        $prevMonth = date('Y-m', strtotime('-1 month'));
+        
+        // 统计日：计算上月分红
+        if (self::isBonusCalculateDay()) {
+            self::calculateMonthlyBonus($prevMonth);
+        }
+        
+        // 发放日：发放上月分红
+        if (self::isBonusSettleDay()) {
+            self::settlePendingBonuses($prevMonth);
         }
     }
 }

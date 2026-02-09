@@ -34,7 +34,7 @@
 					<view v-if="loading" class="flex justify-center py-[32rpx]">
 						<text class="text-[24rpx] text-[#999999]">加载中...</text>
 					</view>
-					<view v-if="!hasMore && list.length > 0" class="flex justify-center py-[32rpx]">
+					<view v-if="!hasMore && list.length > 0" class="flex justify-center items-center py-[32rpx]">
 						<text class="text-[24rpx] text-[#999999]">没有更多了</text>
 					</view>
 				</view>
@@ -71,7 +71,8 @@
 				<view class="flex flex-col gap-[16rpx]">
 					<text class="text-[28rpx] text-[#1f2329] font-medium">反馈内容</text>
 					<textarea 
-						v-model="submitForm.content"
+						:value="submitForm.content"
+						@input="(e: InputEvent) => { submitForm.content = (e.detail as UTSJSONObject)['value'] as string }"
 						class="w-full h-[200rpx] bg-[#f5f7fa] rounded-[12rpx] p-[24rpx] text-[28rpx] text-[#1f2329]"
 						placeholder="请详细描述您的问题或建议（至少10个字）"
 						placeholder-class="text-[#c0c4cc]"

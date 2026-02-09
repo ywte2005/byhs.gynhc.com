@@ -31,6 +31,11 @@ class Index extends Api
         // 获取钱包信息
         $wallet = \app\common\model\wallet\Wallet::getByUserId($userId);
         
+        // 计算提现冻结金额（待处理的提现申请）
+        $withdrawFrozen = \app\common\model\wallet\Withdraw::where('user_id', $userId)
+            ->where('status', 'pending')
+            ->sum('amount') ?: 0;
+        
         // 获取待办事项统计
         $pendingMerchant = \app\common\model\merchant\Merchant::where('user_id', $userId)
             ->where('status', 'pending')
@@ -92,8 +97,8 @@ class Index extends Api
         $data = [
             'wallet' => [
                 'balance' => $wallet->balance,
-                'frozen' => $wallet->frozen,
-                'pending' => 0 // 待结算金额，暂时返回0
+                'frozen' => bcadd($wallet->frozen, $withdrawFrozen, 2),
+                'pending' => $withdrawFrozen
             ],
             'todo' => [
                 'pending_merchant' => $pendingMerchant,

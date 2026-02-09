@@ -44,7 +44,8 @@ class MutualTask extends Model
             'completed' => '已完成',
             'cancelled' => '已取消'
         ];
-        return isset($list[$data['status']]) ? $list[$data['status']] : '';
+        $status = $data['status'] ?? '';
+        return isset($list[$status]) ? $list[$status] : '';
     }
 
     public function getCategoryTextAttr($value, $data)

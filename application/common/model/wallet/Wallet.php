@@ -157,6 +157,60 @@ class Wallet extends Model
         return $this;
     }
 
+    /**
+     * 解冻并扣除保证金（原子操作）
+     * 用于子任务完成结算，将冻结的保证金直接扣除
+     */
+    public function unfreezeAndDeduct($amount, $bizType, $bizId, $remark = '')
+    {
+        if (bccomp($amount, '0', 2) <= 0) {
+            throw new \Exception('金额必须大于0');
+        }
+
+        if (bccomp($this->frozen, $amount, 2) < 0) {
+            throw new \Exception('冻结金额不足');
+        }
+        
+        // 同时减少冻结金额和保证金总额
+        $frozenBefore = $this->frozen;
+        $frozenAfter = bcsub($frozenBefore, $amount, 2);
+        
+        $depositBefore = $this->deposit;
+        $depositAfter = bcsub($depositBefore, $amount, 2);
+        
+        $this->frozen = $frozenAfter;
+        $this->deposit = $depositAfter;
+        $this->save();
+        
+        // 记录解冻日志
+        WalletLog::create([
+            'user_id' => $this->user_id,
+            'wallet_type' => 'frozen',
+            'change_type' => 'unfreeze',
+            'amount' => $amount,
+            'before_amount' => $frozenBefore,
+            'after_amount' => $frozenAfter,
+            'biz_type' => $bizType,
+            'biz_id' => $bizId,
+            'remark' => $remark . '(解冻)'
+        ]);
+        
+        // 记录扣除日志
+        WalletLog::create([
+            'user_id' => $this->user_id,
+            'wallet_type' => 'deposit',
+            'change_type' => 'expense',
+            'amount' => $amount,
+            'before_amount' => $depositBefore,
+            'after_amount' => $depositAfter,
+            'biz_type' => $bizType,
+            'biz_id' => $bizId,
+            'remark' => $remark . '(扣除)'
+        ]);
+        
+        return $this;
+    }
+
     public function changeMutualBalance($amount, $bizType, $bizId, $remark = '')
     {
         $before = $this->mutual_balance;

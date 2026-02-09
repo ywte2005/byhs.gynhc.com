@@ -51,20 +51,23 @@ class User extends Api
         $isMerchant = $merchant && $merchant->status === 'approved';
         $merchantStatus = $merchant ? $merchant->status : 'none';
         
+        // 安全获取用户扩展字段（可能不存在于数据库中）
+        $userData = $user->getData();
+        
         $data = [
             'id' => $user->id,
             'unionid' => $user->id, // 使用id作为unionid
             'nickName' => $user->nickname ?: $user->username,
             'avatarUrl' => $user->avatar ?: '',
             'phone' => $user->mobile ?: '',
-            'gender' => $user->gender ?: 0,
+            'gender' => isset($userData['gender']) ? $userData['gender'] : 0,
             'status' => $user->status == 'normal' ? 1 : 0,
             'description' => $user->bio ?: '',
             'loginType' => 1,
-            'province' => $user->province ?: '',
-            'city' => $user->city ?: '',
-            'district' => $user->district ?: '',
-            'birthday' => $user->birthday ?: '',
+            'province' => isset($userData['province']) ? $userData['province'] : '',
+            'city' => isset($userData['city']) ? $userData['city'] : '',
+            'district' => isset($userData['district']) ? $userData['district'] : '',
+            'birthday' => isset($userData['birthday']) ? $userData['birthday'] : '',
             'isVerified' => $isVerified,
             'isMerchant' => $isMerchant,
             'merchantStatus' => $merchantStatus,
@@ -256,21 +259,33 @@ class User extends Api
         if ($avatar) {
             $user->avatar = $avatar;
         }
+        // 使用setData安全设置可能不存在的字段
+        $extendFields = [];
         if ($gender !== null) {
-            $user->gender = intval($gender);
+            $extendFields['gender'] = intval($gender);
         }
         if ($birthday !== null) {
-            $user->birthday = $birthday;
+            $extendFields['birthday'] = $birthday;
         }
         if ($province !== null) {
-            $user->province = $province;
+            $extendFields['province'] = $province;
         }
         if ($city !== null) {
-            $user->city = $city;
+            $extendFields['city'] = $city;
         }
         if ($district !== null) {
-            $user->district = $district;
+            $extendFields['district'] = $district;
         }
+        
+        // 尝试更新扩展字段（如果数据库字段存在）
+        if (!empty($extendFields)) {
+            try {
+                \think\Db::name('user')->where('id', $user->id)->update($extendFields);
+            } catch (\Exception $e) {
+                // 字段不存在时忽略错误
+            }
+        }
+        
         $user->save();
         $this->success('修改成功');
     }

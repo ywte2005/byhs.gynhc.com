@@ -56,11 +56,11 @@ const ui = useUi();
 const { user } = useStore();
 
 function toLogout() {
-	ui.showConfirm({
+	uni.showModal({
 		title: t("提示"),
-		message: t("确定退出登录吗？"),
-		confirmButtonText: t("确定"),
-		cancelButtonText: t("取消"),
+		content: t("确定退出登录吗？"),
+		confirmText: t("确定"),
+		cancelText: t("取消"),
 		success(res) {
 			if (res.confirm) {
 				user.logout();

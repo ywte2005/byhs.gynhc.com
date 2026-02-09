@@ -425,10 +425,12 @@ const loadTaskDetail = async () => {
 			}
 			const proofTypes = [proofTypeMap[task.proof_type] || '订单截图']
 			
+			// 判断是否是发布者（后端返回 res.isOwner）
+			const isOwner = res.isOwner === true || res.isOwner === 1
 			// 判断是否可以取消（只有发起人且状态为pending可取消）
-			const canCancel = task.status === 'pending'
-			// 判断是否可以接单（状态为running且有待接子任务）
-			const canReceive = task.status === 'running' && subTasks.some((s: any) => s.status === 'pending' || s.status === 'assigned')
+			const canCancel = isOwner && task.status === 'pending'
+			// 判断是否可以接单（非发布者、状态为running且有待接子任务）
+			const canReceive = !isOwner && task.status === 'running' && subTasks.some((s: any) => s.status === 'assigned')
 			// 判断是否可以缴纳保证金（running状态且未缴满时）
 			const paidDeposit = parseFloat(task.deposit_amount || 0)
 			const remainingDeposit = totalAmount - paidDeposit

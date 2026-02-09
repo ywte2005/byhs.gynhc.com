@@ -28,20 +28,8 @@ class Relation extends Model
             }
         });
 
-        self::beforeUpdate(function ($row) {
-            if (isset($row['parent_id']) && $row->isDirty('parent_id')) {
-                if ($row['parent_id'] > 0) {
-                    $parent = self::where('user_id', $row['parent_id'])->find();
-                    if ($parent) {
-                        $row['path'] = $parent['path'] ? $parent['path'] . ',' . $row['parent_id'] : (string)$row['parent_id'];
-                        $row['depth'] = $parent['depth'] + 1;
-                    }
-                } else {
-                    $row['path'] = '';
-                    $row['depth'] = 0;
-                }
-            }
-        });
+        // beforeUpdate 不再自动计算 path 和 depth
+        // 由调用方（如 PromoService::bindParent）负责设置这些字段
     }
 
     public function user()

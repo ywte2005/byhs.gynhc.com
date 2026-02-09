@@ -183,15 +183,34 @@ class Task extends Api
         $this->success('获取成功', ['list' => $list->items(), 'total' => $list->total()]);
     }
 
-    public function subtaskAvailable()
+    /**
+     * 获取任务的子任务列表（仅发布者可查看）
+     */
+    public function subtaskList()
     {
         $page = $this->request->get('page', 1);
         $limit = $this->request->get('limit', 20);
+        $taskId = $this->request->get('task_id', 0);
+        $status = $this->request->get('status', '');
+        $category = $this->request->get('category', '');
+        $commissionRange = $this->request->get('commission_range', 'all');
+        
+        if (!$taskId) {
+            $this->error('请指定任务ID');
+        }
         
         $userId = $this->auth->id;
-        $list = TaskService::getAvailableSubTasks($userId, $page, $limit);
+        $list = TaskService::getTaskSubTasks($taskId, $userId, $status, $category, $commissionRange, $page, $limit);
         
         $this->success('获取成功', ['list' => $list->items(), 'total' => $list->total()]);
+    }
+
+    /**
+     * 可接子任务列表（接单者视角，暂时保留但不使用）
+     */
+    public function subtaskAvailable()
+    {
+        $this->error('此接口已停用');
     }
 
     public function subtaskMy()
@@ -218,6 +237,11 @@ class Task extends Api
             $this->error('子任务不存在');
         }
         
+        // 处理凭证图片URL，加上域名
+        if (!empty($subTask['proof_image'])) {
+            $subTask['proof_image_full'] = cdnurl($subTask['proof_image'], true);
+        }
+        
         $this->success('获取成功', ['subtask' => $subTask]);
     }
 
@@ -236,7 +260,11 @@ class Task extends Api
             $this->error($canReceive['reason']);
         }
         
-        $subTask = TaskService::acceptSubTask($subTaskId, $userId);
+        try {
+            $subTask = TaskService::acceptSubTask($subTaskId, $userId);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
         $this->success('接单成功', ['subtask' => $subTask]);
     }
 
@@ -305,7 +333,11 @@ class Task extends Api
             $this->error('当前状态不允许确认');
         }
         
-        $count = TaskService::completeSubTask($subTaskId);
+        try {
+            $count = TaskService::completeSubTask($subTaskId);
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
         $this->success('确认成功', ['count' => $count]);
     }
 

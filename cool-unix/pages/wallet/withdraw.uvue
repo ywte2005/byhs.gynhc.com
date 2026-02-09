@@ -53,7 +53,7 @@
 								</view>
 								<view class="flex flex-col gap-[8rpx]">
 									<text class="text-[30rpx] font-medium text-[#1f2329]">{{ item.bankName }}</text>
-									<text class="text-[24rpx] text-[#999999]">{{ item.cardNo }}</text>
+									<text class="text-[24rpx] text-[#999999]">{{ item.cardNoDisplay }}</text>
 								</view>
 							</view>
 							<view class="w-[40rpx] h-[40rpx] rounded-full border-[2rpx] flex items-center justify-center bg-white" :class="selectedBankCard === item.id ? 'border-[#0052d9]' : 'border-[#e5e6eb]'">
@@ -167,7 +167,9 @@ const loadBankCards = async () => {
 			bankCards.value = res.list.map((item: any) => ({
 				id: item.id,
 				bankName: item.bank_name,
-				cardNo: `尾号 ${item.card_no.slice(-4)}`
+				cardNo: item.card_no,
+				cardNoDisplay: item.card_no_display || `尾号 ${item.card_no.slice(-4)}`,
+				accountName: item.account_name || item.card_holder || ''
 			}))
 			
 			// 如果当前选中的卡不在列表中，默认选中第一张或默认卡
@@ -260,7 +262,7 @@ const confirmWithdraw = async () => {
 						amount: amount,
 						bank_name: selectedCard.bankName,
 						bank_account: selectedCard.cardNo,
-						account_name: ''
+						account_name: selectedCard.accountName
 					})
 					
 					uni.hideLoading()

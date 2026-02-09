@@ -80,7 +80,7 @@
 					<view class="h-[2rpx] bg-[#f5f7fa] mx-[32rpx]"></view>
 					<view class="flex flex-row justify-between items-center p-[32rpx] bg-white active:bg-gray-50" @tap="handleAction('wallet')">
 						<view class="flex flex-row items-center gap-[24rpx]">
-							<uni-icons type="wallet-filled" size="22" color="#0052d9"></uni-icons>
+							<uni-icons type="locked" size="22" color="#0052d9"></uni-icons>
 							<text class="text-[30rpx] text-[#1f2329]">资金管理</text>
 						</view>
 						<uni-icons type="right" size="20" color="#9aa0a6"></uni-icons>

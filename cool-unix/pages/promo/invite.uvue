@@ -10,9 +10,12 @@
 					<view class="flex flex-col items-center gap-[24rpx] w-full">
 						<text class="text-[28rpx] text-[#646a73]">我的邀请码</text>
 						<text class="text-[64rpx] font-bold text-[#1f2329] tracking-widest">{{ inviteCode }}</text>
-						<view class="w-[320rpx] h-[320rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center gap-[16rpx]">
-							<uni-icons type="scan" size="32" color="#999999"></uni-icons>
-							<text class="text-[26rpx] text-[#646a73]">邀请二维码</text>
+						<view class="w-[320rpx] h-[320rpx] bg-[#f5f7fa] rounded-[16rpx] flex flex-col items-center justify-center gap-[16rpx] overflow-hidden" @tap="previewQrcode">
+							<image v-if="qrcodeUrl.length > 0" :src="qrcodeUrl" class="w-full h-full" mode="aspectFit" />
+							<view v-else class="flex flex-col items-center justify-center gap-[16rpx]">
+								<uni-icons type="image" size="32" color="#999999"></uni-icons>
+								<text class="text-[26rpx] text-[#646a73]">邀请二维码</text>
+							</view>
 						</view>
 					</view>
 					
@@ -62,9 +65,16 @@
 	export default {
 		data() {
 			return {
-				inviteCode: '888888',
+				inviteCode: '********',
+				qrcodeUrl: '',
 				parentCode: ''
 			};
+		},
+		onLoad(options : any) {
+			// 接收从首页扫码传递的邀请码
+			if (options != null && options.parent_code != null) {
+				this.parentCode = options.parent_code as string;
+			}
 		},
 		onShow() {
 			this.loadInviteCode();
@@ -72,10 +82,20 @@
 		methods: {
 			loadInviteCode() {
 				getMyInviteCode()
-					.then((res : { invite_code : string }) => {
+					.then((res : { invite_code : string, qrcode_url ?: string }) => {
 						this.inviteCode = res.invite_code;
+						if (res.qrcode_url != null) {
+							this.qrcodeUrl = res.qrcode_url as string;
+						}
 					})
 					.catch(() => { });
+			},
+			previewQrcode() {
+				if (this.qrcodeUrl.length == 0) return;
+				uni.previewImage({
+					urls: [this.qrcodeUrl],
+					current: this.qrcodeUrl
+				});
 			},
 			copyCode() {
 				uni.setClipboardData({

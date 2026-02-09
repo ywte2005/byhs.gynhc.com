@@ -113,11 +113,11 @@
                     </div>
                     <div class="row" style="margin-top: 15px; border-top: 1px solid #f9f9f9; padding-top: 15px;">
                         <div class="col-xs-4 stat-item">
-                            <span class="value">￥{$performance.personal_amount|default='0.00'}</span>
+                            <span class="value">￥{$performance.personal_performance|default='0.00'}</span>
                             <span class="label">{:__('Personal Performance')}</span>
                         </div>
                         <div class="col-xs-4 stat-item">
-                            <span class="value">￥{$performance.team_amount|default='0.00'}</span>
+                            <span class="value">￥{$performance.team_performance|default='0.00'}</span>
                             <span class="label">{:__('Team Performance')}</span>
                         </div>
                         <div class="col-xs-4 stat-item">
@@ -177,7 +177,7 @@
                         {foreach name="team_top_performers" item="item"}
                         <div class="growth-item">
                             <span class="pull-left text-muted" title="ID: {$item.user_id}">{$item.nickname}</span>
-                            <span class="pull-right text-danger">￥{$item.personal_amount}</span>
+                            <span class="pull-right text-danger">￥{$item.personal_performance}</span>
                             <div class="clearfix"></div>
                         </div>
                         {/foreach}
@@ -205,10 +205,10 @@
                             <tbody>
                                 {foreach name="performance_history" item="item"}
                                 <tr>
-                                    <td>{$item.month}</td>
-                                    <td>￥{$item.personal_amount}</td>
-                                    <td>￥{$item.team_amount}</td>
-                                    <td>￥{:bcadd($item.personal_amount, $item.team_amount, 2)}</td>
+                                    <td>{$item.period}</td>
+                                    <td>￥{$item.personal_performance}</td>
+                                    <td>￥{$item.team_performance}</td>
+                                    <td>￥{:bcadd($item.personal_performance, $item.team_performance, 2)}</td>
                                 </tr>
                                 {/foreach}
                                 {if empty($performance_history)}

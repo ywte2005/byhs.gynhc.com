@@ -8,12 +8,15 @@ import { config } from "@/config";
 export function uploadFile(filePath: string): Promise<{ url: string; fullurl: string }> {
 	return new Promise((resolve, reject) => {
 		const token = uni.getStorageSync('token') || ''
-		const uploadUrl = config.baseUrl + '/common/upload' + (token ? `?token=${token}` : '')
+		const uploadUrl = config.baseUrl + '/common/upload'
 		
 		uni.uploadFile({
 			url: uploadUrl,
 			filePath: filePath,
 			name: 'file',
+			header: {
+				token: token
+			},
 			success: (res) => {
 				try {
 					const data = JSON.parse(res.data)
@@ -33,16 +36,20 @@ export function uploadFile(filePath: string): Promise<{ url: string; fullurl: st
 	})
 }
 
+// 上传结果类型
+export interface UploadResult {
+	url: string      // 相对路径，用于提交给后端
+	fullurl: string  // 完整URL，用于前端展示
+}
+
 // 批量上传文件
-export async function uploadFiles(filePaths: string[]): Promise<string[]> {
-	const urls: string[] = []
+export async function uploadFiles(filePaths: string[]): Promise<UploadResult[]> {
+	const results: UploadResult[] = []
 	for (const filePath of filePaths) {
 		if (filePath) {
 			const result = await uploadFile(filePath)
-			urls.push(result.url)
-		} else {
-			urls.push('')
+			results.push(result)
 		}
 	}
-	return urls
+	return results
 }

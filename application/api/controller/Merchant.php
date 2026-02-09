@@ -52,7 +52,7 @@ class Merchant extends Api
             'level' => $stats['level'],
         ];
         
-        $this->success('获取成功', $data);
+        $this->success('获取成功', ['merchant' => $data]);
     }
     
     /**
@@ -60,25 +60,38 @@ class Merchant extends Api
      */
     private function getMerchantStats($merchantId)
     {
-        // 获取任务统计
-        $totalTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->count();
-        $completedTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->where('status', 'completed')->count();
+        $totalTasks = 0;
+        $completedTasks = 0;
+        $totalIncome = 0;
+        $totalCommission = 0;
+        
+        // 获取任务统计（表可能不存在）
+        try {
+            $totalTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->count();
+            $completedTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->where('status', 'completed')->count();
+        } catch (\Exception $e) {
+            // 表不存在时使用默认值
+        }
+        
         $completionRate = $totalTasks > 0 ? round($completedTasks / $totalTasks * 100, 1) : 0;
         
-        // 获取收入统计
-        $totalIncome = \think\Db::name('wallet_log')
-            ->where('user_id', function($query) use ($merchantId) {
-                $query->name('merchant')->where('id', $merchantId)->field('user_id');
-            })
-            ->where('change_type', 'income')
-            ->sum('amount') ?: 0;
-            
-        $totalCommission = \think\Db::name('wallet_log')
-            ->where('user_id', function($query) use ($merchantId) {
-                $query->name('merchant')->where('id', $merchantId)->field('user_id');
-            })
-            ->where('biz_type', 'in', ['subtask_commission', 'service_fee'])
-            ->sum('amount') ?: 0;
+        // 获取收入统计（表可能不存在）
+        try {
+            $merchant = \think\Db::name('merchant')->where('id', $merchantId)->find();
+            if ($merchant) {
+                $totalIncome = \think\Db::name('wallet_log')
+                    ->where('user_id', $merchant['user_id'])
+                    ->where('change_type', 'income')
+                    ->sum('amount') ?: 0;
+                    
+                $totalCommission = \think\Db::name('wallet_log')
+                    ->where('user_id', $merchant['user_id'])
+                    ->where('biz_type', 'in', ['subtask_commission', 'service_fee'])
+                    ->sum('amount') ?: 0;
+            }
+        } catch (\Exception $e) {
+            // 表不存在时使用默认值
+        }
         
         return [
             'total_tasks' => $totalTasks,

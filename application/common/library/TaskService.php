@@ -488,6 +488,54 @@ class TaskService
         return SubTask::getAvailableForUser($userId, $category, $page, $limit);
     }
 
+    /**
+     * 获取指定任务的子任务列表（发布者视角）
+     */
+    public static function getTaskSubTasks($taskId, $userId, $status = '', $category = '', $commissionRange = 'all', $page = 1, $limit = 20)
+    {
+        // 验证任务归属
+        $task = MutualTask::find($taskId);
+        if (!$task || $task->user_id != $userId) {
+            return new \think\Paginator([], 0, $limit, $page);
+        }
+        
+        $query = SubTask::with(['task' => function($query) {
+                $query->field('id,title,category,platform,status');
+            }])
+            ->where('task_id', $taskId);
+        
+        // 状态筛选
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+        
+        // 分类筛选（由于是查询单个任务的子任务，直接验证任务分类即可）
+        if (!empty($category)) {
+            // 如果任务分类不匹配，返回空结果
+            if ($task->category !== $category) {
+                return new \think\Paginator([], 0, $limit, $page);
+            }
+        }
+        
+        // 佣金范围筛选
+        if (!empty($commissionRange) && $commissionRange !== 'all') {
+            $parts = explode('-', $commissionRange);
+            if (count($parts) == 2) {
+                $min = floatval($parts[0]);
+                $max = $parts[1] !== '' ? floatval($parts[1]) : null;
+                if ($min > 0) {
+                    $query->where('commission', '>=', $min);
+                }
+                if ($max !== null) {
+                    $query->where('commission', '<=', $max);
+                }
+            }
+        }
+        
+        return $query->order('id', 'desc')
+            ->paginate(['page' => $page, 'list_rows' => $limit]);
+    }
+
     public static function getUserAcceptedSubTasks($userId, $status = '', $page = 1, $limit = 20)
     {
         return SubTask::getUserAccepted($userId, $status, $page, $limit);

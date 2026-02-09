@@ -57,11 +57,11 @@ export type LocalUploadResponse = {
 
 // 获取上传模式（本地/云端及云类型）
 async function getUploadMode(): Promise<UploadMode> {
-	const res = await request({
-		url: "/app/base/comm/uploadMode"
-	});
-
-	return parse<UploadMode>(res!)!;
+	// 直接返回本地上传模式，不请求后端
+	return {
+		mode: "local",
+		type: "local"
+	};
 }
 
 /**
@@ -135,8 +135,8 @@ export async function uploadFile(
 				filePath,
 				name: "file",
 				header: {
-					// 本地上传带token
-					Authorization: isLocal ? user.token : null
+					// 本地上传带token（通过header传递）
+					token: isLocal ? user.token : ''
 				},
 				formData: {
 					...(data as UTSJSONObject),
@@ -145,12 +145,21 @@ export async function uploadFile(
 				success(res) {
 					if (isLocal) {
 						// 本地上传返回处理
-						const { code, data, message } = parseObject<LocalUploadResponse>(res.data)!;
-
-						if (code == 1000) {
-							resolve(data);
+						const resData = parseObject<any>(res.data)!;
+						const code = resData.code;
+						const message = resData.msg || resData.message;
+						
+						// FastAdmin返回code=1表示成功
+						if (code == 1 || code == 1000) {
+							// 获取返回的URL，优先使用fullurl
+							let url = resData.data?.fullurl || resData.data?.url || resData.data;
+							// 如果URL不是完整路径，添加baseUrl
+							if (url && typeof url === 'string' && !url.startsWith('http')) {
+								url = config.baseUrl.replace(/\/dev$/, '') + url;
+							}
+							resolve(url);
 						} else {
-							reject(message);
+							reject(message || '上传失败');
 						}
 					} else {
 						// 云上传直接拼接url
@@ -189,7 +198,7 @@ export async function uploadFile(
 		// 本地上传
 		if (isLocal) {
 			next({
-				url: config.baseUrl + "/app/base/comm/upload",
+				url: config.baseUrl + "/common/upload",
 				data: {}
 			});
 		} else {

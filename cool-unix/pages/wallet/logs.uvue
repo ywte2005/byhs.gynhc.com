@@ -194,7 +194,7 @@ const loadLogList = async () => {
 		if (res && res.list) {
 			const formattedList = res.list.map((item: any) => {
 				const amount = parseFloat(item.amount)
-				const isIncome = amount >= 0
+				const isIncome = item.change_type === 'income'
 				return {
 					iconType: isIncome ? 'wallet-filled' : 'upload-filled',
 					iconColor: isIncome ? '#00b578' : '#ff3b30',
@@ -203,7 +203,7 @@ const loadLogList = async () => {
 					time: formatTime(item.createtime),
 					type: isIncome ? 'in' : 'out',
 					amount: Math.abs(amount).toFixed(2),
-					balance: parseFloat(item.after_balance || 0).toFixed(2),
+					balance: parseFloat(item.after_amount || 0).toFixed(2),
 					remark: item.remark || ''
 				}
 			})

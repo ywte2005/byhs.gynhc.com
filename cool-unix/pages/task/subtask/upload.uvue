@@ -59,7 +59,7 @@
 							:key="index"
 							class="w-[192rpx] h-[192rpx] rounded-[16rpx] overflow-hidden relative"
 						>
-							<image :src="img" class="w-full h-full" mode="aspectFill" />
+							<image :src="img.fullurl" class="w-full h-full" mode="aspectFill" />
 							<view 
 								@click="removeImage(index)"
 								class="absolute top-[8rpx] right-[8rpx] w-[40rpx] h-[40rpx] bg-black/50 rounded-full flex items-center justify-center"
@@ -129,7 +129,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { getSubTaskDetail, uploadSubTaskProof } from '@/services/task'
-import { uploadFiles } from '@/services/upload'
+import { uploadFiles, type UploadResult } from '@/services/upload'
 
 // 子任务ID
 const subtaskId = ref(0)
@@ -144,8 +144,8 @@ const taskInfo = ref({
 	specialRequirement: ''
 })
 
-// 已上传的图片
-const uploadedImages = ref<string[]>([])
+// 已上传的图片（包含url和fullurl）
+const uploadedImages = ref<UploadResult[]>([])
 
 // 文字说明
 const proofNote = ref('')
@@ -211,8 +211,8 @@ const chooseImage = () => {
 			try {
 				uni.showLoading({ title: '上传中...' })
 				// 上传到服务器
-				const urls = await uploadFiles(tempFilePaths)
-				uploadedImages.value = uploadedImages.value.concat(urls)
+				const results = await uploadFiles(tempFilePaths)
+				uploadedImages.value = uploadedImages.value.concat(results)
 				uni.hideLoading()
 			} catch (error) {
 				uni.hideLoading()
@@ -234,8 +234,9 @@ const submitProof = async () => {
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
-		// 调用后端接口，参数为 subtask_id 和 proof_image
-		await uploadSubTaskProof(subtaskId.value, uploadedImages.value.join(','), proofNote.value)
+		// 调用后端接口，参数为 subtask_id 和 proof_image（使用相对路径url）
+		const imageUrls = uploadedImages.value.map(img => img.url).join(',')
+		await uploadSubTaskProof(subtaskId.value, imageUrls, proofNote.value)
 		
 		uni.hideLoading()
 		uni.showToast({

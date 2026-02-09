@@ -32,6 +32,10 @@ class WalletLog extends Model
     public static $bizTypes = [
         'recharge' => '充值',
         'withdraw' => '提现',
+        'withdraw_freeze' => '提现冻结',
+        'withdraw_unfreeze' => '提现解冻',
+        'withdraw_success' => '提现成功',
+        'withdraw_fail' => '提现失败退回',
         'deposit_pay' => '保证金充值',
         'deposit_withdraw' => '保证金提取',
         'subtask_amount' => '刷单金额',
