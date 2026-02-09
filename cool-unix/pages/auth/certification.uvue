@@ -329,5 +329,4 @@ const submit = async () => {
 </script>
 
 <style>
-/* No custom CSS needed, all Tailwind */
 </style>

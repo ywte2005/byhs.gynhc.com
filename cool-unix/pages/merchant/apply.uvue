@@ -392,5 +392,4 @@ const handleSubmit = async () => {
 </script>
 
 <style>
-/* Tailwind handles all styling */
 </style>

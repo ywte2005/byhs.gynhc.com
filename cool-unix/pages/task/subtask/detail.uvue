@@ -113,7 +113,7 @@
 		<!-- 底部操作栏 - 未接单状态 -->
 		<view v-if="canAccept" class="bg-white px-[32rpx] py-[24rpx] border-t-[2rpx] border-[#e5e6eb] pb-[calc(24rpx+env(safe-area-inset-bottom))]">
 			<view 
-				class="h-[88rpx] rounded-[44rpx] bg-[#0052d9] flex items-center justify-center shadow-[0_4rpx_16rpx_rgba(0,82,217,0.3)]"
+				class="h-[88rpx] rounded-[44rpx] bg-[#0052d9] flex items-center justify-center shadow-md"
 				@click="handleAccept"
 			>
 				<text class="text-[32rpx] font-bold text-white">立即接单</text>

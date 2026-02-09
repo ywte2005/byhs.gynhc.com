@@ -93,7 +93,6 @@ onMounted(() => {
 	height: 100vh;
 }
 
-/* Header */
 .header {
 	height: 112rpx;
 	background-color: #ffffff;
@@ -124,7 +123,6 @@ onMounted(() => {
 	font-family: 'Inter', sans-serif;
 }
 
-/* Content */
 .content {
 	padding: 32rpx;
 	display: flex;

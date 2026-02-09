@@ -30,7 +30,7 @@
 					v-for="(task, index) in taskList" 
 					:key="index"
 					@click="goToDetail(task.id)"
-					class="bg-white rounded-[24rpx] p-[32rpx] shadow-[0_2rpx_12rpx_rgba(0,0,0,0.03)]"
+					class="bg-white rounded-[24rpx] p-[32rpx] shadow-sm"
 				>
 					<!-- 任务头部 -->
 					<view class="flex flex-row justify-between items-center mb-[24rpx]">

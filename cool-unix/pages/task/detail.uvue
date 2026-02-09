@@ -168,16 +168,16 @@
 							<text class="text-[30rpx] text-white font-bold">{{ taskInfo.depositProgress }}%</text>
 						</view>
 						<!-- 进度条 -->
-						<view class="w-full h-[16rpx] bg-[rgba(255,255,255,0.3)] rounded-full overflow-hidden">
+						<view class="w-full h-[16rpx] bg-white/30 rounded-full overflow-hidden">
 							<view class="h-full bg-white rounded-full" :style="{ width: taskInfo.depositProgress + '%' }"></view>
 						</view>
 						<view class="flex flex-row items-center justify-between mt-[8rpx]">
 							<view class="flex flex-col gap-[8rpx]">
-								<text class="text-[26rpx] text-[rgba(255,255,255,0.85)]">已缴纳</text>
+								<text class="text-[26rpx] text-white/85">已缴纳</text>
 								<text class="text-[36rpx] text-white font-bold">¥{{ taskInfo.paidDeposit }}</text>
 							</view>
 							<view class="flex flex-col gap-[8rpx] items-end">
-								<text class="text-[26rpx] text-[rgba(255,255,255,0.85)]">待缴纳</text>
+								<text class="text-[26rpx] text-white/85">待缴纳</text>
 								<text class="text-[36rpx] text-white font-bold">¥{{ taskInfo.remainingDeposit }}</text>
 							</view>
 						</view>

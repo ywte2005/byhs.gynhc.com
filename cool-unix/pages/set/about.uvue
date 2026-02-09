@@ -3,7 +3,7 @@
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<view class="flex flex-col items-center py-[48rpx]">
-					<view class="w-[160rpx] h-[160rpx] bg-white rounded-[32rpx] flex items-center justify-center shadow-[0_4rpx_12rpx_rgba(0,0,0,0.05)] mb-[24rpx]">
+					<view class="w-[160rpx] h-[160rpx] bg-white rounded-[32rpx] flex items-center justify-center shadow-sm mb-[24rpx]">
 						<image :src="siteConfig.logo || '/static/logo.png'" class="w-[120rpx] h-[120rpx]" mode="aspectFit" />
 					</view>
 					<text class="text-[36rpx] font-semibold text-[#1f2329] mb-[8rpx]">{{ siteConfig.name || config.name }}</text>

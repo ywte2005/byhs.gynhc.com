@@ -9,7 +9,7 @@
 				<view class="bg-[#0052d9] p-[40rpx_32rpx_48rpx_32rpx] flex flex-col rounded-bl-[32rpx] rounded-br-[32rpx]">
 					<view class="flex flex-col items-center mb-[48rpx]">
 						<text class="text-[26rpx] text-white/70">可用余额(元)</text>
-						<text class="text-[72rpx] font-bold text-white mt-[16rpx] font-['DIN_Alternate']">{{ walletInfo.balance }}</text>
+						<text class="text-[72rpx] font-bold text-white mt-[16rpx] ">{{ walletInfo.balance }}</text>
 					</view>
 					
 					<view class="flex flex-row justify-between mb-[48rpx] px-[48rpx]">

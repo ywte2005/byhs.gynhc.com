@@ -27,7 +27,7 @@
 						<view
 							v-for="(item, index) in quickAmounts"
 							:key="index"
-							class="w-[30%] flex-1 min-w-[180rpx] h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx]"
+							class="flex-1 min-w-[180rpx] h-[80rpx] rounded-[16rpx] flex items-center justify-center border-[2rpx]"
 							:class="amount === item ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-[#f5f7fa] border-transparent'"
 							@tap="amount = item"
 						>

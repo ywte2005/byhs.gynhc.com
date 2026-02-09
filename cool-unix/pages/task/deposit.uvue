@@ -9,7 +9,7 @@
 				<view class="bg-[#0052d9] rounded-[24rpx] p-[40rpx_32rpx] flex flex-col shadow-lg shadow-blue-500/20">
 					<view class="flex flex-col items-center mb-[40rpx]">
 						<text class="text-[26rpx] text-white/70 mb-[12rpx]">保证金余额(元)</text>
-						<text class="text-[72rpx] font-bold text-white font-['DIN_Alternate']">{{ depositInfo.balance }}</text>
+						<text class="text-[72rpx] font-bold text-white ">{{ depositInfo.balance }}</text>
 					</view>
 					
 					<view class="flex flex-row items-center justify-between bg-white/10 rounded-[16rpx] p-[24rpx]">
@@ -91,7 +91,7 @@
 							<!-- 右侧金额 -->
 							<view class="flex flex-col items-end gap-[8rpx] ml-[16rpx]">
 								<text 
-									class="text-[32rpx] font-semibold font-['DIN_Alternate']" 
+									class="text-[32rpx] font-semibold " 
 									:class="item.type === 'income' ? 'text-[#00b578]' : 'text-[#ff3b30]'"
 								>
 									{{ item.type === 'income' ? '+' : '-' }}{{ item.amount }}

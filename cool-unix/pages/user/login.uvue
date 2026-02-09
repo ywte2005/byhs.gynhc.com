@@ -254,19 +254,20 @@ async function handleMiniLogin(code: string, userInfo: any) {
 	
 	try {
 		const res = await request({
-			url: '/user/wechatMiniLogin',
+			url: '/user/third',
 			method: 'POST',
 			data: { 
-				code,
-				userInfo: userInfo || {}
+				platform: 'wechatmini',
+				code
 			}
 		});
 		
 		uni.hideLoading();
 		
-		// 保存登录信息
-		if (res.token) {
-			uni.setStorageSync('token', res.token);
+		// 保存登录信息 - third接口返回 { userinfo: { token: ... }, thirdinfo: ... }
+		const token = res.userinfo?.token || res.token;
+		if (token) {
+			uni.setStorageSync('token', token);
 			await user.get();
 			router.push({ path: '/pages/index/home', isTab: true });
 		}

@@ -372,5 +372,4 @@ const submitTask = async () => {
 </script>
 
 <style>
-/* Tailwind CSS handled */
 </style>
