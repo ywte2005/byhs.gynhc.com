@@ -1,0 +1,191 @@
+<template>
+	<view class="flex flex-col bg-white min-h-screen">
+		<cl-topbar title="忘记密码" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top></cl-topbar>
+
+		<view class="flex flex-col px-[64rpx] pt-[48rpx] pb-[64rpx]">
+			<!-- Form -->
+			<view class="flex flex-col gap-[32rpx]">
+				<!-- Phone -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#646a73]">手机号</text>
+					<input
+						class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] px-[32rpx] text-[30rpx] text-[#1f2329]"
+						type="number"
+						v-model="form.mobile"
+						placeholder="请输入注册时的手机号"
+						placeholder-class="text-[#c0c4cc]"
+						maxlength="11"
+					/>
+				</view>
+
+				<!-- Captcha -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#646a73]">验证码</text>
+					<view class="flex flex-row gap-[24rpx]">
+						<input
+							class="flex-1 h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] px-[32rpx] text-[30rpx] text-[#1f2329]"
+							type="number"
+							v-model="form.captcha"
+							placeholder="请输入验证码"
+							placeholder-class="text-[#c0c4cc]"
+							maxlength="6"
+						/>
+						<view 
+							class="w-[240rpx] h-[96rpx] rounded-[16rpx] flex items-center justify-center"
+							:class="canSendCode ? 'bg-[#0052d9]' : 'bg-[#c0c4cc]'"
+							@tap="sendCode"
+						>
+							<text class="text-[28rpx] text-white">{{ codeText }}</text>
+						</view>
+					</view>
+				</view>
+
+				<!-- New Password -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#646a73]">新密码</text>
+					<input
+						class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] px-[32rpx] text-[30rpx] text-[#1f2329]"
+						type="password"
+						v-model="form.newpassword"
+						placeholder="请输入新密码（6-30位）"
+						placeholder-class="text-[#c0c4cc]"
+					/>
+				</view>
+
+				<!-- Confirm Password -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#646a73]">确认密码</text>
+					<input
+						class="h-[96rpx] bg-[#f5f7fa] rounded-[16rpx] px-[32rpx] text-[30rpx] text-[#1f2329]"
+						type="password"
+						v-model="form.confirmPassword"
+						placeholder="请再次输入新密码"
+						placeholder-class="text-[#c0c4cc]"
+					/>
+				</view>
+
+				<!-- Submit Button -->
+				<view 
+					class="h-[96rpx] rounded-[16rpx] flex items-center justify-center mt-[32rpx]"
+					:class="canSubmit ? 'bg-[#0052d9]' : 'bg-[#c0c4cc]'"
+					@tap="toReset"
+				>
+					<text class="text-[32rpx] text-white font-medium">重置密码</text>
+				</view>
+
+				<!-- Actions -->
+				<view class="flex flex-row justify-center items-center gap-[8rpx] mt-[16rpx]">
+					<text class="text-[28rpx] text-[#646a73]">想起密码了？</text>
+					<text class="text-[28rpx] text-[#0052d9]" @tap="toLogin">返回登录</text>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from "vue"
+import { sendSmsCode } from "@/services/auth"
+import { request } from "@/.cool/service"
+
+const form = ref({
+	mobile: "",
+	captcha: "",
+	newpassword: "",
+	confirmPassword: ""
+})
+
+// 验证码倒计时
+const countdown = ref(0)
+const codeText = computed(() => {
+	return countdown.value > 0 ? `${countdown.value}s` : "获取验证码"
+})
+const canSendCode = computed(() => {
+	return countdown.value === 0 && form.value.mobile.length === 11
+})
+
+// 是否可提交
+const canSubmit = computed(() => {
+	return form.value.mobile.length === 11 && 
+		form.value.captcha && 
+		form.value.newpassword.length >= 6 && 
+		form.value.confirmPassword
+})
+
+// 发送验证码
+async function sendCode() {
+	if (!canSendCode.value) return
+	
+	try {
+		uni.showLoading({ title: "发送中..." })
+		await sendSmsCode(form.value.mobile, "resetpwd")
+		uni.hideLoading()
+		uni.showToast({ title: "验证码已发送", icon: "none" })
+		
+		// 开始倒计时
+		countdown.value = 60
+		const timer = setInterval(() => {
+			countdown.value--
+			if (countdown.value <= 0) {
+				clearInterval(timer)
+			}
+		}, 1000)
+	} catch (err: any) {
+		uni.hideLoading()
+		uni.showToast({ title: err.message || "发送失败", icon: "none" })
+	}
+}
+
+// 重置密码
+async function toReset() {
+	if (!canSubmit.value) return
+	
+	if (form.value.mobile.length !== 11) {
+		uni.showToast({ title: "请输入正确的手机号", icon: "none" })
+		return
+	}
+	if (!form.value.captcha) {
+		uni.showToast({ title: "请输入验证码", icon: "none" })
+		return
+	}
+	if (form.value.newpassword.length < 6) {
+		uni.showToast({ title: "密码至少6位", icon: "none" })
+		return
+	}
+	if (form.value.newpassword !== form.value.confirmPassword) {
+		uni.showToast({ title: "两次密码不一致", icon: "none" })
+		return
+	}
+
+	try {
+		uni.showLoading({ title: "重置中..." })
+		await request({
+			url: "/user/resetpwd",
+			method: "POST",
+			data: {
+				type: "mobile",
+				mobile: form.value.mobile,
+				captcha: form.value.captcha,
+				newpassword: form.value.newpassword
+			}
+		})
+		uni.hideLoading()
+		uni.showToast({ title: "密码重置成功", icon: "success" })
+		
+		// 延迟跳转到登录页
+		setTimeout(() => {
+			uni.navigateBack()
+		}, 1500)
+	} catch (err: any) {
+		uni.hideLoading()
+		uni.showToast({ title: err.message || "重置失败", icon: "none" })
+	}
+}
+
+function toLogin() {
+	uni.navigateBack()
+}
+</script>
+
+<style>
+</style>

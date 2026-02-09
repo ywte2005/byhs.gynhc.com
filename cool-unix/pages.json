@@ -503,6 +503,18 @@
 					}
 				},
 				{
+					"path": "register",
+					"style": {
+						"navigationStyle": "custom"
+					}
+				},
+				{
+					"path": "forgot",
+					"style": {
+						"navigationStyle": "custom"
+					}
+				},
+				{
 					"path": "edit",
 					"style": {
 						"navigationBarTitleText": "个人资料"
