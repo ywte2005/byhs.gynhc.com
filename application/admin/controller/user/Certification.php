@@ -94,11 +94,12 @@ class Certification extends Backend
                 $count++;
             }
             Db::commit();
-            $this->success('审核通过成功，共处理' . $count . '条记录');
         } catch (\Exception $e) {
             Db::rollback();
             $this->error($e->getMessage());
         }
+        
+        $this->success('审核通过成功，共处理' . $count . '条记录');
     }
 
     /**
@@ -130,11 +131,12 @@ class Certification extends Backend
                     $count++;
                 }
                 Db::commit();
-                $this->success('审核拒绝成功，共处理' . $count . '条记录');
             } catch (\Exception $e) {
                 Db::rollback();
                 $this->error($e->getMessage());
             }
+            
+            $this->success('审核拒绝成功，共处理' . $count . '条记录');
         }
         
         $this->view->assign('ids', $ids);

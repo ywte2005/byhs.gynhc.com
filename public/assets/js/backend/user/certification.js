@@ -130,6 +130,30 @@ define(['jquery', 'bootstrap', 'backend', 'table', 'form'], function ($, undefin
             });
         },
         detail: function () {
+            // 审核通过按钮
+            $(document).on('click', '.btn-approve', function() {
+                var id = $(this).data('id');
+                Layer.confirm('确定要审核通过吗？', function() {
+                    Fast.api.ajax({
+                        url: 'user/certification/approve',
+                        data: {ids: id}
+                    }, function() {
+                        Layer.closeAll();
+                        location.reload();
+                    });
+                });
+            });
+            
+            // 审核拒绝按钮
+            $(document).on('click', '.btn-reject', function() {
+                var id = $(this).data('id');
+                Fast.api.open('user/certification/reject?ids=' + id, '审核拒绝', {
+                    callback: function() {
+                        location.reload();
+                    }
+                });
+            });
+            
             Controller.api.bindevent();
         },
         reject: function () {

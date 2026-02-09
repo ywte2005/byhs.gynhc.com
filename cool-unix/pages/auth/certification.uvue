@@ -176,8 +176,8 @@
 <script setup lang="uts">
 import { ref, computed, onMounted } from 'vue'
 import { submitCertification, getCertificationStatus } from '@/services/certification'
+import { uploadFile } from '@/services/upload'
 import { useUi } from '@/uni_modules/cool-ui'
-import { request } from '@/.cool'
 
 const ui = useUi()
 
@@ -260,28 +260,8 @@ onMounted(async () => {
 
 // 上传图片到服务器
 const uploadToServer = async (filePath: string): Promise<string> => {
-	return new Promise((resolve, reject) => {
-		uni.uploadFile({
-			url: '/api/common/upload',
-			filePath: filePath,
-			name: 'file',
-			success: (res) => {
-				try {
-					const data = JSON.parse(res.data)
-					if (data.code === 1 && data.data && data.data.url) {
-						resolve(data.data.url)
-					} else {
-						reject(new Error(data.msg || '上传失败'))
-					}
-				} catch (e) {
-					reject(e)
-				}
-			},
-			fail: (err) => {
-				reject(err)
-			}
-		})
-	})
+	const result = await uploadFile(filePath)
+	return result.url
 }
 
 // 提交

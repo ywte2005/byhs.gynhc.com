@@ -42,9 +42,9 @@ class User extends Api
     {
         $user = $this->auth->getUser();
         
-        // 检查是否已实名认证（通过verification字段判断）
-        $verification = $user->verification;
-        $isVerified = !empty($verification->mobile) || !empty($verification->email);
+        // 检查是否已实名认证（通过Certification表判断）
+        $certification = \app\common\model\Certification::getByUserId($user->id);
+        $isVerified = $certification && $certification->status === 'approved';
         
         // 检查是否为商户
         $merchant = \app\common\model\merchant\Merchant::getByUserId($user->id);

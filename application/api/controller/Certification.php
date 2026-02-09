@@ -93,13 +93,14 @@ class Certification extends Api
         
         try {
             $certification = CertificationModel::submit($userId, $data);
-            $this->success('提交成功，等待审核', [
-                'id' => $certification->id,
-                'status' => $certification->status
-            ]);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
+        
+        $this->success('提交成功，等待审核', [
+            'id' => $certification->id,
+            'status' => $certification->status
+        ]);
     }
 
     /**
