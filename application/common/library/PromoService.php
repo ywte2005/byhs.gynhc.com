@@ -193,6 +193,24 @@ class PromoService
             ->whereTime('createtime', 'month')
             ->sum('amount');
         
+        // 获取最近动态（最近5条佣金记录）
+        $recentList = Commission::where('user_id', $userId)
+            ->order('id', 'desc')
+            ->limit(5)
+            ->select();
+        $recentListData = [];
+        foreach ($recentList as $item) {
+            $recentListData[] = [
+                'id' => $item->id,
+                'type' => $item->type,
+                'amount' => $item->amount,
+                'status' => $item->status,
+                'status_text' => $item->status_text ?? '',
+                'remark' => $item->remark ?? '',
+                'createtime' => $item->createtime
+            ];
+        }
+        
         return [
             'level' => $level ? [
                 'id' => $level->id,
@@ -220,7 +238,8 @@ class PromoService
             'bonus' => [
                 'total_bonus' => $totalBonus,
                 'month_bonus' => $monthBonus
-            ]
+            ],
+            'recent_list' => $recentListData
         ];
     }
 

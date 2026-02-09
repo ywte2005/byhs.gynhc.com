@@ -17,7 +17,7 @@
 					</view>
 				</view>
 				<view class="flex flex-col gap-[12rpx]">
-					<view class="w-[48rpx] h-[48rpx] flex items-center justify-center mr-[16rpx]" @tap="toQrCode">
+					<view class="w-[48rpx] h-[48rpx] flex items-center justify-center mr-[16rpx]" @tap.stop="toQrCode">
 						<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
 					</view>
 				</view>
@@ -123,7 +123,92 @@ function toEdit() {
 }
 
 function toQrCode() {
-	uni.showToast({ title: '我的二维码', icon: 'none' });
+	// #ifdef APP-PLUS
+	uni.scanCode({
+		scanType: ['qrCode'],
+		success: (res) => {
+			handleScanResult(res.result)
+		},
+		fail: (err) => {
+			console.log('扫码失败', err)
+		}
+	})
+	// #endif
+	
+	// #ifdef MP-WEIXIN
+	uni.scanCode({
+		onlyFromCamera: false,
+		scanType: ['qrCode'],
+		success: (res) => {
+			handleScanResult(res.result)
+		},
+		fail: (err) => {
+			console.log('扫码失败', err)
+		}
+	})
+	// #endif
+	
+	// #ifdef H5
+	const ua = navigator.userAgent.toLowerCase()
+	const isWechat = ua.indexOf('micromessenger') !== -1
+	
+	if (isWechat) {
+		wxH5Scan()
+	} else {
+		uni.showModal({
+			title: '提示',
+			content: '请在微信中打开使用扫码功能，或前往邀请页面手动输入邀请码',
+			showCancel: false
+		})
+	}
+	// #endif
+}
+
+// 微信H5扫码
+function wxH5Scan() {
+	// #ifdef H5
+	if (typeof wx !== 'undefined' && wx.scanQRCode) {
+		wx.scanQRCode({
+			needResult: 1,
+			scanType: ['qrCode'],
+			success: (res: any) => {
+				handleScanResult(res.resultStr)
+			},
+			fail: (err: any) => {
+				console.log('微信扫码失败', err)
+				uni.showToast({ title: '扫码失败', icon: 'none' })
+			}
+		})
+	} else {
+		uni.showToast({ title: '请在微信中打开', icon: 'none' })
+	}
+	// #endif
+}
+
+// 处理扫码结果
+function handleScanResult(result: string) {
+	if (result.length == 0) {
+		uni.showToast({ title: '未识别到内容', icon: 'none' })
+		return
+	}
+	
+	let code = result
+	
+	if (result.indexOf('invite_code=') !== -1) {
+		const match = result.match(/invite_code=([^&]+)/)
+		if (match != null && match.length > 1) {
+			code = match[1]
+		}
+	} else if (result.indexOf('code=') !== -1) {
+		const match = result.match(/code=([^&]+)/)
+		if (match != null && match.length > 1) {
+			code = match[1]
+		}
+	}
+	
+	uni.navigateTo({
+		url: '/pages/promo/invite?parent_code=' + code
+	})
 }
 
 function toCert() {

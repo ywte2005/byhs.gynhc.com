@@ -112,6 +112,13 @@ class TaskService
         foreach ($pendingSubTasks as $subTask) {
             // 检查保证金是否足够覆盖这个子任务
             if (bccomp($remainingDeposit, $subTask->amount, 2) >= 0) {
+                // 冻结对应金额的保证金
+                WalletService::freezeDeposit($task->user_id, $subTask->amount, 'subtask_assign', $subTask->id, '子任务分配冻结保证金');
+                
+                // 更新任务冻结金额
+                $task->frozen_amount = bcadd($task->frozen_amount ?: '0', $subTask->amount, 2);
+                $task->save();
+                
                 // 释放子任务
                 $subTask->status = 'assigned';
                 $subTask->assigned_time = time();

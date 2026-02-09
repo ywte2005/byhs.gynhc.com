@@ -221,7 +221,6 @@ function goToPage(url: string) {
 // 扫码功能
 function scanCode() {
 	// #ifdef APP-PLUS
-	// APP端使用uni.scanCode
 	uni.scanCode({
 		scanType: ['qrCode'],
 		success: (res) => {
@@ -234,7 +233,6 @@ function scanCode() {
 	// #endif
 	
 	// #ifdef MP-WEIXIN
-	// 微信小程序使用wx.scanCode
 	uni.scanCode({
 		onlyFromCamera: false,
 		scanType: ['qrCode'],
@@ -248,15 +246,12 @@ function scanCode() {
 	// #endif
 	
 	// #ifdef H5
-	// H5端判断是否在微信浏览器中
 	const ua = navigator.userAgent.toLowerCase();
 	const isWechat = ua.indexOf('micromessenger') !== -1;
 	
 	if (isWechat) {
-		// 微信H5使用微信JSSDK扫码
 		wxH5Scan();
 	} else {
-		// 非微信H5提示
 		uni.showModal({
 			title: '提示',
 			content: '请在微信中打开使用扫码功能，或前往邀请页面手动输入邀请码',
@@ -269,14 +264,12 @@ function scanCode() {
 // 微信H5扫码
 function wxH5Scan() {
 	// #ifdef H5
-	// 检查wx对象是否存在
 	if (typeof wx !== 'undefined' && wx.scanQRCode) {
 		wx.scanQRCode({
 			needResult: 1,
 			scanType: ['qrCode'],
 			success: (res: any) => {
-				const result = res.resultStr;
-				handleScanResult(result);
+				handleScanResult(res.resultStr);
 			},
 			fail: (err: any) => {
 				console.log('微信扫码失败', err);
@@ -296,10 +289,8 @@ function handleScanResult(result: string) {
 		return;
 	}
 	
-	// 解析扫码结果，提取邀请码
 	let code = result;
 	
-	// 如果是URL格式，尝试提取邀请码参数
 	if (result.indexOf('invite_code=') !== -1) {
 		const match = result.match(/invite_code=([^&]+)/);
 		if (match != null && match.length > 1) {
@@ -312,7 +303,6 @@ function handleScanResult(result: string) {
 		}
 	}
 	
-	// 跳转到邀请页面并传递邀请码
 	uni.navigateTo({
 		url: '/pages/promo/invite?parent_code=' + code
 	});

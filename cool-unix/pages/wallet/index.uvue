@@ -138,12 +138,16 @@ const loadRecentLogs = async () => {
 	try {
 		const res = await getWalletLogs({ page: 1, limit: 5 })
 		if (res && res.list) {
-			recentLogs.value = res.list.map((item: any) => ({
-				bizTypeText: item.biz_type_text,
-				time: formatTime(item.createtime),
-				type: parseFloat(item.amount) >= 0 ? 'in' : 'out',
-				amount: Math.abs(parseFloat(item.amount)).toFixed(2)
-			}))
+			recentLogs.value = res.list.map((item: any) => {
+				// 根据 change_type 判断收入/支出
+				const isIncome = item.change_type === 'income' || item.change_type === 'unfreeze'
+				return {
+					bizTypeText: item.biz_type_text,
+					time: formatTime(item.createtime),
+					type: isIncome ? 'in' : 'out',
+					amount: parseFloat(item.amount).toFixed(2)
+				}
+			})
 		}
 	} catch (err: any) {
 		console.error('加载交易记录失败', err)

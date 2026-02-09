@@ -10,20 +10,17 @@
 		</cl-topbar>
 
 		<!-- 标签栏 -->
-		<view class="bg-white border-b-2 border-[#f5f7fa]">
-			<view class="flex flex-row gap-6">
-				<view 
-					v-for="(tab, index) in tabs" 
-					:key="index"
-					@click="selectTab(tab.value)"
-					class="flex-1 flex flex-col items-center justify-center px-6 py-4 rounded-lg"
-				>
-					<text :class="['text-lg', currentTab === tab.value ? 'text-[#0052d9] font-medium' : 'text-[#646a73]']">
-						{{ tab.label }}
-					</text>
-					<view v-if="currentTab === tab.value" class="w-10 h-1 bg-[#0052d9] rounded-sm mt-3"></view>
-				</view>
-			</view>
+		<view class="bg-white border-b-[2rpx] border-[#f0f0f0]">
+			<cl-tabs 
+				v-model="currentTab" 
+				:list="tabs" 
+				:show-line="true"
+				:show-slider="false"
+				:gutter="16"
+				color="#0052d9"
+				un-color="#646a73"
+				@change="onTabChange"
+			/>
 		</view>
 
 		<!-- 账单列表 -->
@@ -64,7 +61,7 @@
 				<view v-if="loading" class="flex justify-center py-[32rpx]">
 					<text class="text-[26rpx] text-[#9aa0a6]">加载中...</text>
 				</view>
-				<view v-if="!hasMore && logList.length > 0" class="flex justify-center py-[32rpx]">
+				<view v-if="!hasMore && logList.length > 0" class="flex items-center justify-center py-[32rpx]">
 					<text class="text-[26rpx] text-[#9aa0a6]">没有更多了</text>
 				</view>
 				<view v-if="logList.length === 0 && !loading" class="flex flex-col items-center justify-center py-[120rpx] gap-[24rpx]">
@@ -168,9 +165,8 @@ const timeRanges = [
 	{ label: '近三月', value: 'quarter' }
 ]
 
-// 选择标签
-const selectTab = (value: string) => {
-	currentTab.value = value
+// 标签变化
+const onTabChange = (value: string) => {
 	page.value = 1
 	logList.value = []
 	loadLogList()

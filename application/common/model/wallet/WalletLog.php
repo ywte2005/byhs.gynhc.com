@@ -41,6 +41,8 @@ class WalletLog extends Model
         'subtask_amount' => '刷单金额',
         'subtask_commission' => '刷单佣金',
         'subtask_complete' => '刷单收入',
+        'subtask_assign' => '子任务分配',
+        'subtask_fail' => '子任务失败',
         'service_fee' => '服务费',
         'bonus' => '分红',
         'reward' => '奖励',
