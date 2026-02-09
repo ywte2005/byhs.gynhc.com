@@ -202,7 +202,10 @@ class PromoService
         foreach ($recentList as $item) {
             $recentListData[] = [
                 'id' => $item->id,
-                'type' => $item->type,
+                'reward_type' => $item->reward_type,
+                'reward_type_text' => $item->reward_type_text ?? '',
+                'scene' => $item->scene,
+                'scene_text' => $item->scene_text ?? '',
                 'amount' => $item->amount,
                 'status' => $item->status,
                 'status_text' => $item->status_text ?? '',

@@ -13,12 +13,8 @@
 							<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
 						</view>
 						<view class="flex flex-col items-end gap-[8rpx]">
-							<text class="text-[32rpx] font-bold text-[#ff3b30]">+{{ item.amount }}</text>
-							<text class="text-[24rpx]" :class="{
-								'text-[#00b578]': item.status === 'granted',
-								'text-[#faad14]': item.status === 'pending',
-								'text-[#f53f3f]': item.status === 'failed'
-							}">{{ getStatusName(item.status) }}</text>
+							<text class="text-[32rpx] font-bold text-[#00b578]">+{{ item.amount }}</text>
+							<text class="text-[24rpx]" :class="item.status === 'settled' ? 'text-[#00b578]' : 'text-[#faad14]'">{{ item.status_text }}</text>
 						</view>
 					</view>
 					
@@ -79,14 +75,6 @@
 					'bonus': '分红'
 				};
 				return (map[type] ?? type) as string;
-			},
-			getStatusName(status : string) : string {
-				const map : UTSJSONObject = {
-					'pending': '待发放',
-					'granted': '已发放',
-					'failed': '发放失败'
-				};
-				return (map[status] ?? status) as string;
 			},
 			formatTime(timestamp : number) : string {
 				const date = new Date(timestamp * 1000);

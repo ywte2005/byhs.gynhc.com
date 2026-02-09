@@ -13,25 +13,43 @@ class RewardService
 {
     public static function triggerReward($scene, $userId, $baseAmount, $bizId = 0)
     {
+        \think\Log::info("[RewardService] triggerReward called - scene: {$scene}, userId: {$userId}, baseAmount: {$baseAmount}, bizId: {$bizId}");
+        
         $rules = RewardRule::getRulesByScene($scene);
+        \think\Log::info("[RewardService] Found " . count($rules) . " rules for scene: {$scene}");
+        
         $relation = Relation::getByUserId($userId);
         
-        if (!$relation || !$relation->parent_id) {
+        if (!$relation) {
+            \think\Log::info("[RewardService] No relation found for userId: {$userId}");
             return [];
         }
+        
+        if (!$relation->parent_id) {
+            \think\Log::info("[RewardService] User {$userId} has no parent_id (parent_id: {$relation->parent_id})");
+            return [];
+        }
+        
+        \think\Log::info("[RewardService] User {$userId} has parent_id: {$relation->parent_id}");
         
         $results = [];
         foreach ($rules as $rule) {
             try {
+                \think\Log::info("[RewardService] Processing rule: {$rule->id} - {$rule->name}, type: {$rule->reward_type}");
                 $result = self::processRule($rule, $userId, $relation, $baseAmount, $bizId);
                 if ($result) {
+                    \think\Log::info("[RewardService] Rule {$rule->id} processed successfully, commission created");
                     $results[] = $result;
+                } else {
+                    \think\Log::info("[RewardService] Rule {$rule->id} returned null");
                 }
             } catch (\Exception $e) {
+                \think\Log::error("[RewardService] Rule {$rule->id} exception: " . $e->getMessage());
                 continue;
             }
         }
         
+        \think\Log::info("[RewardService] triggerReward completed, " . count($results) . " commissions created");
         return $results;
     }
 
@@ -60,29 +78,42 @@ class RewardService
 
     protected static function processDirectReward($rule, $sourceUserId, $parentChain, $baseAmount, $bizId)
     {
+        \think\Log::info("[RewardService] processDirectReward - sourceUserId: {$sourceUserId}, parentChain count: " . count($parentChain));
+        
         if (empty($parentChain)) {
+            \think\Log::info("[RewardService] processDirectReward - parentChain is empty");
             return null;
         }
         
         $directParent = $parentChain[0] ?? null;
         if (!$directParent) {
+            \think\Log::info("[RewardService] processDirectReward - directParent is null");
             return null;
         }
         
+        \think\Log::info("[RewardService] processDirectReward - directParent user_id: {$directParent->user_id}, level_id: {$directParent->level_id}");
+        
         // 检查等级要求
         if (!self::checkLevelRequire($rule, $directParent)) {
+            \think\Log::info("[RewardService] processDirectReward - checkLevelRequire failed");
             return null;
         }
         
         // 检查增量门槛
         if (!self::checkGrowthRequire($rule, $directParent->user_id)) {
+            \think\Log::info("[RewardService] processDirectReward - checkGrowthRequire failed");
             return null;
         }
         
         $amount = self::calculateAmount($rule, $baseAmount);
+        \think\Log::info("[RewardService] processDirectReward - calculated amount: {$amount}");
+        
         if (bccomp($amount, '0', 2) <= 0) {
+            \think\Log::info("[RewardService] processDirectReward - amount is zero or negative");
             return null;
         }
+        
+        \think\Log::info("[RewardService] processDirectReward - creating commission for user {$directParent->user_id}, amount: {$amount}");
         
         $commission = Commission::createCommission(
             $directParent->user_id,
@@ -95,7 +126,11 @@ class RewardService
             '直推奖励'
         );
         
+        \think\Log::info("[RewardService] processDirectReward - commission created, id: {$commission->id}, settling...");
+        
         self::settleCommission($commission);
+        
+        \think\Log::info("[RewardService] processDirectReward - commission settled");
         
         return $commission;
     }

@@ -14,6 +14,8 @@ class SettlementService
 {
     public static function settleSubTask($subTask)
     {
+        \think\Log::info("[SettlementService] settleSubTask called - subTask id: {$subTask->id}, to_user_id: {$subTask->to_user_id}, from_user_id: {$subTask->from_user_id}");
+        
         Db::startTrans();
         try {
             $task = MutualTask::find($subTask->task_id);
@@ -23,6 +25,8 @@ class SettlementService
             $amount = $subTask->amount;
             $commission = $subTask->commission;
             $serviceFee = $subTask->service_fee;
+            
+            \think\Log::info("[SettlementService] settleSubTask - amount: {$amount}, commission: {$commission}, serviceFee: {$serviceFee}");
             
             // 分开记录刷单金额和佣金
             WalletService::changeBalance($toUserId, $amount, 'subtask_amount', $subTask->id, "刷单收入（本次刷单¥{$amount}，佣金¥{$commission}）");
@@ -43,17 +47,22 @@ class SettlementService
             }
             $task->save();
             
+            \think\Log::info("[SettlementService] settleSubTask - calling RewardService::updatePerformance for user {$toUserId}");
             RewardService::updatePerformance($toUserId, $amount);
             
-            RewardService::triggerReward('order_complete', $toUserId, $amount, $subTask->id);
+            \think\Log::info("[SettlementService] settleSubTask - calling RewardService::triggerReward('order_complete', {$toUserId}, {$amount}, {$subTask->id})");
+            $rewardResults = RewardService::triggerReward('order_complete', $toUserId, $amount, $subTask->id);
+            \think\Log::info("[SettlementService] settleSubTask - triggerReward returned " . count($rewardResults) . " results");
             
             // 检查是否满足自动升级条件
             PromoService::checkAutoUpgrade($toUserId);
             
             Db::commit();
+            \think\Log::info("[SettlementService] settleSubTask - completed successfully");
             return true;
         } catch (\Exception $e) {
             Db::rollback();
+            \think\Log::error("[SettlementService] settleSubTask - exception: " . $e->getMessage());
             throw $e;
         }
     }

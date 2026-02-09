@@ -70,14 +70,26 @@
 				<!-- Recent List -->
 				<view class="text-[32rpx] font-semibold text-[#1f2329] mt-[16rpx]">最近动态</view>
 				<view class="flex flex-col gap-[16rpx]">
-					<view v-for="(item, index) in recentList" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row items-center gap-[24rpx]">
-						<view class="w-[80rpx] h-[80rpx] bg-[#f5f7fa] rounded-[40rpx] flex items-center justify-center">
-							<uni-icons type="notification" size="20" color="#0052d9"></uni-icons>
+					<view v-for="(item, index) in recentList" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-row justify-between items-center">
+						<view class="flex flex-row items-center gap-[24rpx]">
+							<view class="w-[80rpx] h-[80rpx] bg-[#e8f3ff] rounded-[40rpx] flex items-center justify-center">
+								<uni-icons type="wallet-filled" size="20" color="#0052d9"></uni-icons>
+							</view>
+							<view class="flex flex-col gap-[8rpx]">
+								<text class="text-[28rpx] text-[#1f2329] font-medium">{{ item.reward_type_text || '佣金收入' }}</text>
+								<text class="text-[24rpx] text-[#646a73]">{{ item.scene_text || '' }} · {{ item.remark || '' }}</text>
+								<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
+							</view>
 						</view>
-						<view class="flex flex-col gap-[8rpx]">
-							<text class="text-[28rpx] text-[#1f2329]">{{ item.content }}</text>
-							<text class="text-[24rpx] text-[#999999]">{{ item.time }}</text>
+						<view class="flex flex-col items-end gap-[8rpx]">
+							<text class="text-[32rpx] font-bold text-[#00b578]">+{{ item.amount }}</text>
+							<text class="text-[22rpx]" :class="item.status === 'settled' ? 'text-[#00b578]' : 'text-[#faad14]'">{{ item.status_text || '' }}</text>
 						</view>
+					</view>
+					<!-- 空状态 -->
+					<view v-if="recentList.length === 0" class="bg-white rounded-[24rpx] p-[48rpx] flex flex-col items-center justify-center gap-[16rpx]">
+						<uni-icons type="notification" size="40" color="#dcdfe6"></uni-icons>
+						<text class="text-[28rpx] text-[#999999]">暂无最近动态</text>
 					</view>
 				</view>
 			</view>
@@ -158,6 +170,16 @@
 			},
 			goToLevel() {
 				uni.navigateTo({ url: '/pages/promo/level' });
+			},
+			formatTime(timestamp : number) : string {
+				if (!timestamp) return '';
+				const date = new Date(timestamp * 1000);
+				const y = date.getFullYear();
+				const m = String(date.getMonth() + 1).padStart(2, '0');
+				const d = String(date.getDate()).padStart(2, '0');
+				const h = String(date.getHours()).padStart(2, '0');
+				const min = String(date.getMinutes()).padStart(2, '0');
+				return `${y}-${m}-${d} ${h}:${min}`;
 			}
 		}
 	};

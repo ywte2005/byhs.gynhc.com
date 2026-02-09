@@ -6,7 +6,8 @@ use think\Model;
 class Commission extends Model
 {
     protected $name = 'promo_commission';
-    protected $autoWriteTimestamp = 'createtime';
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
     protected $updateTime = false;
 
     protected $append = [
