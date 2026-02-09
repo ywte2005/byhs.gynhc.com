@@ -12,6 +12,9 @@ export type UserInfo = {
 	city?: string; // 城市
 	district?: string; // 区县
 	birthday?: string; // 生日
+	isVerified?: boolean; // 是否已认证
+	isMerchant?: boolean; // 是否为商户
+	merchantStatus?: string; // 商户状态: none, pending, approved, rejected, disabled
 	createTime: string; // 创建时间
 	updateTime: string; // 更新时间
 };

@@ -1,0 +1,171 @@
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>认证详情</em></div>
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">用户ID:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.user_id}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">用户名:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.user.username|default='-'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">认证类型:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.type_text}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">真实姓名:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.name}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">身份证号:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.id_card}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">联系电话:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.contact_phone}</p>
+                        </div>
+                    </div>
+                    {if $row.type == 'enterprise'}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">企业名称:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.enterprise_name}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">信用代码:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.credit_code}</p>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">状态:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">
+                                {if $row.status == 'pending'}
+                                <span class="label label-warning">{$row.status_text}</span>
+                                {elseif $row.status == 'approved'}
+                                <span class="label label-success">{$row.status_text}</span>
+                                {else}
+                                <span class="label label-danger">{$row.status_text}</span>
+                                {/if}
+                            </p>
+                        </div>
+                    </div>
+                    {if $row.status == 'rejected' && $row.reject_reason}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">拒绝原因:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static text-danger">{$row.reject_reason}</p>
+                        </div>
+                    </div>
+                    {/if}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">提交时间:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.createtime|datetime}</p>
+                        </div>
+                    </div>
+                    {if $row.audit_time}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">审核时间:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.audit_time|datetime}</p>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">身份证正面:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            {if $row.id_card_front}
+                            <a href="{$row.id_card_front}" target="_blank">
+                                <img src="{$row.id_card_front}" style="max-width:300px;max-height:200px;">
+                            </a>
+                            {else}
+                            <p class="form-control-static">-</p>
+                            {/if}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">身份证反面:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            {if $row.id_card_back}
+                            <a href="{$row.id_card_back}" target="_blank">
+                                <img src="{$row.id_card_back}" style="max-width:300px;max-height:200px;">
+                            </a>
+                            {else}
+                            <p class="form-control-static">-</p>
+                            {/if}
+                        </div>
+                    </div>
+                    {if $row.type == 'enterprise'}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">营业执照:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            {if $row.business_license}
+                            <a href="{$row.business_license}" target="_blank">
+                                <img src="{$row.business_license}" style="max-width:300px;max-height:200px;">
+                            </a>
+                            {else}
+                            <p class="form-control-static">-</p>
+                            {/if}
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+            {if $row.status == 'pending'}
+            <div class="row">
+                <div class="col-md-12 text-center" style="margin-top:20px;">
+                    <a href="javascript:;" class="btn btn-success btn-approve" data-id="{$row.id}"><i class="fa fa-check"></i> 审核通过</a>
+                    <a href="javascript:;" class="btn btn-danger btn-reject" data-id="{$row.id}"><i class="fa fa-times"></i> 审核拒绝</a>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $('.btn-approve').click(function(){
+        var id = $(this).data('id');
+        Layer.confirm('确定要审核通过吗？', function(){
+            Fast.api.ajax({
+                url: 'user/certification/approve',
+                data: {ids: id}
+            }, function(){
+                Layer.closeAll();
+                location.reload();
+            });
+        });
+    });
+    $('.btn-reject').click(function(){
+        var id = $(this).data('id');
+        Fast.api.open('user/certification/reject?ids=' + id, '审核拒绝', {
+            callback: function(){
+                location.reload();
+            }
+        });
+    });
+});
+</script>

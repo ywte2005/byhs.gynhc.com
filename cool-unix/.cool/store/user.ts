@@ -118,11 +118,22 @@ export class User {
 			this.info.value![key] = value;
 		});
 
+		// 转换字段名适配后端API
+		const postData: any = {};
+		if (data.nickName !== undefined) postData.nickname = data.nickName;
+		if (data.avatarUrl !== undefined) postData.avatar = data.avatarUrl;
+		if (data.description !== undefined) postData.bio = data.description;
+		if (data.gender !== undefined) postData.gender = data.gender;
+		if (data.birthday !== undefined) postData.birthday = data.birthday;
+		if (data.province !== undefined) postData.province = data.province;
+		if (data.city !== undefined) postData.city = data.city;
+		if (data.district !== undefined) postData.district = data.district;
+
 		// 同步到服务端
 		await request({
-			url: "/app/user/info/updatePerson",
+			url: "/user/profile",
 			method: "POST",
-			data
+			data: postData
 		});
 	}
 

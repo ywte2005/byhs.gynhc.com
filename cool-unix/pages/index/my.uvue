@@ -8,10 +8,10 @@
 				<view class="flex-1 flex flex-col gap-[12rpx]">
 					<text class="text-[40rpx] font-semibold text-white">{{ userInfo?.nickName || '点击登录' }}</text>
 					<view class="flex flex-row gap-[16rpx]" v-if="userInfo?.phone">
-						<view class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-white/20">
+						<view v-if="userInfo?.isVerified" class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-white/20">
 							<text class="text-[22rpx] text-white">已认证</text>
 						</view>
-						<view class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-[#fff7e6]/20">
+						<view v-if="userInfo?.isMerchant" class="h-[44rpx] px-[16rpx] rounded-[8rpx] flex items-center justify-center bg-[#fff7e6]/20">
 							<text class="text-[22rpx] text-[#faad14]">商户</text>
 						</view>
 					</view>

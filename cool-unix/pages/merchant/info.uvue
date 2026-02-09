@@ -3,7 +3,7 @@
 		<!-- 顶部导航 -->
 		<cl-topbar title="商户信息" :show-back="true" background-color="#ffffff" color="#1f2329" safe-area-top>
 			<template #append>
-				<view @click="toggleEdit" class="flex items-center px-[32rpx] h-full">
+				<view @click="toggleEdit" class="h-full flex items-center justify-center px-[32rpx]">
 					<text class="text-[28rpx] text-[#0052d9]">{{ isEditing ? '保存' : '编辑' }}</text>
 				</view>
 			</template>
@@ -12,21 +12,24 @@
 		<!-- 内容区域 -->
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
-				<!-- 商户头像 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx]">
-					<view class="flex items-center">
-						<view class="w-[160rpx] h-[160rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center mr-[32rpx]">
-							<uni-icons type="shop" size="40" color="#0052d9"></uni-icons>
+				<!-- 商户头像卡片 - 美化版 -->
+				<view class="bg-gradient-to-br from-[#0052d9] to-[#2979ff] rounded-[24rpx] p-[32rpx] shadow-lg">
+					<view class="flex flex-row items-center">
+						<view class="w-[140rpx] h-[140rpx] rounded-[24rpx] bg-white/20 flex items-center justify-center mr-[28rpx]">
+							<uni-icons type="shop" size="48" color="#ffffff"></uni-icons>
 						</view>
-						<view class="flex-1">
-							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.name }}</text>
-							<text class="text-[28rpx] text-[#999999] mt-[8rpx]">商户编号：{{ merchantInfo.merchantNo }}</text>
-							<view class="flex flex-row items-center mt-[16rpx]">
-								<view class="bg-[#0052d9] rounded-[8rpx] px-[16rpx] py-[4rpx] mr-[16rpx]">
-									<text class="text-[24rpx] text-white">{{ merchantInfo.level }}</text>
+						<view class="flex-1 flex flex-col gap-[12rpx]">
+							<text class="text-[36rpx] font-bold text-white">{{ merchantInfo.name || '未设置' }}</text>
+							<view class="flex flex-row items-center gap-[8rpx]">
+								<uni-icons type="info" size="14" color="rgba(255,255,255,0.7)"></uni-icons>
+								<text class="text-[26rpx] text-white/70">{{ merchantInfo.merchantNo || '-' }}</text>
+							</view>
+							<view class="flex flex-row items-center gap-[16rpx] mt-[8rpx]">
+								<view class="bg-white/20 rounded-[8rpx] px-[16rpx] py-[6rpx]">
+									<text class="text-[24rpx] text-white font-medium">{{ merchantInfo.level || 'VIP' }}</text>
 								</view>
-								<view class="bg-[#ff9500] rounded-[8rpx] px-[16rpx] py-[4rpx]">
-									<text class="text-[24rpx] text-white">信用分：{{ merchantInfo.credit }}</text>
+								<view class="bg-[#ff9500]/80 rounded-[8rpx] px-[16rpx] py-[6rpx]">
+									<text class="text-[24rpx] text-white font-medium">信用 {{ merchantInfo.credit || 0 }}</text>
 								</view>
 							</view>
 						</view>
@@ -175,36 +178,47 @@
 					</view>
 				</view>
 
-				<!-- 账户统计 -->
-				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] flex flex-col gap-[32rpx]">
-					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[8rpx]">账户统计</text>
+				<!-- 账户统计 - 美化版 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[24rpx]">
+					<text class="text-[32rpx] font-bold text-[#1f2329]">账户统计</text>
 					
-					<view class="flex items-center justify-between">
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.totalOrders }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">总订单数</text>
+					<!-- 第一行：任务统计 -->
+					<view class="flex flex-row">
+						<view class="flex-1 flex flex-col items-center py-[20rpx]">
+							<text class="text-[44rpx] font-bold text-[#1f2329] font-['DIN_Alternate']">{{ merchantInfo.totalOrders || 0 }}</text>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[12rpx]">总任务数</text>
 						</view>
-						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.completedOrders }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">完成订单</text>
+						<view class="w-[1rpx] bg-[#f0f0f0] my-[16rpx]"></view>
+						<view class="flex-1 flex flex-col items-center py-[20rpx]">
+							<text class="text-[44rpx] font-bold text-[#00b578] font-['DIN_Alternate']">{{ merchantInfo.completedOrders || 0 }}</text>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[12rpx]">已完成</text>
 						</view>
-						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#1f2329]">{{ merchantInfo.completionRate }}%</text>
-							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">完成率</text>
+						<view class="w-[1rpx] bg-[#f0f0f0] my-[16rpx]"></view>
+						<view class="flex-1 flex flex-col items-center py-[20rpx]">
+							<text class="text-[44rpx] font-bold text-[#0052d9] font-['DIN_Alternate']">{{ merchantInfo.completionRate || 0 }}<text class="text-[28rpx]">%</text></text>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[12rpx]">完成率</text>
 						</view>
 					</view>
 
-					<view class="flex items-center justify-between border-t-[2rpx] border-[#e5e5e5] pt-[32rpx]">
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#0052d9]">¥{{ merchantInfo.totalIncome }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">累计收入</text>
+					<!-- 分隔线 -->
+					<view class="h-[1rpx] bg-[#f0f0f0]"></view>
+
+					<!-- 第二行：收入统计 -->
+					<view class="flex flex-row">
+						<view class="flex-1 flex flex-col items-center py-[20rpx]">
+							<view class="flex flex-row items-baseline">
+								<text class="text-[28rpx] text-[#0052d9] mr-[4rpx]">¥</text>
+								<text class="text-[44rpx] font-bold text-[#0052d9] font-['DIN_Alternate']">{{ merchantInfo.totalIncome || '0.00' }}</text>
+							</view>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[12rpx]">累计收入</text>
 						</view>
-						<view class="w-[2rpx] h-[64rpx] bg-[#e5e5e5]"></view>
-						<view class="flex-1 flex flex-col items-center">
-							<text class="text-[40rpx] font-bold text-[#ff9500]">¥{{ merchantInfo.totalCommission }}</text>
-							<text class="text-[24rpx] text-[#999999] mt-[8rpx]">累计佣金</text>
+						<view class="w-[1rpx] bg-[#f0f0f0] my-[16rpx]"></view>
+						<view class="flex-1 flex flex-col items-center py-[20rpx]">
+							<view class="flex flex-row items-baseline">
+								<text class="text-[28rpx] text-[#ff9500] mr-[4rpx]">¥</text>
+								<text class="text-[44rpx] font-bold text-[#ff9500] font-['DIN_Alternate']">{{ merchantInfo.totalCommission || '0.00' }}</text>
+							</view>
+							<text class="text-[24rpx] text-[#9aa0a6] mt-[12rpx]">累计佣金</text>
 						</view>
 					</view>
 				</view>
@@ -232,29 +246,29 @@ const isEditing = ref(false)
 
 // 商户信息
 const merchantInfo = ref({
-	merchantNo: 'M202501290001',
+	merchantNo: '',
 	type: 'personal',
-	name: '示例商户',
-	contact: '张三',
-	phone: '13800138000',
-	address: '广东省深圳市南山区科技园',
-	category: '餐饮',
+	name: '',
+	contact: '',
+	phone: '',
+	address: '',
+	category: '',
 	level: 'VIP',
-	credit: 98,
-	joinTime: '2025-01-15 10:30:00',
+	credit: 0,
+	joinTime: '',
 	creditCode: '',
 	legalPerson: '',
 	legalIdCard: '',
-	realName: '张三',
-	idCard: '440***********1234',
+	realName: '',
+	idCard: '',
 	idCardFront: '',
 	idCardBack: '',
 	businessLicense: '',
-	totalOrders: 156,
-	completedOrders: 148,
-	completionRate: 94.9,
-	totalIncome: '125,800.00',
-	totalCommission: '12,580.00'
+	totalOrders: 0,
+	completedOrders: 0,
+	completionRate: 0,
+	totalIncome: '0.00',
+	totalCommission: '0.00'
 })
 
 // 原始数据备份
@@ -269,9 +283,34 @@ const loadMerchantInfo = async () => {
 		
 		uni.hideLoading()
 		
-		if (res.code === 0) {
-			merchantInfo.value = res.data
-			originalInfo.value = JSON.parse(JSON.stringify(res.data))
+		if (res) {
+			// 映射后端数据到前端格式
+			merchantInfo.value = {
+				merchantNo: res.merchant_no || '',
+				type: res.type || 'personal',
+				name: res.name || '',
+				contact: res.legal_name || '',
+				phone: res.contact_phone || '',
+				address: res.contact_address || '',
+				category: res.category || '',
+				level: res.level || 'VIP',
+				credit: res.credit_score || 0,
+				joinTime: res.createtime || '',
+				creditCode: res.credit_code || '',
+				legalPerson: res.legal_name || '',
+				legalIdCard: res.id_card || '',
+				realName: res.legal_name || '',
+				idCard: res.id_card || '',
+				idCardFront: res.id_card_front || '',
+				idCardBack: res.id_card_back || '',
+				businessLicense: res.business_license || '',
+				totalOrders: res.total_tasks || 0,
+				completedOrders: res.completed_tasks || 0,
+				completionRate: res.completion_rate || 0,
+				totalIncome: res.total_income || '0.00',
+				totalCommission: res.total_commission || '0.00'
+			}
+			originalInfo.value = JSON.parse(JSON.stringify(merchantInfo.value))
 		}
 	} catch (error) {
 		uni.hideLoading()

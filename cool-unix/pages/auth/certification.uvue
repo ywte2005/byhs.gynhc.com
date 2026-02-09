@@ -174,8 +174,12 @@
 </template>
 
 <script setup lang="uts">
-import { ref, computed } from 'vue'
-import { registerMerchant } from '@/services/merchant'
+import { ref, computed, onMounted } from 'vue'
+import { submitCertification, getCertificationStatus } from '@/services/certification'
+import { useUi } from '@/uni_modules/cool-ui'
+import { request } from '@/.cool'
+
+const ui = useUi()
 
 // 表单数据
 const form = ref({
@@ -222,6 +226,64 @@ const uploadImage = (field: string) => {
 	})
 }
 
+// 检查认证状态
+onMounted(async () => {
+	try {
+		const res = await getCertificationStatus()
+		if (res && res.status && res.status !== 'none') {
+			if (res.status === 'pending') {
+				ui.showConfirm({
+					title: '提示',
+					message: '您已提交认证申请，正在审核中',
+					showCancelButton: false,
+					confirmButtonText: '知道了',
+					success: () => {
+						uni.navigateBack()
+					}
+				})
+			} else if (res.status === 'approved') {
+				ui.showConfirm({
+					title: '提示',
+					message: '您已通过实名认证',
+					showCancelButton: false,
+					confirmButtonText: '知道了',
+					success: () => {
+						uni.navigateBack()
+					}
+				})
+			}
+		}
+	} catch (e) {
+		console.log('检查认证状态失败', e)
+	}
+})
+
+// 上传图片到服务器
+const uploadToServer = async (filePath: string): Promise<string> => {
+	return new Promise((resolve, reject) => {
+		uni.uploadFile({
+			url: '/api/common/upload',
+			filePath: filePath,
+			name: 'file',
+			success: (res) => {
+				try {
+					const data = JSON.parse(res.data)
+					if (data.code === 1 && data.data && data.data.url) {
+						resolve(data.data.url)
+					} else {
+						reject(new Error(data.msg || '上传失败'))
+					}
+				} catch (e) {
+					reject(e)
+				}
+			},
+			fail: (err) => {
+				reject(err)
+			}
+		})
+	})
+}
+
 // 提交
 const submit = async () => {
 	if (!canSubmit.value) return
@@ -229,47 +291,57 @@ const submit = async () => {
 	try {
 		uni.showLoading({ title: '提交中...' })
 		
+		// 上传图片并获取服务器URL
+		let idCardFrontUrl = form.value.idCardFront
+		let idCardBackUrl = form.value.idCardBack
+		let businessLicenseUrl = form.value.businessLicense
+		
+		// 如果是本地文件路径，需要上传
+		if (idCardFrontUrl && !idCardFrontUrl.startsWith('http')) {
+			idCardFrontUrl = await uploadToServer(idCardFrontUrl)
+		}
+		if (idCardBackUrl && !idCardBackUrl.startsWith('http')) {
+			idCardBackUrl = await uploadToServer(idCardBackUrl)
+		}
+		if (businessLicenseUrl && !businessLicenseUrl.startsWith('http')) {
+			businessLicenseUrl = await uploadToServer(businessLicenseUrl)
+		}
+		
 		// 构造提交数据
 		const payload = {
-			name: form.value.type === 'enterprise' ? form.value.enterpriseName : form.value.name,
-			legal_name: form.value.name,
+			type: form.value.type,
+			name: form.value.name,
 			id_card: form.value.idCard,
 			contact_phone: form.value.phone,
-			id_card_front: form.value.idCardFront,
-			id_card_back: form.value.idCardBack,
-			business_license: form.value.businessLicense,
-			// Optional fields required by type
-			bank_name: '',
-			bank_account: '',
-			bank_branch: '',
-			// Enterprise specific
-			credit_code: form.value.creditCode
+			id_card_front: idCardFrontUrl,
+			id_card_back: idCardBackUrl,
+			enterprise_name: form.value.enterpriseName,
+			credit_code: form.value.creditCode,
+			business_license: businessLicenseUrl
 		}
 
-		const res = await registerMerchant(payload as any)
+		const res = await submitCertification(payload as any)
 		
 		uni.hideLoading()
 		
-		if (res.code === 0) {
+		if (res && res.id) {
 			uni.showToast({
 				title: '提交成功',
 				icon: 'success'
 			})
 			setTimeout(() => {
-				uni.redirectTo({
-					url: '/pages/merchant/audit-status'
-				})
+				uni.navigateBack()
 			}, 1500)
 		} else {
 			uni.showToast({
-				title: res.msg || '提交失败',
+				title: '提交失败',
 				icon: 'none'
 			})
 		}
-	} catch (error) {
+	} catch (error: any) {
 		uni.hideLoading()
 		uni.showToast({
-			title: '提交失败，请重试',
+			title: error.message || '提交失败，请重试',
 			icon: 'none'
 		})
 	}

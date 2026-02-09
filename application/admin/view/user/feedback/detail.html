@@ -1,0 +1,131 @@
+<div class="panel panel-default panel-intro">
+    <div class="panel-heading">
+        <div class="panel-lead"><em>反馈详情</em></div>
+    </div>
+    <div class="panel-body">
+        <div class="form-horizontal">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">用户ID:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.user_id}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">用户昵称:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.user.nickname|default='-'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">反馈类型:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.type_text}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">标题:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.title|default='-'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">内容:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.content}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">联系方式:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.contact|default='-'}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">状态:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">
+                                {if $row.status == 'pending'}
+                                <span class="label label-warning">{$row.status_text}</span>
+                                {elseif $row.status == 'processing'}
+                                <span class="label label-info">{$row.status_text}</span>
+                                {elseif $row.status == 'replied'}
+                                <span class="label label-success">{$row.status_text}</span>
+                                {else}
+                                <span class="label label-default">{$row.status_text}</span>
+                                {/if}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">提交时间:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.createtime|datetime}</p>
+                        </div>
+                    </div>
+                    {if $row.reply}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">回复内容:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static text-success">{$row.reply}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">回复时间:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            <p class="form-control-static">{$row.reply_time|datetime}</p>
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+                <div class="col-md-6">
+                    {if $row.images_arr}
+                    <div class="form-group">
+                        <label class="control-label col-xs-12 col-sm-3">附件图片:</label>
+                        <div class="col-xs-12 col-sm-9">
+                            {foreach $row.images_arr as $img}
+                            <a href="{$img}" target="_blank" style="display:inline-block;margin:5px;">
+                                <img src="{$img}" style="max-width:200px;max-height:150px;">
+                            </a>
+                            {/foreach}
+                        </div>
+                    </div>
+                    {/if}
+                </div>
+            </div>
+            {if $row.status != 'closed' && $row.status != 'replied'}
+            <div class="row">
+                <div class="col-md-12 text-center" style="margin-top:20px;">
+                    <a href="javascript:;" class="btn btn-success btn-reply" data-id="{$row.id}"><i class="fa fa-reply"></i> 回复</a>
+                    <a href="javascript:;" class="btn btn-danger btn-close-feedback" data-id="{$row.id}"><i class="fa fa-times"></i> 关闭</a>
+                </div>
+            </div>
+            {/if}
+        </div>
+    </div>
+</div>
+<script>
+$(function(){
+    $('.btn-reply').click(function(){
+        var id = $(this).data('id');
+        Fast.api.open('user/feedback/reply?ids=' + id, '回复反馈', {
+            callback: function(){
+                location.reload();
+            }
+        });
+    });
+    $('.btn-close-feedback').click(function(){
+        var id = $(this).data('id');
+        Layer.confirm('确定要关闭此反馈吗？', function(){
+            Fast.api.ajax({
+                url: 'user/feedback/close',
+                data: {ids: id}
+            }, function(){
+                Layer.closeAll();
+                location.reload();
+            });
+        });
+    });
+});
+</script>

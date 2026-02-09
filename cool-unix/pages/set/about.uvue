@@ -4,10 +4,10 @@
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<view class="flex flex-col items-center py-[48rpx]">
 					<view class="w-[160rpx] h-[160rpx] bg-white rounded-[32rpx] flex items-center justify-center shadow-[0_4rpx_12rpx_rgba(0,0,0,0.05)] mb-[24rpx]">
-						<image src="/static/logo.png" class="w-[120rpx] h-[120rpx]" mode="aspectFit" />
+						<image :src="siteConfig.logo || '/static/logo.png'" class="w-[120rpx] h-[120rpx]" mode="aspectFit" />
 					</view>
-					<text class="text-[36rpx] font-semibold text-[#1f2329] mb-[8rpx]">{{ config.name }}</text>
-					<text class="text-[26rpx] text-[#999999]">Version {{ config.version }}</text>
+					<text class="text-[36rpx] font-semibold text-[#1f2329] mb-[8rpx]">{{ siteConfig.name || config.name }}</text>
+					<text class="text-[26rpx] text-[#999999]">Version {{ siteConfig.version || config.version }}</text>
 				</view>
 
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
@@ -17,17 +17,10 @@
 						</view>
 						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
-					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
-					<view class="flex flex-row justify-between items-center h-[112rpx]">
-						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[30rpx] text-[#1f2329]">{{ t('版本更新') }}</text>
-						</view>
-						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-					</view>
 				</view>
 
 				<view class="flex justify-center py-[32rpx] items-center">
-					<text class="text-[24rpx] text-[#c0c4cc]">Copyright © 2025 {{ config.name }} All Rights Reserved</text>
+					<text class="text-[24rpx] text-[#c0c4cc]">Copyright © 2025 {{ siteConfig.name || config.name }} All Rights Reserved</text>
 				</view>
 			</view>
 		</scroll-view>
@@ -36,9 +29,39 @@
 
 <script setup lang="ts">
 import { config } from "@/config";
-import { $t, t } from "@/.cool";
+import { t, request } from "@/.cool";
 import { openWeb } from "@/uni_modules/cool-open-web";
-import Icon from "@/components/icon.uvue";
+import { ref, onMounted } from "vue";
+
+// 站点配置
+const siteConfig = ref({
+	name: '',
+	logo: '',
+	version: ''
+});
+
+// 加载站点配置
+onMounted(() => {
+	loadSiteConfig();
+});
+
+async function loadSiteConfig() {
+	try {
+		const res = await request({
+			url: '/common/siteConfig',
+			method: 'GET'
+		});
+		if (res) {
+			siteConfig.value = {
+				name: res.name || '',
+				logo: res.logo || '',
+				version: res.version || ''
+			};
+		}
+	} catch (e) {
+		console.log('加载站点配置失败', e);
+	}
+}
 
 function toWebSite() {
 	openWeb(config.website);

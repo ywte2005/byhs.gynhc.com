@@ -1,7 +1,7 @@
 <template>
 	<view class="flex flex-col min-h-screen bg-[#f5f7fa] pb-[120rpx]">
 		<!-- 顶部导航 -->
-		<cl-topbar title="旺铺集" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
+		<cl-topbar :title="config.name" :show-back="false" background-color="#0052d9" color="#ffffff" safe-area-top>
 			<template #append>
 				<view class="flex flex-row gap-[16rpx] mr-[8rpx]">
 					<uni-icons type="scan" size="24" color="#ffffff"></uni-icons>
@@ -134,6 +134,7 @@
 </template>
 
 <script setup lang="uts">
+import { config } from "@/config";
 import { ref, onMounted } from 'vue';
 import { getStatistics } from '@/services/index';
 import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';

@@ -29,7 +29,7 @@
 					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx] px-[16rpx]">
-						<text class="text-[30rpx] text-[#1f2329]">手机号</text>
+						<text class="text-[30rpx] text-[#1f2329]">手机号码</text>
 						<view class="flex flex-row items-center gap-[8rpx]">
 							<text class="text-[28rpx] text-[#646a73]">{{ userInfo?.phone || '未绑定' }}</text>
 						</view>

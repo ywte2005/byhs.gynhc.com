@@ -4,7 +4,7 @@
 			<view class="flex flex-row justify-center py-3">
 				<view class="rounded-2xl p-2 border border-solid border-surface-100">
 					<cl-image
-						src="https://unix.cool-js.com/show/wechat.png"
+						:src="wechatQrcode"
 						:height="150"
 						:width="150"
 						show-menu-by-longpress
@@ -27,21 +27,66 @@
 
 <script setup lang="ts">
 import { useUi } from "@/uni_modules/cool-ui";
-import { ref } from "vue";
-import { t } from "@/.cool";
+import { ref, onMounted } from "vue";
+import { t, request } from "@/.cool";
 import { openWeb } from "@/uni_modules/cool-open-web";
 import { config } from "@/config";
 
 const visible = ref(false);
+const wechatQrcode = ref('/static/logo.png');
 
 const ui = useUi();
 
+// 加载站点配置
+onMounted(() => {
+	loadSiteConfig();
+});
+
+async function loadSiteConfig() {
+	try {
+		const res = await request({
+			url: '/common/siteConfig',
+			method: 'GET'
+		});
+		if (res && res.wechat_qrcode) {
+			wechatQrcode.value = res.wechat_qrcode;
+		}
+	} catch (e) {
+		console.log('加载站点配置失败', e);
+	}
+}
+
 function saveImage() {
-	uni.saveImageToPhotosAlbum({
-		filePath: "https://unix.cool-js.com/show/wechat.png",
-		success: () => {
+	if (!wechatQrcode.value) {
+		ui.showToast({
+			message: t("二维码未加载")
+		});
+		return;
+	}
+	
+	// 先下载图片到临时文件
+	uni.downloadFile({
+		url: wechatQrcode.value,
+		success: (downloadRes) => {
+			if (downloadRes.statusCode === 200) {
+				uni.saveImageToPhotosAlbum({
+					filePath: downloadRes.tempFilePath,
+					success: () => {
+						ui.showToast({
+							message: t("保存成功")
+						});
+					},
+					fail: () => {
+						ui.showToast({
+							message: t("保存失败")
+						});
+					}
+				});
+			}
+		},
+		fail: () => {
 			ui.showToast({
-				message: "保存成功"
+				message: t("下载失败")
 			});
 		}
 	});
@@ -53,6 +98,7 @@ function toWebSite() {
 
 function open() {
 	visible.value = true;
+	loadSiteConfig();
 }
 
 function close() {

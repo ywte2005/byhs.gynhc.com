@@ -19,25 +19,10 @@
 						</view>
 						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
 					</view>
-					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
-					<view class="flex flex-row justify-between items-center h-[112rpx]">
-						<view class="flex flex-row items-center gap-[24rpx]">
-							<uni-icons type="locked" size="20" color="#0052d9"></uni-icons>
-							<text class="text-[30rpx] text-[#1f2329]">隐私设置</text>
-						</view>
-						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-					</view>
 				</view>
 
 				<!-- Group 2 -->
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
-					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="router.to('/pages/set/about')">
-						<view class="flex flex-row items-center gap-[24rpx]">
-							<uni-icons type="info" size="20" color="#0052d9"></uni-icons>
-							<text class="text-[30rpx] text-[#1f2329]">关于{{ config.name }}</text>
-						</view>
-						<uni-icons type="right" size="16" color="#c0c4cc"></uni-icons>
-					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="refs.open('cs')">
 						<view class="flex flex-row items-center gap-[24rpx]">

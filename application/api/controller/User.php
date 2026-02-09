@@ -42,6 +42,15 @@ class User extends Api
     {
         $user = $this->auth->getUser();
         
+        // 检查是否已实名认证（通过verification字段判断）
+        $verification = $user->verification;
+        $isVerified = !empty($verification->mobile) || !empty($verification->email);
+        
+        // 检查是否为商户
+        $merchant = \app\common\model\merchant\Merchant::getByUserId($user->id);
+        $isMerchant = $merchant && $merchant->status === 'approved';
+        $merchantStatus = $merchant ? $merchant->status : 'none';
+        
         $data = [
             'id' => $user->id,
             'unionid' => $user->id, // 使用id作为unionid
@@ -52,10 +61,13 @@ class User extends Api
             'status' => $user->status == 'normal' ? 1 : 0,
             'description' => $user->bio ?: '',
             'loginType' => 1,
-            'province' => '',
-            'city' => '',
-            'district' => '',
+            'province' => $user->province ?: '',
+            'city' => $user->city ?: '',
+            'district' => $user->district ?: '',
             'birthday' => $user->birthday ?: '',
+            'isVerified' => $isVerified,
+            'isMerchant' => $isMerchant,
+            'merchantStatus' => $merchantStatus,
             'createTime' => date('Y-m-d H:i:s', $user->createtime),
             'updateTime' => date('Y-m-d H:i:s', $user->updatetime)
         ];
@@ -201,10 +213,15 @@ class User extends Api
      * 修改会员个人信息
      *
      * @ApiMethod (POST)
-     * @ApiParams (name="avatar", type="string", required=true, description="头像地址")
-     * @ApiParams (name="username", type="string", required=true, description="用户名")
-     * @ApiParams (name="nickname", type="string", required=true, description="昵称")
-     * @ApiParams (name="bio", type="string", required=true, description="个人简介")
+     * @ApiParams (name="avatar", type="string", required=false, description="头像地址")
+     * @ApiParams (name="username", type="string", required=false, description="用户名")
+     * @ApiParams (name="nickname", type="string", required=false, description="昵称")
+     * @ApiParams (name="bio", type="string", required=false, description="个人简介")
+     * @ApiParams (name="gender", type="integer", required=false, description="性别 0保密 1男 2女")
+     * @ApiParams (name="birthday", type="string", required=false, description="生日 YYYY-MM-DD")
+     * @ApiParams (name="province", type="string", required=false, description="省份")
+     * @ApiParams (name="city", type="string", required=false, description="城市")
+     * @ApiParams (name="district", type="string", required=false, description="区县")
      */
     public function profile()
     {
@@ -213,6 +230,12 @@ class User extends Api
         $nickname = $this->request->post('nickname');
         $bio = $this->request->post('bio');
         $avatar = $this->request->post('avatar', '', 'trim,strip_tags,htmlspecialchars');
+        $gender = $this->request->post('gender');
+        $birthday = $this->request->post('birthday');
+        $province = $this->request->post('province');
+        $city = $this->request->post('city');
+        $district = $this->request->post('district');
+        
         if ($username) {
             $exists = \app\common\model\User::where('username', $username)->where('id', '<>', $this->auth->id)->find();
             if ($exists) {
@@ -227,10 +250,29 @@ class User extends Api
             }
             $user->nickname = $nickname;
         }
-        $user->bio = $bio;
-        $user->avatar = $avatar;
+        if ($bio !== null) {
+            $user->bio = $bio;
+        }
+        if ($avatar) {
+            $user->avatar = $avatar;
+        }
+        if ($gender !== null) {
+            $user->gender = intval($gender);
+        }
+        if ($birthday !== null) {
+            $user->birthday = $birthday;
+        }
+        if ($province !== null) {
+            $user->province = $province;
+        }
+        if ($city !== null) {
+            $user->city = $city;
+        }
+        if ($district !== null) {
+            $user->district = $district;
+        }
         $user->save();
-        $this->success();
+        $this->success('修改成功');
     }
 
     /**

@@ -1,0 +1,21 @@
+<div class="panel panel-default panel-intro">
+    {:build_heading()}
+    <div class="panel-body">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade active in" id="one">
+                <div class="widget-body no-padding">
+                    <div id="toolbar" class="toolbar">
+                        <a href="javascript:;" class="btn btn-info btn-processing btn-disabled disabled {:$auth->check('user/feedback/processing')?'':'hide'}" title="{:__('设为处理中')}"><i class="fa fa-clock-o"></i> {:__('设为处理中')}</a>
+                        <a href="javascript:;" class="btn btn-danger btn-close-feedback btn-disabled disabled {:$auth->check('user/feedback/close')?'':'hide'}" title="{:__('关闭')}"><i class="fa fa-times"></i> {:__('关闭')}</a>
+                    </div>
+                    <table id="table" class="table table-striped table-bordered table-hover table-nowrap"
+                           data-operate-detail="{:$auth->check('user/feedback/detail')}"
+                           data-operate-reply="{:$auth->check('user/feedback/reply')}"
+                           data-operate-close="{:$auth->check('user/feedback/close')}"
+                           width="100%">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

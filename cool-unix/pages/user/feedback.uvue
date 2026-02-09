@@ -6,19 +6,20 @@
 				<view class="flex flex-col gap-[24rpx]">
 					<view v-for="(item, index) in list" :key="index" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[16rpx]">
 						<view class="flex flex-row justify-between items-center">
-							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ item.type }}</text>
+							<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ item.type_text || item.type }}</text>
 							<text class="text-[24rpx]" :class="{
 								'text-[#faad14]': item.status === 'pending',
 								'text-[#0052d9]': item.status === 'processing',
-								'text-[#00b578]': item.status === 'replied'
-							}">{{ getStatusText(item.status) }}</text>
+								'text-[#00b578]': item.status === 'replied',
+								'text-[#999999]': item.status === 'closed'
+							}">{{ item.status_text || getStatusText(item.status) }}</text>
 						</view>
 						<text class="text-[28rpx] text-[#646a73] leading-relaxed">{{ item.content }}</text>
 						<view class="flex flex-col gap-[12rpx] mt-[12rpx] pt-[12rpx] border-t-[2rpx] border-[#f5f7fa]">
 							<text class="text-[22rpx] text-[#999999]">{{ formatTime(item.createtime) }}</text>
-							<view v-if="item.reply" class="bg-[#f5f7fa] p-[16rpx] rounded-[8rpx] flex flex-row">
-								<text class="text-[24rpx] font-semibold text-[#1f2329]">回复：</text>
-								<text class="text-[24rpx] text-[#646a73] flex-1">{{ item.reply }}</text>
+							<view v-if="item.reply" class="bg-[#e6f7f0] p-[16rpx] rounded-[12rpx] flex flex-col gap-[8rpx]">
+								<text class="text-[24rpx] font-semibold text-[#00b578]">客服回复</text>
+								<text class="text-[26rpx] text-[#1f2329]">{{ item.reply }}</text>
 							</view>
 						</view>
 					</view>
@@ -28,99 +29,224 @@
 						<uni-icons type="compose" size="48" color="#999999"></uni-icons>
 						<text class="text-[28rpx] text-[#999999]">暂无反馈记录</text>
 					</view>
+					
+					<!-- 加载更多 -->
+					<view v-if="loading" class="flex justify-center py-[32rpx]">
+						<text class="text-[24rpx] text-[#999999]">加载中...</text>
+					</view>
+					<view v-if="!hasMore && list.length > 0" class="flex justify-center py-[32rpx]">
+						<text class="text-[24rpx] text-[#999999]">没有更多了</text>
+					</view>
 				</view>
 			</view>
 		</scroll-view>
 
 		<!-- Submit Button Area -->
 		<view class="fixed bottom-0 left-0 right-0 bg-white px-[32rpx] pb-[calc(24rpx+env(safe-area-inset-bottom))] py-[24rpx] border-t-[2rpx] border-[#e5e5e5]">
-			<view class="h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center" @tap="goToSubmit">
+			<view class="h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center active:opacity-90" @tap="showSubmitPopup">
 				<text class="text-white text-[32rpx] font-medium">提交反馈</text>
 			</view>
 		</view>
+		
+		<!-- 提交反馈弹窗 -->
+		<cl-popup v-model="submitPopupVisible" title="提交反馈" position="bottom" :height="600">
+			<view class="p-[32rpx] flex flex-col gap-[24rpx]">
+				<!-- 反馈类型 -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#1f2329] font-medium">反馈类型</text>
+					<view class="flex flex-row flex-wrap gap-[16rpx]">
+						<view 
+							v-for="(item, index) in typeOptions" 
+							:key="index"
+							class="px-[24rpx] py-[16rpx] rounded-[12rpx] border-[2rpx]"
+							:class="submitForm.type === item.value ? 'bg-[#eaf2ff] border-[#0052d9]' : 'bg-white border-[#e5e6eb]'"
+							@tap="submitForm.type = item.value"
+						>
+							<text class="text-[26rpx]" :class="submitForm.type === item.value ? 'text-[#0052d9]' : 'text-[#646a73]'">{{ item.label }}</text>
+						</view>
+					</view>
+				</view>
+				
+				<!-- 反馈内容 -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#1f2329] font-medium">反馈内容</text>
+					<textarea 
+						v-model="submitForm.content"
+						class="w-full h-[200rpx] bg-[#f5f7fa] rounded-[12rpx] p-[24rpx] text-[28rpx] text-[#1f2329]"
+						placeholder="请详细描述您的问题或建议（至少10个字）"
+						placeholder-class="text-[#c0c4cc]"
+						maxlength="1000"
+					/>
+					<text class="text-[22rpx] text-[#999999] text-right">{{ submitForm.content.length }}/1000</text>
+				</view>
+				
+				<!-- 联系方式 -->
+				<view class="flex flex-col gap-[16rpx]">
+					<text class="text-[28rpx] text-[#1f2329] font-medium">联系方式（选填）</text>
+					<input 
+						v-model="submitForm.contact"
+						class="h-[88rpx] bg-[#f5f7fa] rounded-[12rpx] px-[24rpx] text-[28rpx] text-[#1f2329]"
+						placeholder="手机号/微信/邮箱"
+						placeholder-class="text-[#c0c4cc]"
+					/>
+				</view>
+				
+				<!-- 提交按钮 -->
+				<view 
+					class="h-[88rpx] rounded-[16rpx] flex items-center justify-center mt-[16rpx]"
+					:class="canSubmit ? 'bg-[#0052d9] active:opacity-90' : 'bg-[#ccc]'"
+					@tap="handleSubmit"
+				>
+					<text class="text-[32rpx] font-medium text-white">提交</text>
+				</view>
+			</view>
+		</cl-popup>
 	</view>
 </template>
 
-<script lang="uts">
-	type FeedbackItem = {
-		id: number,
-		type: string,
-		content: string,
-		status: string,
-		createtime: number,
-		reply?: string
-	}
+<script setup lang="uts">
+import { ref, computed, onMounted } from 'vue'
+import { getFeedbackList, submitFeedback } from '@/services/feedback'
+import { useUi } from '@/uni_modules/cool-ui'
 
-	export default {
-		data() {
-			return {
-				list: [] as FeedbackItem[],
-				page: 1,
-				loading: false,
-				hasMore: true
-			};
-		},
-		onShow() {
-			this.page = 1;
-			this.list = [];
-			this.loadMore();
-		},
-		methods: {
-			loadMore() {
-				if (this.loading || !this.hasMore) return;
-				this.loading = true;
+const ui = useUi()
 
-				// Mock data
-				setTimeout(() => {
-					const mockList : FeedbackItem[] = [];
-					if (this.page === 1) {
-						mockList.push({ 
-							id: 1, 
-							type: '功能建议', 
-							content: '建议增加夜间模式', 
-							status: 'replied', 
-							createtime: 1678888888,
-							reply: '感谢建议，已排期开发'
-						});
-						mockList.push({ 
-							id: 2, 
-							type: '系统故障', 
-							content: '无法上传头像', 
-							status: 'pending', 
-							createtime: 1678889999 
-						});
-					}
-					
-					if (mockList.length > 0) {
-						this.list = this.list.concat(mockList);
-						this.page++;
-					} else {
-						this.hasMore = false;
-					}
-					this.loading = false;
-				}, 500);
-			},
-			getStatusText(status: string): string {
-				const map: UTSJSONObject = {
-					'pending': '待处理',
-					'processing': '处理中',
-					'replied': '已回复'
-				};
-				return (map[status] ?? status) as string;
-			},
-			formatTime(timestamp : number) : string {
-				const date = new Date(timestamp * 1000);
-				const y = date.getFullYear();
-				const m = (date.getMonth() + 1).toString().padStart(2, '0');
-				const d = date.getDate().toString().padStart(2, '0');
-				return `${y}-${m}-${d}`;
-			},
-			goToSubmit() {
-				// Navigate to submit page or show modal
-				uni.showToast({ title: '提交功能开发中', icon: 'none' });
+// 反馈列表
+type FeedbackItem = {
+	id: number,
+	type: string,
+	type_text: string,
+	content: string,
+	status: string,
+	status_text: string,
+	createtime: number,
+	reply?: string
+}
+
+const list = ref<FeedbackItem[]>([])
+const page = ref(1)
+const loading = ref(false)
+const hasMore = ref(true)
+
+// 提交弹窗
+const submitPopupVisible = ref(false)
+const submitForm = ref({
+	type: 'suggestion',
+	content: '',
+	contact: ''
+})
+
+// 反馈类型选项
+const typeOptions = [
+	{ value: 'suggestion', label: '功能建议' },
+	{ value: 'bug', label: '系统故障' },
+	{ value: 'complaint', label: '投诉举报' },
+	{ value: 'question', label: '咨询问题' },
+	{ value: 'other', label: '其他' }
+]
+
+// 是否可提交
+const canSubmit = computed(() => {
+	return submitForm.value.type && submitForm.value.content.length >= 10
+})
+
+// 页面加载
+onMounted(() => {
+	loadData()
+})
+
+// 加载数据
+async function loadData() {
+	page.value = 1
+	list.value = []
+	hasMore.value = true
+	await loadMore()
+}
+
+// 加载更多
+async function loadMore() {
+	if (loading.value || !hasMore.value) return
+	loading.value = true
+	
+	try {
+		const res = await getFeedbackList(page.value, 10)
+		if (res && res.list) {
+			if (res.list.length > 0) {
+				list.value = list.value.concat(res.list as FeedbackItem[])
+				page.value++
+				hasMore.value = list.value.length < res.total
+			} else {
+				hasMore.value = false
 			}
 		}
-	};
+	} catch (e) {
+		console.log('加载反馈列表失败', e)
+	}
+	
+	loading.value = false
+}
+
+// 获取状态文本
+function getStatusText(status: string): string {
+	const map: UTSJSONObject = {
+		'pending': '待处理',
+		'processing': '处理中',
+		'replied': '已回复',
+		'closed': '已关闭'
+	}
+	return (map[status] ?? status) as string
+}
+
+// 格式化时间
+function formatTime(timestamp: number): string {
+	const date = new Date(timestamp * 1000)
+	const y = date.getFullYear()
+	const m = (date.getMonth() + 1).toString().padStart(2, '0')
+	const d = date.getDate().toString().padStart(2, '0')
+	return `${y}-${m}-${d}`
+}
+
+// 显示提交弹窗
+function showSubmitPopup() {
+	submitForm.value = {
+		type: 'suggestion',
+		content: '',
+		contact: ''
+	}
+	submitPopupVisible.value = true
+}
+
+// 提交反馈
+async function handleSubmit() {
+	if (!canSubmit.value) {
+		ui.showToast({ message: '请填写完整反馈内容（至少10个字）' })
+		return
+	}
+	
+	try {
+		uni.showLoading({ title: '提交中...' })
+		
+		const res = await submitFeedback({
+			type: submitForm.value.type as any,
+			content: submitForm.value.content,
+			contact: submitForm.value.contact
+		})
+		
+		uni.hideLoading()
+		
+		if (res && res.id) {
+			ui.showToast({ message: '提交成功' })
+			submitPopupVisible.value = false
+			// 刷新列表
+			loadData()
+		} else {
+			ui.showToast({ message: '提交失败' })
+		}
+	} catch (error: any) {
+		uni.hideLoading()
+		ui.showToast({ message: error.message || '提交失败' })
+	}
+}
 </script>
 
 <style>

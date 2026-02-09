@@ -18,7 +18,77 @@ class Merchant extends Api
             $this->success('未注册商户', ['merchant' => null]);
         }
         
-        $this->success('获取成功', ['merchant' => $merchant]);
+        // 获取统计数据
+        $stats = $this->getMerchantStats($merchant->id);
+        
+        $data = [
+            'id' => $merchant->id,
+            'merchant_no' => $merchant->merchant_no,
+            'type' => $merchant->type,
+            'name' => $merchant->name,
+            'legal_name' => $merchant->legal_name,
+            'contact_phone' => $merchant->contact_phone,
+            'contact_address' => $merchant->contact_address ?? '',
+            'category' => $merchant->category ?? '',
+            'status' => $merchant->status,
+            'status_text' => $merchant->status_text,
+            'id_card' => $merchant->id_card ? substr($merchant->id_card, 0, 6) . '********' . substr($merchant->id_card, -4) : '',
+            'id_card_front' => $merchant->id_card_front ? cdnurl($merchant->id_card_front, true) : '',
+            'id_card_back' => $merchant->id_card_back ? cdnurl($merchant->id_card_back, true) : '',
+            'business_license' => $merchant->business_license ? cdnurl($merchant->business_license, true) : '',
+            'credit_code' => $merchant->credit_code ?? '',
+            'bank_name' => $merchant->bank_name ?? '',
+            'bank_account' => $merchant->bank_account ? substr($merchant->bank_account, 0, 4) . '****' . substr($merchant->bank_account, -4) : '',
+            'entry_fee' => $merchant->entry_fee,
+            'entry_fee_paid' => $merchant->entry_fee_paid,
+            'createtime' => date('Y-m-d H:i:s', $merchant->createtime),
+            // 统计数据
+            'total_tasks' => $stats['total_tasks'],
+            'completed_tasks' => $stats['completed_tasks'],
+            'completion_rate' => $stats['completion_rate'],
+            'total_income' => $stats['total_income'],
+            'total_commission' => $stats['total_commission'],
+            'credit_score' => $stats['credit_score'],
+            'level' => $stats['level'],
+        ];
+        
+        $this->success('获取成功', $data);
+    }
+    
+    /**
+     * 获取商户统计数据
+     */
+    private function getMerchantStats($merchantId)
+    {
+        // 获取任务统计
+        $totalTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->count();
+        $completedTasks = \think\Db::name('task')->where('merchant_id', $merchantId)->where('status', 'completed')->count();
+        $completionRate = $totalTasks > 0 ? round($completedTasks / $totalTasks * 100, 1) : 0;
+        
+        // 获取收入统计
+        $totalIncome = \think\Db::name('wallet_log')
+            ->where('user_id', function($query) use ($merchantId) {
+                $query->name('merchant')->where('id', $merchantId)->field('user_id');
+            })
+            ->where('change_type', 'income')
+            ->sum('amount') ?: 0;
+            
+        $totalCommission = \think\Db::name('wallet_log')
+            ->where('user_id', function($query) use ($merchantId) {
+                $query->name('merchant')->where('id', $merchantId)->field('user_id');
+            })
+            ->where('biz_type', 'in', ['subtask_commission', 'service_fee'])
+            ->sum('amount') ?: 0;
+        
+        return [
+            'total_tasks' => $totalTasks,
+            'completed_tasks' => $completedTasks,
+            'completion_rate' => $completionRate,
+            'total_income' => number_format(abs($totalIncome), 2),
+            'total_commission' => number_format(abs($totalCommission), 2),
+            'credit_score' => 98, // TODO: 实现信用分计算
+            'level' => 'VIP', // TODO: 实现等级计算
+        ];
     }
 
     public function categories()

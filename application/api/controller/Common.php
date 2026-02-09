@@ -17,7 +17,7 @@ use think\Hook;
  */
 class Common extends Api
 {
-    protected $noNeedLogin = ['init', 'captcha'];
+    protected $noNeedLogin = ['init', 'captcha', 'siteConfig'];
     protected $noNeedRight = '*';
 
     public function _initialize()
@@ -162,5 +162,33 @@ class Common extends Api
         ]);
         $captcha = new Captcha((array)Config::get('captcha'));
         return $captcha->entry($id);
+    }
+
+    /**
+     * 获取站点配置
+     * @ApiMethod (GET)
+     */
+    public function siteConfig()
+    {
+        $site = Config::get('site');
+        
+        $data = [
+            'name' => $site['name'] ?? '',
+            'logo' => $site['logo'] ?? '',
+            'version' => $site['version'] ?? '1.0.0',
+            'beian' => $site['beian'] ?? '',
+            'cdnurl' => $site['cdnurl'] ?? '',
+            'wechat_qrcode' => $site['wechat_qrcode'] ?? '',
+        ];
+        
+        // 处理logo和wechat_qrcode的完整URL
+        if ($data['logo'] && !preg_match("/^(http|https):\/\//i", $data['logo'])) {
+            $data['logo'] = cdnurl($data['logo'], true);
+        }
+        if ($data['wechat_qrcode'] && !preg_match("/^(http|https):\/\//i", $data['wechat_qrcode'])) {
+            $data['wechat_qrcode'] = cdnurl($data['wechat_qrcode'], true);
+        }
+        
+        $this->success('获取成功', $data);
     }
 }

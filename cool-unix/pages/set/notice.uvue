@@ -7,7 +7,43 @@
 						<view class="flex flex-row items-center gap-[24rpx]">
 							<text class="text-[30rpx] text-[#1f2329]">{{ t('开启通知') }}</text>
 						</view>
-						<cl-switch></cl-switch>
+						<cl-switch :model-value="notificationEnabled" @change="onNotificationChange"></cl-switch>
+					</view>
+				</view>
+
+				<!-- 通知说明 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[20rpx]">
+					<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ t('通知说明') }}</text>
+					<view class="flex flex-col gap-[12rpx]">
+						<!-- #ifdef APP -->
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('APP端将通过系统推送通知您') }}</text>
+						<!-- #endif -->
+						<!-- #ifdef H5 -->
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('H5端将通过微信公众号通知您') }}</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('请确保已关注公众号并授权') }}</text>
+						<!-- #endif -->
+						<!-- #ifdef MP-WEIXIN -->
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('小程序端将通过模板消息通知您') }}</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('需要您授权订阅消息') }}</text>
+						<!-- #endif -->
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• {{ t('通知内容包括：任务状态变更、资金变动等') }}</text>
+					</view>
+				</view>
+
+				<!-- 通知状态 -->
+				<view v-if="notificationEnabled" class="bg-white rounded-[24rpx] p-[32rpx] flex flex-col gap-[16rpx]">
+					<text class="text-[30rpx] font-semibold text-[#1f2329]">{{ t('通知状态') }}</text>
+					<view class="flex flex-row items-center gap-[12rpx]">
+						<view class="w-[16rpx] h-[16rpx] rounded-full" :class="permissionGranted ? 'bg-[#00b578]' : 'bg-[#ff3b30]'"></view>
+						<text class="text-[26rpx]" :class="permissionGranted ? 'text-[#00b578]' : 'text-[#ff3b30]'">
+							{{ permissionGranted ? t('已获取通知权限') : t('未获取通知权限') }}
+						</text>
+					</view>
+					<view v-if="!permissionGranted" 
+						class="mt-[16rpx] h-[80rpx] bg-[#0052d9] rounded-[12rpx] flex items-center justify-center active:opacity-90"
+						@tap="requestPermission"
+					>
+						<text class="text-[28rpx] text-white">{{ t('授权通知权限') }}</text>
 					</view>
 				</view>
 			</view>
@@ -17,6 +53,199 @@
 
 <script setup lang="ts">
 import { t } from "@/.cool";
+import { ref, onMounted } from "vue";
+import { useUi } from "@/uni_modules/cool-ui";
+
+const ui = useUi();
+
+// 通知开关状态
+const notificationEnabled = ref(false);
+// 权限状态
+const permissionGranted = ref(false);
+
+// 初始化
+onMounted(() => {
+	// 从本地存储读取通知设置
+	const saved = uni.getStorageSync('notification_enabled');
+	notificationEnabled.value = saved === true || saved === 'true';
+	
+	if (notificationEnabled.value) {
+		checkPermission();
+	}
+});
+
+// 检查通知权限
+function checkPermission() {
+	// #ifdef APP
+	checkAppPermission();
+	// #endif
+	
+	// #ifdef MP-WEIXIN
+	checkMpPermission();
+	// #endif
+	
+	// #ifdef H5
+	// H5端通过公众号通知，默认认为已授权
+	permissionGranted.value = true;
+	// #endif
+}
+
+// APP端检查推送权限
+function checkAppPermission() {
+	// #ifdef APP
+	try {
+		uni.getSystemInfo({
+			success: (res) => {
+				// 检查通知权限
+				// @ts-ignore
+				if (res.notificationAuthorized === true || res.notificationAuthorized === 'authorized') {
+					permissionGranted.value = true;
+				} else {
+					permissionGranted.value = false;
+				}
+			}
+		});
+	} catch (e) {
+		permissionGranted.value = false;
+	}
+	// #endif
+}
+
+// 小程序端检查订阅消息权限
+function checkMpPermission() {
+	// #ifdef MP-WEIXIN
+	try {
+		uni.getSetting({
+			withSubscriptions: true,
+			success: (res) => {
+				// @ts-ignore
+				if (res.subscriptionsSetting && res.subscriptionsSetting.mainSwitch) {
+					permissionGranted.value = true;
+				} else {
+					permissionGranted.value = false;
+				}
+			},
+			fail: () => {
+				permissionGranted.value = false;
+			}
+		});
+	} catch (e) {
+		permissionGranted.value = false;
+	}
+	// #endif
+}
+
+// 通知开关变更
+function onNotificationChange(value: boolean) {
+	notificationEnabled.value = value;
+	uni.setStorageSync('notification_enabled', value);
+	
+	if (value) {
+		checkPermission();
+		if (!permissionGranted.value) {
+			requestPermission();
+		}
+	}
+	
+	ui.showToast({
+		message: value ? t('已开启通知') : t('已关闭通知')
+	});
+}
+
+// 请求通知权限
+function requestPermission() {
+	// #ifdef APP
+	requestAppPermission();
+	// #endif
+	
+	// #ifdef MP-WEIXIN
+	requestMpPermission();
+	// #endif
+	
+	// #ifdef H5
+	requestH5Permission();
+	// #endif
+}
+
+// APP端请求推送权限
+function requestAppPermission() {
+	// #ifdef APP
+	try {
+		// 打开系统设置
+		uni.openAppAuthorizeSetting({
+			success: () => {
+				ui.showToast({
+					message: t('请在设置中开启通知权限')
+				});
+			},
+			fail: () => {
+				ui.showToast({
+					message: t('无法打开设置页面')
+				});
+			}
+		});
+	} catch (e) {
+		ui.showToast({
+			message: t('请在系统设置中开启通知权限')
+		});
+	}
+	// #endif
+}
+
+// 小程序端请求订阅消息权限
+function requestMpPermission() {
+	// #ifdef MP-WEIXIN
+	try {
+		// 订阅消息模板ID列表（需要在小程序后台配置）
+		const tmplIds = [
+			'task_status_change',  // 任务状态变更
+			'wallet_change',       // 资金变动
+			'system_notice'        // 系统通知
+		];
+		
+		uni.requestSubscribeMessage({
+			tmplIds: tmplIds,
+			success: (res) => {
+				permissionGranted.value = true;
+				ui.showToast({
+					message: t('订阅成功')
+				});
+			},
+			fail: (err) => {
+				ui.showToast({
+					message: t('订阅失败，请重试')
+				});
+			}
+		});
+	} catch (e) {
+		ui.showToast({
+			message: t('订阅失败')
+		});
+	}
+	// #endif
+}
+
+// H5端请求公众号通知权限
+function requestH5Permission() {
+	// #ifdef H5
+	// H5端通过微信公众号通知，引导用户关注公众号
+	ui.showConfirm({
+		title: t('提示'),
+		message: t('请关注微信公众号以接收通知消息'),
+		confirmButtonText: t('去关注'),
+		cancelButtonText: t('取消'),
+		success: (res) => {
+			if (res.confirm) {
+				// 跳转到公众号关注页面或显示二维码
+				permissionGranted.value = true;
+				ui.showToast({
+					message: t('请扫码关注公众号')
+				});
+			}
+		}
+	});
+	// #endif
+}
 </script>
 
 <style>
