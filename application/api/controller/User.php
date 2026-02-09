@@ -14,7 +14,7 @@ use think\Validate;
  */
 class User extends Api
 {
-    protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third'];
+    protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third', 'wechatLogin', 'wechatMiniLogin', 'getWechatConfig'];
     protected $noNeedRight = '*';
 
     public function _initialize()
@@ -390,6 +390,220 @@ class User extends Api
             }
         }
         $this->error(__('Operation failed'), $url);
+    }
+
+    /**
+     * 获取微信登录配置
+     * 
+     * @ApiMethod (GET)
+     */
+    public function getWechatConfig()
+    {
+        $config = get_addon_config('third');
+        if (!$config) {
+            $this->error('第三方登录未配置');
+        }
+        
+        $data = [
+            'h5_appid' => $config['wechat']['app_id'] ?? '',
+            'mini_appid' => $config['wechatmini']['app_id'] ?? '',
+        ];
+        
+        $this->success('获取成功', $data);
+    }
+
+    /**
+     * 微信登录（APP/H5端）
+     * 
+     * @ApiMethod (POST)
+     * @ApiParams (name="code", type="string", required=true, description="微信授权code")
+     * @ApiParams (name="platform", type="string", required=false, description="平台：app/h5，默认app")
+     */
+    public function wechatLogin()
+    {
+        $code = $this->request->post('code');
+        $platform = $this->request->post('platform', 'app');
+        
+        if (!$code) {
+            $this->error(__('Invalid parameters'));
+        }
+        
+        $config = get_addon_config('third');
+        if (!$config) {
+            $this->error('第三方登录未配置');
+        }
+        
+        // 根据平台选择配置
+        if ($platform === 'h5') {
+            // H5端使用微信公众号配置
+            $appId = $config['wechat']['app_id'] ?? '';
+            $appSecret = $config['wechat']['app_secret'] ?? '';
+        } else {
+            // APP端优先使用wechatapp配置，其次使用wechatweb配置
+            $appId = $config['wechatapp']['app_id'] ?? $config['wechatweb']['app_id'] ?? '';
+            $appSecret = $config['wechatapp']['app_secret'] ?? $config['wechatweb']['app_secret'] ?? '';
+        }
+        
+        if (!$appId || !$appSecret) {
+            $this->error('微信登录配置不完整');
+        }
+        
+        // 通过code获取access_token
+        $tokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$appId}&secret={$appSecret}&code={$code}&grant_type=authorization_code";
+        $tokenResult = json_decode(file_get_contents($tokenUrl), true);
+        
+        if (!$tokenResult || isset($tokenResult['errcode'])) {
+            $this->error($tokenResult['errmsg'] ?? '获取access_token失败');
+        }
+        
+        $accessToken = $tokenResult['access_token'];
+        $openid = $tokenResult['openid'];
+        $unionid = $tokenResult['unionid'] ?? '';
+        
+        // 获取用户信息
+        $userInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token={$accessToken}&openid={$openid}&lang=zh_CN";
+        $userInfo = json_decode(file_get_contents($userInfoUrl), true);
+        
+        if (!$userInfo || isset($userInfo['errcode'])) {
+            $this->error($userInfo['errmsg'] ?? '获取用户信息失败');
+        }
+        
+        // 组装参数
+        $params = [
+            'openid' => $openid,
+            'unionid' => $unionid ?: ($userInfo['unionid'] ?? ''),
+            'nickname' => $userInfo['nickname'] ?? '',
+            'avatar' => $userInfo['headimgurl'] ?? '',
+            'access_token' => $accessToken,
+            'refresh_token' => $tokenResult['refresh_token'] ?? '',
+            'expires_in' => $tokenResult['expires_in'] ?? 7200,
+        ];
+        
+        // 调用第三方登录服务
+        $loginret = \addons\third\library\Service::connect('wechat', $params);
+        if (!$loginret) {
+            $this->error('登录失败');
+        }
+        
+        $userinfo = $this->auth->getUserinfo();
+        $data = [
+            'token' => $userinfo['token'],
+            'expire' => 7200,
+            'refreshToken' => $userinfo['token'],
+            'refreshExpire' => 2592000,
+            'userinfo' => $userinfo
+        ];
+        $this->success('登录成功', $data);
+    }
+    
+    /**
+     * 微信小程序登录
+     * 
+     * @ApiMethod (POST)
+     * @ApiParams (name="code", type="string", required=true, description="小程序登录code")
+     * @ApiParams (name="encryptedData", type="string", required=false, description="加密数据")
+     * @ApiParams (name="iv", type="string", required=false, description="加密向量")
+     * @ApiParams (name="userInfo", type="object", required=false, description="用户信息")
+     */
+    public function wechatMiniLogin()
+    {
+        $code = $this->request->post('code');
+        $encryptedData = $this->request->post('encryptedData');
+        $iv = $this->request->post('iv');
+        $userInfoData = $this->request->post('userInfo');
+        
+        if (!$code) {
+            $this->error(__('Invalid parameters'));
+        }
+        
+        $config = get_addon_config('third');
+        if (!$config) {
+            $this->error('第三方登录未配置');
+        }
+        
+        // 小程序配置（需要在后台添加wechatmini配置）
+        $appId = $config['wechatmini']['app_id'] ?? $config['wechat']['app_id'] ?? '';
+        $appSecret = $config['wechatmini']['app_secret'] ?? $config['wechat']['app_secret'] ?? '';
+        
+        if (!$appId || !$appSecret) {
+            $this->error('小程序登录配置不完整');
+        }
+        
+        // 通过code获取session_key和openid
+        $sessionUrl = "https://api.weixin.qq.com/sns/jscode2session?appid={$appId}&secret={$appSecret}&js_code={$code}&grant_type=authorization_code";
+        $sessionResult = json_decode(file_get_contents($sessionUrl), true);
+        
+        if (!$sessionResult || isset($sessionResult['errcode'])) {
+            $this->error($sessionResult['errmsg'] ?? '获取session失败');
+        }
+        
+        $openid = $sessionResult['openid'];
+        $sessionKey = $sessionResult['session_key'];
+        $unionid = $sessionResult['unionid'] ?? '';
+        
+        // 解密用户信息（如果提供了加密数据）
+        $nickname = '';
+        $avatar = '';
+        if ($encryptedData && $iv) {
+            $decrypted = $this->decryptWxData($appId, $sessionKey, $encryptedData, $iv);
+            if ($decrypted) {
+                $nickname = $decrypted['nickName'] ?? '';
+                $avatar = $decrypted['avatarUrl'] ?? '';
+                $unionid = $decrypted['unionId'] ?? $unionid;
+            }
+        } elseif ($userInfoData) {
+            // 使用前端传递的用户信息
+            $nickname = $userInfoData['nickName'] ?? '';
+            $avatar = $userInfoData['avatarUrl'] ?? '';
+        }
+        
+        // 组装参数
+        $params = [
+            'openid' => $openid,
+            'unionid' => $unionid,
+            'nickname' => $nickname,
+            'avatar' => $avatar,
+            'access_token' => $sessionKey,
+            'expires_in' => 7200,
+        ];
+        
+        // 调用第三方登录服务
+        $loginret = \addons\third\library\Service::connect('wechat', $params);
+        if (!$loginret) {
+            $this->error('登录失败');
+        }
+        
+        $userinfo = $this->auth->getUserinfo();
+        $data = [
+            'token' => $userinfo['token'],
+            'expire' => 7200,
+            'refreshToken' => $userinfo['token'],
+            'refreshExpire' => 2592000,
+            'userinfo' => $userinfo
+        ];
+        $this->success('登录成功', $data);
+    }
+    
+    /**
+     * 解密微信小程序数据
+     */
+    private function decryptWxData($appId, $sessionKey, $encryptedData, $iv)
+    {
+        $aesKey = base64_decode($sessionKey);
+        $aesIV = base64_decode($iv);
+        $aesCipher = base64_decode($encryptedData);
+        
+        $result = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
+        if (!$result) {
+            return null;
+        }
+        
+        $data = json_decode($result, true);
+        if (!$data || !isset($data['watermark']['appid']) || $data['watermark']['appid'] !== $appId) {
+            return null;
+        }
+        
+        return $data;
     }
 
     /**

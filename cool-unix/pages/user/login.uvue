@@ -6,7 +6,7 @@
 			<!-- Logo -->
 			<view class="flex flex-col items-center justify-center gap-[24rpx] mb-[64rpx]">
 				<view class="w-[144rpx] h-[144rpx] bg-[#0052d9] rounded-[32rpx] flex items-center justify-center">
-					<uni-icons type="bolt-filled" size="30" color="#ffffff"></uni-icons>
+					<uni-icons type="paperplane" size="30" color="#ffffff"></uni-icons>
 				</view>
 				<text class="text-[48rpx] font-semibold text-[#1f2329]">旺铺集</text>
 			</view>
@@ -59,8 +59,9 @@
 				</view>
 
 				<!-- Wx Login -->
-				<view class="h-[96rpx] bg-white border border-[#e5e6eb] rounded-[16rpx] flex items-center justify-center" @tap="wxLogin">
-					<text class="text-[30rpx] text-[#1f2329]">微信一键登录</text>
+				<view class="wx-login-btn" @tap="wxLogin">
+					<uni-icons type="weixin" size="22" color="#07c160"></uni-icons>
+					<text class="text-[30rpx] text-[#1f2329] ml-[16rpx]">微信一键登录</text>
 				</view>
 			</view>
 		</view>
@@ -70,6 +71,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useStore, router } from "@/.cool";
+import { request } from "@/.cool/service";
 
 const { user } = useStore();
 
@@ -128,13 +130,162 @@ function toForget() {
 	uni.navigateTo({ url: "/pages/user/forgot" });
 }
 
-function wxLogin() {
-	uni.showToast({
-		title: "微信登录开发中",
-		icon: "none"
+async function wxLogin() {
+	if (!form.value.agree) {
+		uni.showToast({
+			title: "请阅读并同意用户协议",
+			icon: "none"
+		});
+		return;
+	}
+	
+	// #ifdef APP-PLUS
+	// APP端微信登录
+	uni.login({
+		provider: 'weixin',
+		success: async (loginRes) => {
+			if (loginRes.code) {
+				await handleWxLoginCode(loginRes.code, 'app');
+			} else {
+				uni.showToast({ title: '获取授权失败', icon: 'none' });
+			}
+		},
+		fail: (err) => {
+			console.log('微信登录失败', err);
+			uni.showToast({ title: '微信登录失败', icon: 'none' });
+		}
 	});
+	// #endif
+	
+	// #ifdef H5
+	// H5端微信登录（需要在微信浏览器中）
+	const ua = navigator.userAgent.toLowerCase();
+	const isWechat = ua.indexOf('micromessenger') !== -1;
+	
+	if (isWechat) {
+		// 检查URL中是否有code参数
+		const urlParams = new URLSearchParams(window.location.search);
+		const code = urlParams.get('code');
+		
+		if (code) {
+			// 有code，直接登录
+			await handleWxLoginCode(code, 'h5');
+		} else {
+			// 没有code，从后端获取AppID并跳转微信授权
+			try {
+				const configRes = await request({
+					url: '/user/getWechatConfig',
+					method: 'GET'
+				});
+				const appId = configRes.h5_appid;
+				if (!appId) {
+					uni.showToast({ title: '微信登录未配置', icon: 'none' });
+					return;
+				}
+				const redirectUri = encodeURIComponent(window.location.href);
+				const authUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${appId}&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
+				window.location.href = authUrl;
+			} catch (err) {
+				uni.showToast({ title: '获取配置失败', icon: 'none' });
+			}
+		}
+	} else {
+		uni.showToast({ title: '请在微信中打开', icon: 'none' });
+	}
+	// #endif
+	
+	// #ifdef MP-WEIXIN
+	// 微信小程序登录
+	uni.login({
+		provider: 'weixin',
+		success: async (loginRes) => {
+			if (loginRes.code) {
+				// 获取用户信息
+				uni.getUserProfile({
+					desc: '用于完善用户资料',
+					success: async (userRes) => {
+						await handleMiniLogin(loginRes.code, userRes.userInfo);
+					},
+					fail: async () => {
+						// 用户拒绝授权，仅使用code登录
+						await handleMiniLogin(loginRes.code, null);
+					}
+				});
+			} else {
+				uni.showToast({ title: '获取授权失败', icon: 'none' });
+			}
+		},
+		fail: (err) => {
+			console.log('微信登录失败', err);
+			uni.showToast({ title: '微信登录失败', icon: 'none' });
+		}
+	});
+	// #endif
+}
+
+// 处理APP/H5端微信登录code
+async function handleWxLoginCode(code: string, platform: string) {
+	uni.showLoading({ title: '登录中...' });
+	
+	try {
+		const res = await request({
+			url: '/user/wechatLogin',
+			method: 'POST',
+			data: { code, platform }
+		});
+		
+		uni.hideLoading();
+		
+		// 保存登录信息
+		if (res.token) {
+			uni.setStorageSync('token', res.token);
+			await user.get();
+			router.push({ path: '/pages/index/home', isTab: true });
+		}
+	} catch (err: any) {
+		uni.hideLoading();
+		uni.showToast({ title: err.message || '登录失败', icon: 'none' });
+	}
+}
+
+// 处理微信小程序登录
+async function handleMiniLogin(code: string, userInfo: any) {
+	uni.showLoading({ title: '登录中...' });
+	
+	try {
+		const res = await request({
+			url: '/user/wechatMiniLogin',
+			method: 'POST',
+			data: { 
+				code,
+				userInfo: userInfo || {}
+			}
+		});
+		
+		uni.hideLoading();
+		
+		// 保存登录信息
+		if (res.token) {
+			uni.setStorageSync('token', res.token);
+			await user.get();
+			router.push({ path: '/pages/index/home', isTab: true });
+		}
+	} catch (err: any) {
+		uni.hideLoading();
+		uni.showToast({ title: err.message || '登录失败', icon: 'none' });
+	}
 }
 </script>
 
 <style>
+.wx-login-btn {
+	height: 96rpx;
+	background-color: #ffffff;
+	border: 2rpx solid #e5e6eb;
+	border-radius: 16rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
 </style>
