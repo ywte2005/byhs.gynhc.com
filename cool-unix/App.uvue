@@ -1,10 +1,13 @@
 <script lang="ts">
-import { useStore } from "./.cool";
+import { useStore, setTheme } from "./.cool";
 import { setupRouterGuard } from "./.cool/router/guard";
 
 export default {
 	onLaunch: function () {
 		console.log("App Launch");
+		
+		// 强制设置为浅色模式
+		setTheme("light");
 		
 		// 初始化路由守卫
 		setupRouterGuard();

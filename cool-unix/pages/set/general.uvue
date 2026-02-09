@@ -3,12 +3,6 @@
 		<scroll-view class="flex-1 h-0" scroll-y>
 			<view class="p-[32rpx] flex flex-col gap-[32rpx]">
 				<view class="bg-white rounded-[24rpx] px-[32rpx] flex flex-col">
-					<view class="flex flex-row justify-between items-center h-[112rpx]">
-						<view class="flex flex-row items-center gap-[24rpx]">
-							<text class="text-[30rpx] text-[#1f2329]">{{ t('深色模式') }}</text>
-						</view>
-						<cl-switch :model-value="isDark" @change="onThemeChange"></cl-switch>
-					</view>
 					<view class="h-[2rpx] bg-[#f0f0f0]"></view>
 					<view class="flex flex-row justify-between items-center h-[112rpx]" @tap="setLocale">
 						<view class="flex flex-row items-center gap-[24rpx]">
@@ -36,15 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import { isDark, toggleTheme, useRefs, t } from "@/.cool";
+import { useRefs, t } from "@/.cool";
 import LocaleSet from "@/components/locale-set.uvue";
 import SizeSet from "@/components/size-set.uvue";
 
 const refs = useRefs();
-
-function onThemeChange() {
-	toggleTheme();
-}
 
 function setLocale() {
 	refs.open("localeSet");

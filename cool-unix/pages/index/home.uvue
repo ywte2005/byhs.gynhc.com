@@ -33,7 +33,7 @@
 
 			<!-- 快捷入口 -->
 			<view class="flex flex-row justify-around">
-				<view class="flex flex-col items-center" @tap="goToPage('/pages/merchant/register')">
+				<view class="flex flex-col items-center" @tap="goToMerchantPage">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
 						<uni-icons type="compose" size="22" color="#ffffff"></uni-icons>
 					</view>
@@ -89,6 +89,14 @@
 		<view class="px-[32rpx] pt-[32rpx] flex flex-col gap-[24rpx]">
 			<view class="bg-white rounded-[24rpx] p-[32rpx]">
 				<text class="text-[32rpx] font-semibold text-[#1f2329]">今日数据</text>
+
+				<view class="mt-[16rpx]">
+					<view class="rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#fff8e1]">
+						<text class="text-[40rpx] font-bold text-[#faad14]">¥{{ formatMoney(statistics.today.income) }}</text>
+						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">今日收入</text>
+					</view>
+				</view>
+				
 				<view class="flex flex-row gap-[16rpx] mt-[24rpx]">
 					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#f8f9ff]">
 						<text class="text-[40rpx] font-bold text-[#0052d9]">{{ statistics.today.accepted }}</text>
@@ -97,10 +105,6 @@
 					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#f0f9f4]">
 						<text class="text-[40rpx] font-bold text-[#00b578]">{{ statistics.today.completed }}</text>
 						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">已完成</text>
-					</view>
-					<view class="flex-1 rounded-[16rpx] p-[24rpx] flex flex-col items-center bg-[#fff8e1]">
-						<text class="text-[40rpx] font-bold text-[#faad14]">¥{{ formatMoney(statistics.today.income) }}</text>
-						<text class="text-[24rpx] text-[#646a73] mt-[8rpx]">今日收入</text>
 					</view>
 				</view>
 			</view>
@@ -141,12 +145,16 @@
 import { config } from "@/config";
 import { ref, onMounted } from 'vue';
 import { getStatistics } from '@/services/index';
+import { useStore } from '@/.cool';
 import CustomTabbar from '@/components/custom-tabbar/custom-tabbar.uvue';
 
 // 定义组件选项
 defineOptions({
 	name: 'PageHomeSimple'
 });
+
+// 获取用户 store
+const { user } = useStore();
 
 // 统计数据
 const statistics = ref({
@@ -216,6 +224,41 @@ function goToPage(url: string) {
 	uni.navigateTo({
 		url: url
 	});
+}
+
+// 去进件页面（根据用户信息中的商户状态判断）
+function goToMerchantPage() {
+	const userInfo = user.info.value;
+	
+	if (!userInfo) {
+		// 未登录，跳转登录页
+		uni.navigateTo({ url: '/pages/user/login' });
+		return;
+	}
+	
+	// 根据商户状态跳转
+	if (!userInfo.isMerchant || userInfo.merchantStatus === 'none') {
+		// 未注册商户，跳转到入驻申请页
+		uni.navigateTo({ url: '/pages/merchant/apply' });
+	} else if (userInfo.merchantStatus === 'pending') {
+		// 审核中，跳转审核状态页
+		uni.navigateTo({ url: '/pages/merchant/audit-status' });
+	} else if (userInfo.merchantStatus === 'approved') {
+		// 已通过审核，跳转商户中心
+		uni.navigateTo({ url: '/pages/merchant/index' });
+	} else if (userInfo.merchantStatus === 'rejected') {
+		// 被拒绝，可以重新提交，跳转到入驻申请页
+		uni.navigateTo({ url: '/pages/merchant/apply' });
+	} else if (userInfo.merchantStatus === 'disabled') {
+		// 已禁用，提示用户
+		uni.showToast({
+			title: '您的商户账号已被禁用',
+			icon: 'none'
+		});
+	} else {
+		// 其他状态，跳转到入驻申请页
+		uni.navigateTo({ url: '/pages/merchant/apply' });
+	}
 }
 
 // 扫码功能

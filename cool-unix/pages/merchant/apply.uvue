@@ -247,8 +247,11 @@ const form = ref({
 	bankAccount: '',
 	bankBranch: '',
 	idCardFront: '',
+	idCardFrontUrl: '', // 用于提交的相对路径
 	idCardBack: '',
-	businessLicense: ''
+	idCardBackUrl: '', // 用于提交的相对路径
+	businessLicense: '',
+	businessLicenseUrl: '' // 用于提交的相对路径
 })
 
 const submitting = ref(false)
@@ -263,6 +266,7 @@ const loadBanks = async () => {
 		}
 	} catch (err: any) {
 		console.error('加载银行列表失败', err)
+		// 不显示错误提示，静默失败
 	}
 }
 
@@ -275,30 +279,8 @@ const selectBank = (bank: BankItem) => {
 	showBankPicker.value = false
 }
 
-const checkMerchantStatus = async () => {
-	try {
-		const res = await getMerchantInfo()
-		const merchant = res?.merchant
-		if (merchant && merchant.id) {
-			// 已有商户记录
-			if (merchant.status === 'approved') {
-				// 已通过审核，跳转商户中心
-				uni.redirectTo({ url: '/pages/merchant/index' })
-				return
-			} else if (merchant.status === 'pending') {
-				// 审核中，跳转审核状态页
-				uni.redirectTo({ url: '/pages/merchant/audit-status' })
-				return
-			}
-			// rejected 状态允许重新提交，不跳转
-		}
-	} catch (err: any) {
-		// 未注册商户，继续显示入驻页面
-	}
-}
-
 onMounted(() => {
-	checkMerchantStatus()
+	// 只加载银行列表
 	loadBanks()
 })
 
@@ -329,11 +311,18 @@ const uploadImage = async (field: string) => {
 			const uploadRes = await uploadFile(res.tempFilePaths[0])
 			uni.hideLoading()
 			
-			if (uploadRes && uploadRes.url) {
+			if (uploadRes && uploadRes.url && uploadRes.fullurl) {
 				const newForm = { ...form.value }
-				if (field === 'idCardFront') newForm.idCardFront = uploadRes.url
-				else if (field === 'idCardBack') newForm.idCardBack = uploadRes.url
-				else if (field === 'businessLicense') newForm.businessLicense = uploadRes.url
+				if (field === 'idCardFront') {
+					newForm.idCardFront = uploadRes.fullurl // 用于显示
+					newForm.idCardFrontUrl = uploadRes.url // 用于提交
+				} else if (field === 'idCardBack') {
+					newForm.idCardBack = uploadRes.fullurl // 用于显示
+					newForm.idCardBackUrl = uploadRes.url // 用于提交
+				} else if (field === 'businessLicense') {
+					newForm.businessLicense = uploadRes.fullurl // 用于显示
+					newForm.businessLicenseUrl = uploadRes.url // 用于提交
+				}
 				form.value = newForm
 			}
 		}
@@ -361,9 +350,9 @@ const handleSubmit = async () => {
 			bank_name: form.value.bankName,
 			bank_account: form.value.bankAccount,
 			bank_branch: form.value.bankBranch,
-			id_card_front: form.value.idCardFront,
-			id_card_back: form.value.idCardBack,
-			business_license: form.value.businessLicense
+			id_card_front: form.value.idCardFrontUrl, // 使用相对路径
+			id_card_back: form.value.idCardBackUrl, // 使用相对路径
+			business_license: form.value.businessLicenseUrl // 使用相对路径
 		}
 		
 		await registerMerchant(payload as any)
