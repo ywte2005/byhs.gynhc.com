@@ -171,17 +171,17 @@ export const PRIMARY_COLOR_PALETTES = [
 	{
 		name: "blue",
 		palette: {
-			50: "#eff6ff",
-			100: "#dbeafe",
-			200: "#bfdbfe",
-			300: "#93c5fd",
-			400: "#60a5fa",
-			500: "#3b82f6",
-			600: "#2563eb",
-			700: "#1d4ed8",
-			800: "#1e40af",
-			900: "#1e3a8a",
-			950: "#172554"
+			50: "#eaf2ff",
+			100: "#d6e5ff",
+			200: "#adc9ff",
+			300: "#84adff",
+			400: "#5b91ff",
+			500: "#0052d9",
+			600: "#0046b8",
+			700: "#003a97",
+			800: "#002e76",
+			900: "#002255",
+			950: "#001634"
 		}
 	},
 	{
@@ -452,7 +452,7 @@ export default {
 	theme: {
 		extend: {
 			colors: {
-				...getPrimary("teal"),
+				...getPrimary("blue"),
 				...getSurface("zinc")
 			},
 			fontSize: {
