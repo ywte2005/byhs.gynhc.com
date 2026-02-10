@@ -6,8 +6,9 @@ use think\Model;
 class MerchantAudit extends Model
 {
     protected $name = 'merchant_audit';
-    protected $autoWriteTimestamp = 'createtime';
-    protected $updateTime = false;
+    protected $autoWriteTimestamp = 'int';
+    protected $createTime = 'createtime';
+    protected $updateTime = 'updatetime';
 
     public function merchant()
     {

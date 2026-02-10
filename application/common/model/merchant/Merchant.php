@@ -104,6 +104,7 @@ class Merchant extends Model
         $this->approved_time = time();
         $this->save();
 
+        // 不需要传入 createtime，模型会自动写入
         MerchantAudit::create([
             'merchant_id' => $this->id,
             'admin_id' => $adminId,
@@ -120,6 +121,7 @@ class Merchant extends Model
         $this->reject_reason = $reason;
         $this->save();
 
+        // 不需要传入 createtime，模型会自动写入
         MerchantAudit::create([
             'merchant_id' => $this->id,
             'admin_id' => $adminId,
