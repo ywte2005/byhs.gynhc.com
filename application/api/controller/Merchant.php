@@ -42,6 +42,8 @@ class Merchant extends Api
             'entry_fee' => $merchant->entry_fee,
             'entry_fee_paid' => $merchant->entry_fee_paid,
             'createtime' => date('Y-m-d H:i:s', $merchant->createtime),
+            'approved_time' => $merchant->approved_time ? $merchant->approved_time : null, // 审核通过时间（Unix时间戳）
+            'updatetime' => $merchant->updatetime ? $merchant->updatetime : null, // 更新时间（Unix时间戳）
             // 统计数据
             'total_tasks' => $stats['total_tasks'],
             'completed_tasks' => $stats['completed_tasks'],

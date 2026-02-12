@@ -51,6 +51,10 @@
 							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.auditTime || auditInfo.submitTime }}</text>
 						</view>
 						<view class="flex flex-row justify-between items-center">
+							<text class="text-[26rpx] text-[#646a73]">审核编号</text>
+							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.auditNo }}</text>
+						</view>
+						<view class="flex flex-row justify-between items-center">
 							<text class="text-[26rpx] text-[#646a73]">商户编号</text>
 							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.merchantNo }}</text>
 						</view>
@@ -86,6 +90,10 @@
 							<text class="text-[26rpx] text-[#646a73]">审核时间</text>
 							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.auditTime || auditInfo.submitTime }}</text>
 						</view>
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[26rpx] text-[#646a73]">审核编号</text>
+							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.auditNo }}</text>
+						</view>
 					</view>
 
 					<view class="mt-[32rpx]">
@@ -95,6 +103,41 @@
 						>
 							<text class="text-[32rpx] font-medium text-white">重新提交</text>
 						</view>
+					</view>
+				</view>
+
+				<!-- 账号已禁用 -->
+				<view v-if="auditInfo.status === 'disabled'" class="bg-white rounded-[24rpx] p-[32rpx]">
+					<view class="flex flex-col items-center py-[32rpx]">
+						<view class="w-[120rpx] h-[120rpx] rounded-full bg-[#f5f5f5] flex items-center justify-center mb-[24rpx]">
+							<uni-icons type="locked" size="48" color="#999999"></uni-icons>
+						</view>
+						<text class="text-[36rpx] font-bold text-[#999999] mb-[12rpx]">账号已禁用</text>
+						<text class="text-[28rpx] text-[#646a73]">您的商户账号已被禁用</text>
+					</view>
+
+					<view class="bg-[#f5f5f5] rounded-[16rpx] p-[24rpx] mb-[16rpx]">
+						<text class="text-[26rpx] text-[#646a73] mb-[8rpx] block">禁用原因</text>
+						<text class="text-[28rpx] text-[#999999]">{{ auditInfo.rejectReason || '违反平台规则' }}</text>
+					</view>
+
+					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx] flex flex-col gap-[20rpx]">
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[26rpx] text-[#646a73]">禁用时间</text>
+							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.auditTime || auditInfo.submitTime }}</text>
+						</view>
+						<view class="flex flex-row justify-between items-center">
+							<text class="text-[26rpx] text-[#646a73]">商户编号</text>
+							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.merchantNo }}</text>
+						</view>
+					</view>
+
+					<view class="mt-[32rpx] bg-[#fff9e6] rounded-[16rpx] p-[24rpx]">
+						<view class="flex flex-row items-center gap-[8rpx] mb-[12rpx]">
+							<uni-icons type="info-filled" size="20" color="#ed6a0c"></uni-icons>
+							<text class="text-[26rpx] text-[#ed6a0c] font-bold">申诉说明</text>
+						</view>
+						<text class="text-[24rpx] text-[#646a73]">如对禁用有异议，请提交工单申诉</text>
 					</view>
 				</view>
 
@@ -135,55 +178,55 @@
 					<text class="text-[32rpx] font-bold text-[#1f2329] mb-[24rpx] block">审核进度</text>
 					
 					<view class="flex flex-col">
-						<view class="flex items-start h-[120rpx]">
+						<view class="flex flex-row items-start py-[16rpx]">
 							<view class="flex flex-col items-center mr-[24rpx]">
 								<view class="w-[48rpx] h-[48rpx] rounded-full bg-[#0052d9] flex items-center justify-center z-10">
 									<uni-icons type="checkmarkempty" size="16" color="#ffffff"></uni-icons>
 								</view>
-								<view class="w-[4rpx] h-full bg-[#0052d9] -mt-[8rpx]"></view>
+								<view class="w-[4rpx] flex-1 bg-[#0052d9] mt-[4rpx]"></view>
 							</view>
-							<view class="flex-1">
-								<text class="text-[28rpx] text-[#1f2329] font-bold block">提交申请</text>
-								<text class="text-[24rpx] text-[#999999] mt-[8rpx] block">{{ auditInfo.submitTime }}</text>
+							<view class="flex-1 flex flex-col gap-[6rpx] pt-[2rpx]">
+								<text class="text-[28rpx] text-[#1f2329] font-bold">提交申请</text>
+								<text class="text-[24rpx] text-[#86909c]">{{ auditInfo.submitTime }}</text>
 							</view>
 						</view>
 
-						<view class="flex items-start h-[120rpx]">
+						<view class="flex flex-row items-start py-[16rpx]">
 							<view class="flex flex-col items-center mr-[24rpx]">
 								<view class="w-[48rpx] h-[48rpx] rounded-full bg-[#0052d9] flex items-center justify-center z-10">
-									<uni-icons type="time-filled" size="16" color="#ffffff"></uni-icons>
+									<uni-icons type="locked" size="16" color="#ffffff"></uni-icons>
 								</view>
-								<view class="w-[4rpx] h-full bg-[#e5e5e5] -mt-[8rpx]"></view>
+								<view class="w-[4rpx] flex-1 bg-[#e5e5e5] mt-[4rpx]"></view>
 							</view>
-							<view class="flex-1">
-								<text class="text-[28rpx] text-[#1f2329] font-bold block">资料审核</text>
-								<text class="text-[24rpx] text-[#999999] mt-[8rpx] block">审核中...</text>
+							<view class="flex-1 flex flex-col gap-[6rpx] pt-[2rpx]">
+								<text class="text-[28rpx] text-[#1f2329] font-bold">资料审核</text>
+								<text class="text-[24rpx] text-[#86909c]">审核中，请耐心等待</text>
 							</view>
 						</view>
 
-						<view class="flex items-start">
+						<view class="flex flex-row items-start">
 							<view class="flex flex-col items-center mr-[24rpx]">
 								<view class="w-[48rpx] h-[48rpx] rounded-full bg-[#e5e5e5] flex items-center justify-center z-10">
 									<text class="text-[24rpx] text-[#999999]">3</text>
 								</view>
 							</view>
-							<view class="flex-1">
-								<text class="text-[28rpx] text-[#999999] block">审核完成</text>
-								<text class="text-[24rpx] text-[#999999] mt-[8rpx] block">等待审核</text>
+							<view class="flex-1 flex flex-col gap-[6rpx] pt-[2rpx]">
+								<text class="text-[28rpx] text-[#86909c] font-bold">审核完成</text>
+								<text class="text-[24rpx] text-[#b8c0cc]">完成后将通过短信与站内消息通知</text>
 							</view>
 						</view>
 					</view>
 				</view>
 
 				<!-- 温馨提示 -->
-				<view class="bg-[#fff9e6] rounded-[16rpx] p-[32rpx] flex flex-col gap-[16rpx]">
+				<view v-if="auditInfo.status !== 'disabled'" class="bg-[#fff9e6] rounded-[16rpx] p-[32rpx] flex flex-col gap-[16rpx]">
 					<view class="flex flex-row items-center gap-[8rpx]">
 						<uni-icons type="info-filled" size="20" color="#ed6a0c"></uni-icons>
 						<text class="text-[28rpx] text-[#ed6a0c] font-bold">温馨提示</text>
 					</view>
 					<view class="flex flex-col gap-[8rpx]">
 						<text class="text-[26rpx] text-[#646a73]">• 审核时间：工作日9:00-18:00</text>
-						<text class="text-[26rpx] text-[#646a73]">• 如有疑问，请联系客服：400-123-4567</text>
+						<text class="text-[26rpx] text-[#646a73]">• 如有疑问，请使用工单反馈</text>
 						<text class="text-[26rpx] text-[#646a73]">• 审核结果将通过短信和站内消息通知</text>
 					</view>
 				</view>
@@ -240,12 +283,15 @@ const loadMerchantInfo = async () => {
 		const merchant = res?.merchant
 		
 		if (merchant && merchant.id) {
-			// 审核时间：优先使用 approved_time，否则使用 updatetime
-			const auditTimeValue = merchant.approved_time || (merchant.status !== 'pending' ? merchant.updatetime : 0)
+			// 提交时间：支持数字时间戳或字符串
+			const submitTimeStr = formatDateTimeOrString(merchant.createtime)
+			// 审核时间：优先 approved_time，其次 updatetime，通过/驳回时无则用 createtime 兜底
+			const auditTimeRaw = merchant.approved_time ?? merchant.updatetime ?? (merchant.status !== 'pending' ? merchant.createtime : null)
+			const auditTimeStr = auditTimeRaw != null ? formatDateTimeOrString(auditTimeRaw) : ''
 			auditInfo.value = {
 				status: merchant.status || 'pending',
-				submitTime: formatDateTime(merchant.createtime),
-				auditTime: auditTimeValue ? formatDateTime(auditTimeValue) : '',
+				submitTime: submitTimeStr,
+				auditTime: auditTimeStr,
 				auditNo: `SH${merchant.id}`,
 				merchantNo: merchant.merchant_no || '',
 				rejectReason: merchant.reject_reason || '',
@@ -279,10 +325,11 @@ const loadMerchantInfo = async () => {
 	}
 }
 
-// 格式化日期时间
-const formatDateTime = (timestamp: number): string => {
-	if (!timestamp) return ''
-	const date = new Date(timestamp * 1000)
+// 格式化日期时间：支持数字时间戳（秒）或已格式化的日期字符串
+const formatDateTimeOrString = (value: number | string | null): string => {
+	if (value == null || value === '') return ''
+	if (typeof value === 'string') return value
+	const date = new Date(value * 1000)
 	const y = date.getFullYear()
 	const m = String(date.getMonth() + 1).padStart(2, '0')
 	const d = String(date.getDate()).padStart(2, '0')

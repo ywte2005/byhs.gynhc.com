@@ -22,9 +22,9 @@ export type MerchantInfo = {
 	contact_phone: string
 	entry_fee: number
 	status: MerchantStatus
-	approved_time: number
-	createtime: number
-	updatetime: number
+	approved_time?: number  // 审核通过时间（秒时间戳），后端可能未返回
+	createtime: number | string  // 创建时间，可能为时间戳或已格式化的字符串
+	updatetime?: number  // 更新时间（秒时间戳），后端可能未返回
 }
 
 // 商户注册表单

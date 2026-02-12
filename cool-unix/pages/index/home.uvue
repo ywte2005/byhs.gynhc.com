@@ -35,9 +35,9 @@
 			<view class="flex flex-row justify-around">
 				<view class="flex flex-col items-center" @tap="goToMerchantPage">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
-						<uni-icons type="compose" size="22" color="#ffffff"></uni-icons>
+						<uni-icons type="shop" size="22" color="#ffffff"></uni-icons>
 					</view>
-					<text class="text-[24rpx] text-white mt-[12rpx]">进件</text>
+					<text class="text-[24rpx] text-white mt-[12rpx]">商户中心</text>
 				</view>
 				<view class="flex flex-col items-center" @tap="goToPage('/pages/task/create')">
 					<view class="w-[88rpx] h-[88rpx] bg-white/20 rounded-full flex items-center justify-center">
@@ -240,21 +240,14 @@ function goToMerchantPage() {
 	if (!userInfo.isMerchant || userInfo.merchantStatus === 'none') {
 		// 未注册商户，跳转到入驻申请页
 		uni.navigateTo({ url: '/pages/merchant/apply' });
-	} else if (userInfo.merchantStatus === 'pending') {
+	} else if (['pending', 'rejected', 'disabled'].includes(userInfo.merchantStatus)) {
 		// 审核中，跳转审核状态页
+		// 被拒绝，可以重新提交，跳转到入驻申请页
+		// 已禁用，提示用户
 		uni.navigateTo({ url: '/pages/merchant/audit-status' });
 	} else if (userInfo.merchantStatus === 'approved') {
 		// 已通过审核，跳转商户中心
 		uni.navigateTo({ url: '/pages/merchant/index' });
-	} else if (userInfo.merchantStatus === 'rejected') {
-		// 被拒绝，可以重新提交，跳转到入驻申请页
-		uni.navigateTo({ url: '/pages/merchant/apply' });
-	} else if (userInfo.merchantStatus === 'disabled') {
-		// 已禁用，提示用户
-		uni.showToast({
-			title: '您的商户账号已被禁用',
-			icon: 'none'
-		});
 	} else {
 		// 其他状态，跳转到入驻申请页
 		uni.navigateTo({ url: '/pages/merchant/apply' });
