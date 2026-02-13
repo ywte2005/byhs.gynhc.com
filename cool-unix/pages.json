@@ -419,6 +419,16 @@
 					"meta": {
 						"isAuth": true
 					}
+				},
+				{
+					"path": "pay-entry-fee",
+					"style": {
+						"navigationBarTitleText": "支付入驻费",
+						"navigationStyle": "custom"
+					},
+					"meta": {
+						"isAuth": true
+					}
 				}
 			]
 		},

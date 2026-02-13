@@ -1,0 +1,205 @@
+<template>
+	<cl-page>
+		<view class="flex flex-col bg-[#f5f7fa] min-h-screen">
+			<cl-topbar title="支付入驻费" :show-back="true" background-color="#ffffff"></cl-topbar>
+
+			<view class="flex flex-col px-[32rpx] pt-[32rpx] pb-[160rpx]">
+				<!-- 入驻费卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[48rpx] mb-[24rpx] shadow-sm">
+					<view class="flex flex-col items-center">
+						<text class="text-[28rpx] text-[#86909c] mb-[16rpx]">入驻服务费</text>
+						<text class="text-[80rpx] font-bold text-[#0052d9] mb-[8rpx]">¥{{ entryFee }}</text>
+						<text v-if="isFree" class="text-[24rpx] text-[#00b578]">限时免费入驻</text>
+					</view>
+				</view>
+
+				<!-- 钱包余额卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] shadow-sm">
+					<view class="flex flex-row items-center justify-between mb-[24rpx]">
+						<view class="flex flex-row items-center gap-[12rpx]">
+							<view class="w-[48rpx] h-[48rpx] bg-[#e6f4ff] rounded-full flex items-center justify-center">
+								<uni-icons type="wallet" size="20" color="#0052d9"></uni-icons>
+							</view>
+							<text class="text-[30rpx] text-[#1f2329] font-medium">钱包余额</text>
+						</view>
+						<text class="text-[36rpx] text-[#0052d9] font-bold">¥{{ walletBalance }}</text>
+					</view>
+					
+					<view v-if="!isFree" class="h-[1rpx] bg-[#f0f0f0] mb-[24rpx]"></view>
+					
+					<view v-if="!isFree" class="flex flex-row items-center justify-between">
+						<text class="text-[28rpx] text-[#86909c]">支付后余额</text>
+						<text class="text-[32rpx] font-semibold" :class="isBalanceEnough ? 'text-[#1f2329]' : 'text-[#f5222d]'">¥{{ afterBalance }}</text>
+					</view>
+				</view>
+
+				<!-- 说明卡片 -->
+				<view class="bg-white rounded-[24rpx] p-[32rpx] mb-[24rpx] shadow-sm">
+					<view class="flex flex-row items-center gap-[12rpx] mb-[24rpx]">
+						<view class="w-[48rpx] h-[48rpx] bg-[#fff7e6] rounded-full flex items-center justify-center">
+							<uni-icons type="info" size="20" color="#ff9800"></uni-icons>
+						</view>
+						<text class="text-[30rpx] text-[#1f2329] font-medium">温馨提示</text>
+					</view>
+					<view class="flex flex-col gap-[16rpx] pl-[60rpx]">
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 入驻费用于平台服务和风控保障</text>
+						<text class="text-[26rpx] text-[#646a73] leading-[1.6]">• 支付后即可开始使用商户功能</text>
+						<text v-if="isFree" class="text-[26rpx] text-[#00b578] leading-[1.6]">• 当前为免费入驻，无需支付</text>
+						<text v-else class="text-[26rpx] text-[#646a73] leading-[1.6]">• 支付成功后将自动开通商户权限</text>
+					</view>
+				</view>
+
+				<!-- 余额不足提示 -->
+				<view v-if="!isFree && !isBalanceEnough" class="bg-white rounded-[24rpx] p-[32rpx] shadow-sm">
+					<view class="flex flex-row items-center gap-[12rpx]">
+						<view class="w-[48rpx] h-[48rpx] bg-[#fff1f0] rounded-full flex items-center justify-center">
+							<uni-icons type="closeempty" size="20" color="#f5222d"></uni-icons>
+						</view>
+						<view class="flex-1">
+							<text class="text-[28rpx] text-[#f5222d] font-medium">余额不足</text>
+							<text class="text-[24rpx] text-[#86909c] block mt-[8rpx]">请先充值后再支付入驻费</text>
+						</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<!-- 底部操作栏 -->
+		<cl-footer>
+			<view class="flex flex-row gap-[24rpx] px-[32rpx]">
+				<view 
+					v-if="isFree"
+					class="flex-1 h-[96rpx] bg-[#00b578] rounded-[16rpx] flex items-center justify-center shadow-lg"
+					@tap="handlePay"
+				>
+					<text class="text-[32rpx] text-white font-medium">免费开通</text>
+				</view>
+				<view 
+					v-else-if="!isBalanceEnough"
+					class="flex-1 h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center shadow-lg"
+					@tap="toRecharge"
+				>
+					<text class="text-[32rpx] text-white font-medium">去充值</text>
+				</view>
+				<view 
+					v-else
+					class="flex-1 h-[96rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center shadow-lg"
+					@tap="handlePay"
+				>
+					<text class="text-[32rpx] text-white font-medium">确认支付</text>
+				</view>
+			</view>
+		</cl-footer>
+	</cl-page>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { merchantService } from '@/services/merchant';
+import { useStore } from '@/.cool';
+
+const { user } = useStore();
+
+const entryFee = ref('0.00');
+const walletBalance = ref('0.00');
+const loading = ref(false);
+
+const isFree = computed(() => {
+	return parseFloat(entryFee.value) === 0;
+});
+
+const isBalanceEnough = computed(() => {
+	return parseFloat(walletBalance.value) >= parseFloat(entryFee.value);
+});
+
+const afterBalance = computed(() => {
+	const after = parseFloat(walletBalance.value) - parseFloat(entryFee.value);
+	return after >= 0 ? after.toFixed(2) : '0.00';
+});
+
+onMounted(() => {
+	loadData();
+});
+
+async function loadData() {
+	try {
+		const res = await merchantService.getAuditStatus();
+		entryFee.value = res.entry_fee || '0.00';
+		walletBalance.value = res.wallet_balance || '0.00';
+	} catch (err: any) {
+		uni.showToast({
+			title: err.message || '加载失败',
+			icon: 'none'
+		});
+	}
+}
+
+function toRecharge() {
+	uni.navigateTo({
+		url: '/pages/wallet/recharge'
+	});
+}
+
+async function handlePay() {
+	if (loading.value) return;
+	
+	const title = isFree.value ? '确认开通' : '确认支付';
+	const content = isFree.value 
+		? '确认免费开通商户功能？' 
+		: `确认支付入驻费 ¥${entryFee.value}？`;
+	
+	uni.showModal({
+		title: title,
+		content: content,
+		success: async (res) => {
+			if (res.confirm) {
+				await doPay();
+			}
+		}
+	});
+}
+
+async function doPay() {
+	loading.value = true;
+	uni.showLoading({
+		title: isFree.value ? '开通中...' : '支付中...'
+	});
+
+	try {
+		await merchantService.payEntryFee();
+		uni.hideLoading();
+		
+		// 刷新用户信息
+		await user.get();
+		
+		uni.showToast({
+			title: isFree.value ? '开通成功' : '支付成功',
+			icon: 'success',
+			duration: 2000
+		});
+		
+		setTimeout(() => {
+			uni.reLaunch({
+				url: '/pages/index/home'
+			});
+		}, 2000);
+	} catch (err: any) {
+		uni.hideLoading();
+		loading.value = false;
+		uni.showToast({
+			title: err.message || (isFree.value ? '开通失败' : '支付失败'),
+			icon: 'none'
+		});
+	}
+}
+</script>
+
+<style scoped>
+.shadow-sm {
+	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.shadow-lg {
+	box-shadow: 0 4rpx 16rpx rgba(0, 82, 217, 0.2);
+}
+</style>

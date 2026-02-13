@@ -46,10 +46,11 @@ class User extends Api
         $certification = \app\common\model\Certification::getByUserId($user->id);
         $isVerified = $certification && $certification->status === 'approved';
         
-        // 检查是否为商户
+        // 检查是否为商户（只要审核通过就算商户，不管是否支付入驻费）
         $merchant = \app\common\model\merchant\Merchant::getByUserId($user->id);
         $isMerchant = $merchant && $merchant->status === 'approved';
         $merchantStatus = $merchant ? $merchant->status : 'none';
+        $entryFeePaid = $merchant ? $merchant->entry_fee_paid : 0;
         
         // 安全获取用户扩展字段（可能不存在于数据库中）
         $userData = $user->getData();
@@ -71,6 +72,7 @@ class User extends Api
             'isVerified' => $isVerified,
             'isMerchant' => $isMerchant,
             'merchantStatus' => $merchantStatus,
+            'entryFeePaid' => $entryFeePaid,
             'createTime' => date('Y-m-d H:i:s', $user->createtime),
             'updateTime' => date('Y-m-d H:i:s', $user->updatetime)
         ];

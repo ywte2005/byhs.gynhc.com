@@ -229,6 +229,7 @@ function goToPage(url: string) {
 // 去进件页面（根据用户信息中的商户状态判断）
 function goToMerchantPage() {
 	const userInfo = user.info.value;
+	console.log('用户信息:', userInfo);
 	
 	if (!userInfo) {
 		// 未登录，跳转登录页
@@ -237,17 +238,32 @@ function goToMerchantPage() {
 	}
 	
 	// 根据商户状态跳转
-	if (!userInfo.isMerchant || userInfo.merchantStatus === 'none') {
+	const status = userInfo.merchantStatus;
+	console.log('商户状态:', status, '入驻费已支付:', userInfo.entryFeePaid);
+	
+	if (!status || status === 'none') {
 		// 未注册商户，跳转到入驻申请页
 		uni.navigateTo({ url: '/pages/merchant/apply' });
-	} else if (['pending', 'rejected', 'disabled'].includes(userInfo.merchantStatus)) {
+	} else if (status === 'pending') {
 		// 审核中，跳转审核状态页
-		// 被拒绝，可以重新提交，跳转到入驻申请页
-		// 已禁用，提示用户
 		uni.navigateTo({ url: '/pages/merchant/audit-status' });
-	} else if (userInfo.merchantStatus === 'approved') {
-		// 已通过审核，跳转商户中心
-		uni.navigateTo({ url: '/pages/merchant/index' });
+	} else if (status === 'rejected') {
+		// 被拒绝，跳转审核状态页（可以重新提交）
+		uni.navigateTo({ url: '/pages/merchant/audit-status' });
+	} else if (status === 'disabled') {
+		// 已禁用，跳转审核状态页
+		uni.navigateTo({ url: '/pages/merchant/audit-status' });
+	} else if (status === 'approved') {
+		// 已通过审核，检查是否已支付入驻费
+		if (userInfo.entryFeePaid) {
+			// 已支付，跳转商户中心
+			console.log('跳转到商户中心');
+			uni.navigateTo({ url: '/pages/merchant/index' });
+		} else {
+			// 未支付，跳转支付页面
+			console.log('跳转到支付页面');
+			uni.navigateTo({ url: '/pages/merchant/pay-entry-fee' });
+		}
 	} else {
 		// 其他状态，跳转到入驻申请页
 		uni.navigateTo({ url: '/pages/merchant/apply' });

@@ -25,7 +25,11 @@ export function registerMerchant(form: MerchantRegisterForm): Promise<{ merchant
 // 获取审核状态
 export function getAuditStatus(): Promise<{
 	status: string;
-	audit_list: MerchantAudit[];
+	message: string;
+	reject_reason: string;
+	entry_fee: string;
+	entry_fee_paid: number;
+	wallet_balance: string;
 }> {
 	return request({
 		url: "/merchant/auditStatus",
@@ -34,7 +38,7 @@ export function getAuditStatus(): Promise<{
 }
 
 // 支付入驻费
-export function payEntryFee(payMethod: string = "balance"): Promise<{ order_no: string }> {
+export function payEntryFee(payMethod: string = "balance"): Promise<void> {
 	return request({
 		url: "/merchant/payEntryFee",
 		method: "POST",
@@ -162,3 +166,18 @@ export function resubmitApplication(id: number, form: ApplicationForm): Promise<
 		data: { id, ...form }
 	});
 }
+
+// 导出服务对象
+export const merchantService = {
+	getMerchantInfo,
+	registerMerchant,
+	getAuditStatus,
+	payEntryFee,
+	getBanks,
+	updateMerchantInfo,
+	getMerchantCategories,
+	getApplicationList,
+	getApplicationDetail,
+	submitApplication,
+	resubmitApplication
+};

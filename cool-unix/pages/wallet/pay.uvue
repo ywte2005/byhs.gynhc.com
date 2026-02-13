@@ -75,19 +75,46 @@ const platform = ref("");
 const payStatus = ref("waiting"); // waiting, paying, success, fail
 
 onMounted(() => {
+	// 获取页面参数
 	const pages = getCurrentPages();
 	const currentPage = pages[pages.length - 1];
-	const options = currentPage.$page?.options || {};
+	
+	// 尝试多种方式获取参数
+	let options: any = {};
+	
+	// 方式1: 通过 $page.options 获取
+	if (currentPage.$page && currentPage.$page.options) {
+		options = currentPage.$page.options;
+	}
+	// 方式2: 通过 options 属性获取
+	else if (currentPage.options) {
+		options = currentPage.options;
+	}
+	
+	console.log("页面参数:", options);
 	
 	orderNo.value = options.order_no || "";
 	amount.value = options.amount || "0";
+	
+	if (!orderNo.value) {
+		uni.showToast({
+			title: "订单号不存在",
+			icon: "none"
+		});
+		setTimeout(() => {
+			uni.navigateBack();
+		}, 1500);
+		return;
+	}
 	
 	// 获取当前平台
 	const systemInfo = uni.getSystemInfoSync();
 	platform.value = systemInfo.uniPlatform || "";
 	
 	// 自动发起支付
-	handlePay();
+	setTimeout(() => {
+		handlePay();
+	}, 500);
 });
 
 const copyOrderNo = () => {

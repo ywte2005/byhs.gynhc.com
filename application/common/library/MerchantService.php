@@ -14,6 +14,15 @@ class MerchantService
 
     public static function register($userId, $data)
     {
+        // 从配置表获取入驻费
+        $merchantType = $data['type'] ?? 'personal';
+        $entryFee = \app\common\model\merchant\EntryFeeConfig::getEntryFee($merchantType);
+        
+        // 确保入驻费被正确设置
+        if (!isset($data['entry_fee']) || $data['entry_fee'] === null) {
+            $data['entry_fee'] = $entryFee;
+        }
+        
         return Merchant::register($userId, $data);
     }
 
@@ -75,6 +84,16 @@ class MerchantService
             }
             
             $entryFee = $merchant->entry_fee;
+            
+            // 如果入驻费为0，直接标记为已支付
+            if (bccomp($entryFee, '0', 2) == 0) {
+                $merchant->entry_fee_paid = 1;
+                $merchant->save();
+                Db::commit();
+                return $merchant;
+            }
+            
+            // 入驻费大于0，从钱包扣款
             if (bccomp($entryFee, '0', 2) > 0) {
                 WalletService::changeBalance($userId, '-' . $entryFee, 'entry_fee', $merchant->id, '商户入驻费');
             }
@@ -82,6 +101,7 @@ class MerchantService
             $merchant->entry_fee_paid = 1;
             $merchant->save();
             
+            // 触发推广奖励
             if (bccomp($entryFee, '0', 2) > 0) {
                 RewardService::triggerReward('merchant_entry', $userId, $entryFee, $merchant->id);
             }
@@ -101,6 +121,16 @@ class MerchantService
             return ['status' => 'none', 'message' => '未提交申请'];
         }
         
+        // 如果商户记录中的 entry_fee 为 0，尝试从配置表重新获取
+        if ($merchant->entry_fee == 0 || $merchant->entry_fee === '0.00') {
+            $entryFee = \app\common\model\merchant\EntryFeeConfig::getEntryFee($merchant->type);
+            // 更新商户记录中的入驻费
+            if ($entryFee && $entryFee != '0.00') {
+                $merchant->entry_fee = $entryFee;
+                $merchant->save();
+            }
+        }
+        
         $statusMap = [
             'pending' => '审核中',
             'approved' => $merchant->entry_fee_paid ? '已入驻' : '待支付入驻费',
@@ -108,12 +138,16 @@ class MerchantService
             'disabled' => '已禁用'
         ];
         
+        // 获取用户钱包余额
+        $wallet = \app\common\model\wallet\Wallet::getByUserId($userId);
+        
         return [
             'status' => $merchant->status,
             'message' => $statusMap[$merchant->status] ?? '',
             'reject_reason' => $merchant->reject_reason,
             'entry_fee' => $merchant->entry_fee,
-            'entry_fee_paid' => $merchant->entry_fee_paid
+            'entry_fee_paid' => $merchant->entry_fee_paid,
+            'wallet_balance' => $wallet ? $wallet->balance : '0.00'
         ];
     }
 

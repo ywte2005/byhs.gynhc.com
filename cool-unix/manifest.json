@@ -7,7 +7,7 @@
 	"uni-app-x": {},
 	"quickapp": {},
 	"mp-weixin": {
-		"darkmode": true,
+		"darkmode": false,
 		"appid": "wxfc84dc92f28575c8",
 		"setting": {
 			"urlCheck": false,
@@ -41,7 +41,7 @@
 		}
 	},
 	"web": {
-		"darkmode": true,
+		"darkmode": false,
 		"router": {
 			"mode": "",
 			"base": "./"

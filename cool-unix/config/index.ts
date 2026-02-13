@@ -13,7 +13,7 @@ export const config = {
 	name: "旺铺集",
 	locale: "zh-tw",
 	website: "https://byhs.gynhc.com",
-	showDarkButton: isMp() ? false : true,
+	showDarkButton: false,
 	isCustomTabBar: true,
 	backTop: true,
 	wx: {

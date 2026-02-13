@@ -43,6 +43,7 @@
 						</view>
 						<text class="text-[36rpx] font-bold text-[#00b578] mb-[12rpx]">审核通过</text>
 						<text class="text-[28rpx] text-[#646a73]">恭喜您，入驻申请已通过审核</text>
+						<text v-if="!auditInfo.entryFeePaid" class="text-[24rpx] text-[#ff9800] mt-[8rpx]">请支付入驻费后开始使用</text>
 					</view>
 
 					<view class="bg-[#f5f7fa] rounded-[16rpx] p-[24rpx] flex flex-col gap-[20rpx]">
@@ -58,14 +59,26 @@
 							<text class="text-[26rpx] text-[#646a73]">商户编号</text>
 							<text class="text-[26rpx] text-[#1f2329]">{{ auditInfo.merchantNo }}</text>
 						</view>
+						<view v-if="!auditInfo.entryFeePaid" class="flex flex-row justify-between items-center">
+							<text class="text-[26rpx] text-[#646a73]">入驻费</text>
+							<text class="text-[26rpx] text-[#ff9800] font-bold">¥{{ auditInfo.entryFee }}</text>
+						</view>
 					</view>
 
 					<view class="mt-[32rpx]">
 						<view 
+							v-if="auditInfo.entryFeePaid"
 							@tap="goToMerchant"
 							class="w-full h-[88rpx] bg-[#0052d9] rounded-[16rpx] flex items-center justify-center"
 						>
 							<text class="text-[32rpx] font-medium text-white">进入商户中心</text>
+						</view>
+						<view 
+							v-else
+							@tap="goToPayEntryFee"
+							class="w-full h-[88rpx] bg-[#ff9800] rounded-[16rpx] flex items-center justify-center"
+						>
+							<text class="text-[32rpx] font-medium text-white">支付入驻费</text>
 						</view>
 					</view>
 				</view>
@@ -272,7 +285,9 @@ const auditInfo = ref({
 	address: '',
 	category: '',
 	bankName: '',
-	bankAccount: ''
+	bankAccount: '',
+	entryFee: '0.00',
+	entryFeePaid: 0
 })
 
 // 加载商户信息
@@ -302,7 +317,9 @@ const loadMerchantInfo = async () => {
 				address: merchant.contact_address || '',
 				category: merchant.category || '',
 				bankName: merchant.bank_name || '',
-				bankAccount: merchant.bank_account || ''
+				bankAccount: merchant.bank_account || '',
+				entryFee: merchant.entry_fee || '0.00',
+				entryFeePaid: merchant.entry_fee_paid || 0
 			}
 		} else {
 			// 未找到商户信息，跳转到入驻页面
@@ -342,6 +359,13 @@ const formatDateTimeOrString = (value: number | string | null): string => {
 const goToMerchant = () => {
 	uni.redirectTo({
 		url: '/pages/merchant/index'
+	})
+}
+
+// 去支付入驻费
+const goToPayEntryFee = () => {
+	uni.navigateTo({
+		url: '/pages/merchant/pay-entry-fee'
 	})
 }
 

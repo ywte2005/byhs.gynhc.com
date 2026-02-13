@@ -62,6 +62,7 @@ class Merchant extends Model
                 $merchant->bank_name = $data['bank_name'] ?? '';
                 $merchant->bank_account = $data['bank_account'] ?? '';
                 $merchant->bank_branch = $data['bank_branch'] ?? '';
+                $merchant->entry_fee = $data['entry_fee'] ?? 0;
                 $merchant->status = 'pending';
                 $merchant->reject_reason = '';
                 $merchant->save();

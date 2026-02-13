@@ -28,7 +28,7 @@ export function getWalletLogs(params: {
 }
 
 // 充值
-export function recharge(form: RechargeForm): Promise<{ order_no: string; pay_info: any }> {
+export function recharge(form: RechargeForm): Promise<{ recharge: any }> {
 	return request({
 		url: "/wallet/recharge",
 		method: "POST",
